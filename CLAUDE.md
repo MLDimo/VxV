@@ -56,6 +56,27 @@ La table complète est dans le README. Règles :
 - `ReloadUI()` est protégée sur Forever : demander au joueur de taper `/reload`.
 - Ordre de chargement dans le `.toc` : `Core` (outillage générique) puis modules métier puis `Bootstrap.lua` en dernier.
 
+## Zéro erreur Lua chez les joueurs (exigence, à outiller en P4)
+
+Chaque famille d'erreur courante des addons doit être couverte par un test automatique avant toute version publiée.
+
+| Erreur courante | Prévention | Test automatique |
+| --- | --- | --- |
+| API absente du client (anciennes globales, fonctions renommées) | Couche Compat uniquement | Toute globale lue par l'addon figure dans la liste des API mesurées sur Forever (inventaire de la sonde, base d'API capturée) |
+| Événement inconnu ou interdit (`COMBAT_LOG_EVENT_UNFILTERED`) | Liste fermée d'événements | Chaque événement enregistré figure dans la liste validée en P0 |
+| SavedVariables lues trop tôt ou absentes au premier lancement | Lecture dans `ADDON_LOADED`, valeurs par défaut, migrations versionnées | Scénarios « première installation » et « mise à jour depuis la version précédente » |
+| Valeurs secrètes comparées ou concaténées | `Util.Safe` / `Util.IsSecret` | Simulateur renvoyant des noms secrets en combat |
+| Action protégée en combat (cadres sécurisés, bouton minimap, `ReloadUI`) | Aucune action protégée, report après le combat | Simulateur avec `InCombatLockdown()` vrai, aucun `ADDON_ACTION_BLOCKED` |
+| Bouton minimap : base de position nulle, forme de minimap inconnue, doublon avec le compartiment d'addons | Création après `ADDON_LOADED`, valeurs par défaut | Scénario sans données sauvegardées, et minimap sans `GetMinimapShape` |
+| Objet pas encore en cache (`C_Item.GetItemInfo` renvoie nil) | Attente de `ITEM_DATA_LOAD_RESULT` | Simulateur renvoyant nil au premier appel |
+| Globales qui fuient ou écrasent une autre addon, remplacement de fonctions Blizzard (taint) | Espace de noms privé, `hooksecurefunc` seulement | Analyse statique des globales (luacheck ou équivalent) en CI |
+| Syntaxe hors Lua 5.1 | — | Analyse de syntaxe Lua 5.1 (déjà en place pour les packs) |
+| Messages addon trop longs, trop rapides ou pendant un boss | File d'envoi de VXV_Core | Tests de la file : découpage 255 octets, débit, verrou de rencontre |
+| Troncature d'un nom accentué au milieu d'un caractère | Découpage UTF-8 sûr | Tests sur des noms comme « Ðéjà Vu » |
+| Ordre de chargement des bundles | Dépendances déclarées dans les `.toc` | Chargement des bundles dans l'ordre du client par le simulateur |
+
+Outil : le simulateur de client de `tools/probe-harness` (fengari + API simulée) deviendra le banc de test de l'addon, enrichi de ces scénarios.
+
 ## Conventions TypeScript (site, bot, compagnon, outils)
 
 - TypeScript strict (`tsconfig.base.json` : `strict`, `noUncheckedIndexedAccess`), modules ES, Node 22 ou plus.
