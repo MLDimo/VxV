@@ -8,7 +8,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
-- **P1 Fondations** : en cours. 1.1, 1.2 et 1.3 faites.
+- **P1 Fondations** : en cours. 1.1 à 1.4 faites.
 - P2 à P11 : pas commencées.
 
 ## Structure du dépôt
