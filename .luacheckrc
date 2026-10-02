@@ -1,0 +1,23 @@
+-- Lua lint configuration for every addon bundle (WoW runs Lua 5.1).
+std = "lua51"
+max_line_length = 120
+exclude_files = { "**/External/*.lua" }
+
+-- Globals each addon is allowed to define.
+globals = {
+    "VXV_ProbeDB",
+    "VXV_ProbeInbox",
+    "SLASH_VXVPROBE1",
+    "SlashCmdList",
+    "UISpecialFrames",
+}
+
+-- WoW client API used in read-only mode.
+read_globals = {
+    "C_ChatInfo", "C_GuildInfo", "C_PartyInfo", "C_Timer",
+    "ChatFontNormal", "CreateFrame", "Enum", "GetBuildInfo", "GetGuildRosterInfo",
+    "GetInstanceInfo", "GetLootSlotLink", "GetNumGuildMembers", "GetNumLootItems",
+    "GetTime", "GiveMasterLoot", "InCombatLockdown", "IsInGroup", "IsInGuild", "IsInInstance", "IsInRaid",
+    "LE_PARTY_CATEGORY_INSTANCE", "UIParent", "UnitFullName", "UnitName",
+    "date", "hooksecurefunc", "issecretvalue", "strsplit", "time",
+}

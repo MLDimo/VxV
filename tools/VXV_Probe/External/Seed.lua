@@ -1,0 +1,1 @@
+-- Empty by default. Test 0.6: replace with a copy of WTF/Account/<COMPTE>/SavedVariables/VXV_Probe.lua.
