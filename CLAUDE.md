@@ -7,8 +7,18 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 ## État d'avancement
 
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
-  Toute modification de la sonde passe `npm test` dans `tools/probe-harness` avant `tools/install-probe.sh`.
-- P1 à P11 : pas commencées. Ne pas créer leurs dossiers avant leur phase (YAGNI).
+  Toute modification de la sonde passe `npm test` avant `tools/install-probe.sh`.
+- **P1 Fondations** : en cours. 1.1 (structure du dépôt) faite, garde-fou de tests (hook + CI) prêt.
+- P2 à P11 : pas commencées.
+
+## Structure du dépôt
+
+Dépôt unique, espaces de travail npm (`apps/*`, `packages/*`, outils), Node 22 ou plus.
+La table complète est dans le README. Règles :
+
+- Un dossier n'est créé qu'à la phase qui le remplit (YAGNI).
+- `apps/` contient les applications déployées, `packages/` le code TypeScript partagé, `addon/` les bundles Lua.
+- Paquets nommés `@vxv/<nom>`. Une application ne dépend jamais d'une autre application, seulement de `packages/`.
 
 ## Principes non négociables
 
@@ -20,6 +30,14 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
 - Nouveau raid = nouvelles données (JSON), jamais de modification de code.
 - Membres : zéro effort. Installer l'addon suffit.
+
+## Workflow git et tests
+
+- Commits au format Conventional Commits : `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`.
+- Une branche par étape (`feat/p1-4-raid-data`), fusionnée dans `main` par pull request une fois la CI verte.
+- `npm test` lance tous les tests. Le hook `pre-push` (activé par `npm install`) bloque tout push si un test échoue. Ne jamais le contourner (`--no-verify` interdit).
+- À chaque push, décider explicitement si la nouveauté mérite un test unitaire, et le justifier dans la pull request.
+- Tout déploiement (addon, Vercel) dépend du job de tests de la CI.
 
 ## Conventions Lua (addons)
 

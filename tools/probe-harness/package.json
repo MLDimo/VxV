@@ -1,5 +1,5 @@
 {
-  "name": "vxv-probe-harness",
+  "name": "@vxv/probe-harness",
   "private": true,
   "description": "Runs VXV_Probe outside the game: syntax check and mocked scenario (test), journal export (export).",
   "scripts": {
