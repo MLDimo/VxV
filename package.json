@@ -9,6 +9,7 @@
     "apps/*",
     "packages/*",
     "supabase",
+    "tools/data-generator",
     "tools/probe-harness"
   ],
   "scripts": {
@@ -19,7 +20,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm test",
-    "export:probe": "npm run export -w @vxv/probe-harness --"
+    "export:probe": "npm run export -w @vxv/probe-harness --",
+    "generate": "npm run generate -w @vxv/data-generator"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

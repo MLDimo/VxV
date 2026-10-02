@@ -8,7 +8,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
-- **P1 Fondations** : en cours. 1.1 à 1.4 faites.
+- **P1 Fondations** : en cours. 1.1 à 1.5 faites.
 - P2 à P11 : pas commencées.
 
 ## Structure du dépôt
@@ -45,6 +45,7 @@ La table complète est dans le README. Règles :
 - Lua 5.1, `## Interface: 16001` (WoW Forever, API Mainline 12.x avec restrictions Midnight).
 - Code, noms et commentaires en anglais. Textes affichés aux joueurs en français.
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
+- Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Dépendance vers `VXV_Core` et chargement à la demande : ajoutés en P4 quand le socle existera.
 - Un fichier = une responsabilité. Module exposé via `ns.<Module>` ; dépendances lues en tête de fichier (`local Util = ns.Util`).
 - Nommage : `PascalCase` pour modules et fonctions publiques, `camelCase` pour locales, `UPPER_SNAKE_CASE` pour constantes. Pas de nombre magique.
 - Indentation 4 espaces, 120 caractères max, lint via `.luacheckrc`.
