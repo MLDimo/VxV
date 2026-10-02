@@ -9,7 +9,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
-- **P2 API et site** : en cours. Socle Next.js en ligne (projet Vercel `vxv-web`), connexion Discord et droits (2.1, 2.2).
+- **P2 API et site** : en cours. Socle Next.js en ligne (projet Vercel `vxv-web`), connexion Discord et droits (2.1, 2.2), journal et import de la liste de guilde (2.3, 2.4).
 - P3 à P11 : pas commencées.
 
 ## Structure du dépôt
@@ -47,6 +47,7 @@ La table complète est dans le README. Règles :
 - Lua 5.1, `## Interface: 16001` (WoW Forever, API Mainline 12.x avec restrictions Midnight).
 - Code, noms et commentaires en anglais. Textes affichés aux joueurs en français.
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
+- Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Dépendance vers `VXV_Core` et chargement à la demande : ajoutés en P4 quand le socle existera.
 - Un fichier = une responsabilité. Module exposé via `ns.<Module>` ; dépendances lues en tête de fichier (`local Util = ns.Util`).
 - Nommage : `PascalCase` pour modules et fonctions publiques, `camelCase` pour locales, `UPPER_SNAKE_CASE` pour constantes. Pas de nombre magique.

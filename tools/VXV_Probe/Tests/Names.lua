@@ -6,6 +6,8 @@ local log = ns.Log.For("names")
 
 local ROSTER_TIMEOUT = 10
 local PRINTED_MEMBERS = 5
+-- Website import format (P2.4): header line, then "Prénom;Nom;CLASSE" per character.
+local ROSTER_HEADER = "VXV-ROSTER-1"
 
 local savedDb
 local rosterRequested = false
@@ -100,6 +102,25 @@ local function requestRoster()
     end)
 end
 
+local function exportRoster()
+    local roster = savedDb.roster
+    if not roster then
+        log.Fail("aucune liste lue : taper d'abord /vxvtest names roster")
+        return
+    end
+    local lines = { ROSTER_HEADER }
+    for _, member in ipairs(roster.members) do
+        local firstName, lastName = member.name:match("^(%S+)%s+(.+)$")
+        if firstName then
+            lines[#lines + 1] = firstName .. ";" .. lastName .. ";" .. member.class
+        else
+            log.Fail("nom sans nom de famille ignoré :", member.name)
+        end
+    end
+    ns.Report.Show(table.concat(lines, "\n"))
+    log.Info("export :", #lines - 1, "personnages, à copier avec Ctrl+C dans la page Liste de guilde du site")
+end
+
 ns.Registry.Register({
     id = "names",
     description = "format des noms (prénom + nom) et lecture de la liste de guilde",
@@ -110,5 +131,6 @@ ns.Registry.Register({
     commands = {
         { name = "unit", usage = "[unité, ex. target]", run = checkUnit },
         { name = "roster", run = requestRoster },
+        { name = "export", run = exportRoster },
     },
 })

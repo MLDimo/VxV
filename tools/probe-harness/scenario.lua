@@ -4,7 +4,7 @@ Fire("PLAYER_LOGIN")
 local run = SlashCmdList.VXVPROBE
 for _, command in ipairs({
     "", "api run", "comm ping", "comm size RAID", "comm burst GUILD 5", "loot status",
-    "names unit", "names roster", "api find masterloot", "api find", "files payload 1", "files check", "log 3", "report", "verbose", "clear",
+    "names unit", "names roster", "names export", "api find masterloot", "api find", "files payload 1", "files check", "log 3", "report", "verbose", "clear",
 }) do
     run(command)
 end

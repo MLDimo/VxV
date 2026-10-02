@@ -1,5 +1,5 @@
 import "server-only";
-import type { Member, SignedIn } from "@vxv/server";
+import { canManageRaids, type Member, type SignedIn } from "@vxv/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -36,6 +36,15 @@ export async function requireMember(): Promise<Member> {
   const member = await getCurrentMember();
   if (member === undefined) {
     redirect("/connexion");
+  }
+  return member;
+}
+
+/** For officer pages: other members go back to the home page. */
+export async function requireOfficer(): Promise<Member> {
+  const member = await requireMember();
+  if (!canManageRaids(member.role)) {
+    redirect("/");
   }
   return member;
 }
