@@ -1,0 +1,16 @@
+{
+  "name": "@vxv/database",
+  "private": true,
+  "description": "Supabase schema and migrations, tested against an in-process PostgreSQL (PGlite).",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8"
+  },
+  "exports": {
+    "./testing": "./src/testing.ts"
+  }
+}

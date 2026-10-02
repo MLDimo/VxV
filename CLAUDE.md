@@ -8,7 +8,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
-- **P1 Fondations** : en cours. 1.1 et 1.2 faites.
+- **P1 Fondations** : en cours. 1.1, 1.2 et 1.3 faites.
 - P2 à P11 : pas commencées.
 
 ## Structure du dépôt
@@ -62,6 +62,13 @@ La table complète est dans le README. Règles :
 - ESLint (`typescript-eslint` strict) et Prettier (largeur 120) sur tout le code. Markdown et Lua ne sont pas formatés par Prettier.
 - `npm run check` = formatage, lint, typage, tests. C'est la commande de la CI et du hook `pre-push`.
 - Tests unitaires avec Vitest, à côté du code testé (`*.test.ts`).
+
+## Base de données (Supabase)
+
+- Migrations SQL dans `supabase/migrations`, nommées `AAAAMMJJHHMMSS_sujet.sql`, jamais modifiées une fois fusionnées : toute évolution passe par une nouvelle migration.
+- Toutes les tables activent la sécurité par ligne sans politique : seul le serveur (rôle service) lit et écrit.
+- Le journal (`journal`) est en ajout seul, motif obligatoire, garanti par des triggers.
+- Les règles d'intégrité vivent dans le schéma (contraintes) et sont couvertes par des tests PGlite (`supabase/tests`). `@vxv/database/testing` fournit une base migrée pour les tests des autres paquets.
 
 ## Contraintes WoW Forever (mesurées en P0, build 70170)
 
