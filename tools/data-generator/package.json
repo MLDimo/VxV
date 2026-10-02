@@ -1,0 +1,20 @@
+{
+  "name": "@vxv/data-generator",
+  "private": true,
+  "description": "Generates the addon data packs and the database sync script from data/raids.",
+  "type": "module",
+  "scripts": {
+    "generate": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vxv/raid-data": "*"
+  },
+  "devDependencies": {
+    "@types/luaparse": "^0.2.13",
+    "@vxv/database": "*",
+    "fengari": "^0.1.5",
+    "luaparse": "^0.3.1"
+  }
+}

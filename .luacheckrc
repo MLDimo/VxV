@@ -7,6 +7,7 @@ exclude_files = { "**/External/*.lua" }
 globals = {
     "VXV_ProbeDB",
     "VXV_ProbeInbox",
+    "VXV_RaidData",
     "SLASH_VXVPROBE1",
     "SlashCmdList",
     "UISpecialFrames",
