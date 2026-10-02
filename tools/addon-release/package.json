@@ -1,0 +1,11 @@
+{
+  "name": "@vxv/addon-release",
+  "private": true,
+  "description": "Assembles the addon folders of a release and stamps their version.",
+  "type": "module",
+  "scripts": {
+    "prepare-release": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  }
+}

@@ -1,0 +1,85 @@
+name: Release addon
+
+# A tag such as v1.2.0 publishes the addon. A manual run builds the archive only (dry run).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  tests:
+    uses: ./.github/workflows/ci.yml
+
+  package:
+    name: Package and publish
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      CF_PROJECT_ID: ${{ vars.CF_PROJECT_ID }}
+      CF_GAME_VERSION_IDS: ${{ vars.CF_GAME_VERSION_IDS }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      WAGO_PROJECT_ID: ${{ vars.WAGO_PROJECT_ID }}
+      WAGO_PATCH_FIELD: ${{ vars.WAGO_PATCH_FIELD }}
+      WAGO_PATCH: ${{ vars.WAGO_PATCH }}
+      RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      - name: Version
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then tag="$GITHUB_REF_NAME"; else tag="0.0.0-dev.$GITHUB_RUN_NUMBER"; fi
+          version="${tag#v}"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "ARCHIVE=dist/release/VXV-$version.zip" >> "$GITHUB_ENV"
+          if [[ "$version" == *-* ]]; then echo "STABILITY=beta" >> "$GITHUB_ENV"; else echo "STABILITY=release" >> "$GITHUB_ENV"; fi
+
+      - name: Build the archive
+        run: |
+          npm run generate
+          npm run release:prepare -- "$VERSION"
+          (cd dist/release/VXV && zip -qr "../VXV-$VERSION.zip" .)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VXV-${{ env.VERSION }}
+          path: ${{ env.ARCHIVE }}
+
+      - name: GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          if [[ "$STABILITY" == "beta" ]]; then prerelease="--prerelease"; fi
+          gh release create "$GITHUB_REF_NAME" "$ARCHIVE" --title "VXV $VERSION" --generate-notes $prerelease
+
+      # Enabled once the CurseForge project exists: secret CF_API_KEY,
+      # variables CF_PROJECT_ID and CF_GAME_VERSION_IDS (comma-separated CurseForge game version ids).
+      - name: CurseForge
+        if: github.ref_type == 'tag' && env.CF_API_KEY != '' && env.CF_PROJECT_ID != ''
+        run: |
+          metadata=$(jq -n --arg name "VXV $VERSION" --arg changelog "$RELEASE_URL" --arg type "$STABILITY" \
+            --argjson versions "[$CF_GAME_VERSION_IDS]" \
+            '{displayName: $name, changelog: $changelog, changelogType: "text", releaseType: $type, gameVersions: $versions}')
+          curl --fail-with-body -sS -H "X-Api-Token: $CF_API_KEY" -F "metadata=$metadata" -F "file=@$ARCHIVE" \
+            "https://wow.curseforge.com/api/projects/$CF_PROJECT_ID/upload-file"
+
+      # Enabled once the Wago project exists: secret WAGO_API_TOKEN, variables WAGO_PROJECT_ID,
+      # WAGO_PATCH_FIELD (e.g. supported_retail_patch) and WAGO_PATCH (game patch, e.g. 1.60.1).
+      - name: Wago
+        if: github.ref_type == 'tag' && env.WAGO_API_TOKEN != '' && env.WAGO_PROJECT_ID != ''
+        run: |
+          stability="stable"
+          if [[ "$STABILITY" == "beta" ]]; then stability="beta"; fi
+          curl --fail-with-body -sS -H "Authorization: Bearer $WAGO_API_TOKEN" -H "Accept: application/json" \
+            -F "label=$VERSION" -F "stability=$stability" -F "changelog=$RELEASE_URL" \
+            -F "$WAGO_PATCH_FIELD=$WAGO_PATCH" -F "file=@$ARCHIVE" \
+            "https://addons.wago.io/api/projects/$WAGO_PROJECT_ID/version"
