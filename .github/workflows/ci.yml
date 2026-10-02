@@ -45,6 +45,16 @@ jobs:
           cache: npm
       - if: steps.token.outputs.present == 'true'
         run: npm ci
+      - name: Check the website configuration
+        if: steps.token.outputs.present == 'true'
+        run: |
+          required=$(grep -oE '^[A-Z_]+=' apps/web/.env.example | tr -d '=' | sort)
+          defined=$(npx "$VERCEL_CLI" env ls "$VERCEL_ENVIRONMENT" --format json --token="$VERCEL_TOKEN" | jq -r '.envs[].key' | sort -u)
+          missing=$(comm -23 <(echo "$required") <(echo "$defined"))
+          if [[ -n "$missing" ]]; then
+            echo "::error::Missing $VERCEL_ENVIRONMENT variables in Vercel: $(echo $missing)"
+            exit 1
+          fi
       - name: Build and deploy
         if: steps.token.outputs.present == 'true'
         run: |
