@@ -44,3 +44,5 @@ La clé « service role » de Supabase ne quitte jamais le serveur : ni l'addon 
    ```
 
 4. Lancer le flux « Deploy database » sur `main`, une fois avec la cible « test », puis une fois avec « production ».
+
+Après un changement de mot de passe d'une base, remplacer son secret avec `gh secret set` et attendre quelques minutes avant de déployer : le point d'accès « Session pooler » de Supabase met un peu de temps à accepter le nouveau mot de passe (erreur `password authentication failed` en attendant).
