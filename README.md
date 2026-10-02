@@ -31,7 +31,8 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `tools/probe-harness` | Fait tourner la sonde hors du jeu (`npm test`) et exporte son journal (`npm run export:probe -- <fichier>`) | P0 |
 | `tools/install-probe.sh` | Copie la sonde dans le dossier AddOns d'un client | P0 |
 | `tools/write-inbox.sh` | Simule le compagnon pour le test fichiers | P0 |
-| `docs/` | Rapports et protocoles par phase | toutes |
+| `tools/deploy-database.sh` | Déploie la base : migrations puis données de raid ([environnements](docs/environnements.md)) | P1.7 |
+| `docs/` | Rapports, protocoles et notices | toutes |
 
 ## Publier l'addon
 

@@ -18,3 +18,31 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  database-deploy:
+    name: Database deploy
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.119.0
+      - name: Deploy to a throwaway database
+        run: tools/deploy-database.sh "$DATABASE_URL"
+      - name: Deploy again (must be a no-op)
+        run: tools/deploy-database.sh "$DATABASE_URL"

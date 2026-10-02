@@ -8,7 +8,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
-- **P1 Fondations** : en cours. 1.1 à 1.6 faites (envoi CurseForge et Wago à activer quand les projets existeront).
+- **P1 Fondations** : 1.1 à 1.7 faites. Restent à faire par le propriétaire : créer les projets Supabase et renseigner leurs secrets (`docs/environnements.md`). CurseForge et Wago à activer quand les projets existeront.
 - P2 à P11 : pas commencées.
 
 ## Structure du dépôt
@@ -91,6 +91,7 @@ Outil : le simulateur de client de `tools/probe-harness` (fengari + API simulée
 - Migrations SQL dans `supabase/migrations`, nommées `AAAAMMJJHHMMSS_sujet.sql`, jamais modifiées une fois fusionnées : toute évolution passe par une nouvelle migration.
 - Toutes les tables activent la sécurité par ligne sans politique : seul le serveur (rôle service) lit et écrit.
 - Le journal (`journal`) est en ajout seul, motif obligatoire, garanti par des triggers.
+- Déploiement : `tools/deploy-database.sh` (migrations puis données de raid), automatique vers test, manuel vers production. Voir `docs/environnements.md`.
 - Les règles d'intégrité vivent dans le schéma (contraintes) et sont couvertes par des tests PGlite (`supabase/tests`). `@vxv/database/testing` fournit une base migrée pour les tests des autres paquets.
 
 ## Contraintes WoW Forever (mesurées en P0, build 70170)
