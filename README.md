@@ -11,6 +11,7 @@ npm i -g npm@11  # npm 11 ou plus (npm 10 plante sur la résolution des dépenda
 npm install      # installe tous les espaces de travail
 npm run check    # formatage, lint, typage, tests ; aussi lancé avant chaque push
 npm run generate # packs de l'addon et SQL des raids, depuis data/raids
+npm run dev -w @vxv/web   # site en local sur http://localhost:3000
 ```
 
 ## Structure
@@ -19,7 +20,7 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 
 | Dossier | Contenu | Phase |
 | --- | --- | --- |
-| `apps/web` | Site et API (Vercel) | P2 |
+| `apps/web` | Site et API, Next.js 16 sur Vercel ([vxv-web.vercel.app](https://vxv-web.vercel.app)) | P2 |
 | `apps/bot` | Bot Discord en interactions HTTP (Vercel) | P3 |
 | `apps/companion` | Application de bureau compagnon | P7 |
 | `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`…) | P1.5 puis P4 |

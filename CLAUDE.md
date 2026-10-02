@@ -9,7 +9,8 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
-- P2 à P11 : pas commencées.
+- **P2 API et site** : en cours. Socle Next.js en ligne (projet Vercel `vxv-web`).
+- P3 à P11 : pas commencées.
 
 ## Structure du dépôt
 
@@ -38,7 +39,7 @@ La table complète est dans le README. Règles :
 - `npm run check` lance toutes les vérifications. Le hook `pre-push` (activé par `npm install`) bloque tout push si l'une échoue. Ne jamais le contourner (`--no-verify` interdit).
 - `main` n'est pas protégée côté GitHub (offre gratuite, dépôt privé) : la discipline repose sur le hook et la CI.
 - À chaque push, décider explicitement si la nouveauté mérite un test unitaire, et le justifier dans la pull request.
-- Tout déploiement (addon, Vercel) dépend du job de tests de la CI (`ci.yml`, réutilisé par les flux de publication).
+- Flux GitHub : `tests.yml` (réutilisable, seul endroit où sont définis les tests) ; `ci.yml` (demandes de fusion et `main` : tests puis déploiement du site) ; `deploy-database.yml` ; `release-addon.yml`. Tout déploiement dépend de `tests.yml`.
 - Versions de l'addon : étiquettes `v<semver>` sur `main`. Aucune étiquette avant que l'addon soit utilisable (P4 au plus tôt).
 
 ## Conventions Lua (addons)

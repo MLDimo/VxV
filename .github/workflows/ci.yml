@@ -1,48 +1,54 @@
 name: CI
 
+# Pull requests: tests, then a preview of the website. Main: tests, then the website in production.
 on:
   push:
     branches: [main]
   pull_request:
-  workflow_call:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run check
+  tests:
+    uses: ./.github/workflows/tests.yml
 
-  database-deploy:
-    name: Database deploy
+  deploy-web:
+    name: Deploy website (${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }})
+    needs: tests
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+      VERCEL_CLI: vercel@55.0.0
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check the Vercel token
+        id: token
+        run: |
+          if [[ -z "$VERCEL_TOKEN" ]]; then
+            echo "::notice::No VERCEL_TOKEN secret yet: website deployment skipped."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.token.outputs.present == 'true'
+        uses: actions/checkout@v4
+      - if: steps.token.outputs.present == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - uses: supabase/setup-cli@v1
-        with:
-          version: 2.119.0
-      - name: Deploy to a throwaway database
-        run: tools/deploy-database.sh "$DATABASE_URL"
-      - name: Deploy again (must be a no-op)
-        run: tools/deploy-database.sh "$DATABASE_URL"
+      - if: steps.token.outputs.present == 'true'
+        run: npm ci
+      - name: Build and deploy
+        if: steps.token.outputs.present == 'true'
+        run: |
+          production=""
+          if [[ "$VERCEL_ENVIRONMENT" == "production" ]]; then production="--prod"; fi
+          npx "$VERCEL_CLI" pull --yes --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+          npx "$VERCEL_CLI" build $production --token="$VERCEL_TOKEN"
+          url=$(npx "$VERCEL_CLI" deploy --prebuilt $production --token="$VERCEL_TOKEN")
+          echo "Website ($VERCEL_ENVIRONMENT): $url" >> "$GITHUB_STEP_SUMMARY"
