@@ -24,6 +24,8 @@ jobs:
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
       VERCEL_CLI: vercel@55.0.0
+      # Stable address of the latest preview, registered as a Discord OAuth redirect.
+      TEST_ALIAS: vxv-web-test.vercel.app
     steps:
       - name: Check the Vercel token
         id: token
@@ -51,4 +53,8 @@ jobs:
           npx "$VERCEL_CLI" pull --yes --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
           npx "$VERCEL_CLI" build $production --token="$VERCEL_TOKEN"
           url=$(npx "$VERCEL_CLI" deploy --prebuilt $production --token="$VERCEL_TOKEN")
+          if [[ "$VERCEL_ENVIRONMENT" == "preview" ]]; then
+            npx "$VERCEL_CLI" alias set "$url" "$TEST_ALIAS" --token="$VERCEL_TOKEN"
+            url="https://$TEST_ALIAS"
+          fi
           echo "Website ($VERCEL_ENVIRONMENT): $url" >> "$GITHUB_STEP_SUMMARY"

@@ -24,6 +24,30 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.strict,
   ...nextRules,
+  // Clean architecture: the domain depends on nothing, use cases only know ports (tests wire real adapters).
+  {
+    files: ["packages/server/src/domain/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["**/application/**", "**/infrastructure/**", "pg"], message: "The domain depends on nothing." },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["packages/server/src/application/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { patterns: [{ group: ["**/infrastructure/**", "pg"], message: "Use cases only depend on ports." }] },
+      ],
+    },
+  },
   {
     files: ["tools/probe-harness/**/*.js"],
     languageOptions: { sourceType: "commonjs", globals: globals.node },

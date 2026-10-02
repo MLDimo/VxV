@@ -1,0 +1,22 @@
+{
+  "name": "@vxv/server",
+  "private": true,
+  "description": "Server core shared by the website and the Discord bot: domain rules, use cases, PostgreSQL adapters.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite-socket": "^0.2.11",
+    "@types/pg": "^8.23.1",
+    "@vxv/database": "*"
+  }
+}
