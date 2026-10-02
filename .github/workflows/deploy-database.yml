@@ -42,7 +42,7 @@ jobs:
       - run: npm ci
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.119.0
       - name: Deploy
         run: |
           url="$TEST_DATABASE_URL"

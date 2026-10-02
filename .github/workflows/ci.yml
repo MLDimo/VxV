@@ -41,7 +41,7 @@ jobs:
       - run: npm ci
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.119.0
       - name: Deploy to a throwaway database
         run: tools/deploy-database.sh "$DATABASE_URL"
       - name: Deploy again (must be a no-op)
