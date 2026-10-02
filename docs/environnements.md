@@ -12,7 +12,7 @@ La base de test ne contient jamais de vraies données de membres : son mot de pa
 
 Chaque déploiement de la base passe d'abord tous les tests. Il applique les migrations en attente, puis aligne les données de raid (`tools/deploy-database.sh`). La CI rejoue ce déploiement deux fois sur un PostgreSQL jetable à chaque demande de fusion.
 
-Site : projet Vercel `vxv-web` (racine `apps/web`), en ligne sur https://vxv-web.vercel.app. Le flux CI le déploie après les tests : une prévisualisation pour chaque demande de fusion, la production à chaque fusion dans `main`. Le déploiement automatique de Vercel depuis git est désactivé (`apps/web/vercel.json`) pour que rien ne parte sans les tests. Les prévisualisations sont protégées par Vercel (connexion à l'équipe requise). Preview utilise la base `vxv-test`, Production la base `vxv-prod`.
+Site : projet Vercel `vxv-web` (racine `apps/web`), en ligne sur https://vxv-web.vercel.app. La dernière prévisualisation est toujours accessible sur https://vxv-web-test.vercel.app. Le flux CI le déploie après les tests : une prévisualisation pour chaque demande de fusion, la production à chaque fusion dans `main`. Le déploiement automatique de Vercel depuis git est désactivé (`apps/web/vercel.json`) pour que rien ne parte sans les tests. Les prévisualisations sont protégées par Vercel (connexion à l'équipe requise). Preview utilise la base `vxv-test`, Production la base `vxv-prod`.
 
 ## Où vivent les secrets
 
@@ -24,7 +24,7 @@ Aucun secret dans le dépôt : `.env` et ses variantes sont ignorés par git.
 | `SUPABASE_PRODUCTION_DB_URL` | Secrets du dépôt GitHub | Flux « Deploy database », cible production |
 | `CF_API_KEY`, `WAGO_API_TOKEN` | Secrets du dépôt GitHub | Flux « Release addon » |
 | `VERCEL_TOKEN` | Secrets du dépôt GitHub (`VERCEL_ORG_ID` et `VERCEL_PROJECT_ID` en variables) | Flux « CI », déploiement du site |
-| Clés Supabase et Discord des applications | Variables d'environnement Vercel, par environnement | Site et bot (P2, P3) |
+| Variables du site (liste dans `apps/web/.env.example`) | Variables d'environnement Vercel, par environnement | Site |
 
 La clé « service role » de Supabase ne quitte jamais le serveur : ni l'addon ni le compagnon ne la reçoivent.
 
@@ -52,3 +52,21 @@ Après un changement de mot de passe d'une base, remplacer son secret avec `gh s
 
 1. Créer un jeton sur vercel.com, Account Settings, Tokens, limité à l'équipe « MLDimo's projects ».
 2. L'enregistrer dans GitHub sans l'afficher : `gh secret set VERCEL_TOKEN`.
+
+## Mise en place de la connexion Discord (une fois)
+
+1. Sur discord.com/developers, créer une application « VXV ».
+2. Page OAuth2, ajouter ces adresses de redirection :
+   - `https://vxv-web.vercel.app/connexion/discord/retour` (production)
+   - `https://vxv-web-test.vercel.app/connexion/discord/retour` (test)
+   - `http://localhost:3000/connexion/discord/retour` (développement local)
+3. Identifiants non secrets (les copier en mode développeur Discord, clic droit puis « Copier l'identifiant ») : identifiant client de l'application, serveur de la guilde, rôles membre, trésorier, officier et GM. Ils vont dans Vercel pour Preview et Production.
+4. Secrets, à saisir sans les afficher :
+
+   ```sh
+   vercel env add DISCORD_CLIENT_SECRET production
+   vercel env add DISCORD_CLIENT_SECRET preview
+   vercel env add DATABASE_URL production   # Transaction pooler (port 6543) de vxv-prod
+   ```
+
+`DATABASE_URL` de Preview pointe déjà sur `vxv-test` (Transaction pooler, port 6543, adapté aux fonctions serverless).
