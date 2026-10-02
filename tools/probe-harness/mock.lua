@@ -1,4 +1,9 @@
 -- Minimal WoW client mock: just enough API for VXV_Probe to load and run every command.
+-- Chat output is silenced unless VXV_VERBOSE=1, to keep test logs readable.
+if os.getenv("VXV_VERBOSE") ~= "1" then
+    print = function() end
+end
+
 local frames = {}
 
 function Fire(event, ...)

@@ -1,13 +1,16 @@
 // Loads an addon into a fengari Lua VM on top of the mocked WoW API.
-const fs = require('fs');
-const path = require('path');
-const { lua, lauxlib, lualib, to_luastring } = require('fengari');
+const fs = require("fs");
+const path = require("path");
+const { lua, lauxlib, lualib, to_luastring } = require("fengari");
 
 function readTocFiles(addonDir) {
   const addonName = path.basename(addonDir);
-  return fs.readFileSync(path.join(addonDir, `${addonName}.toc`), 'utf8')
-    .split('\n').map((line) => line.trim()).filter((line) => line && !line.startsWith('#'))
-    .map((file) => file.replace(/\\/g, '/'));
+  return fs
+    .readFileSync(path.join(addonDir, `${addonName}.toc`), "utf8")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"))
+    .map((file) => file.replace(/\\/g, "/"));
 }
 
 function loadProbe(addonDir) {
@@ -40,9 +43,9 @@ function loadProbe(addonDir) {
     return value;
   }
 
-  runChunk(fs.readFileSync(path.join(__dirname, 'mock.lua'), 'utf8'), 'mock');
+  runChunk(fs.readFileSync(path.join(__dirname, "mock.lua"), "utf8"), "mock");
   for (const file of readTocFiles(addonDir)) {
-    runChunk(fs.readFileSync(path.join(addonDir, file), 'utf8'), file, true);
+    runChunk(fs.readFileSync(path.join(addonDir, file), "utf8"), file, true);
   }
   return { runChunk, getGlobalString };
 }
