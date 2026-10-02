@@ -7,6 +7,7 @@ Conventions et état d'avancement : voir [CLAUDE.md](CLAUDE.md).
 
 ```sh
 nvm use          # Node 22 ou plus
+npm i -g npm@11  # npm 11 ou plus (npm 10 plante sur la résolution des dépendances de Vitest 4)
 npm install      # installe tous les espaces de travail
 npm run check    # formatage, lint, typage, tests ; aussi lancé avant chaque push
 npm run generate # packs de l'addon et SQL des raids, depuis data/raids

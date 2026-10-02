@@ -7,7 +7,7 @@
     "export": "node export.js ../VXV_Probe"
   },
   "devDependencies": {
-    "fengari": "0.1.4",
+    "fengari": "^0.1.5",
     "luaparse": "0.3.1"
   }
 }
