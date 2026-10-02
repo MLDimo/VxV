@@ -1,6 +1,6 @@
 #!/bin/sh
 # Project rule: nothing is pushed unless every test passes. Never bypass with --no-verify.
-if ! npm test; then
+if ! npm run check; then
   echo "Push annulé : au moins un test échoue." >&2
   exit 1
 fi

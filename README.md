@@ -8,7 +8,7 @@ Conventions et état d'avancement : voir [CLAUDE.md](CLAUDE.md).
 ```sh
 nvm use          # Node 22 ou plus
 npm install      # installe tous les espaces de travail
-npm test         # tous les tests ; aussi lancé avant chaque push
+npm run check    # formatage, lint, typage, tests ; aussi lancé avant chaque push
 ```
 
 ## Structure

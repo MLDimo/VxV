@@ -10,4 +10,4 @@
 
 - [ ] DRY, SRP, KISS, YAGNI et SOLID respectés
 - [ ] Aucun dossier créé avant la phase qui le remplit
-- [ ] `npm test` passe en local
+- [ ] `npm run check` passe en local

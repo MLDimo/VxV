@@ -1,0 +1,7 @@
+# Prose and generated or game files are not formatted.
+*.md
+*.lua
+dist/
+docs/
+tools/VXV_Probe/
+package-lock.json
