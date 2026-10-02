@@ -1,4 +1,6 @@
 import { createAuth } from "./application/auth.ts";
+import { createJournal } from "./application/journal.ts";
+import { createRoster } from "./application/roster.ts";
 import type { Clock } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
@@ -15,6 +17,8 @@ export function createApplication({ sql, discordRoles, clock = () => new Date() 
   const unitOfWork = createUnitOfWork(sql);
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
+    roster: createRoster({ unitOfWork }),
+    journal: createJournal({ unitOfWork }),
   };
 }
 

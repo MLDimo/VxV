@@ -1,4 +1,7 @@
+import type { Character } from "../domain/characters.ts";
+import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
+import type { RosterEntry } from "../domain/roster.ts";
 
 export interface DiscordIdentity {
   discordId: string;
@@ -25,9 +28,24 @@ export interface SessionRepository {
   delete(sessionId: string): Promise<void>;
 }
 
+export interface CharacterRepository {
+  listAll(): Promise<Character[]>;
+  add(entries: readonly RosterEntry[]): Promise<void>;
+  changeClass(characterId: string, characterClass: string): Promise<void>;
+  setInGuild(characterIds: readonly string[], inGuild: boolean): Promise<void>;
+}
+
+export interface JournalRepository {
+  record(entry: NewJournalEntry): Promise<void>;
+  /** Latest entries first. */
+  listRecent(limit: number): Promise<JournalEntry[]>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
+  characters: CharacterRepository;
+  journal: JournalRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */
