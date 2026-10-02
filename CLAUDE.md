@@ -8,7 +8,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
-- **P1 Fondations** : 1.1 à 1.7 faites. Restent à faire par le propriétaire : créer les projets Supabase et renseigner leurs secrets (`docs/environnements.md`). CurseForge et Wago à activer quand les projets existeront.
+- **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
 - P2 à P11 : pas commencées.
 
 ## Structure du dépôt
