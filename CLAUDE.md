@@ -13,7 +13,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 
 ## Structure du dépôt
 
-Dépôt unique, espaces de travail npm (`apps/*`, `packages/*`, outils), Node 22 ou plus.
+Dépôt unique, espaces de travail npm (`apps/*`, `packages/*`, outils), Node 22 ou plus, npm 11 ou plus (npm 10.9 plante sur les dépendances optionnelles de Vitest 4). `npm audit` doit rester à zéro vulnérabilité.
 La table complète est dans le README. Règles :
 
 - Un dossier n'est créé qu'à la phase qui le remplit (YAGNI).
