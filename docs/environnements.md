@@ -12,7 +12,7 @@ La base de test ne contient jamais de vraies données de membres : son mot de pa
 
 Chaque déploiement de la base passe d'abord tous les tests. Il applique les migrations en attente, puis aligne les données de raid (`tools/deploy-database.sh`). La CI rejoue ce déploiement deux fois sur un PostgreSQL jetable à chaque demande de fusion.
 
-Vercel fournit déjà les environnements Preview et Production pour chaque projet. Les projets Vercel seront créés avec leur application (site en P2, bot en P3), reliés à `vxv-test` pour Preview et à `vxv-prod` pour Production.
+Site : projet Vercel `vxv-web` (racine `apps/web`), en ligne sur https://vxv-web.vercel.app. Le flux CI le déploie après les tests : une prévisualisation pour chaque demande de fusion, la production à chaque fusion dans `main`. Le déploiement automatique de Vercel depuis git est désactivé (`apps/web/vercel.json`) pour que rien ne parte sans les tests. Les prévisualisations sont protégées par Vercel (connexion à l'équipe requise). Preview utilise la base `vxv-test`, Production la base `vxv-prod`.
 
 ## Où vivent les secrets
 
@@ -23,6 +23,7 @@ Aucun secret dans le dépôt : `.env` et ses variantes sont ignorés par git.
 | `SUPABASE_TEST_DB_URL` | Secrets du dépôt GitHub | Flux « Deploy database », cible test |
 | `SUPABASE_PRODUCTION_DB_URL` | Secrets du dépôt GitHub | Flux « Deploy database », cible production |
 | `CF_API_KEY`, `WAGO_API_TOKEN` | Secrets du dépôt GitHub | Flux « Release addon » |
+| `VERCEL_TOKEN` | Secrets du dépôt GitHub (`VERCEL_ORG_ID` et `VERCEL_PROJECT_ID` en variables) | Flux « CI », déploiement du site |
 | Clés Supabase et Discord des applications | Variables d'environnement Vercel, par environnement | Site et bot (P2, P3) |
 
 La clé « service role » de Supabase ne quitte jamais le serveur : ni l'addon ni le compagnon ne la reçoivent.
@@ -46,3 +47,8 @@ La clé « service role » de Supabase ne quitte jamais le serveur : ni l'addon 
 4. Lancer le flux « Deploy database » sur `main`, une fois avec la cible « test », puis une fois avec « production ».
 
 Après un changement de mot de passe d'une base, remplacer son secret avec `gh secret set` et attendre quelques minutes avant de déployer : le point d'accès « Session pooler » de Supabase met un peu de temps à accepter le nouveau mot de passe (erreur `password authentication failed` en attendant).
+
+## Mise en place du déploiement du site (une fois)
+
+1. Créer un jeton sur vercel.com, Account Settings, Tokens, limité à l'équipe « MLDimo's projects ».
+2. L'enregistrer dans GitHub sans l'afficher : `gh secret set VERCEL_TOKEN`.

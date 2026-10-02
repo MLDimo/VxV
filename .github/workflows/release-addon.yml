@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/tests.yml
 
   package:
     name: Package and publish

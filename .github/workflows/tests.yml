@@ -1,9 +1,7 @@
-name: CI
+name: Tests
 
+# Reusable: every workflow that ships something runs these jobs first.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_call:
 
 jobs:
