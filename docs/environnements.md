@@ -33,7 +33,7 @@ La clé « service role » de Supabase ne quitte jamais le serveur : ni l'addon 
    - **Automatically expose new tables : décoché.** Aucune table n'est accessible aux rôles publics ; les droits du serveur seront accordés explicitement par migration en P2.
    - **Enable automatic RLS : décoché.** La sécurité par ligne est déjà activée par les migrations et vérifiée par les tests ; un mécanisme propre à l'hébergement ferait diverger les environnements.
    - Mot de passe de la base : le conserver dans un gestionnaire de mots de passe, il entre dans la chaîne de connexion.
-2. Pour chaque projet : bouton « Connect », onglet « Session pooler ». Copier la chaîne de connexion, qui fonctionne en IPv4 comme l'exige GitHub, et y remplacer `[YOUR-PASSWORD]` par le mot de passe de la base.
+2. Pour chaque projet : bouton « Connect », tuile « Direct — Connection string », méthode « Session pooler » (la connexion directe passe par IPv6, que GitHub ne joint pas). Copier la chaîne au format URI et y remplacer `[YOUR-PASSWORD]`, crochets compris, par le mot de passe de la base. Un mot de passe contenant `@ # / : ? %` casse la chaîne : en régénérer un sans symbole (Project Settings, Database).
 3. Enregistrer chaque chaîne dans GitHub sans l'afficher :
 
    ```sh
