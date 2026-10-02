@@ -8,6 +8,8 @@
 | Mise à jour de la base | Automatique à chaque fusion dans `main` qui touche `supabase/migrations` ou `data/raids` | Manuelle uniquement : flux « Deploy database », cible « production », depuis `main` |
 | Site et bot (Vercel, à partir de P2) | Déploiements « Preview » des branches | Déploiement « Production » de `main` |
 
+La base de test ne contient jamais de vraies données de membres : son mot de passe est considéré comme exposé. Elle ne reçoit que des données de raid et des données fictives.
+
 Chaque déploiement de la base passe d'abord tous les tests. Il applique les migrations en attente, puis aligne les données de raid (`tools/deploy-database.sh`). La CI rejoue ce déploiement deux fois sur un PostgreSQL jetable à chaque demande de fusion.
 
 Vercel fournit déjà les environnements Preview et Production pour chaque projet. Les projets Vercel seront créés avec leur application (site en P2, bot en P3), reliés à `vxv-test` pour Preview et à `vxv-prod` pour Production.
