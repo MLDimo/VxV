@@ -9,7 +9,8 @@ Conventions et état d'avancement : voir [CLAUDE.md](CLAUDE.md).
 nvm use          # Node 22 ou plus
 npm i -g npm@11  # npm 11 ou plus (npm 10 plante sur la résolution des dépendances de Vitest 4)
 npm install      # installe tous les espaces de travail
-npm run check    # formatage, lint, typage, tests ; aussi lancé avant chaque push
+npx playwright install chromium   # navigateur des tests de bout en bout, une fois
+npm run check    # formatage, lint, typage, tests unitaires et de bout en bout ; aussi lancé avant chaque push
 npm run generate # packs de l'addon et SQL des raids, depuis data/raids
 npm run dev -w @vxv/web   # site en local sur http://localhost:3000
 ```

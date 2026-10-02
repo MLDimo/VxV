@@ -14,6 +14,11 @@ async function migrate(): Promise<PGlite> {
   return database;
 }
 
+/** A new migrated PGlite instance, for tools that need the concrete class (e.g. a PostgreSQL socket server). */
+export function createMigratedPGlite(): Promise<PGlite> {
+  return migrate();
+}
+
 /**
  * Returns a fresh in-process PostgreSQL database with every migration applied in file-name order.
  * Migrations run once per test process; each call clones that template, which is much faster.

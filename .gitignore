@@ -9,3 +9,5 @@ dist/
 next-env.d.ts
 .vercel/
 *.tsbuildinfo
+playwright-report/
+test-results/

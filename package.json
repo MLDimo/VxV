@@ -21,11 +21,12 @@
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run test:e2e",
     "export:probe": "npm run export -w @vxv/probe-harness --",
     "generate": "npm run generate -w @vxv/data-generator",
     "release:prepare": "npm run prepare-release -w @vxv/addon-release --",
-    "build": "npm run build --workspaces --if-present"
+    "build": "npm run build --workspaces --if-present",
+    "test:e2e": "npm run test:e2e -w @vxv/web"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
