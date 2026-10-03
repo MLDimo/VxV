@@ -11,7 +11,14 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`. Le harnais vérifie aussi la longueur des lignes et les globales autorisées de `.luacheckrc`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
 - **P2 API et site** : terminée et validée en conditions réelles le 3 octobre (connexion Discord, liste de guilde, personnage, événement, inscription, SR, journal sur https://vxv-web.vercel.app). Inclut les décisions du 3 octobre : rôles cumulables, tout membre du serveur Discord est membre de la guilde, mode d'attribution des loots et historique complet, présence au raid et SR+ ; 25 tests de bout en bout.
-- P3 à P15 : pas commencées.
+- **P3 Bot Discord** : code terminé (3.1 à 3.7, 31 tests de bout en bout), en production. Le bot fonctionne en interactions HTTP, hébergé par le site (`/api/discord/interactions`, code dans `packages/bot`) :
+  - `/vxv_main` et `/vxv_reroll` (salon de liaison) ;
+  - pseudo « Pseudo - [Prénom Nom] » et rôle de classe ;
+  - `/vxv_raid` (officiers) et message d'inscription dans le salon des raids ;
+  - inscription par bouton, synchronisée avec le site dans les deux sens ;
+  - rappel quotidien (tâche Vercel, 8 h UTC).
+  Validation en attente : essai réel sur le serveur avec un second compte.
+- P4 à P15 : pas commencées.
 
 ## Structure du dépôt
 
