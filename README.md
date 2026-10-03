@@ -21,8 +21,9 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 
 | Dossier | Contenu | Phase |
 | --- | --- | --- |
-| `apps/web` | Site et API, Next.js 16 sur Vercel ([vxv-web.vercel.app](https://vxv-web.vercel.app)) | P2 |
-| `apps/bot` | Bot Discord en interactions HTTP (Vercel) | P3 |
+| `apps/web` | Site et API, Next.js 16 sur Vercel ([vxv-web.vercel.app](https://vxv-web.vercel.app)), et adresse des interactions du bot (`/api/discord/interactions`) | P2, P3 |
+| `packages/server` | Cœur du serveur partagé par le site et le bot : domaine, cas d'usage, PostgreSQL (`@vxv/server`) | P2 |
+| `packages/bot` | Bot Discord en interactions HTTP : signature, commandes, boutons (`@vxv/bot`), hébergé par `apps/web` | P3 |
 | `apps/companion` | Application de bureau compagnon | P7 |
 | `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`…) | P1.5 puis P4 |
 | `packages/raid-data` | Schéma et validation des données de raid (`@vxv/raid-data`) | P1.4 |
