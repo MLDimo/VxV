@@ -1,8 +1,9 @@
 # VXV
 
 Outil de guilde pour WoW Forever : addon en jeu, site web, bot Discord et app compagnon, autour d'une base Supabase.
-Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de référence est le PDF
-« VXV - Plan de développement » v1.0 : 12 phases (P0 à P11), avancées étape par étape.
+Gestion des raids, soft reserves (SR), attribution et suivi du loot, puis paris, missions, titres, artisans et deathroll.
+Le plan de référence est le PDF « VXV - Plan de développement » v1.0 du 3 octobre 2026 : 16 phases (P0 à P15),
+avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` (SR+, historique, droits, modèle de données).
 
 ## État d'avancement
 
