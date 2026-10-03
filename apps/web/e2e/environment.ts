@@ -44,4 +44,6 @@ export interface E2ESeed {
   softReserveEventId: string;
   /** Event starting 10 minutes after the seed: its soft reserves are locked. */
   lockedEventId: string;
+  /** Event with recorded loots, for the history tests. */
+  historyEventId: string;
 }

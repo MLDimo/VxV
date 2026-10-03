@@ -2,6 +2,7 @@ import { createAuth } from "./application/auth.ts";
 import { createCharacters } from "./application/characters.ts";
 import { createEvents } from "./application/events.ts";
 import { createExclusions } from "./application/exclusions.ts";
+import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
@@ -28,6 +29,7 @@ export function createApplication({ sql, discordRoles, clock = () => new Date() 
     signups: createSignups({ unitOfWork, clock }),
     softReserves: createSoftReserves({ unitOfWork, clock }),
     exclusions: createExclusions({ unitOfWork }),
+    history: createHistory({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
   };
 }
