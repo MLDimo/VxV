@@ -7,22 +7,23 @@ interface MemberRow {
   id: string;
   discord_id: string;
   discord_name: string;
-  role: MemberRole;
+  roles: MemberRole[];
 }
 
-const COLUMNS = "id, discord_id, discord_name, role";
+// Drivers may not know the enum array type: roles travel as text[], which every driver reads and writes.
+const COLUMNS = "id, discord_id, discord_name, roles::text[] as roles";
 
 function toMember(row: MemberRow): Member {
-  return { id: row.id, discordId: row.discord_id, discordName: row.discord_name, role: row.role };
+  return { id: row.id, discordId: row.discord_id, discordName: row.discord_name, roles: row.roles };
 }
 
 export function memberRepository(sql: SqlClient): MemberRepository {
   return {
-    async saveFromDiscord(identity, role) {
-      const statement = `insert into members (discord_id, discord_name, role) values ($1, $2, $3)
-        on conflict (discord_id) do update set discord_name = excluded.discord_name, role = excluded.role
+    async saveFromDiscord(identity, roles) {
+      const statement = `insert into members (discord_id, discord_name, roles) values ($1, $2, $3::text[]::member_role[])
+        on conflict (discord_id) do update set discord_name = excluded.discord_name, roles = excluded.roles
         returning ${COLUMNS}`;
-      const rows = await sql.query<MemberRow>(statement, [identity.discordId, identity.discordName, role]);
+      const rows = await sql.query<MemberRow>(statement, [identity.discordId, identity.discordName, roles]);
       return toMember(expectRow(rows, "save member"));
     },
 

@@ -1,7 +1,7 @@
 import { canManageRaids, type Member } from "@vxv/server";
 import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
-import { ROLE_LABELS } from "./roleLabels";
+import { rolesLabel } from "./roleLabels";
 
 export function MemberNav({ member }: { member: Member }) {
   return (
@@ -19,13 +19,13 @@ export function MemberNav({ member }: { member: Member }) {
         <Link href="/journal" className="text-zinc-300 hover:text-white">
           Journal
         </Link>
-        {canManageRaids(member.role) && (
+        {canManageRaids(member.roles) && (
           <Link href="/officiers/liste-de-guilde" className="text-zinc-300 hover:text-white">
             Liste de guilde
           </Link>
         )}
         <span className="ml-auto text-sm text-zinc-400">
-          {member.discordName} · {ROLE_LABELS[member.role]}
+          {member.discordName} · {rolesLabel(member.roles)}
         </span>
         <form action={signOut}>
           <button type="submit" className="text-sm text-zinc-400 hover:text-white">

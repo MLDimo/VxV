@@ -17,9 +17,13 @@ const database = await createMigratedPGlite();
 await database.exec(renderSeedSql(await loadRaids()).content);
 const app = createApplication({ sql: sqlClientFromPGlite(database), discordRoles: DISCORD_ROLES });
 
-const signIn = (discordId: string, discordName: string, role: keyof typeof DISCORD_ROLES) =>
-  app.auth.signIn({ discordId, discordName }, [DISCORD_ROLES[role]]);
-const officer = await signIn("100", "Officier Test", "officer");
+const signIn = (discordId: string, discordName: string, ...roles: (keyof typeof DISCORD_ROLES)[]) =>
+  app.auth.signIn(
+    { discordId, discordName },
+    roles.map((role) => DISCORD_ROLES[role]),
+  );
+// Roles are cumulative: the test officer is also treasurer.
+const officer = await signIn("100", "Officier Test", "member", "officer", "treasurer");
 const member = await signIn("200", "Membre Test", "member");
 const newcomer = await signIn("300", "Nouveau Membre", "member");
 const leavingMember = await signIn("400", "Membre Sortant", "member");

@@ -26,7 +26,7 @@ describe("auth", () => {
 
   it("signs in a guild member and authenticates their session", async () => {
     const signedIn = await auth.signIn(identity, ["member-role"]);
-    expect(signedIn.member).toMatchObject({ discordId: "123", discordName: "Déjà", role: "member" });
+    expect(signedIn.member).toMatchObject({ discordId: "123", discordName: "Déjà", roles: ["member"] });
     expect(signedIn.expiresAt).toEqual(new Date(now.getTime() + SESSION_DURATION_MS));
     expect(await auth.authenticate(signedIn.token)).toEqual(signedIn.member);
   });
@@ -36,10 +36,15 @@ describe("auth", () => {
     expect((await database.query("select 1 from members")).rows).toEqual([]);
   });
 
-  it("refreshes the name and role of a returning member", async () => {
+  it("records every guild role the member holds", async () => {
+    const signedIn = await auth.signIn(identity, ["officer-role", "t", "member-role"]);
+    expect(signedIn.member.roles).toEqual(["member", "treasurer", "officer"]);
+  });
+
+  it("refreshes the name and roles of a returning member", async () => {
     const first = await auth.signIn(identity, ["member-role"]);
     const second = await auth.signIn({ ...identity, discordName: "Déjà Vu" }, ["officer-role"]);
-    expect(second.member).toEqual({ ...first.member, discordName: "Déjà Vu", role: "officer" });
+    expect(second.member).toEqual({ ...first.member, discordName: "Déjà Vu", roles: ["officer"] });
   });
 
   it("stores only a hash of the token", async () => {

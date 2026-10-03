@@ -7,7 +7,7 @@ import type { SqlClient } from "../infrastructure/sql.ts";
 
 /** Saves a member as a Discord sign-in would. */
 export function createMember(sql: SqlClient, role: MemberRole, name = `${role}-member`): Promise<Member> {
-  return memberRepository(sql).saveFromDiscord({ discordId: `discord-${name}`, discordName: name }, role);
+  return memberRepository(sql).saveFromDiscord({ discordId: `discord-${name}`, discordName: name }, [role]);
 }
 
 /** Adds guild characters named "Prénom Nom" and returns them, one per name, in the given order. */

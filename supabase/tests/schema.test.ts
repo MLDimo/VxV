@@ -29,6 +29,25 @@ describe("initial schema", () => {
     expect(rows.filter((table) => !table.rowsecurity).map((table) => table.tablename)).toEqual([]);
   });
 
+  describe("members", () => {
+    it("gives the member role by default", async () => {
+      const memberId = await insertMember(database, "1");
+      const { rows } = await database.query<{ roles: string[] }>(
+        "select roles::text[] as roles from members where id = $1",
+        [memberId],
+      );
+      expect(rows[0]?.roles).toEqual(["member"]);
+    });
+
+    it("accepts several roles and refuses none", async () => {
+      const memberId = await insertMember(database, "1");
+      await database.query("update members set roles = '{member,treasurer,officer}' where id = $1", [memberId]);
+      await expect(database.query("update members set roles = '{}' where id = $1", [memberId])).rejects.toThrow(
+        /members_roles_not_empty/,
+      );
+    });
+  });
+
   describe("characters", () => {
     it("rejects a second character with the same first and last name", async () => {
       await insertCharacter(database, { firstName: "Ðéjà", lastName: "Vu" });

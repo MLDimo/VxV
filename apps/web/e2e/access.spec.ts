@@ -17,6 +17,14 @@ test("a member reaches the site but not the officer pages", async ({ page, conte
   await expect(page).toHaveURL(/\/$/);
 });
 
+test("an officer who is also treasurer sees both roles and the officer pages", async ({ page, context }) => {
+  await signInAs(context, "officer");
+  await page.goto("/");
+  await expect(page.getByRole("navigation")).toContainText("Officier Test · Officier, Trésorier");
+  await page.getByRole("link", { name: "Liste de guilde" }).click();
+  await expect(page).toHaveURL(/\/officiers\/liste-de-guilde$/);
+});
+
 test("signing out ends the session", async ({ page, context }) => {
   await signInAs(context, "leavingMember");
   await page.goto("/");
