@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { buildBoard, checkSoftReserveChoice, type LootItem, type SoftReserve } from "./softReserves.ts";
+import {
+  areSoftReservesLocked,
+  buildBoard,
+  checkSoftReserveChoice,
+  softReservesLockAt,
+  type LootItem,
+  type SoftReserve,
+} from "./softReserves.ts";
 
 const context = { allowance: 2, lootItemIds: new Set([1, 2, 3]), excludedItemIds: new Set([3]) };
 
@@ -51,8 +58,8 @@ describe("buildBoard", () => {
       {
         ...loot[0],
         reservedBy: [
-          { characterName: "Ðéjà Vu", characterClass: "ROGUE" },
-          { characterName: "Eole Hermes", characterClass: "ROGUE" },
+          { characterId: "me", characterName: "Ðéjà Vu", characterClass: "ROGUE" },
+          { characterId: "other", characterName: "Eole Hermes", characterClass: "ROGUE" },
         ],
         alreadyOwnedBy: 3,
         excluded: false,
@@ -60,5 +67,16 @@ describe("buildBoard", () => {
       },
       { ...loot[1], reservedBy: [], alreadyOwnedBy: 0, excluded: true, mine: false },
     ]);
+  });
+});
+
+describe("soft reserve lock", () => {
+  const startsAt = new Date("2026-12-10T20:00:00Z");
+
+  it("locks 30 minutes before the raid", () => {
+    expect(softReservesLockAt(startsAt)).toEqual(new Date("2026-12-10T19:30:00Z"));
+    expect(areSoftReservesLocked(startsAt, new Date("2026-12-10T19:29:59Z"))).toBe(false);
+    expect(areSoftReservesLocked(startsAt, new Date("2026-12-10T19:30:00Z"))).toBe(true);
+    expect(areSoftReservesLocked(startsAt, new Date("2026-12-10T21:00:00Z"))).toBe(true);
   });
 });

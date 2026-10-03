@@ -15,8 +15,21 @@ export interface SoftReserve {
 }
 
 export interface Reserver {
+  characterId: string;
   characterName: string;
   characterClass: string;
+}
+
+/** Members can no longer change their soft reserves this long before the raid; officers still can. */
+export const SOFT_RESERVE_LOCK_BEFORE_START_MS = 30 * 60 * 1000;
+
+export function softReservesLockAt(eventStartsAt: Date): Date {
+  return new Date(eventStartsAt.getTime() - SOFT_RESERVE_LOCK_BEFORE_START_MS);
+}
+
+/** Computed from the clock rather than stored: no scheduled job is needed to lock. */
+export function areSoftReservesLocked(eventStartsAt: Date, now: Date): boolean {
+  return now.getTime() >= softReservesLockAt(eventStartsAt).getTime();
 }
 
 export interface BoardItem extends LootItem {
@@ -63,7 +76,11 @@ export function buildBoard(
     const onItem = reserves.filter((reserve) => reserve.itemId === item.itemId);
     return {
       ...item,
-      reservedBy: onItem.map(({ characterName, characterClass }) => ({ characterName, characterClass })),
+      reservedBy: onItem.map(({ characterId, characterName, characterClass }) => ({
+        characterId,
+        characterName,
+        characterClass,
+      })),
       alreadyOwnedBy: ownersByItem.get(item.itemId) ?? 0,
       excluded: excludedItemIds.has(item.itemId),
       mine: onItem.some((reserve) => reserve.characterId === myCharacterId),

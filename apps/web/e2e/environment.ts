@@ -20,7 +20,7 @@ export const WEB_ENVIRONMENT = {
 };
 
 /** Guild characters imported before the tests (accents included, as in the game). */
-export const SEED_ROSTER = ["Aubé;Clairval;PRIEST", "Brume;Noire;MAGE", "Ciel;Gris;WARRIOR"];
+export const SEED_ROSTER = ["Aubé;Clairval;PRIEST", "Brume;Noire;MAGE", "Ciel;Gris;WARRIOR", "Dune;Sable;HUNTER"];
 
 /** Session tokens of the prepared members. */
 export interface E2ESessions {
@@ -31,6 +31,8 @@ export interface E2ESessions {
   newcomer: string;
   /** Reserved to the sign-out test, which ends it. */
   leavingMember: string;
+  /** Member whose main is Dune Sable, signed up to the locked event. */
+  lockedMember: string;
 }
 
 /** What the database server prepared, written for the tests to read. */
@@ -40,4 +42,6 @@ export interface E2ESeed {
   signupEventId: string;
   /** Event on La salle des Thanes where the officer (Ciel Gris) is already signed up, for the soft reserve tests. */
   softReserveEventId: string;
+  /** Event starting 10 minutes after the seed: its soft reserves are locked. */
+  lockedEventId: string;
 }

@@ -56,4 +56,27 @@ describe("describeJournalEntry", () => {
       "« Tête d'Onyxia » (Onyxia, 10/12/2026 21:00) ; SR retirées : Ðéjà Vu, Eole Hermes",
     );
   });
+
+  it("shows a correction's reserves before and after", () => {
+    const entry: JournalEntry = {
+      id: "4",
+      occurredAt: new Date(),
+      actorName: "Officier",
+      action: "softReserve.override",
+      entity: "softReserve",
+      entityId: "e/c",
+      before: null,
+      after: {
+        characterName: "Ðéjà Vu",
+        raids: ["Onyxia"],
+        eventStartsAt: "2026-12-10T20:00:00.000Z",
+        before: ["Tête d'Onyxia"],
+        after: [],
+      },
+      reason: "Erreur",
+    };
+    expect(describeJournalEntry(entry)).toBe(
+      "SR de Ðéjà Vu (Onyxia, 10/12/2026 21:00) : avant « Tête d'Onyxia » ; après aucune",
+    );
+  });
 });

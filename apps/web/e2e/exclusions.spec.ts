@@ -24,6 +24,6 @@ test.describe.serial("exclusions", () => {
   test("a member does not see the officers' exclusion form", async ({ page, context }) => {
     await signInAs(context, "member");
     await page.goto(eventPage());
-    await expect(page.getByRole("heading", { name: "Officiers · exclusions" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Officiers · exclusions et corrections" })).toHaveCount(0);
   });
 });

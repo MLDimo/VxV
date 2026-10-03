@@ -4,7 +4,7 @@ export { ApplicationError, ForbiddenError, ValidationError } from "./application
 export type { DiscordIdentity } from "./application/ports.ts";
 export type { EventCreationRecord } from "./application/events.ts";
 export type { ExclusionRecord } from "./application/exclusions.ts";
-export type { SoftReserveBoard } from "./application/softReserves.ts";
+export type { SoftReserveBoard, SoftReserveOverrideRecord } from "./application/softReserves.ts";
 export { fullName, type Character } from "./domain/characters.ts";
 export {
   DEFAULT_SOFT_RESERVES,
