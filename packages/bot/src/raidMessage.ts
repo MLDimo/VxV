@@ -17,16 +17,8 @@ const NOBODY = "—";
 /** Players who answered without coming, listed after the composition. */
 const OTHER_STATUSES: readonly SignupStatus[] = ["maybe", "bench", "absent"];
 
-const SIGNUP_BUTTON_PREFIX = "signup:";
-
 /** The sign-up button of an event's message, read back when a member clicks it. */
-export function signupButtonId(eventId: string): string {
-  return `${SIGNUP_BUTTON_PREFIX}${eventId}`;
-}
-
-export function eventIdOfSignupButton(customId: string): string | undefined {
-  return customId.startsWith(SIGNUP_BUTTON_PREFIX) ? customId.slice(SIGNUP_BUTTON_PREFIX.length) : undefined;
-}
+export const SIGNUP_BUTTON_PREFIX = "signup:";
 
 export function eventUrl(siteUrl: string, eventId: string): string {
   return `${siteUrl}/evenements/${eventId}`;
@@ -96,7 +88,7 @@ export function raidMessage({ event, signups }: AnnouncedRaid, siteUrl: string):
             type: ComponentType.Button,
             style: ButtonStyle.Primary,
             label: "S'inscrire",
-            custom_id: signupButtonId(event.id),
+            custom_id: `${SIGNUP_BUTTON_PREFIX}${event.id}`,
           },
           { type: ComponentType.Button, style: ButtonStyle.Link, label: "Voir sur le site", url },
         ],

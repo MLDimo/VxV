@@ -1,6 +1,6 @@
 import type { AnnouncedRaid, Signup } from "@vxv/server";
 import { describe, expect, it } from "vitest";
-import { eventIdOfSignupButton, raidMessage, signupButtonId } from "./raidMessage.ts";
+import { raidMessage, SIGNUP_BUTTON_PREFIX } from "./raidMessage.ts";
 
 const EVENT_ID = "11111111-1111-1111-1111-111111111111";
 
@@ -73,9 +73,7 @@ describe("raid sign-up message", () => {
 
   it("carries a sign-up button that names the event, never pinging anybody", () => {
     const message = raidMessage(raid([]), "https://vxv.test");
-    expect(JSON.stringify(message.components)).toContain(signupButtonId(EVENT_ID));
-    expect(eventIdOfSignupButton(signupButtonId(EVENT_ID))).toBe(EVENT_ID);
-    expect(eventIdOfSignupButton("other:1")).toBeUndefined();
+    expect(JSON.stringify(message.components)).toContain(`"custom_id":"${SIGNUP_BUTTON_PREFIX}${EVENT_ID}"`);
     expect(message.allowed_mentions).toEqual({ parse: [] });
   });
 });

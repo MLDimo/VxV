@@ -2,9 +2,12 @@ import { createPrivateKey, createPublicKey, randomBytes, sign } from "node:crypt
 import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
+  ComponentType,
   InteractionType,
   type APIApplicationCommandAutocompleteGuildInteraction,
   type APIChatInputApplicationCommandGuildInteraction,
+  type APIMessageComponentGuildInteraction,
+  type APIModalSubmitGuildInteraction,
 } from "discord-api-types/v10";
 import type { SignedRequest } from "./interactions.ts";
 
@@ -99,4 +102,35 @@ export function autocomplete(
       options: [{ name: option, type: ApplicationCommandOptionType.String, value: typed, focused: true }],
     },
   } as unknown as APIApplicationCommandAutocompleteGuildInteraction;
+}
+
+/** A click on a button of a message. */
+export function buttonClick(customId: string, actor: TestActor): APIMessageComponentGuildInteraction {
+  return {
+    ...guildInteraction(actor),
+    type: InteractionType.MessageComponent,
+    message: { id: "message", channel_id: actor.channelId },
+    data: { custom_id: customId, component_type: ComponentType.Button },
+  } as unknown as APIMessageComponentGuildInteraction;
+}
+
+/** A form (modal) sent by the member: one value per select menu, and the typed texts. */
+export function formSubmission(
+  customId: string,
+  fields: { selects: Record<string, string>; texts: Record<string, string> },
+  actor: TestActor,
+): APIModalSubmitGuildInteraction {
+  const selects = Object.entries(fields.selects).map(([field, value]) => ({
+    type: ComponentType.Label,
+    component: { type: ComponentType.StringSelect, custom_id: field, values: [value] },
+  }));
+  const texts = Object.entries(fields.texts).map(([field, value]) => ({
+    type: ComponentType.Label,
+    component: { type: ComponentType.TextInput, custom_id: field, value },
+  }));
+  return {
+    ...guildInteraction(actor),
+    type: InteractionType.ModalSubmit,
+    data: { custom_id: customId, components: [...selects, ...texts] },
+  } as unknown as APIModalSubmitGuildInteraction;
 }

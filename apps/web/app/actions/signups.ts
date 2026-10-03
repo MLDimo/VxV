@@ -9,12 +9,14 @@ export async function signUp(_previous: ActionState, form: FormData): Promise<Ac
   const member = await requireMember();
   const eventId = String(form.get("eventId") ?? "");
   return runFormAction(async () => {
-    await getApplication().signups.signUp(member, eventId, {
+    const application = getApplication();
+    await application.signups.signUp(member, eventId, {
       characterId: String(form.get("characterId") ?? ""),
       role: String(form.get("role") ?? ""),
       spec: String(form.get("spec") ?? ""),
       status: String(form.get("status") ?? ""),
     });
+    await application.raidAnnouncements.announceQuietly(eventId);
     return "Inscription enregistrée.";
   }, [`/evenements/${eventId}`]);
 }
