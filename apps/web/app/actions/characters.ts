@@ -2,6 +2,7 @@
 
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
+import { syncDiscordProfile } from "@/server/discordProfile";
 import { runFormAction } from "@/server/formActions";
 import { requireMember } from "@/server/session";
 
@@ -12,7 +13,9 @@ export async function linkCharacter(_previous: ActionState, form: FormData): Pro
   const asMain = form.get("as") === "main";
   return runFormAction(async () => {
     await getApplication().characters.link(member, String(form.get("characterId") ?? ""), asMain);
-    return asMain ? "Personnage ajouté comme main." : "Personnage ajouté comme reroll.";
+    return asMain
+      ? `Personnage ajouté comme main. ${await syncDiscordProfile(member)}`
+      : "Personnage ajouté comme reroll.";
   }, PAGES);
 }
 
@@ -22,7 +25,7 @@ export async function changeCharacter(_previous: ActionState, form: FormData): P
   return runFormAction(async () => {
     if (form.get("intent") === "main") {
       await getApplication().characters.setMain(member, characterId);
-      return "Main mis à jour.";
+      return `Main mis à jour. ${await syncDiscordProfile(member)}`;
     }
     await getApplication().characters.unlink(member, characterId);
     return "Personnage retiré.";

@@ -1,6 +1,6 @@
 import { autocomplete, slashCommand, type TestActor } from "@vxv/bot/testing";
 import { expect, test, type APIRequestContext } from "@playwright/test";
-import { DISCORD, WEB_ENVIRONMENT } from "./environment";
+import { DISCORD, FAKE_DISCORD_URL, WEB_ENVIRONMENT } from "./environment";
 import { signInAs } from "./sessions";
 
 const ENDPOINT = "/api/discord/interactions";
@@ -32,7 +32,7 @@ test("Discord's ping is answered, and a request Discord did not sign is refused"
   expect(unsigned.status()).toBe(401);
 });
 
-test("a member links their main with /vxv_main on Discord, and finds it on the website", async ({
+test("a member links their main with /vxv_main: renamed on Discord with the class role, shown on the website", async ({
   request,
   page,
   context,
@@ -46,8 +46,12 @@ test("a member links their main with /vxv_main on Discord, and finds it on the w
     slashCommand("vxv_main", { personnage: data.choices[0]?.value ?? "" }, DISCORD_MEMBER),
   );
   expect(await linked.json()).toMatchObject({
-    data: { content: "Éole Vent est maintenant ton personnage principal." },
+    data: {
+      content: "Éole Vent est maintenant ton personnage principal. Pseudo Discord et rôle de classe mis à jour.",
+    },
   });
+  const onDiscord = await request.get(`${FAKE_DISCORD_URL}/state/${DISCORD_MEMBER.userId}`);
+  expect(await onDiscord.json()).toEqual({ nickname: "Membre Discord - [Éole Vent]", roles: ["Druide"] });
 
   await signInAs(context, "discordMember");
   await page.goto("/personnages");

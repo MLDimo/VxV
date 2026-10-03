@@ -1,10 +1,11 @@
 import type { PGliteInterface } from "@electric-sql/pglite";
 import type { Application } from "@vxv/server";
 import type { APIInteractionResponse } from "discord-api-types/v10";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { FakeDiscord } from "@vxv/server/testing";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext, SlashCommand } from "./commands.ts";
 import { VXV_MAIN, VXV_REROLL } from "./linkCommands.ts";
-import { createTestApplication } from "./testApplication.ts";
+import { createTestApplication, SERVER_OWNER } from "./testApplication.ts";
 import { autocomplete, slashCommand, type TestActor } from "./testing.ts";
 
 const LINKS = "links-channel";
@@ -21,13 +22,19 @@ describe("character linking commands", () => {
   let database: PGliteInterface;
   let app: Application;
   let context: BotContext;
+  let discord: FakeDiscord;
 
   beforeEach(async () => {
-    ({ app, database } = await createTestApplication(["Ðéjà;Vu;ROGUE", "Eole;Hermes;DRUID", "Ugly;Hole;WARRIOR"]));
+    ({ app, database, discord } = await createTestApplication([
+      "Ðéjà;Vu;ROGUE",
+      "Eole;Hermes;DRUID",
+      "Ugly;Hole;WARRIOR",
+    ]));
     context = { app, linkChannelId: LINKS };
   });
 
   afterEach(async () => {
+    vi.unstubAllGlobals();
     await database.close();
   });
 
@@ -42,7 +49,11 @@ describe("character linking commands", () => {
 
   it("links the chosen main, then a reroll typed in full, as the website would", async () => {
     const dejaId = String((await suggest("ðéjà"))?.[0]?.value);
-    expect(await reply(VXV_MAIN, dejaId)).toBe("Ðéjà Vu est maintenant ton personnage principal.");
+    expect(await reply(VXV_MAIN, dejaId)).toBe(
+      "Ðéjà Vu est maintenant ton personnage principal. Pseudo Discord et rôle de classe mis à jour.",
+    );
+    expect(discord.nicknameOf(ME.userId)).toBe("Déjà - [Ðéjà Vu]");
+    expect(discord.roleNamesOf(ME.userId)).toEqual(["Voleur"]);
     expect(await reply(VXV_REROLL, "eole hermes")).toBe("Eole Hermes est lié à ton compte comme reroll.");
 
     const me = await app.auth.identify({ discordId: ME.userId, discordName: ME.name }, []);
@@ -51,6 +62,12 @@ describe("character linking commands", () => {
       ["Ðéjà", true],
       ["Eole", false],
     ]);
+  });
+
+  it("tells the server owner to change their nickname by hand, and still gives the class role", async () => {
+    const owner = { ...ME, userId: SERVER_OWNER, name: "GM" };
+    expect(await reply(VXV_MAIN, "Eole Hermes", owner)).toMatch(/Rôle de classe mis à jour.*à la main/);
+    expect(discord.roleNamesOf(SERVER_OWNER)).toEqual(["Druide"]);
   });
 
   it("explains how to find a character missing from the guild list", async () => {

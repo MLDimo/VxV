@@ -1,6 +1,6 @@
 import type { PGliteInterface } from "@electric-sql/pglite";
 import { InteractionResponseType, InteractionType } from "discord-api-types/v10";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createInteractionHandler, type InteractionHandler } from "./interactions.ts";
 import { parsePublicKey } from "./signature.ts";
 import { createTestApplication } from "./testApplication.ts";
@@ -22,6 +22,7 @@ describe("interaction handler", () => {
   });
 
   afterAll(async () => {
+    vi.unstubAllGlobals();
     await database.close();
   });
 

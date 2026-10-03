@@ -1,5 +1,5 @@
 import "server-only";
-import { createApplication, createPgSqlClient, type Application } from "@vxv/server";
+import { createApplication, createDiscordGuild, createPgSqlClient, type Application } from "@vxv/server";
 import { getConfig } from "./config";
 
 let application: Application | undefined;
@@ -8,7 +8,11 @@ let application: Application | undefined;
 export function getApplication(): Application {
   if (application === undefined) {
     const { databaseUrl, discord } = getConfig();
-    application = createApplication({ sql: createPgSqlClient(databaseUrl), discordRoles: discord.roles });
+    application = createApplication({
+      sql: createPgSqlClient(databaseUrl),
+      discordRoles: discord.roles,
+      guild: createDiscordGuild({ token: discord.botToken, guildId: discord.guildId, apiUrl: discord.apiUrl }),
+    });
   }
   return application;
 }
