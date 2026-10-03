@@ -9,8 +9,11 @@ import { isChatInputApplicationCommandInteraction, isGuildInteraction } from "di
 import type { KeyObject } from "node:crypto";
 import { SLASH_COMMANDS } from "./commandList.ts";
 import type { BotContext } from "./commands.ts";
+import { afterPrefix } from "./customIds.ts";
+import { SIGNUP_BUTTON_PREFIX } from "./raidMessage.ts";
 import { ephemeral } from "./responses.ts";
 import { isSignedByDiscord } from "./signature.ts";
+import { openSignupForm, SIGNUP_FORM_PREFIX, submitSignupForm } from "./signupForm.ts";
 
 export interface SignedRequest {
   body: string;
@@ -50,6 +53,18 @@ async function respond(interaction: APIInteraction, context: BotContext): Promis
     const command = commandsByName.get(interaction.data.name);
     if (command?.autocomplete !== undefined) {
       return command.autocomplete(interaction, context);
+    }
+  }
+  if (interaction.type === InteractionType.MessageComponent) {
+    const eventId = afterPrefix(interaction.data.custom_id, SIGNUP_BUTTON_PREFIX);
+    if (eventId !== undefined) {
+      return openSignupForm(interaction, context, eventId);
+    }
+  }
+  if (interaction.type === InteractionType.ModalSubmit) {
+    const eventId = afterPrefix(interaction.data.custom_id, SIGNUP_FORM_PREFIX);
+    if (eventId !== undefined) {
+      return submitSignupForm(interaction, context, eventId);
     }
   }
   return ephemeral(UNAVAILABLE);

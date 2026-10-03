@@ -1,13 +1,9 @@
-import { fullName, identityFromDiscordUser, type Character, type Member } from "@vxv/server";
+import { fullName, type Character, type Member } from "@vxv/server";
 import { classLabel } from "@vxv/server/domain/characterClasses";
 import { normalizeForSearch, searchCharacters } from "@vxv/server/domain/characterSearch";
-import {
-  ApplicationCommandOptionType,
-  InteractionResponseType,
-  type APIApplicationCommandAutocompleteGuildInteraction,
-  type APIChatInputApplicationCommandGuildInteraction,
-} from "discord-api-types/v10";
+import { ApplicationCommandOptionType, InteractionResponseType } from "discord-api-types/v10";
 import { stringOption, type BotContext, type SlashCommand } from "./commands.ts";
+import { actingMember } from "./members.ts";
 import { ephemeral } from "./responses.ts";
 
 const CHARACTER_OPTION = "personnage";
@@ -17,13 +13,6 @@ const MAX_SUGGESTIONS = 25;
 const NOT_FOUND =
   "Personnage introuvable dans la liste de guilde. Tape son prénom et choisis-le dans la liste proposée. " +
   "S'il n'y figure pas, un officier doit importer la liste de guilde à jour depuis le jeu.";
-
-type GuildInteraction =
-  APIChatInputApplicationCommandGuildInteraction | APIApplicationCommandAutocompleteGuildInteraction;
-
-function memberOf(interaction: GuildInteraction, { app }: BotContext): Promise<Member> {
-  return app.auth.identify(identityFromDiscordUser(interaction.member.user), interaction.member.roles);
-}
 
 /** The member's own characters, then the guild characters nobody has claimed yet. */
 async function linkableCharacters({ app }: BotContext, member: Member): Promise<Character[]> {
@@ -65,7 +54,7 @@ function linkCommand(
       if (interaction.channel.id !== context.linkChannelId) {
         return ephemeral(`Les personnages se lient dans le salon <#${context.linkChannelId}>.`);
       }
-      const member = await memberOf(interaction, context);
+      const member = await actingMember(interaction, context.app);
       const character = findCharacter(
         await linkableCharacters(context, member),
         stringOption(interaction, CHARACTER_OPTION),
@@ -81,7 +70,7 @@ function linkCommand(
     },
 
     async autocomplete(interaction, context) {
-      const member = await memberOf(interaction, context);
+      const member = await actingMember(interaction, context.app);
       const candidates = (await linkableCharacters(context, member)).map((character) => ({
         id: character.id,
         name: fullName(character),

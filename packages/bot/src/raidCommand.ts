@@ -1,8 +1,9 @@
-import { DEFAULT_SOFT_RESERVES, identityFromDiscordUser, MAX_SOFT_RESERVES } from "@vxv/server";
+import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES } from "@vxv/server";
 import { normalizeForSearch } from "@vxv/server/domain/characterSearch";
 import { ApplicationCommandOptionType, InteractionResponseType } from "discord-api-types/v10";
 import { focusedOption, integerOption, stringOption, type BotContext, type SlashCommand } from "./commands.ts";
 import { parseRaidStart } from "./dateInput.ts";
+import { actingMember } from "./members.ts";
 import { ephemeral } from "./responses.ts";
 
 const RAID_OPTIONS = ["raid", "raid2"];
@@ -75,7 +76,7 @@ export const VXV_RAID: Required<SlashCommand> = {
       return ephemeral(INVALID_DATE);
     }
     const { app } = context;
-    const officer = await app.auth.identify(identityFromDiscordUser(interaction.member.user), interaction.member.roles);
+    const officer = await actingMember(interaction, app);
     const eventId = await app.events.createEvent(
       officer,
       {

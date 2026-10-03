@@ -104,6 +104,7 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Toutes les tables activent la sécurité par ligne sans politique : seul le serveur (rôle service) lit et écrit.
 - Le journal (`journal`) est en ajout seul, motif obligatoire, garanti par des triggers.
 - Déploiement : `tools/deploy-database.sh` (migrations puis données de raid), automatique vers test, manuel vers production. Voir `docs/environnements.md`.
+- Une migration lue par le code fusionné se déploie en production aussitôt la fusion faite (`deploy-database.yml`, cible production) : le site part en production automatiquement, la base non.
 - Les règles d'intégrité vivent dans le schéma (contraintes) et sont couvertes par des tests PGlite (`supabase/tests`). `@vxv/database/testing` fournit une base migrée pour les tests des autres paquets.
 
 ## Contraintes WoW Forever (mesurées en P0, build 70170)
