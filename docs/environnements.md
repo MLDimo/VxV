@@ -60,7 +60,7 @@ Après un changement de mot de passe d'une base, remplacer son secret avec `gh s
    - `https://vxv-web.vercel.app/connexion/discord/retour` (production)
    - `https://vxv-web-test.vercel.app/connexion/discord/retour` (test)
    - `http://localhost:3000/connexion/discord/retour` (développement local)
-3. Identifiants non secrets (les copier en mode développeur Discord, clic droit puis « Copier l'identifiant ») : identifiant client de l'application, serveur de la guilde, rôles membre, trésorier, officier et GM. Ils vont dans Vercel pour Preview et Production.
+3. Identifiants non secrets (les copier en mode développeur Discord, clic droit puis « Copier l'identifiant ») : identifiant client de l'application, serveur de la guilde, rôles trésorier, officier et GM. Ils vont dans Vercel pour Preview et Production. Tout le monde sur le serveur de la guilde est membre, sans rôle ; le GM porte un rôle « GM » (le propriétaire du serveur ne se détecte pas sans demander à chaque membre la liste de ses serveurs).
 4. Secrets, à saisir sans les afficher :
 
    ```sh

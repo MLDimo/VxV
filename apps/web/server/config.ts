@@ -9,7 +9,6 @@ const environmentSchema = z.object({
   DISCORD_CLIENT_ID: discordId,
   DISCORD_CLIENT_SECRET: z.string().min(1),
   DISCORD_GUILD_ID: discordId,
-  DISCORD_ROLE_MEMBER: discordId,
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -40,7 +39,6 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       clientSecret: env.DISCORD_CLIENT_SECRET,
       guildId: env.DISCORD_GUILD_ID,
       roles: {
-        member: env.DISCORD_ROLE_MEMBER,
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,
         gm: env.DISCORD_ROLE_GM,

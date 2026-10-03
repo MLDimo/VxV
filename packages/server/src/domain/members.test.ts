@@ -1,30 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { rolesFromDiscordRoles, type DiscordRoleMapping } from "./members.ts";
 
-const mapping: DiscordRoleMapping = { member: "m", treasurer: "t", officer: "o", gm: "g" };
+const mapping: DiscordRoleMapping = { treasurer: "t", officer: "o", gm: "g" };
 
 describe("rolesFromDiscordRoles", () => {
   it.each([
-    [["m"], ["member"]],
+    [[], ["member"]],
+    [["unrelated"], ["member"]],
+    [["o"], ["member", "officer"]],
     [
-      ["m", "o"],
-      ["member", "officer"],
-    ],
-    [
-      ["o", "t", "m"],
+      ["o", "t"],
       ["member", "treasurer", "officer"],
     ],
-    [["g"], ["gm"]],
     [
-      ["other", "m", "g"],
+      ["other", "g"],
       ["member", "gm"],
     ],
-  ])("gives every guild role among %j, in rank order: %j", (roles, expected) => {
+  ])("makes everybody on the server a member, plus the roles granted by %j: %j", (roles, expected) => {
     expect(rolesFromDiscordRoles(roles, mapping)).toEqual(expected);
-  });
-
-  it("gives no role to a Discord user outside the guild", () => {
-    expect(rolesFromDiscordRoles(["unrelated"], mapping)).toEqual([]);
-    expect(rolesFromDiscordRoles([], mapping)).toEqual([]);
   });
 });
