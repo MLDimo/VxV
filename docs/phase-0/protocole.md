@@ -93,6 +93,47 @@ L'écoute est permanente dès la connexion. Il suffit de jouer un vrai raid ou u
 3. Relancer. La ligne « seed » indique si le client conserve ces données ou les efface.
 4. Remettre ensuite `External/Seed.lua` dans son état d'origine (`git checkout tools/VXV_Probe/External`).
 
+## Compléments du 3 octobre (T1 à T10)
+
+Tests ajoutés par les décisions du 3 octobre (`docs/plan/decisions-2026-10-03.md`), à faire avant la fin de la bêta.
+Après chaque série : `/reload` pour écrire le journal, ou `/vxvtest report` pour le copier.
+
+**Sans clic.** `/vxvtest later <test> <commande>` lance la commande 3 secondes plus tard, hors du clic du joueur.
+C'est ainsi que le vrai addon agira quand il réagit à un événement (inviter un inscrit, annoncer un gagnant).
+Le jeu bloque certaines actions qui ne viennent pas d'un clic : la ligne `[client] FAIL action bloquée` le signale.
+Pour chaque action ci-dessous, faire la commande directe, puis la même précédée de `later`.
+
+**Seul, en ville**
+
+| Test | Commandes | À vérifier |
+| --- | --- | --- |
+| T5 roll par un bouton | `/vxvtest rolls button`, cliquer sur le bouton ; puis `/vxvtest later rolls roll` | Le jet apparaît dans le chat et la ligne « roll lu » suit |
+| T3 lecture des `/roll` | Taper `/roll` à la main | Ligne « roll lu : [Prénom Nom] n (1-100) » |
+| T7 compteur de dégâts | `/vxvtest meter list` ; taper un mannequin d'entraînement ou un monstre ; `/vxvtest meter read` pendant puis après le combat | Fonctions et types présents ; montants et noms lisibles, ou secrets |
+| T8 compteurs du jeu | `/vxvtest counters list tu` ; `/vxvtest counters diff` ; tuer un monstre **gris** ; `/vxvtest counters diff` ; même chose avec un monstre normal | Quel compteur change pour un monstre gris, et lequel pour un monstre normal |
+| T9 infobulle et canal de guilde | Juste après un `/reload`, avant d'ouvrir la fenêtre de guilde : `/vxvtest display on`. Survoler un joueur, attendre un message de guilde | « [Titre VXV] » dans l'infobulle et devant les messages de guilde |
+| T9 liste de guilde | Ouvrir la fenêtre de guilde (même session que la ligne précédente), parcourir la liste | « [Titre VXV] » après les noms ; noter les lignes « fenêtre … présente » |
+| T10 métiers et recettes | `/vxvtest professions list` ; ouvrir la fenêtre de chaque métier | Métiers et niveaux ; « n recette(s) connue(s) » à l'ouverture (sinon `/vxvtest professions recipes`, fenêtre ouverte) |
+
+**En groupe (au moins deux joueurs, un seul avec la sonde suffit)**
+
+| Test | Commandes | À vérifier |
+| --- | --- | --- |
+| T1 invitations | `/vxvtest group status` ; `/vxvtest group invite Prénom Nom` ; quitter le groupe ; `/vxvtest later group invite Prénom Nom` | L'invitation arrive chez l'autre joueur dans les deux cas ; sinon le message d'erreur |
+| T1 passage en raid | En chef de groupe : `/vxvtest group raid`, puis dans un autre groupe `/vxvtest later group raid` | Le groupe devient un raid |
+| T3 `/roll` des autres | L'autre joueur tape `/roll` | « roll lu » avec son nom |
+| T4 canal raid | En raid : `/vxvtest chat send`, `/vxvtest later chat send`, `/vxvtest chat send RAID_WARNING` | Messages visibles chez les autres ; ligne « CHAT_MSG_RAID lu » ; refus éventuel |
+| T4 pendant un boss | `/vxvtest chat send` pendant la rencontre | Message envoyé ou refusé (contexte « verrou-chat ») |
+| T6 morts et résurrections | `/vxvtest deaths watch` avant un combat ; mourir ou voir mourir un membre ; se faire relever | Lignes « mort : » et « relevé : », PLAYER_DEAD, RESURRECT_REQUEST avec le nom du soigneur |
+
+**En raid, maître du butin, sur un boss de donjon** (T2, complète le point 0.4)
+
+1. `/vxvtest loot status` : la ligne « je suis maître du butin : true » doit apparaître.
+2. Ouvrir le corps du boss : la sonde liste chaque emplacement et ses candidats numérotés (« 1=Prénom Nom »).
+3. Donner un objet avec le menu du jeu : ligne « GiveMasterLoot … attribué à … ».
+4. Donner un autre objet par l'addon : `/vxvtest loot give <emplacement> <n° du candidat>`, puis la même chose avec `later`.
+   Vérifier que l'objet part bien chez le joueur choisi.
+
 ## 0.7 Rapport
 
 Remplir `docs/phase-0/rapport-faisabilite.md` à partir des rapports de session.

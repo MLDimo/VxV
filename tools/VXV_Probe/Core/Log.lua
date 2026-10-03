@@ -37,7 +37,7 @@ function Log.Record(testId, level, ...)
     end
 end
 
---- Returns a logger bound to one test: .Ok(...), .Fail, .Info, .Trace, and .Check(success, ...).
+--- Returns a logger bound to one test: .Ok(...), .Fail, .Info, .Trace, .Check(success, ...), .Call, .Listen, .Journal.
 function Log.For(testId)
     local logger = {}
     for method, level in pairs(LOGGER_METHODS) do
@@ -47,6 +47,24 @@ function Log.For(testId)
     end
     logger.Check = function(success, ...)
         Log.Record(testId, success and "ok" or "fail", ...)
+    end
+    --- Logs a call made through Compat or pcall (ok, error). A blocked action is journaled separately as "client".
+    logger.Call = function(label, ok, problem)
+        logger.Check(ok, label, ok and "appelé sans erreur Lua" or problem)
+    end
+    --- Subscribes the handler; a refused event is journaled instead of raised.
+    logger.Listen = function(event, handler)
+        if not ns.Events.On(event, handler) then
+            logger.Trace("événement refusé :", event)
+        end
+    end
+    --- Journals each event with all its arguments, at its level: { EVENT_NAME = "Info" | "Trace" | ... }.
+    logger.Journal = function(eventLevels)
+        for event, method in pairs(eventLevels) do
+            logger.Listen(event, function(...)
+                logger[method](event, ...)
+            end)
+        end
     end
     return logger
 end

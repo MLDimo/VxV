@@ -25,7 +25,8 @@ Aucun no-go bloquant. Le plan tient, avec les ajustements listés en fin de rapp
 
 Reste à tester :
 
-- 0.4 : distribution en étant soi-même maître du butin (interface classique présente, risque faible).
+- 0.4 : distribution en étant soi-même maître du butin (interface classique présente, risque faible), repris par T2.
+- T1 à T10 : tests complémentaires du 3 octobre, avant la fin de la bêta le 21 octobre (section dédiée plus bas).
 
 ## Résultats par fonctionnalité
 
@@ -51,6 +52,21 @@ Reste à tester :
 | 0.6 | Fichier externe lu après /reload | Oui : 64 Ko écrits jeu ouvert, lus après /reload | ✅ | Valide la descente des données par le compagnon (bundle `VXV_Sync`). |
 | 0.6 | Taille maximale du fichier externe | 2 Mo lus sans erreur, après /reload et après redémarrage | ✅ | Largement suffisant pour les données de la guilde. |
 | 0.6 | Contournement seed | Inutile : les SavedVariables sont relues normalement | ✅ | Abandonné. |
+
+## Compléments du 3 octobre (T1 à T10)
+
+| Test | Question | Résultat | Verdict | Impact sur le plan |
+| --- | --- | --- | --- | --- |
+| T1 | L'addon invite-t-il un « Prénom Nom » et passe-t-il le groupe en raid, avec et sans clic ? | | ⏳ | Invitations automatiques des inscrits (P5) |
+| T2 | Le maître du butin peut-il donner un objet depuis l'addon, avec et sans clic ? | | ⏳ | Attribution depuis la liste des SR (P6) |
+| T3 | Les `/roll` de tous les joueurs sont-ils lisibles (nom, jet, bornes) ? | | ⏳ | Rolls SR et SR+ (P6), deathroll (P15) |
+| T4 | L'addon lit-il et écrit-il dans le canal raid, y compris pendant un boss ? | | ⏳ | Annonces automatiques en raid |
+| T5 | Un bouton de l'addon peut-il lancer un `/roll`, et sans clic ? | | ⏳ | Bouton de roll (P6, P15) |
+| T6 | Les morts et résurrections du groupe sont-elles visibles sans journal de combat ? | | ⏳ | Titres liés aux morts (P13) |
+| T7 | Le compteur de dégâts et de soins du jeu est-il lisible par l'addon ? | | ⏳ | Si non : titres de dégâts et de soins abandonnés (P13) |
+| T8 | Quels compteurs du jeu sont lisibles, et un monstre gris tué est-il compté ? | | ⏳ | Si les kills gris ne sont pas comptables : mission abandonnée (P12) |
+| T9 | Peut-on afficher un titre dans l'infobulle, le canal de guilde et la liste de guilde ? | | ⏳ | Affichage des titres (P13) |
+| T10 | Les métiers et recettes connues du joueur sont-ils lisibles ? | | ⏳ | Annuaire des artisans (P14) |
 
 ## Hypothèses de départ (sources communautaires)
 
