@@ -1,6 +1,6 @@
 import { composition, SIGNUP_ROLES, type Signup } from "@vxv/server";
 import { CharacterName } from "./CharacterName";
-import { classLabel } from "./characterClasses";
+import { classLabel } from "@vxv/server/domain/characterClasses";
 import { ROLE_LABELS, STATUS_LABELS } from "./signupLabels";
 
 /** Expected players by role and class, then every sign-up grouped by role. */

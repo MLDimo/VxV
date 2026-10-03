@@ -11,6 +11,7 @@ const environmentSchema = z.object({
   DISCORD_CLIENT_SECRET: z.string().min(1),
   DISCORD_PUBLIC_KEY: discordPublicKey,
   DISCORD_GUILD_ID: discordId,
+  DISCORD_LINK_CHANNEL_ID: discordId,
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -24,6 +25,8 @@ export interface WebConfig {
     /** Verifies that interactions come from Discord. */
     publicKey: string;
     guildId: string;
+    /** Channel where members link their characters with /vxv_main and /vxv_reroll. */
+    linkChannelId: string;
     roles: DiscordRoleMapping;
   };
 }
@@ -43,6 +46,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       clientSecret: env.DISCORD_CLIENT_SECRET,
       publicKey: env.DISCORD_PUBLIC_KEY,
       guildId: env.DISCORD_GUILD_ID,
+      linkChannelId: env.DISCORD_LINK_CHANNEL_ID,
       roles: {
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,

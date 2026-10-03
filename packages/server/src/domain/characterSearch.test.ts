@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeForSearch, searchCharacters } from "./characterSearch";
+import { normalizeForSearch, searchCharacters } from "./characterSearch.ts";
 
 describe("normalizeForSearch", () => {
   it.each([

@@ -5,7 +5,7 @@ import { changeCharacter } from "@/app/actions/characters";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 import { CharacterName } from "./CharacterName";
-import type { SearchableCharacter } from "./characterSearch";
+import type { SearchableCharacter } from "@vxv/server/domain/characterSearch";
 
 export interface OwnCharacter extends SearchableCharacter {
   isMain: boolean;

@@ -1,0 +1,71 @@
+import type { PGliteInterface } from "@electric-sql/pglite";
+import type { Application } from "@vxv/server";
+import type { APIInteractionResponse } from "discord-api-types/v10";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { BotContext, SlashCommand } from "./commands.ts";
+import { VXV_MAIN, VXV_REROLL } from "./linkCommands.ts";
+import { createTestApplication } from "./testApplication.ts";
+import { autocomplete, slashCommand, type TestActor } from "./testing.ts";
+
+const LINKS = "links-channel";
+const ME: TestActor = { userId: "200", name: "Déjà", channelId: LINKS };
+const OTHER: TestActor = { userId: "300", name: "Autre", channelId: LINKS };
+
+function contentOf(response: APIInteractionResponse): string | undefined {
+  return "data" in response && response.data !== undefined && "content" in response.data
+    ? response.data.content
+    : undefined;
+}
+
+describe("character linking commands", () => {
+  let database: PGliteInterface;
+  let app: Application;
+  let context: BotContext;
+
+  beforeEach(async () => {
+    ({ app, database } = await createTestApplication(["Ðéjà;Vu;ROGUE", "Eole;Hermes;DRUID", "Ugly;Hole;WARRIOR"]));
+    context = { app, linkChannelId: LINKS };
+  });
+
+  afterEach(async () => {
+    await database.close();
+  });
+
+  const reply = async (command: SlashCommand, typed: string, actor = ME) =>
+    contentOf(await command.run(slashCommand(command.definition.name, { personnage: typed }, actor), context));
+  const suggest = async (typed: string) =>
+    (await VXV_MAIN.autocomplete(autocomplete("vxv_main", "personnage", typed, ME), context)).data.choices;
+
+  it("suggests the guild characters matching what the member types, accents ignored", async () => {
+    expect(await suggest("deja")).toEqual([{ name: "Ðéjà Vu · Voleur", value: expect.any(String) }]);
+  });
+
+  it("links the chosen main, then a reroll typed in full, as the website would", async () => {
+    const dejaId = String((await suggest("ðéjà"))?.[0]?.value);
+    expect(await reply(VXV_MAIN, dejaId)).toBe("Ðéjà Vu est maintenant ton personnage principal.");
+    expect(await reply(VXV_REROLL, "eole hermes")).toBe("Eole Hermes est lié à ton compte comme reroll.");
+
+    const me = await app.auth.identify({ discordId: ME.userId, discordName: ME.name }, []);
+    const mine = await app.characters.listMine(me);
+    expect(mine.map((character) => [character.firstName, character.isMain])).toEqual([
+      ["Ðéjà", true],
+      ["Eole", false],
+    ]);
+  });
+
+  it("explains how to find a character missing from the guild list", async () => {
+    expect(await reply(VXV_MAIN, "Inconnu Total")).toMatch(/^Personnage introuvable dans la liste de guilde/);
+  });
+
+  it("only works in the linking channel", async () => {
+    expect(await reply(VXV_MAIN, "Ðéjà Vu", { ...ME, channelId: "general" })).toBe(
+      `Les personnages se lient dans le salon <#${LINKS}>.`,
+    );
+  });
+
+  it("neither suggests nor links a character claimed by another member", async () => {
+    await reply(VXV_MAIN, "Ugly Hole", OTHER);
+    expect(await suggest("ugly")).toEqual([]);
+    expect(await reply(VXV_MAIN, "Ugly Hole")).toMatch(/^Personnage introuvable/);
+  });
+});

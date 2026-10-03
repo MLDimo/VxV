@@ -18,13 +18,20 @@ export const WEB_ENVIRONMENT = {
   DISCORD_CLIENT_SECRET: "e2e",
   DISCORD_PUBLIC_KEY: DISCORD.publicKeyHex,
   DISCORD_GUILD_ID: "2",
+  DISCORD_LINK_CHANNEL_ID: "20",
   DISCORD_ROLE_TREASURER: DISCORD_ROLES.treasurer,
   DISCORD_ROLE_OFFICER: DISCORD_ROLES.officer,
   DISCORD_ROLE_GM: DISCORD_ROLES.gm,
 };
 
 /** Guild characters imported before the tests (accents included, as in the game). */
-export const SEED_ROSTER = ["Aubé;Clairval;PRIEST", "Brume;Noire;MAGE", "Ciel;Gris;WARRIOR", "Dune;Sable;HUNTER"];
+export const SEED_ROSTER = [
+  "Aubé;Clairval;PRIEST",
+  "Brume;Noire;MAGE",
+  "Ciel;Gris;WARRIOR",
+  "Dune;Sable;HUNTER",
+  "Éole;Vent;DRUID",
+];
 
 /** Session tokens of the prepared members. */
 export interface E2ESessions {
@@ -37,6 +44,8 @@ export interface E2ESessions {
   leavingMember: string;
   /** Member whose main is Dune Sable, signed up to the locked event. */
   lockedMember: string;
+  /** Member who links Éole Vent through the bot (Discord user 600). */
+  discordMember: string;
 }
 
 /** What the database server prepared, written for the tests to read. */
