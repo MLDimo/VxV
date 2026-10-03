@@ -1,6 +1,6 @@
 # Phase 0 — Rapport de faisabilité
 
-Client testé : 1.60.1 build 70170 · Interface : 16001 (confirmée) · Sessions : 2026-10-02, solo, donjon à 5, guilde puis raid à 2 (journal complet dans `sessions/`, 29 sessions, aucune erreur Lua de la sonde)
+Client testé : 1.60.1 build 70170 · Interface : 16001 (confirmée) · Sessions : 2026-10-02, solo, donjon à 5, guilde puis raid à 2 ; 2026-10-03, solo (journal complet dans `sessions/`, aucune erreur Lua de la sonde)
 
 Légende : ✅ go · ⚠️ go avec contournement · ❌ no-go · ⏳ non testé
 
@@ -59,14 +59,14 @@ Reste à tester :
 | --- | --- | --- | --- | --- |
 | T1 | L'addon invite-t-il un « Prénom Nom » et passe-t-il le groupe en raid, avec et sans clic ? | | ⏳ | Invitations automatiques des inscrits (P5) |
 | T2 | Le maître du butin peut-il donner un objet depuis l'addon, avec et sans clic ? | | ⏳ | Attribution depuis la liste des SR (P6) |
-| T3 | Les `/roll` de tous les joueurs sont-ils lisibles (nom, jet, bornes) ? | | ⏳ | Rolls SR et SR+ (P6), deathroll (P15) |
+| T3 | Les `/roll` de tous les joueurs sont-ils lisibles (nom, jet, bornes) ? | Les siens : oui. Message système « Ðéjà Vu obtient un 98 (1-100). », découpé grâce au format du jeu `RANDOM_ROLL_RESULT` (« %s obtient un %d (%d-%d). »), nom au format « Prénom Nom ». Rolls des autres joueurs : à vérifier en groupe (même message). | ✅ | Rolls SR et SR+ (P6), deathroll (P15) |
 | T4 | L'addon lit-il et écrit-il dans le canal raid, y compris pendant un boss ? | | ⏳ | Annonces automatiques en raid |
-| T5 | Un bouton de l'addon peut-il lancer un `/roll`, et sans clic ? | | ⏳ | Bouton de roll (P6, P15) |
+| T5 | Un bouton de l'addon peut-il lancer un `/roll`, et sans clic ? | Oui dans les deux cas : `RandomRoll(1, 100)` depuis un bouton, puis 3 s après une commande, hors de tout clic. Aucune action bloquée. | ✅ | Bouton de roll (P6, P15) |
 | T6 | Les morts et résurrections du groupe sont-elles visibles sans journal de combat ? | | ⏳ | Titres liés aux morts (P13) |
 | T7 | Le compteur de dégâts et de soins du jeu est-il lisible par l'addon ? | | ⏳ | Si non : titres de dégâts et de soins abandonnés (P13) |
-| T8 | Quels compteurs du jeu sont lisibles, et un monstre gris tué est-il compté ? | | ⏳ | Si les kills gris ne sont pas comptables : mission abandonnée (P12) |
-| T9 | Peut-on afficher un titre dans l'infobulle, le canal de guilde et la liste de guilde ? | | ⏳ | Affichage des titres (P13) |
-| T10 | Les métiers et recettes connues du joueur sont-ils lisibles ? | | ⏳ | Annuaire des artisans (P14) |
+| T8 | Quelles statistiques du jeu sont lisibles ? | | ⏳ | Missions et titres fondés sur les compteurs du jeu (P12, P13). La mission « monstres gris » est abandonnée. |
+| T9 | Peut-on afficher un titre dans l'infobulle, le canal de guilde et la liste de guilde ? | Infobulle : ligne ajoutée par `TooltipDataProcessor.AddTooltipPostCall`. Canal de guilde : filtre en place, aucun message reçu pendant la session. Liste de guilde : fenêtre moderne `CommunitiesFrame`, chargée dès la connexion ; l'accroche par le mixin n'a rien donné, refaite en sonde 0.2.1 sur les lignes de la liste. | ⏳ | Affichage des titres (P13) |
+| T10 | Les métiers et recettes connues du joueur sont-ils lisibles ? | Oui. `GetProfessions` et `GetProfessionInfo` : 4 métiers avec niveau (Herboristerie 95/150, Dépeçage 104/150, Secourisme 22/75, Cuisine 6/75). À l'ouverture de chaque fenêtre de métier, `C_TradeSkillUI` donne les recettes connues avec identifiant et nom (3275 Bandage en lin, 2538 Viande de loup grillée…). Les métiers de récolte ont aussi des recettes (Herboristerie : Bougie d'encens). | ✅ | Annuaire des artisans (P14) |
 
 ## Hypothèses de départ (sources communautaires)
 

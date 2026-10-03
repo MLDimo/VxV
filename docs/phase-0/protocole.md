@@ -110,9 +110,9 @@ Pour chaque action ci-dessous, faire la commande directe, puis la même précéd
 | T5 roll par un bouton | `/vxvtest rolls button`, cliquer sur le bouton ; puis `/vxvtest later rolls roll` | Le jet apparaît dans le chat et la ligne « roll lu » suit |
 | T3 lecture des `/roll` | Taper `/roll` à la main | Ligne « roll lu : [Prénom Nom] n (1-100) » |
 | T7 compteur de dégâts | `/vxvtest meter list` ; taper un mannequin d'entraînement ou un monstre ; `/vxvtest meter read` pendant puis après le combat | Fonctions et types présents ; montants et noms lisibles, ou secrets |
-| T8 compteurs du jeu | `/vxvtest counters list tu` ; `/vxvtest counters diff` ; tuer un monstre **gris** ; `/vxvtest counters diff` ; même chose avec un monstre normal | Quel compteur change pour un monstre gris, et lequel pour un monstre normal |
-| T9 infobulle et canal de guilde | Juste après un `/reload`, avant d'ouvrir la fenêtre de guilde : `/vxvtest display on`. Survoler un joueur, attendre un message de guilde | « [Titre VXV] » dans l'infobulle et devant les messages de guilde |
-| T9 liste de guilde | Ouvrir la fenêtre de guilde (même session que la ligne précédente), parcourir la liste | « [Titre VXV] » après les noms ; noter les lignes « fenêtre … présente » |
+| T8 compteurs du jeu | `/vxvtest counters list` | Nombre de compteurs lus et valeurs plausibles (créatures tuées, morts…) |
+| T9 infobulle et canal de guilde | `/vxvtest display on`, survoler un joueur, attendre un message de guilde | « [Titre VXV] » dans l'infobulle et devant les messages de guilde |
+| T9 liste de guilde | Même session : ouvrir la fenêtre de guilde, onglet de la liste des membres, la faire défiler | « [Titre VXV] » après les noms ; sinon la ligne « nom introuvable » décrit une ligne de la liste |
 | T10 métiers et recettes | `/vxvtest professions list` ; ouvrir la fenêtre de chaque métier | Métiers et niveaux ; « n recette(s) connue(s) » à l'ouverture (sinon `/vxvtest professions recipes`, fenêtre ouverte) |
 
 **En groupe (au moins deux joueurs, un seul avec la sonde suffit)**
