@@ -6,6 +6,7 @@ import { createExclusions } from "./application/exclusions.ts";
 import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
+import { createRaidReminders } from "./application/raidReminders.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
@@ -39,6 +40,7 @@ export function createApplication({
     characters: createCharacters({ unitOfWork }),
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
     raidAnnouncements: createRaidAnnouncements({ unitOfWork, announcer }),
+    raidReminders: createRaidReminders({ unitOfWork, announcer }),
     events: createEvents({ unitOfWork, clock }),
     signups: createSignups({ unitOfWork, clock }),
     softReserves: createSoftReserves({ unitOfWork, clock }),

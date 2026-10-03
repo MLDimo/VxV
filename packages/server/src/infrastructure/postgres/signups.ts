@@ -35,6 +35,25 @@ function toSignup(row: SignupRow): Signup {
 
 export function signupRepository(sql: SqlClient): SignupRepository {
   return {
+    async listReminderTargets(eventId) {
+      const rows = await sql.query<{ discord_id: string; status: SignupStatus; has_soft_reserves: boolean }>(
+        `select members.discord_id, signups.status,
+                exists (select 1 from soft_reserves
+                        where soft_reserves.event_id = signups.event_id
+                          and soft_reserves.character_id = signups.character_id) as has_soft_reserves
+         from signups
+         join members on members.id = signups.member_id
+         where signups.event_id = $1
+         order by members.discord_name`,
+        [eventId],
+      );
+      return rows.map((row) => ({
+        discordId: row.discord_id,
+        status: row.status,
+        hasSoftReserves: row.has_soft_reserves,
+      }));
+    },
+
     async listByEvent(eventId) {
       const rows = await sql.query<SignupRow>(
         `${SELECT_SIGNUPS} where signups.event_id = $1

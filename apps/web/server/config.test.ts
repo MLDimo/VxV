@@ -4,6 +4,7 @@ import { parseConfig } from "./config";
 const environment = {
   DATABASE_URL: "postgresql://user:password@localhost:5432/postgres",
   SITE_URL: "https://vxv.test",
+  CRON_SECRET: "c".repeat(32),
   DISCORD_CLIENT_ID: "111",
   DISCORD_CLIENT_SECRET: "secret",
   DISCORD_PUBLIC_KEY: "ab".repeat(32),
@@ -21,6 +22,7 @@ describe("parseConfig", () => {
     expect(parseConfig(environment)).toEqual({
       databaseUrl: environment.DATABASE_URL,
       siteUrl: "https://vxv.test",
+      cronSecret: "c".repeat(32),
       discord: {
         clientId: "111",
         clientSecret: "secret",

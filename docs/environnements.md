@@ -83,3 +83,5 @@ Le bot fonctionne en interactions HTTP : Discord envoie chaque commande à `http
 4. GitHub : variables `DISCORD_CLIENT_ID` et `DISCORD_GUILD_ID` (`gh variable set`). Après chaque déploiement en production, la CI enregistre les commandes du bot sur le serveur (`npm run register-commands -w @vxv/bot`).
 
 Le site a aussi besoin de `SITE_URL` (son adresse publique, pour les liens des messages du bot : `https://vxv-web.vercel.app` en Production, `https://vxv-web-test.vercel.app` en Preview) et de `DISCORD_RAID_CHANNEL_ID` (salon des messages d'inscription aux raids).
+
+Rappels des raids : Vercel appelle chaque jour à 8 h UTC `/api/cron/reminders` (déclaré dans `apps/web/vercel.json`) avec le secret `CRON_SECRET`, aléatoire (32 caractères ou plus), enregistré sans l'afficher : `vercel env add CRON_SECRET production --value "$(openssl rand -hex 32)" --sensitive`. Chaque raid des 24 heures suivantes reçoit un rappel, une seule fois.
