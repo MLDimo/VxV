@@ -64,6 +64,10 @@ local function describeGuildUi()
 end
 
 local function decorateRosterEntry(entry)
+    if type(entry) ~= "table" then
+        reportOnce("Fail", "liste de guilde, ligne illisible", "valeur reçue :", entry)
+        return
+    end
     local nameText = entry.NameFrame and entry.NameFrame.Name
     local text = nameText and nameText:GetText()
     if Util.IsSecret(text) or type(text) ~= "string" then
@@ -76,9 +80,18 @@ local function decorateRosterEntry(entry)
 end
 
 --- Preferred: the list's own callback, run after each row is filled, also for the rows already created.
+--- On Forever the new rows come as (owner, row); the rows already created may come as (row) alone.
 local function hookRosterRows(scrollBox)
+    local owner = {}
+    local function onRowFilled(first, second)
+        if first == owner then
+            decorateRosterEntry(second)
+        else
+            decorateRosterEntry(first)
+        end
+    end
     log.Call("liste de guilde : accroche des lignes (ScrollUtil.AddInitializedFrameCallback)",
-        pcall(ScrollUtil.AddInitializedFrameCallback, scrollBox, decorateRosterEntry, reported, true))
+        pcall(ScrollUtil.AddInitializedFrameCallback, scrollBox, onRowFilled, owner, true))
 end
 
 local function hookRoster()
