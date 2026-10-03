@@ -1,4 +1,5 @@
 import "server-only";
+import { identityFromDiscordUser, type DiscordUser } from "@vxv/server";
 import { Discord } from "arctic";
 import { getConfig } from "./config";
 import type { DiscordGuildMember } from "./discordSignIn";
@@ -17,7 +18,7 @@ export function createDiscordClient(origin: string): Discord {
 }
 
 interface GuildMemberResponse {
-  user: { id: string; username: string; global_name: string | null };
+  user: DiscordUser;
   roles: string[];
 }
 
@@ -32,8 +33,5 @@ export async function fetchGuildMember(accessToken: string): Promise<DiscordGuil
     throw new Error(`Discord guild member request failed: ${response.status}`);
   }
   const member = (await response.json()) as GuildMemberResponse;
-  return {
-    identity: { discordId: member.user.id, discordName: member.user.global_name ?? member.user.username },
-    roleIds: member.roles,
-  };
+  return { identity: identityFromDiscordUser(member.user), roleIds: member.roles };
 }

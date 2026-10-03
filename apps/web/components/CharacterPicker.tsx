@@ -5,7 +5,7 @@ import { linkCharacter } from "@/app/actions/characters";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 import { CharacterName } from "./CharacterName";
-import { searchCharacters, type SearchableCharacter } from "./characterSearch";
+import { searchCharacters, type SearchableCharacter } from "@vxv/server/domain/characterSearch";
 
 const MAX_SUGGESTIONS = 8;
 

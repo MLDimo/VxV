@@ -28,6 +28,7 @@ const member = await signIn("200", "Membre Test");
 const newcomer = await signIn("300", "Nouveau Membre");
 const leavingMember = await signIn("400", "Membre Sortant");
 const lockedMember = await signIn("500", "Membre Verrouillé");
+const discordMember = await signIn("600", "Membre Discord");
 
 await app.roster.importRoster(officer.member, ["VXV-ROSTER-1", ...SEED_ROSTER].join("\n"), "Liste de départ des tests");
 async function seedCharacter(firstName: string) {
@@ -140,6 +141,7 @@ const seed: E2ESeed = {
     newcomer: newcomer.token,
     leavingMember: leavingMember.token,
     lockedMember: lockedMember.token,
+    discordMember: discordMember.token,
   },
   signupEventId,
   softReserveEventId,

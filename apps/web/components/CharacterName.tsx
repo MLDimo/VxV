@@ -1,4 +1,5 @@
-import { classColor, classLabel } from "./characterClasses";
+import { classLabel } from "@vxv/server/domain/characterClasses";
+import { classColor } from "./characterClasses";
 
 /** A character name in its class color, the class shown on hover. */
 export function CharacterName({ name, characterClass }: { name: string; characterClass: string }) {

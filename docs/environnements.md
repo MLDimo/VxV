@@ -70,3 +70,14 @@ Après un changement de mot de passe d'une base, remplacer son secret avec `gh s
    ```
 
 `DATABASE_URL` de Preview pointe déjà sur `vxv-test` (Transaction pooler, port 6543, adapté aux fonctions serverless).
+
+## Mise en place du bot Discord (une fois)
+
+Le bot fonctionne en interactions HTTP : Discord envoie chaque commande à `https://vxv-web.vercel.app/api/discord/interactions`, hébergée par le site.
+
+1. Developer Portal, application VXV :
+   - Informations générales : la clé publique va dans Vercel (`DISCORD_PUBLIC_KEY`, Production et Preview, lisible). Une fois le site déployé, renseigner « Interactions Endpoint URL » avec l'adresse ci-dessus : Discord la vérifie aussitôt par un ping signé.
+   - Bot : désactiver « Bot public », laisser les intents privilégiés désactivés, puis réinitialiser le jeton et le saisir sans l'afficher dans Vercel (`DISCORD_BOT_TOKEN`, Production et Preview, sensible) et dans GitHub (`gh secret set DISCORD_BOT_TOKEN`).
+2. Inviter le bot avec les permissions gérer les rôles, gérer les pseudos, voir les salons, envoyer des messages, intégrer des liens et lire l'historique : `https://discord.com/oauth2/authorize?client_id=<identifiant client>&scope=bot+applications.commands&permissions=402738176&guild_id=<serveur>&disable_guild_select=true`.
+3. Serveur : placer le rôle du bot au-dessus des rôles des membres (il ne peut modifier que les membres placés en dessous de lui ; personne ne peut renommer le propriétaire). Créer le salon de liaison des personnages et le salon des raids ; leurs identifiants vont dans Vercel (`DISCORD_LINK_CHANNEL_ID`, …).
+4. GitHub : variables `DISCORD_CLIENT_ID` et `DISCORD_GUILD_ID` (`gh variable set`). Après chaque déploiement en production, la CI enregistre les commandes du bot sur le serveur (`npm run register-commands -w @vxv/bot`).

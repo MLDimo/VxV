@@ -36,6 +36,13 @@ describe("auth", () => {
     expect(signedIn.member.roles).toEqual(["member", "treasurer", "officer"]);
   });
 
+  it("identifies a member acting through the bot as the same member, without a session", async () => {
+    const signedIn = await auth.signIn(identity, []);
+    const identified = await auth.identify({ ...identity, discordName: "Déjà Vu" }, ["officer-role"]);
+    expect(identified).toEqual({ ...signedIn.member, discordName: "Déjà Vu", roles: ["member", "officer"] });
+    expect((await database.query("select 1 from sessions")).rows).toHaveLength(1);
+  });
+
   it("refreshes the name and roles of a returning member", async () => {
     const first = await auth.signIn(identity, []);
     const second = await auth.signIn({ ...identity, discordName: "Déjà Vu" }, ["officer-role"]);

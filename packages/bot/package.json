@@ -9,10 +9,14 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
-    "test": "vitest run"
+    "test": "vitest run --maxWorkers=2 --hookTimeout=30000 --testTimeout=30000",
+    "register-commands": "tsx src/registerCommands.ts"
   },
   "dependencies": {
     "@vxv/server": "*",
     "discord-api-types": "^0.38.56"
+  },
+  "devDependencies": {
+    "@vxv/database": "*"
   }
 }

@@ -7,6 +7,7 @@ const environment = {
   DISCORD_CLIENT_SECRET: "secret",
   DISCORD_PUBLIC_KEY: "ab".repeat(32),
   DISCORD_GUILD_ID: "222",
+  DISCORD_LINK_CHANNEL_ID: "333",
   DISCORD_ROLE_TREASURER: "2",
   DISCORD_ROLE_OFFICER: "3",
   DISCORD_ROLE_GM: "4",
@@ -21,6 +22,7 @@ describe("parseConfig", () => {
         clientSecret: "secret",
         publicKey: "ab".repeat(32),
         guildId: "222",
+        linkChannelId: "333",
         roles: { treasurer: "2", officer: "3", gm: "4" },
       },
     });
