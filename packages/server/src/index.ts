@@ -13,6 +13,16 @@ export {
 } from "./domain/events.ts";
 export type { JournalAction, JournalEntry } from "./domain/journal.ts";
 export { ROSTER_HEADER, RosterFormatError, type RosterImportSummary } from "./domain/roster.ts";
+export {
+  composition,
+  MAX_SPEC_LENGTH,
+  SIGNUP_ROLES,
+  SIGNUP_STATUSES,
+  type Composition,
+  type Signup,
+  type SignupRole,
+  type SignupStatus,
+} from "./domain/signups.ts";
 export { MEMBER_ROLES, type DiscordRoleMapping, type Member, type MemberRole } from "./domain/members.ts";
 export { canManageRaids } from "./domain/permissions.ts";
 export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastructure/sql.ts";

@@ -20,7 +20,9 @@ test.describe.serial("raid events", () => {
     await expect(page.getByText("2 SR par joueur")).toBeVisible();
 
     await page.getByRole("link", { name: "VXV" }).click();
-    await expect(page.getByRole("link", { name: /La salle des Thanes/ })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /La salle des Thanes/ }).filter({ hasText: "12 décembre 2030" }),
+    ).toBeVisible();
     await page.getByRole("link", { name: "Journal" }).click();
     await expect(page.getByRole("listitem").filter({ hasText: "Motif : Raid de test" })).toContainText(
       "La salle des Thanes, le 12/12/2030 21:00, 2 SR par joueur",
@@ -39,7 +41,9 @@ test.describe.serial("raid events", () => {
   test("a member sees the event but cannot create one", async ({ page, context }) => {
     await signInAs(context, "member");
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /La salle des Thanes/ })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /La salle des Thanes/ }).filter({ hasText: "12 décembre 2030" }),
+    ).toBeVisible();
     await expect(page.getByRole("link", { name: "Créer un événement" })).toHaveCount(0);
     await page.goto("/evenements/nouveau");
     await expect(page).toHaveURL(/\/$/);

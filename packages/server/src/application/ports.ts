@@ -3,6 +3,7 @@ import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { RosterEntry } from "../domain/roster.ts";
+import type { Signup, SignupChoice } from "../domain/signups.ts";
 
 export interface DiscordIdentity {
   discordId: string;
@@ -64,6 +65,15 @@ export interface EventRepository {
   listStartingAfter(instant: Date): Promise<RaidEvent[]>;
 }
 
+export interface SignupRepository {
+  /** Tanks, then healers, then DPS, by character name. */
+  listByEvent(eventId: string): Promise<Signup[]>;
+  findByMember(eventId: string, memberId: string): Promise<Signup | undefined>;
+  /** Creates the sign-up of this character, or updates it. */
+  save(signup: SignupChoice & { eventId: string; memberId: string }): Promise<void>;
+  delete(eventId: string, characterId: string): Promise<void>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
@@ -71,6 +81,7 @@ export interface Repositories {
   journal: JournalRepository;
   raids: RaidRepository;
   events: EventRepository;
+  signups: SignupRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

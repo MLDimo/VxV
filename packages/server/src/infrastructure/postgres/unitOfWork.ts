@@ -6,6 +6,7 @@ import { journalRepository } from "./journal.ts";
 import { memberRepository } from "./members.ts";
 import { raidRepository } from "./raids.ts";
 import { sessionRepository } from "./sessions.ts";
+import { signupRepository } from "./signups.ts";
 
 function createRepositories(sql: SqlClient): Repositories {
   return {
@@ -15,6 +16,7 @@ function createRepositories(sql: SqlClient): Repositories {
     journal: journalRepository(sql),
     raids: raidRepository(sql),
     events: eventRepository(sql),
+    signups: signupRepository(sql),
   };
 }
 

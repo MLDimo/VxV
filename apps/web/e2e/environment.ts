@@ -4,7 +4,7 @@ import { join } from "node:path";
 /** Shared by the Playwright config, the database server and the tests. */
 export const DATABASE_PORT = 54329;
 export const WEB_PORT = 3200;
-export const SESSIONS_FILE = join(tmpdir(), "vxv-e2e-sessions.json");
+export const SEED_FILE = join(tmpdir(), "vxv-e2e-seed.json");
 
 export const DISCORD_ROLES = { member: "10", treasurer: "11", officer: "12", gm: "13" } as const;
 
@@ -22,9 +22,20 @@ export const WEB_ENVIRONMENT = {
 /** Guild characters imported before the tests (accents included, as in the game). */
 export const SEED_ROSTER = ["Aubé;Clairval;PRIEST", "Brume;Noire;MAGE", "Ciel;Gris;WARRIOR"];
 
+/** Session tokens of the prepared members. */
 export interface E2ESessions {
+  /** Officer, whose main is Ciel Gris. */
   officer: string;
   member: string;
+  /** Member without any character. */
+  newcomer: string;
   /** Reserved to the sign-out test, which ends it. */
   leavingMember: string;
+}
+
+/** What the database server prepared, written for the tests to read. */
+export interface E2ESeed {
+  sessions: E2ESessions;
+  /** Event on La salle des Thanes, reserved to the sign-up tests. */
+  signupEventId: string;
 }
