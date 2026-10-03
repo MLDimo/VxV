@@ -6,7 +6,7 @@ const guildMember: DiscordGuildMember = { identity: { discordId: "1", discordNam
 const session: SignedIn = {
   token: "token",
   expiresAt: new Date("2026-10-10T00:00:00Z"),
-  member: { id: "m", discordId: "1", discordName: "Déjà", role: "member" },
+  member: { id: "m", discordId: "1", discordName: "Déjà", roles: ["member"] },
 };
 const validRequest = { code: "code", state: "state", expectedState: "state", codeVerifier: "verifier" };
 

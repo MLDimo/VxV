@@ -43,7 +43,7 @@ export async function requireMember(): Promise<Member> {
 /** For officer pages: other members go back to the home page. */
 export async function requireOfficer(): Promise<Member> {
   const member = await requireMember();
-  if (!canManageRaids(member.role)) {
+  if (!canManageRaids(member.roles)) {
     redirect("/");
   }
   return member;

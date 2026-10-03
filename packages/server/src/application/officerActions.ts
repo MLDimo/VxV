@@ -2,9 +2,9 @@ import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 
-/** Every officer action checks the actor's role and requires a reason, kept in the journal. */
+/** Every officer action checks the actor's roles and requires a reason, kept in the journal. */
 export function checkOfficerAction(actor: Member, reason: string): string {
-  if (!canManageRaids(actor.role)) {
+  if (!canManageRaids(actor.roles)) {
     throw new ForbiddenError();
   }
   const trimmed = reason.trim();

@@ -64,7 +64,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         />
       </section>
 
-      {canManageRaids(member.role) && (
+      {canManageRaids(member.roles) && (
         <section className="mt-8 rounded border border-amber-900/60 p-4">
           <h2 className="text-lg font-semibold">Officiers · exclusions et corrections</h2>
           <p className="mt-1 text-sm text-zinc-400">

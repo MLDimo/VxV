@@ -11,7 +11,7 @@ export default async function HomePage() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Raids à venir</h1>
-        {canManageRaids(member.role) && (
+        {canManageRaids(member.roles) && (
           <Link
             href="/evenements/nouveau"
             className="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500"

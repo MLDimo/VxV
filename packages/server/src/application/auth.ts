@@ -1,4 +1,4 @@
-import { roleFromDiscordRoles, type DiscordRoleMapping, type Member } from "../domain/members.ts";
+import { rolesFromDiscordRoles, type DiscordRoleMapping, type Member } from "../domain/members.ts";
 import type { Clock, DiscordIdentity, UnitOfWork } from "./ports.ts";
 import { generateSessionToken, sessionIdFromToken } from "./sessionTokens.ts";
 
@@ -26,16 +26,16 @@ export interface SignedIn {
 
 export function createAuth({ unitOfWork, clock, discordRoles }: AuthDependencies) {
   return {
-    /** Opens a session for a Discord user who holds a guild role, recording their current name and role. */
+    /** Opens a session for a Discord user who holds a guild role, recording their current name and roles. */
     async signIn(identity: DiscordIdentity, discordRoleIds: readonly string[]): Promise<SignedIn> {
-      const role = roleFromDiscordRoles(discordRoleIds, discordRoles);
-      if (role === undefined) {
+      const roles = rolesFromDiscordRoles(discordRoleIds, discordRoles);
+      if (roles.length === 0) {
         throw new NotGuildMemberError();
       }
       const token = generateSessionToken();
       const expiresAt = new Date(clock().getTime() + SESSION_DURATION_MS);
       const member = await unitOfWork.run(async ({ members, sessions }) => {
-        const saved = await members.saveFromDiscord(identity, role);
+        const saved = await members.saveFromDiscord(identity, roles);
         await sessions.create({ id: sessionIdFromToken(token), memberId: saved.id, expiresAt });
         return saved;
       });

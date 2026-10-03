@@ -20,8 +20,8 @@ export interface Session {
 }
 
 export interface MemberRepository {
-  /** Creates the member on first sign-in, or refreshes their Discord name and guild role. */
-  saveFromDiscord(identity: DiscordIdentity, role: MemberRole): Promise<Member>;
+  /** Creates the member on first sign-in, or refreshes their Discord name and guild roles. */
+  saveFromDiscord(identity: DiscordIdentity, roles: readonly MemberRole[]): Promise<Member>;
   findById(id: string): Promise<Member | undefined>;
 }
 
