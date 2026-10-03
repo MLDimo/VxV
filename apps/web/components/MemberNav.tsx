@@ -10,6 +10,9 @@ export function MemberNav({ member }: { member: Member }) {
         <Link href="/" className="text-lg font-bold">
           VXV
         </Link>
+        <Link href="/personnages" className="text-zinc-300 hover:text-white">
+          Mes personnages
+        </Link>
         <Link href="/journal" className="text-zinc-300 hover:text-white">
           Journal
         </Link>

@@ -14,7 +14,12 @@ const nextRules = nextVitals
   .map((config) => {
     const languageOptions = { ...config.languageOptions };
     delete languageOptions.parser;
-    return { ...config, languageOptions, files: WEB_FILES };
+    return {
+      ...config,
+      languageOptions,
+      files: WEB_FILES,
+      settings: { ...config.settings, next: { rootDir: "apps/web" } },
+    };
   });
 
 export default tseslint.config(

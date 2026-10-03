@@ -30,6 +30,16 @@ export interface SessionRepository {
 
 export interface CharacterRepository {
   listAll(): Promise<Character[]>;
+  /** Undefined when the id is unknown or malformed. */
+  findById(characterId: string): Promise<Character | undefined>;
+  /** In the guild and linked to nobody: what a member may claim. */
+  listAvailable(): Promise<Character[]>;
+  /** Main first, then by name. */
+  listByMember(memberId: string): Promise<Character[]>;
+  link(characterId: string, memberId: string): Promise<void>;
+  unlink(characterId: string): Promise<void>;
+  /** Makes this character the member's only main. */
+  setMain(memberId: string, characterId: string): Promise<void>;
   add(entries: readonly RosterEntry[]): Promise<void>;
   changeClass(characterId: string, characterClass: string): Promise<void>;
   setInGuild(characterIds: readonly string[], inGuild: boolean): Promise<void>;
