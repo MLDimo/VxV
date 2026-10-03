@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import type { ActionState } from "@/components/actionState";
-import { wallClockToInstant } from "@/components/dateTime";
+import { wallClockToInstant } from "@vxv/server/domain/dateTime";
 import { getApplication } from "@/server/application";
 import { runFormAction } from "@/server/formActions";
 import { requireOfficer } from "@/server/session";
@@ -11,7 +11,8 @@ export async function createEvent(_previous: ActionState, form: FormData): Promi
   const officer = await requireOfficer();
   let eventId: string | undefined;
   const state = await runFormAction(async () => {
-    eventId = await getApplication().events.createEvent(
+    const application = getApplication();
+    eventId = await application.events.createEvent(
       officer,
       {
         startsAt: wallClockToInstant(String(form.get("startsAt") ?? "")),
@@ -20,6 +21,7 @@ export async function createEvent(_previous: ActionState, form: FormData): Promi
       },
       String(form.get("reason") ?? ""),
     );
+    await application.raidAnnouncements.announceQuietly(eventId);
     return "Événement créé.";
   }, ["/", "/journal"]);
   if (eventId !== undefined) {

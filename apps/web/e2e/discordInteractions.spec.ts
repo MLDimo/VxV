@@ -1,6 +1,7 @@
 import { autocomplete, slashCommand, type TestActor } from "@vxv/bot/testing";
 import { expect, test, type APIRequestContext } from "@playwright/test";
-import { DISCORD, FAKE_DISCORD_URL, WEB_ENVIRONMENT } from "./environment";
+import { DISCORD, DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
+import { discordEventMessage, discordMemberState } from "./fakeDiscord";
 import { signInAs } from "./sessions";
 
 const ENDPOINT = "/api/discord/interactions";
@@ -50,10 +51,30 @@ test("a member links their main with /vxv_main: renamed on Discord with the clas
       content: "Éole Vent est maintenant ton personnage principal. Pseudo Discord et rôle de classe mis à jour.",
     },
   });
-  const onDiscord = await request.get(`${FAKE_DISCORD_URL}/state/${DISCORD_MEMBER.userId}`);
-  expect(await onDiscord.json()).toEqual({ nickname: "Membre Discord - [Éole Vent]", roles: ["Druide"] });
+  expect(await discordMemberState(request, DISCORD_MEMBER.userId)).toEqual({
+    nickname: "Membre Discord - [Éole Vent]",
+    roles: ["Druide"],
+  });
 
   await signInAs(context, "discordMember");
   await page.goto("/personnages");
   await expect(page.getByRole("listitem").filter({ hasText: "Éole Vent" })).toContainText("Main");
+});
+
+test("an officer creates a raid with /vxv_raid, published in the raid channel", async ({ request, page, context }) => {
+  const officer: TestActor = { userId: "100", name: "Officier Test", roleIds: [DISCORD_ROLES.officer], channelId: "1" };
+  const plan = { raid: "salle-des-thanes", date: "20/03/2031", heure: "21h", motif: "Raid créé depuis Discord" };
+  const reply = await postSigned(request, slashCommand("vxv_raid", plan, officer));
+  expect(await reply.json()).toMatchObject({
+    data: { content: `Événement créé et publié dans <#${WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID}>.` },
+  });
+
+  await signInAs(context, "officer");
+  await page.goto("/");
+  await page
+    .getByRole("link", { name: /La salle des Thanes/ })
+    .filter({ hasText: "20 mars 2031" })
+    .click();
+  const message = await discordEventMessage(request, page.url().split("/").pop() ?? "");
+  expect(message?.embed?.title).toBe("La salle des Thanes");
 });

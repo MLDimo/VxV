@@ -7,6 +7,7 @@ const discordPublicKey = z.string().regex(/^[0-9a-f]{64}$/i, "doit être la clé
 
 const environmentSchema = z.object({
   DATABASE_URL: z.url(),
+  SITE_URL: z.url(),
   DISCORD_CLIENT_ID: discordId,
   DISCORD_CLIENT_SECRET: z.string().min(1),
   DISCORD_PUBLIC_KEY: discordPublicKey,
@@ -15,6 +16,7 @@ const environmentSchema = z.object({
   DISCORD_API_URL: z.url().optional(),
   DISCORD_GUILD_ID: discordId,
   DISCORD_LINK_CHANNEL_ID: discordId,
+  DISCORD_RAID_CHANNEL_ID: discordId,
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -22,6 +24,8 @@ const environmentSchema = z.object({
 
 export interface WebConfig {
   databaseUrl: string;
+  /** Public address of the website, for the links in the bot's messages. */
+  siteUrl: string;
   discord: {
     clientId: string;
     clientSecret: string;
@@ -32,6 +36,8 @@ export interface WebConfig {
     guildId: string;
     /** Channel where members link their characters with /vxv_main and /vxv_reroll. */
     linkChannelId: string;
+    /** Channel where each event has its sign-up message. */
+    raidChannelId: string;
     roles: DiscordRoleMapping;
   };
 }
@@ -46,6 +52,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
   const env = result.data;
   return {
     databaseUrl: env.DATABASE_URL,
+    siteUrl: env.SITE_URL,
     discord: {
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
@@ -54,6 +61,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       apiUrl: env.DISCORD_API_URL,
       guildId: env.DISCORD_GUILD_ID,
       linkChannelId: env.DISCORD_LINK_CHANNEL_ID,
+      raidChannelId: env.DISCORD_RAID_CHANNEL_ID,
       roles: {
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,

@@ -1,10 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { WEB_ENVIRONMENT } from "./environment";
+import { discordEventMessage } from "./fakeDiscord";
 import { signInAs } from "./sessions";
 
 test.describe.serial("raid events", () => {
-  test("an officer creates an event on a raid, shown on the home page and in the journal", async ({
+  test("an officer creates an event on a raid, shown on the home page, on Discord and in the journal", async ({
     page,
     context,
+    request,
   }) => {
     await signInAs(context, "officer");
     await page.goto("/");
@@ -18,6 +21,9 @@ test.describe.serial("raid events", () => {
     await expect(page.getByRole("heading", { name: "La salle des Thanes" })).toBeVisible();
     await expect(page.getByText("jeudi 12 décembre 2030 à 21:00")).toBeVisible();
     await expect(page.getByText("2 SR par joueur")).toBeVisible();
+    const message = await discordEventMessage(request, page.url().split("/").pop() ?? "");
+    expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID);
+    expect(message?.embed?.title).toBe("La salle des Thanes");
 
     await page.getByRole("link", { name: "VXV" }).click();
     await expect(

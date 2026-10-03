@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { wallClockToInstant } from "./dateTime";
+import { wallClockToInstant } from "./dateTime.ts";
 
 describe("wallClockToInstant", () => {
   it.each([

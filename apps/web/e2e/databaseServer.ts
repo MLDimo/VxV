@@ -3,6 +3,7 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { renderSeedSql } from "@vxv/data-generator/seedSql";
 import { createMigratedPGlite } from "@vxv/database/testing";
 import { loadRaids } from "@vxv/raid-data";
+import { createDiscordRaidAnnouncer } from "@vxv/bot";
 import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
 import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, WEB_ENVIRONMENT, type E2ESeed } from "./environment";
@@ -15,13 +16,15 @@ const MAX_CONNECTIONS = 10;
 
 const database = await createMigratedPGlite();
 await database.exec(renderSeedSql(await loadRaids()).content);
+const rest = { token: WEB_ENVIRONMENT.DISCORD_BOT_TOKEN, apiUrl: WEB_ENVIRONMENT.DISCORD_API_URL };
 const app = createApplication({
   sql: sqlClientFromPGlite(database),
   discordRoles: DISCORD_ROLES,
-  guild: createDiscordGuild({
-    token: WEB_ENVIRONMENT.DISCORD_BOT_TOKEN,
-    guildId: WEB_ENVIRONMENT.DISCORD_GUILD_ID,
-    apiUrl: WEB_ENVIRONMENT.DISCORD_API_URL,
+  guild: createDiscordGuild({ ...rest, guildId: WEB_ENVIRONMENT.DISCORD_GUILD_ID }),
+  announcer: createDiscordRaidAnnouncer({
+    ...rest,
+    channelId: WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID,
+    siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
 });
 

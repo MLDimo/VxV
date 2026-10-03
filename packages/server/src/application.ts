@@ -5,10 +5,11 @@ import { createEvents } from "./application/events.ts";
 import { createExclusions } from "./application/exclusions.ts";
 import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
+import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
-import type { Clock, GuildGateway } from "./application/ports.ts";
+import type { Clock, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "./infrastructure/sql.ts";
@@ -18,17 +19,26 @@ export interface ApplicationConfig {
   discordRoles: DiscordRoleMapping;
   /** The guild's Discord server, where the bot updates nicknames and roles. */
   guild: GuildGateway;
+  /** The raid channel, where each event has its sign-up message. */
+  announcer: RaidAnnouncer;
   clock?: Clock;
 }
 
 /** Composition root shared by the website and the bot: every use case wired to PostgreSQL. */
-export function createApplication({ sql, discordRoles, guild, clock = () => new Date() }: ApplicationConfig) {
+export function createApplication({
+  sql,
+  discordRoles,
+  guild,
+  announcer,
+  clock = () => new Date(),
+}: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     roster: createRoster({ unitOfWork }),
     characters: createCharacters({ unitOfWork }),
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
+    raidAnnouncements: createRaidAnnouncements({ unitOfWork, announcer }),
     events: createEvents({ unitOfWork, clock }),
     signups: createSignups({ unitOfWork, clock }),
     softReserves: createSoftReserves({ unitOfWork, clock }),

@@ -5,10 +5,10 @@ import type { FakeDiscord } from "@vxv/server/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext, SlashCommand } from "./commands.ts";
 import { VXV_MAIN, VXV_REROLL } from "./linkCommands.ts";
-import { createTestApplication, SERVER_OWNER } from "./testApplication.ts";
+import { createTestApplication, LINK_CHANNEL, SERVER_OWNER } from "./testApplication.ts";
 import { autocomplete, slashCommand, type TestActor } from "./testing.ts";
 
-const LINKS = "links-channel";
+const LINKS = LINK_CHANNEL;
 const ME: TestActor = { userId: "200", name: "Déjà", channelId: LINKS };
 const OTHER: TestActor = { userId: "300", name: "Autre", channelId: LINKS };
 
@@ -25,12 +25,11 @@ describe("character linking commands", () => {
   let discord: FakeDiscord;
 
   beforeEach(async () => {
-    ({ app, database, discord } = await createTestApplication([
+    ({ app, database, discord, context } = await createTestApplication([
       "Ðéjà;Vu;ROGUE",
       "Eole;Hermes;DRUID",
       "Ugly;Hole;WARRIOR",
     ]));
-    context = { app, linkChannelId: LINKS };
   });
 
   afterEach(async () => {
