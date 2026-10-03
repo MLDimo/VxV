@@ -9,7 +9,7 @@ Gestion des raids, soft reserves (SR), suivi du loot, puis paris. Le plan de ré
 - **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
-- **P2 API et site** : en cours. Socle Next.js en ligne (projet Vercel `vxv-web`), connexion Discord et droits (2.1, 2.2), journal et import de la liste de guilde (2.3, 2.4), liaison des personnages (2.5), événements (2.6), inscriptions (2.7).
+- **P2 API et site** : en cours. Socle Next.js en ligne (projet Vercel `vxv-web`), connexion Discord et droits (2.1, 2.2), journal et import de la liste de guilde (2.3, 2.4), liaison des personnages (2.5), événements (2.6), inscriptions (2.7), SR des membres (2.8, exclusions et verrouillage à venir).
 - P3 à P11 : pas commencées.
 
 ## Structure du dépôt

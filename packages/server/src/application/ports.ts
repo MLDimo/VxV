@@ -4,6 +4,7 @@ import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
+import type { LootItem, SoftReserve } from "../domain/softReserves.ts";
 
 export interface DiscordIdentity {
   discordId: string;
@@ -74,6 +75,27 @@ export interface SignupRepository {
   delete(eventId: string, characterId: string): Promise<void>;
 }
 
+export interface BossLootRepository {
+  /** Items dropped by the bosses of these raids, by raid, then boss order, then name; each item once. */
+  listForRaids(raidIds: readonly string[]): Promise<LootItem[]>;
+}
+
+export interface LootHistoryRepository {
+  /** For each item, how many characters signed up to the event already received it. */
+  countSignedUpOwners(eventId: string): Promise<Map<number, number>>;
+}
+
+export interface SoftReserveRepository {
+  listByEvent(eventId: string): Promise<SoftReserve[]>;
+  /** The character's soft reserves for the event become exactly these items. */
+  replaceForCharacter(eventId: string, characterId: string, itemIds: readonly number[]): Promise<void>;
+}
+
+export interface ExclusionRepository {
+  /** Items the officers excluded from soft reserves for this event. */
+  listByEvent(eventId: string): Promise<Set<number>>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
@@ -82,6 +104,10 @@ export interface Repositories {
   raids: RaidRepository;
   events: EventRepository;
   signups: SignupRepository;
+  bossLoot: BossLootRepository;
+  lootHistory: LootHistoryRepository;
+  softReserves: SoftReserveRepository;
+  exclusions: ExclusionRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

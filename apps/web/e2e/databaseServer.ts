@@ -36,6 +36,18 @@ const signupEventId = await app.events.createEvent(
   "Événement des tests d'inscription",
 );
 
+const softReserveEventId = await app.events.createEvent(
+  officer.member,
+  { startsAt: new Date("2031-01-22T20:00:00Z"), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+  "Événement des tests de SR",
+);
+await app.signups.signUp(officer.member, softReserveEventId, {
+  characterId: cielGris.id,
+  role: "tank",
+  spec: "Protection",
+  status: "present",
+});
+
 const seed: E2ESeed = {
   sessions: {
     officer: officer.token,
@@ -44,6 +56,7 @@ const seed: E2ESeed = {
     leavingMember: leavingMember.token,
   },
   signupEventId,
+  softReserveEventId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 

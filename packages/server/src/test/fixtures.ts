@@ -45,3 +45,27 @@ export async function createRaids(sql: SqlClient, raids: Record<string, string>)
 export function createEvent(sql: SqlClient, createdBy: Member, startsAt: Date, raidIds: string[]): Promise<string> {
   return eventRepository(sql).create({ startsAt, raidIds, softReservesPerPlayer: 1 }, createdBy.id);
 }
+
+/** Onyxia's lair with two bosses and their loot, as the generated raid data would create it. */
+export async function createRaidWithLoot(sql: SqlClient): Promise<void> {
+  await sql.query("insert into raids (id, name, instance_id) values ('onyxia', 'Onyxia', 249)");
+  await sql.query(
+    `insert into bosses (encounter_id, raid_id, name, position) values
+       (1, 'onyxia', 'Gardienne', 1), (2, 'onyxia', 'Onyxia', 2)`,
+  );
+  await sql.query(
+    `insert into items (id, name) values (10, 'Cape de la gardienne'), (20, 'Tête d''Onyxia'), (21, 'Sac en peau')`,
+  );
+  await sql.query("insert into boss_loot (encounter_id, item_id) values (1, 10), (2, 20), (2, 21)");
+}
+
+/** A loot already received by a character during an event. */
+export async function recordLoot(
+  sql: SqlClient,
+  loot: { eventId: string; encounterId: number; itemId: number; characterId: string },
+): Promise<void> {
+  await sql.query(
+    "insert into loots (event_id, encounter_id, item_id, character_id, looted_at) values ($1, $2, $3, $4, now())",
+    [loot.eventId, loot.encounterId, loot.itemId, loot.characterId],
+  );
+}

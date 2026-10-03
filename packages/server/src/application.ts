@@ -4,6 +4,7 @@ import { createEvents } from "./application/events.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
+import { createSoftReserves } from "./application/softReserves.ts";
 import type { Clock } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
@@ -24,6 +25,7 @@ export function createApplication({ sql, discordRoles, clock = () => new Date() 
     characters: createCharacters({ unitOfWork }),
     events: createEvents({ unitOfWork, clock }),
     signups: createSignups({ unitOfWork, clock }),
+    softReserves: createSoftReserves({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
   };
 }
