@@ -30,3 +30,12 @@ export async function createGuildCharacters<const Names extends readonly string[
     return character;
   }) as { [Index in keyof Names]: Character };
 }
+
+/** Raids as the generated raid data would create them; ids are slugs, names are given. */
+export async function createRaids(sql: SqlClient, raids: Record<string, string>): Promise<void> {
+  let instanceId = 1;
+  for (const [id, name] of Object.entries(raids)) {
+    await sql.query("insert into raids (id, name, instance_id) values ($1, $2, $3)", [id, name, instanceId]);
+    instanceId += 1;
+  }
+}

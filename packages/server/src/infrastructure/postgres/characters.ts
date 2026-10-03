@@ -1,6 +1,7 @@
 import type { CharacterRepository } from "../../application/ports.ts";
 import type { Character } from "../../domain/characters.ts";
 import type { SqlClient } from "../sql.ts";
+import { isUuid } from "./uuid.ts";
 
 interface CharacterRow {
   id: string;
@@ -25,7 +26,6 @@ function toCharacter(row: CharacterRow): Character {
 }
 
 const COLUMNS = "id, first_name, last_name, class, member_id, is_main, in_guild";
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function characterRepository(sql: SqlClient): CharacterRepository {
   const select = async (where: string, params: unknown[] = []) =>
@@ -37,7 +37,7 @@ export function characterRepository(sql: SqlClient): CharacterRepository {
     },
 
     async findById(characterId) {
-      if (!UUID.test(characterId)) {
+      if (!isUuid(characterId)) {
         return undefined;
       }
       const [character] = await select("where id = $1", [characterId]);

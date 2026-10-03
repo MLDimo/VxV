@@ -1,8 +1,10 @@
 import type { Repositories, UnitOfWork } from "../../application/ports.ts";
 import type { SqlClient } from "../sql.ts";
 import { characterRepository } from "./characters.ts";
+import { eventRepository } from "./events.ts";
 import { journalRepository } from "./journal.ts";
 import { memberRepository } from "./members.ts";
+import { raidRepository } from "./raids.ts";
 import { sessionRepository } from "./sessions.ts";
 
 function createRepositories(sql: SqlClient): Repositories {
@@ -11,6 +13,8 @@ function createRepositories(sql: SqlClient): Repositories {
     sessions: sessionRepository(sql),
     characters: characterRepository(sql),
     journal: journalRepository(sql),
+    raids: raidRepository(sql),
+    events: eventRepository(sql),
   };
 }
 

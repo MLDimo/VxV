@@ -1,4 +1,5 @@
 import type { Character } from "../domain/characters.ts";
+import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { RosterEntry } from "../domain/roster.ts";
@@ -51,11 +52,25 @@ export interface JournalRepository {
   listRecent(limit: number): Promise<JournalEntry[]>;
 }
 
+export interface RaidRepository {
+  /** Raids known from data/raids, by name. */
+  listAll(): Promise<RaidSummary[]>;
+}
+
+export interface EventRepository {
+  create(event: NewRaidEvent, createdBy: string): Promise<string>;
+  findById(eventId: string): Promise<RaidEvent | undefined>;
+  /** Events starting after the given instant, soonest first. */
+  listStartingAfter(instant: Date): Promise<RaidEvent[]>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
   characters: CharacterRepository;
   journal: JournalRepository;
+  raids: RaidRepository;
+  events: EventRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */
