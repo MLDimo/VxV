@@ -6,7 +6,13 @@ export type { EventCreationRecord } from "./application/events.ts";
 export type { ExclusionRecord } from "./application/exclusions.ts";
 export type { SoftReserveBoard, SoftReserveOverrideRecord } from "./application/softReserves.ts";
 export { fullName, type Character } from "./domain/characters.ts";
-export { softReserveRespected, type SoftReservedLoot } from "./domain/history.ts";
+export {
+  LOOT_METHODS,
+  SOFT_RESERVE_METHODS,
+  softReserveRespected,
+  type LootMethod,
+  type LootRecord,
+} from "./domain/history.ts";
 export {
   DEFAULT_SOFT_RESERVES,
   MAX_SOFT_RESERVES,
