@@ -3,6 +3,7 @@ import { createCharacters } from "./application/characters.ts";
 import { createEvents } from "./application/events.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRoster } from "./application/roster.ts";
+import { createSignups } from "./application/signups.ts";
 import type { Clock } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
@@ -22,6 +23,7 @@ export function createApplication({ sql, discordRoles, clock = () => new Date() 
     roster: createRoster({ unitOfWork }),
     characters: createCharacters({ unitOfWork }),
     events: createEvents({ unitOfWork, clock }),
+    signups: createSignups({ unitOfWork, clock }),
     journal: createJournal({ unitOfWork }),
   };
 }

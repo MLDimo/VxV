@@ -49,9 +49,12 @@ export function insertEvent(database: PGliteInterface, createdBy: string): Promi
   );
 }
 
-export async function insertSignup(database: PGliteInterface, eventId: string, characterId: string): Promise<void> {
-  await database.query("insert into signups (event_id, character_id, role, spec) values ($1, $2, 'dps', 'Combat')", [
-    eventId,
-    characterId,
-  ]);
+export async function insertSignup(
+  database: PGliteInterface,
+  signup: { eventId: string; characterId: string; memberId: string },
+): Promise<void> {
+  await database.query(
+    "insert into signups (event_id, character_id, member_id, role, spec) values ($1, $2, $3, 'dps', 'Combat')",
+    [signup.eventId, signup.characterId, signup.memberId],
+  );
 }

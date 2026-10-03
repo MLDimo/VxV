@@ -1,6 +1,7 @@
 import type { Character } from "../domain/characters.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
+import { eventRepository } from "../infrastructure/postgres/events.ts";
 import { memberRepository } from "../infrastructure/postgres/members.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 
@@ -38,4 +39,9 @@ export async function createRaids(sql: SqlClient, raids: Record<string, string>)
     await sql.query("insert into raids (id, name, instance_id) values ($1, $2, $3)", [id, name, instanceId]);
     instanceId += 1;
   }
+}
+
+/** An event on the given raids, as an officer would create it. */
+export function createEvent(sql: SqlClient, createdBy: Member, startsAt: Date, raidIds: string[]): Promise<string> {
+  return eventRepository(sql).create({ startsAt, raidIds, softReservesPerPlayer: 1 }, createdBy.id);
 }

@@ -93,8 +93,21 @@ describe("initial schema", () => {
         ]);
 
       await expect(reserve()).rejects.toThrow(/foreign key/);
-      await insertSignup(database, eventId, characterId);
+      await insertSignup(database, { eventId, characterId, memberId });
       await expect(reserve()).resolves.toBeDefined();
+    });
+  });
+
+  describe("sign-ups", () => {
+    it("allows a single sign-up per member and event, whatever the character", async () => {
+      const memberId = await insertMember(database, "1");
+      const main = await insertCharacter(database, { firstName: "Ðéjà", lastName: "Vu", memberId });
+      const reroll = await insertCharacter(database, { firstName: "Eole", lastName: "Hermes", memberId });
+      const eventId = await insertEvent(database, memberId);
+      await insertSignup(database, { eventId, characterId: main, memberId });
+      await expect(insertSignup(database, { eventId, characterId: reroll, memberId })).rejects.toThrow(
+        /signups_one_per_member/,
+      );
     });
   });
 
