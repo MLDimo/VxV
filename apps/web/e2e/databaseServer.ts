@@ -80,6 +80,29 @@ await app.softReserves.override(
   "SR de départ des tests",
 );
 
+const historyEventId = await app.events.createEvent(
+  officer.member,
+  { startsAt: new Date("2031-02-05T20:00:00Z"), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+  "Événement des tests d'historique",
+);
+await app.signups.signUp(lockedMember.member, historyEventId, {
+  characterId: duneSable.id,
+  role: "dps",
+  spec: "Précision",
+  status: "present",
+});
+const BOTTINES = 270229;
+const PILLAGE = 3494;
+const JAMBIERES = 270260;
+const DURGEN = 3496;
+await app.softReserves.setMine(lockedMember.member, historyEventId, [String(BOTTINES)]);
+// Loots are recorded by the addon from P6 on; until then the tests insert them directly.
+await database.query(
+  `insert into loots (event_id, encounter_id, item_id, character_id, looted_at)
+   values ($1, $2, $3, $4, now()), ($1, $5, $6, $7, now())`,
+  [historyEventId, PILLAGE, BOTTINES, duneSable.id, DURGEN, JAMBIERES, cielGris.id],
+);
+
 const seed: E2ESeed = {
   sessions: {
     officer: officer.token,
@@ -91,6 +114,7 @@ const seed: E2ESeed = {
   signupEventId,
   softReserveEventId,
   lockedEventId,
+  historyEventId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 
