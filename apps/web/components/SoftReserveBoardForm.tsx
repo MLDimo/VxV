@@ -14,13 +14,19 @@ export function SoftReserveBoardForm({
   eventId,
   items,
   allowance,
-  canReserve,
+  signedUp,
+  locked,
+  lockLabel,
 }: {
   eventId: string;
   items: BoardItem[];
   allowance: number;
-  canReserve: boolean;
+  signedUp: boolean;
+  locked: boolean;
+  /** When the soft reserves lock, already formatted in the guild's time zone. */
+  lockLabel: string;
 }) {
+  const canReserve = signedUp && !locked;
   const [state, action, pending] = useActionState(setMySoftReserves, IDLE);
   const [chosen, setChosen] = useState(() => new Set(items.filter((item) => item.mine).map((item) => item.itemId)));
   const full = chosen.size >= allowance;
@@ -36,13 +42,20 @@ export function SoftReserveBoardForm({
   };
 
   return (
-    <form action={action} className="mt-4">
+    <form action={action} aria-label="Mes SR" className="mt-4">
       <input type="hidden" name="eventId" value={eventId} />
-      <p className="text-sm text-zinc-400">
-        {canReserve
-          ? `Vous avez droit à ${softReserveCount(allowance)} : ${chosen.size} choisie(s).`
-          : "Inscrivez-vous à l'événement pour choisir vos SR."}
+      <p className={`text-sm ${locked ? "text-amber-300" : "text-zinc-400"}`}>
+        {locked
+          ? `SR verrouillées depuis le ${lockLabel} : seul un officier peut encore les modifier.`
+          : `Verrouillage des SR le ${lockLabel}.`}
       </p>
+      {!locked && (
+        <p className="text-sm text-zinc-400">
+          {signedUp
+            ? `Vous avez droit à ${softReserveCount(allowance)} : ${chosen.size} choisie(s).`
+            : "Inscrivez-vous à l'événement pour choisir vos SR."}
+        </p>
+      )}
       {groupByBoss(items).map((group) => (
         <fieldset key={`${group.raidName}/${group.bossName}`} className="mt-4">
           <legend className="text-sm font-semibold text-zinc-300">

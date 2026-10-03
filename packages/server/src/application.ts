@@ -26,7 +26,7 @@ export function createApplication({ sql, discordRoles, clock = () => new Date() 
     characters: createCharacters({ unitOfWork }),
     events: createEvents({ unitOfWork, clock }),
     signups: createSignups({ unitOfWork, clock }),
-    softReserves: createSoftReserves({ unitOfWork }),
+    softReserves: createSoftReserves({ unitOfWork, clock }),
     exclusions: createExclusions({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
   };

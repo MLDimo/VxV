@@ -4,6 +4,7 @@ import type {
   JournalAction,
   JournalEntry,
   RosterImportSummary,
+  SoftReserveOverrideRecord,
 } from "@vxv/server";
 import { count, formatDateTime, raidTitle, softReserveCount } from "./format";
 
@@ -12,6 +13,7 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "event.create": "Création d'un événement",
   "exclusion.add": "Objet exclu des SR",
   "exclusion.remove": "Objet de nouveau réservable",
+  "softReserve.override": "SR corrigées par un officier",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -35,6 +37,15 @@ function describeExclusion(exclusion: ExclusionRecord): string {
   return `« ${exclusion.itemName} » (${where})${removed}`;
 }
 
+function itemList(names: readonly string[]): string {
+  return names.length === 0 ? "aucune" : names.map((name) => `« ${name} »`).join(", ");
+}
+
+function describeOverride(override: SoftReserveOverrideRecord): string {
+  const where = `${raidTitle(override.raids)}, ${formatDateTime(new Date(override.eventStartsAt))}`;
+  return `SR de ${override.characterName} (${where}) : avant ${itemList(override.before)} ; après ${itemList(override.after)}`;
+}
+
 /** One-line description of what an officer action changed. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -45,5 +56,7 @@ export function describeJournalEntry(entry: JournalEntry): string {
     case "exclusion.add":
     case "exclusion.remove":
       return describeExclusion(entry.after as ExclusionRecord);
+    case "softReserve.override":
+      return describeOverride(entry.after as SoftReserveOverrideRecord);
   }
 }

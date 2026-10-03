@@ -28,7 +28,7 @@ describe("exclusions", () => {
     ({ database, sql } = await createTestDatabase());
     const unitOfWork = createUnitOfWork(sql);
     exclusions = createExclusions({ unitOfWork });
-    softReserves = createSoftReserves({ unitOfWork });
+    softReserves = createSoftReserves({ unitOfWork, clock: () => new Date("2026-12-01T12:00:00Z") });
     journal = createJournal({ unitOfWork });
     officer = await createMember(sql, "officer", "Officier");
     member = await createMember(sql, "member", "Membre");

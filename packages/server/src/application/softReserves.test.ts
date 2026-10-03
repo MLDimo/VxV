@@ -7,7 +7,8 @@ import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, recordLoot } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
-import { ValidationError } from "./errors.ts";
+import { ForbiddenError, ValidationError } from "./errors.ts";
+import { createJournal } from "./journal.ts";
 import { createSignups } from "./signups.ts";
 import { createSoftReserves } from "./softReserves.ts";
 
@@ -21,6 +22,8 @@ describe("soft reserves", () => {
   let deja: Character;
   let eole: Character;
   let eventId: string;
+  let now: Date;
+  let journal: ReturnType<typeof createJournal>;
 
   const signUp = (member: Member, character: Character) =>
     signups.signUp(member, eventId, { characterId: character.id, role: "dps", spec: "Combat", status: "present" });
@@ -28,9 +31,11 @@ describe("soft reserves", () => {
   beforeEach(async () => {
     ({ database, sql } = await createTestDatabase());
     const unitOfWork = createUnitOfWork(sql);
-    const clock = () => new Date("2026-12-01T12:00:00Z");
-    softReserves = createSoftReserves({ unitOfWork });
+    now = new Date("2026-12-01T12:00:00Z");
+    const clock = () => now;
+    softReserves = createSoftReserves({ unitOfWork, clock });
     signups = createSignups({ unitOfWork, clock });
+    journal = createJournal({ unitOfWork });
     me = await createMember(sql, "member", "Moi");
     other = await createMember(sql, "member", "Autre");
     [deja, eole] = await createGuildCharacters(sql, "Ðéjà Vu", "Eole Hermes");
@@ -111,5 +116,55 @@ describe("soft reserves", () => {
 
   it("has no board for an unknown event", async () => {
     expect(await softReserves.getBoard(me, "not-an-id")).toBeUndefined();
+  });
+
+  describe("lock and officer corrections", () => {
+    const LOCK = new Date("2026-12-10T19:30:00Z");
+
+    it("locks the members' soft reserves 30 minutes before the raid", async () => {
+      await signUp(me, deja);
+      await softReserves.setMine(me, eventId, ["20"]);
+      now = LOCK;
+      expect(await board(me)).toMatchObject({ locked: true, lockAt: LOCK });
+      await expect(softReserves.setMine(me, eventId, ["10"])).rejects.toThrow(/verrouillées/);
+      expect((await board(me)).items.filter((item) => item.mine).map((item) => item.itemId)).toEqual([20]);
+    });
+
+    it("lets an officer correct a player's reserves after the lock, recorded with before and after", async () => {
+      const officer = await createMember(sql, "officer", "Officier");
+      await signUp(me, deja);
+      await softReserves.setMine(me, eventId, ["20"]);
+      now = LOCK;
+      await softReserves.override(officer, eventId, deja.id, ["21"], "Erreur de clic signalée en vocal");
+      expect((await board(me)).items.filter((item) => item.mine).map((item) => item.itemId)).toEqual([21]);
+      expect(await journal.listRecent()).toEqual([
+        expect.objectContaining({
+          action: "softReserve.override",
+          reason: "Erreur de clic signalée en vocal",
+          after: {
+            characterName: "Ðéjà Vu",
+            raids: ["Onyxia"],
+            eventStartsAt: "2026-12-10T20:00:00.000Z",
+            before: ["Tête d'Onyxia"],
+            after: ["Sac en peau"],
+          },
+        }),
+      ]);
+    });
+
+    it("refuses corrections by a member, without reason, or for a character not signed up", async () => {
+      const officer = await createMember(sql, "officer", "Officier");
+      await signUp(me, deja);
+      await expect(softReserves.override(other, eventId, deja.id, ["20"], "Motif")).rejects.toBeInstanceOf(
+        ForbiddenError,
+      );
+      await expect(softReserves.override(officer, eventId, deja.id, ["20"], "")).rejects.toBeInstanceOf(
+        ValidationError,
+      );
+      await expect(softReserves.override(officer, eventId, eole.id, ["20"], "Motif")).rejects.toThrow(
+        /n'est pas inscrit/,
+      );
+      await expect(softReserves.override(officer, eventId, deja.id, ["20", "21"], "Motif")).rejects.toThrow(/au plus/);
+    });
   });
 });

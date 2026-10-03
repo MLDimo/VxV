@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EventSignups } from "@/components/EventSignups";
 import { ExclusionForm } from "@/components/ExclusionForm";
-import { formatEventDate, raidTitle, softReserveCount } from "@/components/format";
+import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@/components/format";
 import { SignupForm } from "@/components/SignupForm";
 import { SoftReserveBoardForm } from "@/components/SoftReserveBoardForm";
+import { SoftReserveOverrideForm } from "@/components/SoftReserveOverrideForm";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
@@ -57,17 +58,25 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           eventId={event.id}
           items={board.items}
           allowance={board.allowance}
-          canReserve={mine !== undefined}
+          signedUp={mine !== undefined}
+          locked={board.locked}
+          lockLabel={formatDateTime(board.lockAt)}
         />
       </section>
 
       {canManageRaids(member.role) && (
         <section className="mt-8 rounded border border-amber-900/60 p-4">
-          <h2 className="text-lg font-semibold">Officiers · exclusions</h2>
+          <h2 className="text-lg font-semibold">Officiers · exclusions et corrections</h2>
           <p className="mt-1 text-sm text-zinc-400">
             Exclure un objet retire les SR déjà posées dessus. Chaque changement est inscrit au journal.
           </p>
           <ExclusionForm eventId={event.id} items={board.items} />
+          <h3 className="mt-8 font-semibold">Corriger les SR d&apos;un joueur</h3>
+          <SoftReserveOverrideForm
+            eventId={event.id}
+            items={board.items}
+            players={eventSignups.map(({ characterId, characterName }) => ({ characterId, characterName }))}
+          />
         </section>
       )}
 

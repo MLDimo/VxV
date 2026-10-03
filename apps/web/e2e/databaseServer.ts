@@ -23,13 +23,20 @@ const officer = await signIn("100", "Officier Test", "officer");
 const member = await signIn("200", "Membre Test", "member");
 const newcomer = await signIn("300", "Nouveau Membre", "member");
 const leavingMember = await signIn("400", "Membre Sortant", "member");
+const lockedMember = await signIn("500", "Membre Verrouillé", "member");
 
 await app.roster.importRoster(officer.member, ["VXV-ROSTER-1", ...SEED_ROSTER].join("\n"), "Liste de départ des tests");
-const cielGris = (await app.characters.listAvailable()).find((character) => character.firstName === "Ciel");
-if (cielGris === undefined) {
-  throw new Error("Ciel Gris is missing from the seed roster");
+async function seedCharacter(firstName: string) {
+  const character = (await app.characters.listAvailable()).find((candidate) => candidate.firstName === firstName);
+  if (character === undefined) {
+    throw new Error(`${firstName} is missing from the seed roster`);
+  }
+  return character;
 }
+const cielGris = await seedCharacter("Ciel");
+const duneSable = await seedCharacter("Dune");
 await app.characters.link(officer.member, cielGris.id, true);
+await app.characters.link(lockedMember.member, duneSable.id, true);
 const signupEventId = await app.events.createEvent(
   officer.member,
   { startsAt: new Date("2031-01-15T20:00:00Z"), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
@@ -48,15 +55,42 @@ await app.signups.signUp(officer.member, softReserveEventId, {
   status: "present",
 });
 
+const LOCKED_EVENT_DELAY_MS = 10 * 60 * 1000;
+const lockedEventId = await app.events.createEvent(
+  officer.member,
+  {
+    startsAt: new Date(Date.now() + LOCKED_EVENT_DELAY_MS),
+    raidIds: ["salle-des-thanes"],
+    softReservesPerPlayer: 1,
+  },
+  "Événement verrouillé des tests",
+);
+await app.signups.signUp(lockedMember.member, lockedEventId, {
+  characterId: duneSable.id,
+  role: "dps",
+  spec: "Précision",
+  status: "present",
+});
+const brassards = 271096;
+await app.softReserves.override(
+  officer.member,
+  lockedEventId,
+  duneSable.id,
+  [String(brassards)],
+  "SR de départ des tests",
+);
+
 const seed: E2ESeed = {
   sessions: {
     officer: officer.token,
     member: member.token,
     newcomer: newcomer.token,
     leavingMember: leavingMember.token,
+    lockedMember: lockedMember.token,
   },
   signupEventId,
   softReserveEventId,
+  lockedEventId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 
