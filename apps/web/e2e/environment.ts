@@ -17,6 +17,7 @@ export const DISCORD = createTestSigner(Buffer.alloc(32, 7));
 
 export const WEB_ENVIRONMENT = {
   DATABASE_URL: `postgresql://postgres@127.0.0.1:${DATABASE_PORT}/postgres`,
+  SITE_URL: `http://localhost:${WEB_PORT}`,
   DISCORD_CLIENT_ID: "1",
   DISCORD_CLIENT_SECRET: "e2e",
   DISCORD_PUBLIC_KEY: DISCORD.publicKeyHex,
@@ -24,6 +25,7 @@ export const WEB_ENVIRONMENT = {
   DISCORD_API_URL: `${FAKE_DISCORD_URL}/api/v10`,
   DISCORD_GUILD_ID: "2",
   DISCORD_LINK_CHANNEL_ID: "20",
+  DISCORD_RAID_CHANNEL_ID: "21",
   DISCORD_ROLE_TREASURER: DISCORD_ROLES.treasurer,
   DISCORD_ROLE_OFFICER: DISCORD_ROLES.officer,
   DISCORD_ROLE_GM: DISCORD_ROLES.gm,

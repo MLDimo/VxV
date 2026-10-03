@@ -14,11 +14,7 @@ describe("interaction handler", () => {
   beforeAll(async () => {
     const test = await createTestApplication(["Ðéjà;Vu;ROGUE"]);
     database = test.database;
-    handle = createInteractionHandler({
-      publicKey: parsePublicKey(discord.publicKeyHex),
-      app: test.app,
-      linkChannelId: "links",
-    });
+    handle = createInteractionHandler({ publicKey: parsePublicKey(discord.publicKeyHex), ...test.context });
   });
 
   afterAll(async () => {
@@ -40,6 +36,13 @@ describe("interaction handler", () => {
       timestamp: null,
     });
     expect(reply.status).toBe(401);
+  });
+
+  it("turns a refusal of the application into a private message", async () => {
+    const member = { userId: "2", name: "Membre", channelId: "x" };
+    const plan = { raid: "onyxia", date: "12/12", heure: "21:00", motif: "Essai" };
+    const reply = await handle(discord.sign(slashCommand("vxv_raid", plan, member)));
+    expect(reply.body).toMatchObject({ data: { content: "Cette action est réservée aux officiers.", flags: 64 } });
   });
 
   it("answers an unknown command privately", async () => {

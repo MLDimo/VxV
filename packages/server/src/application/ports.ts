@@ -65,6 +65,7 @@ export interface EventRepository {
   findById(eventId: string): Promise<RaidEvent | undefined>;
   /** Events starting after the given instant, soonest first. */
   listStartingAfter(instant: Date): Promise<RaidEvent[]>;
+  setDiscordMessage(eventId: string, messageId: string): Promise<void>;
 }
 
 export interface SignupRepository {
@@ -131,4 +132,18 @@ export interface GuildGateway {
   setNickname(discordId: string, nickname: string): Promise<boolean>;
   /** Gives the member this role, creating it if needed, and takes away the other roles of the group. */
   setOnlyRoleAmong(discordId: string, roleName: string, group: readonly string[]): Promise<void>;
+}
+
+/** An event and its sign-ups, as shown in its Discord message. */
+export interface AnnouncedRaid {
+  event: RaidEvent;
+  signups: Signup[];
+}
+
+/** The raid channel on Discord, where each event has a sign-up message. */
+export interface RaidAnnouncer {
+  /** Publishes the event's sign-up message and returns its id. */
+  publish(raid: AnnouncedRaid): Promise<string>;
+  /** Refreshes the message; false when it no longer exists (deleted on Discord). */
+  update(messageId: string, raid: AnnouncedRaid): Promise<boolean>;
 }

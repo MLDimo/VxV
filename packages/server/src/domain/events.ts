@@ -9,6 +9,8 @@ export interface RaidEvent {
   softReservesPerPlayer: number;
   /** One or several raids played the same evening, by name. */
   raids: RaidSummary[];
+  /** Sign-up message published by the bot on Discord, once it exists. */
+  discordMessageId: string | undefined;
 }
 
 export interface NewRaidEvent {

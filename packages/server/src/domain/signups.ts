@@ -9,6 +9,10 @@ export type SignupStatus = (typeof SIGNUP_STATUSES)[number];
 /** Players expected in the raid: they count in the composition. */
 const COMING_STATUSES: ReadonlySet<SignupStatus> = new Set(["present", "late"]);
 
+export function isComing(status: SignupStatus): boolean {
+  return COMING_STATUSES.has(status);
+}
+
 export const MAX_SPEC_LENGTH = 30;
 
 export interface SignupChoice {
@@ -86,7 +90,7 @@ export function composition(signups: readonly Signup[]): Composition {
   };
   for (const signup of signups) {
     result.byStatus[signup.status] += 1;
-    if (COMING_STATUSES.has(signup.status)) {
+    if (isComing(signup.status)) {
       result.byRole[signup.role] += 1;
       result.byClass[signup.characterClass] = (result.byClass[signup.characterClass] ?? 0) + 1;
     }

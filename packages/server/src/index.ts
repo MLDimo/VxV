@@ -44,5 +44,11 @@ export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastru
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
-export type { GuildGateway } from "./application/ports.ts";
+export type { AnnouncedRaid, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+export {
+  createDiscordRest,
+  DiscordApiError,
+  type DiscordRest,
+  type DiscordRestOptions,
+} from "./infrastructure/discord/rest.ts";
 export type { BoardItem, LootItem, Reserver } from "./domain/softReserves.ts";

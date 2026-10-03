@@ -12,50 +12,108 @@ interface Role {
   name: string;
 }
 
+/** A message the bot published in a channel, as last edited. */
+export interface FakeMessage {
+  id: string;
+  channelId: string;
+  body: Record<string, unknown>;
+}
+
 const HTTP_OK = 200;
 const HTTP_NO_CONTENT = 204;
 const HTTP_FORBIDDEN = 403;
 const HTTP_NOT_FOUND = 404;
 const MISSING_PERMISSIONS = { message: "Missing Permissions", code: 50013 };
+const UNKNOWN_MESSAGE = { message: "Unknown Message", code: 10008 };
+
+type Handler = (params: string[], body: unknown) => FakeDiscordReply;
 
 export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
   const roles: Role[] = [];
   const memberRoles = new Map<string, Set<string>>();
   const nicknames = new Map<string, string>();
+  const messages = new Map<string, FakeMessage>();
   const requests: { method: string; path: string; body: unknown }[] = [];
   let lastId = 0;
   const newId = () => String((lastId += 1));
-  const rolesOfMember = (userId: string) => memberRoles.get(userId) ?? new Set<string>();
+  const rolesOf = (userId: string) => memberRoles.get(userId) ?? new Set<string>();
+  const ok = (body?: unknown): FakeDiscordReply => ({ status: body === undefined ? HTTP_NO_CONTENT : HTTP_OK, body });
 
-  function handle(method: string, path: string, body: unknown): FakeDiscordReply {
-    requests.push({ method, path, body });
-    const [, , , resource, userId, , roleId] = path.split("/");
-    const route = `${method} ${resource}${userId === undefined ? "" : "/:id"}${roleId === undefined ? "" : "/roles/:id"}`;
-    switch (route) {
-      case "GET roles":
-        return { status: HTTP_OK, body: roles };
-      case "POST roles": {
+  const routes: [method: string, path: RegExp, handler: Handler][] = [
+    ["GET", /^\/guilds\/[^/]+\/roles$/, () => ok(roles)],
+    [
+      "POST",
+      /^\/guilds\/[^/]+\/roles$/,
+      (_, body) => {
         const role = { id: newId(), name: (body as { name: string }).name };
         roles.push(role);
-        return { status: HTTP_OK, body: role };
-      }
-      case "GET members/:id":
-        return { status: HTTP_OK, body: { user: { id: userId }, roles: [...rolesOfMember(userId ?? "")] } };
-      case "PATCH members/:id":
+        return ok(role);
+      },
+    ],
+    [
+      "GET",
+      /^\/guilds\/[^/]+\/members\/([^/]+)$/,
+      ([userId = ""]) => ok({ user: { id: userId }, roles: [...rolesOf(userId)] }),
+    ],
+    [
+      "PATCH",
+      /^\/guilds\/[^/]+\/members\/([^/]+)$/,
+      ([userId = ""], body) => {
         if (userId === ownerId) {
           return { status: HTTP_FORBIDDEN, body: MISSING_PERMISSIONS };
         }
-        nicknames.set(userId ?? "", (body as { nick: string }).nick);
-        return { status: HTTP_OK, body: {} };
-      case "PUT members/:id/roles/:id":
-        memberRoles.set(userId ?? "", rolesOfMember(userId ?? "").add(roleId ?? ""));
-        return { status: HTTP_NO_CONTENT };
-      case "DELETE members/:id/roles/:id":
-        rolesOfMember(userId ?? "").delete(roleId ?? "");
-        return { status: HTTP_NO_CONTENT };
-      default:
-        return { status: HTTP_NOT_FOUND, body: { message: `Unknown route ${method} ${path}` } };
+        nicknames.set(userId, (body as { nick: string }).nick);
+        return ok({});
+      },
+    ],
+    [
+      "PUT",
+      /^\/guilds\/[^/]+\/members\/([^/]+)\/roles\/([^/]+)$/,
+      ([userId = "", roleId = ""]) => {
+        memberRoles.set(userId, rolesOf(userId).add(roleId));
+        return ok();
+      },
+    ],
+    [
+      "DELETE",
+      /^\/guilds\/[^/]+\/members\/([^/]+)\/roles\/([^/]+)$/,
+      ([userId = "", roleId = ""]) => {
+        rolesOf(userId).delete(roleId);
+        return ok();
+      },
+    ],
+    [
+      "POST",
+      /^\/channels\/([^/]+)\/messages$/,
+      ([channelId = ""], body) => {
+        const message = { id: newId(), channelId, body: body as Record<string, unknown> };
+        messages.set(message.id, message);
+        return ok({ id: message.id, channel_id: channelId });
+      },
+    ],
+    [
+      "PATCH",
+      /^\/channels\/([^/]+)\/messages\/([^/]+)$/,
+      ([channelId = "", messageId = ""], body) => {
+        const message = messages.get(messageId);
+        if (message?.channelId !== channelId) {
+          return { status: HTTP_NOT_FOUND, body: UNKNOWN_MESSAGE };
+        }
+        message.body = body as Record<string, unknown>;
+        return ok({ id: messageId, channel_id: channelId });
+      },
+    ],
+  ];
+
+  function handle(method: string, path: string, body: unknown): FakeDiscordReply {
+    requests.push({ method, path, body });
+    for (const [routeMethod, pattern, handler] of routes) {
+      const match = routeMethod === method ? pattern.exec(path) : null;
+      if (match !== null) {
+        return handler(match.slice(1), body);
+      }
     }
+    return { status: HTTP_NOT_FOUND, body: { message: `Unknown route ${method} ${path}` } };
   }
 
   return {
@@ -69,8 +127,9 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
       return new Response(reply.body === undefined ? null : JSON.stringify(reply.body), { status: reply.status });
     },
     nicknameOf: (userId: string) => nicknames.get(userId),
-    roleNamesOf: (userId: string) =>
-      roles.filter((role) => rolesOfMember(userId).has(role.id)).map((role) => role.name),
+    roleNamesOf: (userId: string) => roles.filter((role) => rolesOf(userId).has(role.id)).map((role) => role.name),
+    /** Messages published by the bot, in publication order. */
+    messages: () => [...messages.values()],
   };
 }
 

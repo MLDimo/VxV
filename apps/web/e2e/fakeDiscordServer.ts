@@ -4,7 +4,7 @@ import { FAKE_DISCORD_PORT } from "./environment";
 
 /**
  * Discord's REST API for the end-to-end tests, in memory. The tests read what the bot did
- * at /state/<Discord user id>: nickname and role names.
+ * at /state/<Discord user id> (nickname and role names) and /messages (messages published, in order).
  */
 const API_PREFIX = "/api/v10";
 const discord = createFakeDiscord();
@@ -15,6 +15,10 @@ createServer((request, response) => {
   request.on("end", () => {
     const path = request.url ?? "/";
     response.setHeader("Content-Type", "application/json");
+    if (path === "/messages") {
+      response.end(JSON.stringify(discord.messages()));
+      return;
+    }
     if (path.startsWith("/state/")) {
       const userId = path.slice("/state/".length);
       response.end(JSON.stringify({ nickname: discord.nicknameOf(userId), roles: discord.roleNamesOf(userId) }));

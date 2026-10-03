@@ -9,10 +9,11 @@ interface EventRow {
   starts_at: Date;
   soft_reserves_per_player: number;
   raids: RaidSummary[];
+  discord_message_id: string | null;
 }
 
 const SELECT_EVENTS = `
-  select events.id, events.starts_at, events.soft_reserves_per_player,
+  select events.id, events.starts_at, events.soft_reserves_per_player, events.discord_message_id,
          coalesce(json_agg(json_build_object('id', raids.id, 'name', raids.name) order by raids.name)
                   filter (where raids.id is not null), '[]') as raids
   from events
@@ -25,6 +26,7 @@ function toEvent(row: EventRow): RaidEvent {
     startsAt: row.starts_at,
     softReservesPerPlayer: row.soft_reserves_per_player,
     raids: row.raids,
+    discordMessageId: row.discord_message_id ?? undefined,
   };
 }
 
@@ -46,6 +48,10 @@ export function eventRepository(sql: SqlClient): EventRepository {
       }
       const [row] = await sql.query<EventRow>(`${SELECT_EVENTS} where events.id = $1 group by events.id`, [eventId]);
       return row && toEvent(row);
+    },
+
+    async setDiscordMessage(eventId, messageId) {
+      await sql.query("update events set discord_message_id = $2 where id = $1", [eventId, messageId]);
     },
 
     async listStartingAfter(instant) {

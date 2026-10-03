@@ -13,6 +13,7 @@ export function getInteractionHandler(): InteractionHandler {
       publicKey: parsePublicKey(discord.publicKey),
       app: getApplication(),
       linkChannelId: discord.linkChannelId,
+      raidChannelId: discord.raidChannelId,
     });
   }
   return handler;

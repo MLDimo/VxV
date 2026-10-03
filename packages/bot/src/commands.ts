@@ -13,6 +13,8 @@ export interface BotContext {
   app: Application;
   /** Channel where members link their characters. */
   linkChannelId: string;
+  /** Channel where each event has its sign-up message. */
+  raidChannelId: string;
 }
 
 export interface SlashCommand {
@@ -28,11 +30,31 @@ export interface SlashCommand {
   ): Promise<APIApplicationCommandAutocompleteResponse>;
 }
 
+type CommandInteraction =
+  APIChatInputApplicationCommandGuildInteraction | APIApplicationCommandAutocompleteGuildInteraction;
+
+const optionNamed = (interaction: CommandInteraction, name: string) =>
+  interaction.data.options?.find((candidate) => candidate.name === name);
+
 /** Value of a text option of the command, empty when absent. */
-export function stringOption(
-  interaction: APIChatInputApplicationCommandGuildInteraction | APIApplicationCommandAutocompleteGuildInteraction,
-  name: string,
-): string {
-  const option = interaction.data.options?.find((candidate) => candidate.name === name);
+export function stringOption(interaction: CommandInteraction, name: string): string {
+  const option = optionNamed(interaction, name);
   return option?.type === ApplicationCommandOptionType.String ? option.value : "";
+}
+
+/** Value of a whole number option of the command, undefined when absent. */
+export function integerOption(interaction: CommandInteraction, name: string): number | undefined {
+  const option = optionNamed(interaction, name);
+  return option?.type === ApplicationCommandOptionType.Integer && typeof option.value === "number"
+    ? option.value
+    : undefined;
+}
+
+/** The option the member is typing, which an autocomplete request is about. */
+export function focusedOption(interaction: APIApplicationCommandAutocompleteGuildInteraction): {
+  name: string;
+  value: string;
+} {
+  const option = interaction.data.options.find((candidate) => "focused" in candidate && candidate.focused === true);
+  return { name: option?.name ?? "", value: option !== undefined && "value" in option ? String(option.value) : "" };
 }
