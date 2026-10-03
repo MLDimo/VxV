@@ -46,4 +46,6 @@ export interface E2ESeed {
   lockedEventId: string;
   /** Event with recorded loots, for the history tests. */
   historyEventId: string;
+  /** Event where Dune Sable reserves an item missed at an earlier raid: SR+ +10. */
+  bonusEventId: string;
 }

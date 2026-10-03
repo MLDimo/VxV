@@ -3,8 +3,11 @@ import {
   areSoftReservesLocked,
   buildBoard,
   checkSoftReserveChoice,
+  reserveKey,
+  softReserveBonus,
   softReservesLockAt,
   type LootItem,
+  type PastEventForItem,
   type SoftReserve,
 } from "./softReserves.ts";
 
@@ -34,6 +37,9 @@ describe("checkSoftReserveChoice", () => {
   });
 });
 
+/** Present at a previous raid with the item, reserved it and did not get it. */
+const MISSED: PastEventForItem = { dropsItem: true, present: true, reserved: true, obtained: false };
+
 describe("buildBoard", () => {
   const loot: LootItem[] = [
     { itemId: 1, name: "Croc de Magmatus", raidName: "Thanes", bossName: "Infurnus" },
@@ -46,20 +52,21 @@ describe("buildBoard", () => {
     characterClass: "ROGUE",
   });
 
-  it("shows reservers, owners, exclusions and the viewer's own choices", () => {
-    const board = buildBoard(
+  it("shows reservers with their SR+ bonus, owners, exclusions and the viewer's own choices", () => {
+    const board = buildBoard({
       loot,
-      [reserve(1, "me", "Ðéjà Vu"), reserve(1, "other", "Eole Hermes")],
-      new Set([2]),
-      new Map([[1, 3]]),
-      "me",
-    );
+      reserves: [reserve(1, "me", "Ðéjà Vu"), reserve(1, "other", "Eole Hermes")],
+      excludedItemIds: new Set([2]),
+      ownersByItem: new Map([[1, 3]]),
+      pastEventsByReserve: new Map([[reserveKey("other", 1), [MISSED]]]),
+      myCharacterId: "me",
+    });
     expect(board).toEqual([
       {
         ...loot[0],
         reservedBy: [
-          { characterId: "me", characterName: "Ðéjà Vu", characterClass: "ROGUE" },
-          { characterId: "other", characterName: "Eole Hermes", characterClass: "ROGUE" },
+          { characterId: "me", characterName: "Ðéjà Vu", characterClass: "ROGUE", bonus: 0 },
+          { characterId: "other", characterName: "Eole Hermes", characterClass: "ROGUE", bonus: 10 },
         ],
         alreadyOwnedBy: 3,
         excluded: false,
@@ -67,6 +74,27 @@ describe("buildBoard", () => {
       },
       { ...loot[1], reservedBy: [], alreadyOwnedBy: 0, excluded: true, mine: false },
     ]);
+  });
+});
+
+describe("softReserveBonus", () => {
+  const ABSENT: PastEventForItem = { dropsItem: true, present: false, reserved: false, obtained: false };
+  const OTHER_RAID: PastEventForItem = { dropsItem: false, present: true, reserved: false, obtained: false };
+  const OBTAINED: PastEventForItem = { dropsItem: true, present: true, reserved: true, obtained: true };
+  const NOT_RESERVED: PastEventForItem = { dropsItem: true, present: true, reserved: false, obtained: false };
+
+  it.each<[string, PastEventForItem[], number]>([
+    ["no previous event", [], 0],
+    ["one reserve not obtained", [MISSED], 10],
+    ["three in a row", [MISSED, MISSED, MISSED], 30],
+    ["capped at +50", Array<PastEventForItem>(7).fill(MISSED), 50],
+    ["an absence is neutral", [MISSED, ABSENT, MISSED], 20],
+    ["an event without the item's raid is neutral", [MISSED, OTHER_RAID, MISSED], 20],
+    ["getting the item ends the streak", [MISSED, OBTAINED, MISSED], 10],
+    ["being present without reserving ends the streak", [MISSED, NOT_RESERVED, MISSED], 10],
+    ["nothing after getting the item at the last raid", [OBTAINED, MISSED], 0],
+  ])("%s: +%i", (_, pastEvents, bonus) => {
+    expect(softReserveBonus(pastEvents)).toBe(bonus);
   });
 });
 

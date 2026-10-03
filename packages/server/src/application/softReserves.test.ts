@@ -5,7 +5,14 @@ import type { Member } from "../domain/members.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, recordLoot } from "../test/fixtures.ts";
+import {
+  createEvent,
+  createGuildCharacters,
+  createMember,
+  createRaidWithLoot,
+  recordAttendance,
+  recordLoot,
+} from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createJournal } from "./journal.ts";
@@ -95,6 +102,35 @@ describe("soft reserves", () => {
     const items = (await board(me)).items;
     expect(items.find((item) => item.itemId === 20)?.alreadyOwnedBy).toBe(1);
     expect(items.find((item) => item.itemId === 21)?.alreadyOwnedBy).toBe(0);
+  });
+
+  it("gives each reserver the SR+ bonus earned at previous raids", async () => {
+    now = new Date("2026-10-01T12:00:00Z");
+    const reserveHeadAt = async (startsAt: string, attended: boolean) => {
+      const pastEvent = await createEvent(sql, me, new Date(startsAt), ["onyxia"]);
+      await signups.signUp(me, pastEvent, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
+      await softReserves.setMine(me, pastEvent, ["20"]);
+      if (attended) {
+        await recordAttendance(sql, pastEvent, deja.id);
+      }
+      return pastEvent;
+    };
+    const obtained = await reserveHeadAt("2026-10-25T20:00:00Z", true);
+    await recordLoot(sql, { eventId: obtained, encounterId: 2, itemId: 20, characterId: deja.id });
+    await reserveHeadAt("2026-11-01T20:00:00Z", true);
+    await reserveHeadAt("2026-11-08T20:00:00Z", false);
+
+    now = new Date("2026-12-01T12:00:00Z");
+    await signUp(me, deja);
+    await signUp(other, eole);
+    await softReserves.setMine(me, eventId, ["20"]);
+    await softReserves.setMine(other, eventId, ["20"]);
+
+    const head = (await board(me)).items.find((item) => item.itemId === 20);
+    const bonuses = Object.fromEntries(
+      head?.reservedBy.map((reserver) => [reserver.characterName, reserver.bonus]) ?? [],
+    );
+    expect(bonuses).toEqual({ "Ðéjà Vu": 10, "Eole Hermes": 0 });
   });
 
   it("refuses soft reserves without sign-up, beyond the allowance or outside the loot", async () => {

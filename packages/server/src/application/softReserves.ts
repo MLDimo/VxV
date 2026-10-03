@@ -64,16 +64,24 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
         if (event === undefined) {
           return undefined;
         }
-        const [loot, reserves, excluded, owners, mySignup] = await Promise.all([
+        const [loot, reserves, excludedItemIds, ownersByItem, pastEventsByReserve, mySignup] = await Promise.all([
           repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id)),
           repositories.softReserves.listByEvent(event.id),
           repositories.exclusions.listByEvent(event.id),
           repositories.lootHistory.countSignedUpOwners(event.id),
+          repositories.lootHistory.pastEventsForReserves(event.id),
           repositories.signups.findByMember(event.id, member.id),
         ]);
         return {
           allowance: event.softReservesPerPlayer,
-          items: buildBoard(loot, reserves, excluded, owners, mySignup?.characterId),
+          items: buildBoard({
+            loot,
+            reserves,
+            excludedItemIds,
+            ownersByItem,
+            pastEventsByReserve,
+            myCharacterId: mySignup?.characterId,
+          }),
           mySignup,
           lockAt: softReservesLockAt(event.startsAt),
           locked: areSoftReservesLocked(event.startsAt, clock()),
