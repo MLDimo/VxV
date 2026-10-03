@@ -5,7 +5,7 @@ import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
-import type { LootItem, SoftReserve } from "../domain/softReserves.ts";
+import type { LootItem, PastEventForItem, SoftReserve } from "../domain/softReserves.ts";
 
 export interface DiscordIdentity {
   discordId: string;
@@ -86,6 +86,8 @@ export interface LootHistoryRepository {
   countSignedUpOwners(eventId: string): Promise<Map<number, number>>;
   /** Loots given by one of the methods, latest first. */
   list(limit: number, methods: readonly LootMethod[]): Promise<LootRecord[]>;
+  /** For each soft reserve of the event (by reserveKey), what happened at every earlier event, newest first. */
+  pastEventsForReserves(eventId: string): Promise<Map<string, PastEventForItem[]>>;
 }
 
 export interface SoftReserveRepository {

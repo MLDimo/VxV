@@ -136,6 +136,19 @@ describe("initial schema", () => {
     });
   });
 
+  describe("attendance", () => {
+    it("records a character once per event", async () => {
+      const memberId = await insertMember(database, "1");
+      const characterId = await insertCharacter(database, { firstName: "Ðéjà", lastName: "Vu", memberId });
+      const eventId = await insertEvent(database, memberId);
+      const attend = () =>
+        database.query("insert into event_attendance (event_id, character_id) values ($1, $2)", [eventId, characterId]);
+
+      await expect(attend()).resolves.toBeDefined();
+      await expect(attend()).rejects.toThrow(/duplicate key/);
+    });
+  });
+
   describe("sign-ups", () => {
     it("allows a single sign-up per member and event, whatever the character", async () => {
       const memberId = await insertMember(database, "1");

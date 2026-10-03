@@ -107,6 +107,32 @@ await database.query(
   [historyEventId, PILLAGE, BOTTINES, duneSable.id, DURGEN, JAMBIERES, cielGris.id],
 );
 
+// SR+: Dune Sable reserved the Jambières at an earlier raid, was present and did not get them.
+const createThanesEvent = (startsAt: string, reason: string) =>
+  app.events.createEvent(
+    officer.member,
+    { startsAt: new Date(startsAt), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+    reason,
+  );
+const reserveJambieres = async (eventId: string) => {
+  await app.signups.signUp(lockedMember.member, eventId, {
+    characterId: duneSable.id,
+    role: "dps",
+    spec: "Précision",
+    status: "present",
+  });
+  await app.softReserves.setMine(lockedMember.member, eventId, [String(JAMBIERES)]);
+};
+const bonusPastEventId = await createThanesEvent("2031-03-05T20:00:00Z", "Raid précédent des tests de SR+");
+await reserveJambieres(bonusPastEventId);
+// Attendance is recorded by the addon from P6 on; until then the tests insert it directly.
+await database.query("insert into event_attendance (event_id, character_id) values ($1, $2)", [
+  bonusPastEventId,
+  duneSable.id,
+]);
+const bonusEventId = await createThanesEvent("2031-03-12T20:00:00Z", "Événement des tests de SR+");
+await reserveJambieres(bonusEventId);
+
 const seed: E2ESeed = {
   sessions: {
     officer: officer.token,
@@ -119,6 +145,7 @@ const seed: E2ESeed = {
   softReserveEventId,
   lockedEventId,
   historyEventId,
+  bonusEventId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 

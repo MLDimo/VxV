@@ -18,6 +18,45 @@ export interface Reserver {
   characterId: string;
   characterName: string;
   characterClass: string;
+  /** SR+ bonus added to the character's roll on this item. */
+  bonus: number;
+}
+
+/** SR+: each previous raid where the character, present, reserved the item without getting it adds a step. */
+export const SOFT_RESERVE_BONUS_STEP = 10;
+export const SOFT_RESERVE_BONUS_CAP = 50;
+
+/** What happened to a character, for one item, at a previous event. */
+export interface PastEventForItem {
+  /** One of the event's raids drops the item. */
+  dropsItem: boolean;
+  present: boolean;
+  reserved: boolean;
+  obtained: boolean;
+}
+
+/** Key of a character's reserve on an item, to find the past events of that reserve. */
+export function reserveKey(characterId: string, itemId: number): string {
+  return `${characterId}/${itemId}`;
+}
+
+/**
+ * SR+ bonus of a character on an item it reserves again, from its previous events, newest first.
+ * An absence, or an event without the item's raid, is neutral. Getting the item, or being present without
+ * reserving it, ends the streak.
+ */
+export function softReserveBonus(pastEvents: readonly PastEventForItem[]): number {
+  let bonus = 0;
+  for (const event of pastEvents) {
+    if (!event.dropsItem || !event.present) {
+      continue;
+    }
+    if (event.obtained || !event.reserved) {
+      break;
+    }
+    bonus += SOFT_RESERVE_BONUS_STEP;
+  }
+  return Math.min(bonus, SOFT_RESERVE_BONUS_CAP);
 }
 
 /** Members can no longer change their soft reserves this long before the raid; officers still can. */
@@ -64,14 +103,25 @@ export function checkSoftReserveChoice(
   return { valid: true, itemIds };
 }
 
-/** Every lootable item of the event with its reservers, as shown to the guild. */
-export function buildBoard(
-  loot: readonly LootItem[],
-  reserves: readonly SoftReserve[],
-  excludedItemIds: ReadonlySet<number>,
-  ownersByItem: ReadonlyMap<number, number>,
-  myCharacterId: string | undefined,
-): BoardItem[] {
+export interface BoardFacts {
+  loot: readonly LootItem[];
+  reserves: readonly SoftReserve[];
+  excludedItemIds: ReadonlySet<number>;
+  ownersByItem: ReadonlyMap<number, number>;
+  /** Previous events of each reserve, by reserveKey, newest first. */
+  pastEventsByReserve: ReadonlyMap<string, readonly PastEventForItem[]>;
+  myCharacterId: string | undefined;
+}
+
+/** Every lootable item of the event with its reservers and their SR+ bonus, as shown to the guild. */
+export function buildBoard({
+  loot,
+  reserves,
+  excludedItemIds,
+  ownersByItem,
+  pastEventsByReserve,
+  myCharacterId,
+}: BoardFacts): BoardItem[] {
   return loot.map((item) => {
     const onItem = reserves.filter((reserve) => reserve.itemId === item.itemId);
     return {
@@ -80,6 +130,7 @@ export function buildBoard(
         characterId,
         characterName,
         characterClass,
+        bonus: softReserveBonus(pastEventsByReserve.get(reserveKey(characterId, item.itemId)) ?? []),
       })),
       alreadyOwnedBy: ownersByItem.get(item.itemId) ?? 0,
       excluded: excludedItemIds.has(item.itemId),

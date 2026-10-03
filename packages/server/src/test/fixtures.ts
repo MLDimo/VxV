@@ -71,3 +71,8 @@ export async function recordLoot(
     [loot.eventId, loot.encounterId, loot.itemId, loot.characterId, loot.method ?? "soft_reserve"],
   );
 }
+
+/** Presence of a character at an event, as the addon records it from P6 on. */
+export async function recordAttendance(sql: SqlClient, eventId: string, characterId: string): Promise<void> {
+  await sql.query("insert into event_attendance (event_id, character_id) values ($1, $2)", [eventId, characterId]);
+}

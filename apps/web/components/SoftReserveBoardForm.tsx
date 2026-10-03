@@ -1,6 +1,7 @@
 "use client";
 
 import type { BoardItem } from "@vxv/server";
+import { SOFT_RESERVE_BONUS_CAP, SOFT_RESERVE_BONUS_STEP } from "@vxv/server/domain/softReserves";
 import { useActionState, useState } from "react";
 import { setMySoftReserves } from "@/app/actions/softReserves";
 import { ActionMessages } from "./ActionMessages";
@@ -56,6 +57,10 @@ export function SoftReserveBoardForm({
             : "Inscrivez-vous à l'événement pour choisir vos SR."}
         </p>
       )}
+      <p className="text-xs text-zinc-500">
+        SR+ : +{SOFT_RESERVE_BONUS_STEP} au roll pour chaque raid précédent où le joueur était présent et avait réservé
+        l&apos;objet sans l&apos;obtenir, jusqu&apos;à +{SOFT_RESERVE_BONUS_CAP}.
+      </p>
       {groupByBoss(items).map((group) => (
         <fieldset key={`${group.raidName}/${group.bossName}`} className="mt-4">
           <legend className="text-sm font-semibold text-zinc-300">
@@ -84,11 +89,14 @@ export function SoftReserveBoardForm({
                 {item.reservedBy.length > 0 && (
                   <p className="mt-1 flex flex-wrap gap-x-3 pl-7 text-sm">
                     {item.reservedBy.map((reserver) => (
-                      <CharacterName
-                        key={reserver.characterName}
-                        name={reserver.characterName}
-                        characterClass={reserver.characterClass}
-                      />
+                      <span key={reserver.characterName}>
+                        <CharacterName name={reserver.characterName} characterClass={reserver.characterClass} />
+                        {reserver.bonus > 0 && (
+                          <span className="ml-1 text-xs text-emerald-400" title="Bonus SR+ ajouté au roll">
+                            SR+ +{reserver.bonus}
+                          </span>
+                        )}
+                      </span>
                     ))}
                   </p>
                 )}
