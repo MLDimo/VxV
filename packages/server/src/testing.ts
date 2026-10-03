@@ -25,3 +25,5 @@ export async function createTestDatabase(): Promise<{ database: PGliteInterface;
   const database = await createMigratedDatabase();
   return { database, sql: sqlClientFromPGlite(database) };
 }
+
+export { createFakeDiscord, type FakeDiscord, type FakeDiscordReply } from "./infrastructure/discord/fakeDiscord.ts";

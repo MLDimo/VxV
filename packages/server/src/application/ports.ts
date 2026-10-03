@@ -124,3 +124,11 @@ export interface UnitOfWork {
 }
 
 export type Clock = () => Date;
+
+/** The guild's Discord server, as the bot acts on it. */
+export interface GuildGateway {
+  /** Sets the member's nickname; false when Discord refuses (server owner, or member ranked above the bot). */
+  setNickname(discordId: string, nickname: string): Promise<boolean>;
+  /** Gives the member this role, creating it if needed, and takes away the other roles of the group. */
+  setOnlyRoleAmong(discordId: string, roleName: string, group: readonly string[]): Promise<void>;
+}

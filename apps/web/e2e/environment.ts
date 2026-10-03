@@ -4,6 +4,9 @@ import { createTestSigner } from "@vxv/bot/testing";
 
 /** Shared by the Playwright config, the database server and the tests. */
 export const DATABASE_PORT = 54329;
+/** Stands for Discord's REST API, which the bot calls. */
+export const FAKE_DISCORD_PORT = 54330;
+export const FAKE_DISCORD_URL = `http://127.0.0.1:${FAKE_DISCORD_PORT}`;
 export const WEB_PORT = 3200;
 export const SEED_FILE = join(tmpdir(), "vxv-e2e-seed.json");
 
@@ -17,6 +20,8 @@ export const WEB_ENVIRONMENT = {
   DISCORD_CLIENT_ID: "1",
   DISCORD_CLIENT_SECRET: "e2e",
   DISCORD_PUBLIC_KEY: DISCORD.publicKeyHex,
+  DISCORD_BOT_TOKEN: "e2e",
+  DISCORD_API_URL: `${FAKE_DISCORD_URL}/api/v10`,
   DISCORD_GUILD_ID: "2",
   DISCORD_LINK_CHANNEL_ID: "20",
   DISCORD_ROLE_TREASURER: DISCORD_ROLES.treasurer,

@@ -74,7 +74,10 @@ function linkCommand(
         return ephemeral(NOT_FOUND);
       }
       await context.app.characters.link(member, character.id, asMain);
-      return ephemeral(done(fullName(character)));
+      const confirmation = done(fullName(character));
+      return ephemeral(
+        asMain ? `${confirmation} ${await context.app.discordProfiles.syncForMessage(member)}` : confirmation,
+      );
     },
 
     async autocomplete(interaction, context) {

@@ -42,4 +42,7 @@ export {
 export { canManageRaids } from "./domain/permissions.ts";
 export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastructure/sql.ts";
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
+export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
+export type { DiscordProfileSync } from "./application/discordProfiles.ts";
+export type { GuildGateway } from "./application/ports.ts";
 export type { BoardItem, LootItem, Reserver } from "./domain/softReserves.ts";

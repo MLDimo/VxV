@@ -10,6 +10,9 @@ const environmentSchema = z.object({
   DISCORD_CLIENT_ID: discordId,
   DISCORD_CLIENT_SECRET: z.string().min(1),
   DISCORD_PUBLIC_KEY: discordPublicKey,
+  DISCORD_BOT_TOKEN: z.string().min(1),
+  // Only the end-to-end tests point the bot to a fake Discord.
+  DISCORD_API_URL: z.url().optional(),
   DISCORD_GUILD_ID: discordId,
   DISCORD_LINK_CHANNEL_ID: discordId,
   DISCORD_ROLE_TREASURER: discordId,
@@ -24,6 +27,8 @@ export interface WebConfig {
     clientSecret: string;
     /** Verifies that interactions come from Discord. */
     publicKey: string;
+    botToken: string;
+    apiUrl: string | undefined;
     guildId: string;
     /** Channel where members link their characters with /vxv_main and /vxv_reroll. */
     linkChannelId: string;
@@ -45,6 +50,8 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
       publicKey: env.DISCORD_PUBLIC_KEY,
+      botToken: env.DISCORD_BOT_TOKEN,
+      apiUrl: env.DISCORD_API_URL,
       guildId: env.DISCORD_GUILD_ID,
       linkChannelId: env.DISCORD_LINK_CHANNEL_ID,
       roles: {

@@ -1,0 +1,48 @@
+import type { GuildGateway } from "../../application/ports.ts";
+import { createDiscordRest, DiscordApiError, type DiscordRestOptions } from "./rest.ts";
+
+const HTTP_FORBIDDEN = 403;
+const AUDIT_REASON = "VXV : personnage principal";
+
+interface DiscordRole {
+  id: string;
+  name: string;
+}
+
+/** The guild's Discord server through the REST API, acting as the bot. */
+export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions & { guildId: string }): GuildGateway {
+  const request = createDiscordRest(options);
+  const memberPath = (discordId: string) => `/guilds/${guildId}/members/${discordId}`;
+
+  return {
+    async setNickname(discordId, nickname) {
+      try {
+        await request("PATCH", memberPath(discordId), { body: { nick: nickname }, reason: AUDIT_REASON });
+        return true;
+      } catch (error) {
+        if (error instanceof DiscordApiError && error.status === HTTP_FORBIDDEN) {
+          return false;
+        }
+        throw error;
+      }
+    },
+
+    async setOnlyRoleAmong(discordId, roleName, group) {
+      const roles = await request<DiscordRole[]>("GET", `/guilds/${guildId}/roles`);
+      const target =
+        roles.find((role) => role.name === roleName) ??
+        (await request<DiscordRole>("POST", `/guilds/${guildId}/roles`, {
+          body: { name: roleName, mentionable: true },
+          reason: AUDIT_REASON,
+        }));
+      const groupIds = new Set(roles.filter((role) => group.includes(role.name)).map((role) => role.id));
+      const member = await request<{ roles: string[] }>("GET", memberPath(discordId));
+      for (const roleId of member.roles.filter((id) => groupIds.has(id) && id !== target.id)) {
+        await request("DELETE", `${memberPath(discordId)}/roles/${roleId}`, { reason: AUDIT_REASON });
+      }
+      if (!member.roles.includes(target.id)) {
+        await request("PUT", `${memberPath(discordId)}/roles/${target.id}`, { reason: AUDIT_REASON });
+      }
+    },
+  };
+}

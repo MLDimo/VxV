@@ -3,9 +3,9 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { renderSeedSql } from "@vxv/data-generator/seedSql";
 import { createMigratedPGlite } from "@vxv/database/testing";
 import { loadRaids } from "@vxv/raid-data";
-import { createApplication } from "@vxv/server";
+import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
-import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, type E2ESeed } from "./environment";
+import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, WEB_ENVIRONMENT, type E2ESeed } from "./environment";
 
 /**
  * PostgreSQL for the end-to-end tests: a migrated PGlite reachable over the network, holding the real raid data.
@@ -15,7 +15,15 @@ const MAX_CONNECTIONS = 10;
 
 const database = await createMigratedPGlite();
 await database.exec(renderSeedSql(await loadRaids()).content);
-const app = createApplication({ sql: sqlClientFromPGlite(database), discordRoles: DISCORD_ROLES });
+const app = createApplication({
+  sql: sqlClientFromPGlite(database),
+  discordRoles: DISCORD_ROLES,
+  guild: createDiscordGuild({
+    token: WEB_ENVIRONMENT.DISCORD_BOT_TOKEN,
+    guildId: WEB_ENVIRONMENT.DISCORD_GUILD_ID,
+    apiUrl: WEB_ENVIRONMENT.DISCORD_API_URL,
+  }),
+});
 
 const signIn = (discordId: string, discordName: string, ...roles: (keyof typeof DISCORD_ROLES)[]) =>
   app.auth.signIn(
