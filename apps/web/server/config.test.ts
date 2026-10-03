@@ -5,6 +5,7 @@ const environment = {
   DATABASE_URL: "postgresql://user:password@localhost:5432/postgres",
   DISCORD_CLIENT_ID: "111",
   DISCORD_CLIENT_SECRET: "secret",
+  DISCORD_PUBLIC_KEY: "ab".repeat(32),
   DISCORD_GUILD_ID: "222",
   DISCORD_ROLE_TREASURER: "2",
   DISCORD_ROLE_OFFICER: "3",
@@ -18,6 +19,7 @@ describe("parseConfig", () => {
       discord: {
         clientId: "111",
         clientSecret: "secret",
+        publicKey: "ab".repeat(32),
         guildId: "222",
         roles: { treasurer: "2", officer: "3", gm: "4" },
       },

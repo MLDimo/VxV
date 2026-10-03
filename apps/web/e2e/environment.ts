@@ -1,5 +1,6 @@
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createTestSigner } from "@vxv/bot/testing";
 
 /** Shared by the Playwright config, the database server and the tests. */
 export const DATABASE_PORT = 54329;
@@ -8,10 +9,14 @@ export const SEED_FILE = join(tmpdir(), "vxv-e2e-seed.json");
 
 export const DISCORD_ROLES = { treasurer: "11", officer: "12", gm: "13" } as const;
 
+/** Stands for the Discord application: signs the interactions sent to the website. */
+export const DISCORD = createTestSigner(Buffer.alloc(32, 7));
+
 export const WEB_ENVIRONMENT = {
   DATABASE_URL: `postgresql://postgres@127.0.0.1:${DATABASE_PORT}/postgres`,
   DISCORD_CLIENT_ID: "1",
   DISCORD_CLIENT_SECRET: "e2e",
+  DISCORD_PUBLIC_KEY: DISCORD.publicKeyHex,
   DISCORD_GUILD_ID: "2",
   DISCORD_ROLE_TREASURER: DISCORD_ROLES.treasurer,
   DISCORD_ROLE_OFFICER: DISCORD_ROLES.officer,
