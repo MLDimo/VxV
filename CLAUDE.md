@@ -7,8 +7,8 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 
 ## État d'avancement
 
-- **P0 Validation technique** : tout est validé sauf la distribution d'un objet par le maître du butin, à faire dès qu'un objet vert tombe. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
-  Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`.
+- **P0 Validation technique** : validée sauf la distribution par le maître du butin et les tests complémentaires T1 à T10 (décisions du 3 octobre), à faire avant la fin de la bêta le 21 octobre. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
+  Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`. Le harnais vérifie aussi la longueur des lignes et les globales autorisées de `.luacheckrc`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
 - **P2 API et site** : code terminé (2.1 à 2.10, 23 tests de bout en bout). Validation en attente : application Discord, identifiants du serveur et des rôles, secrets Vercel (`docs/environnements.md`).
 - P3 à P11 : pas commencées.

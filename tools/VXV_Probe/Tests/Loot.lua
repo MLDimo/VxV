@@ -57,7 +57,7 @@ local function describeCandidates(slot)
             return Util.Safe(name)
         end
         if name then
-            names[#names + 1] = Util.Safe(name)
+            names[#names + 1] = index .. "=" .. Util.Safe(name)
         end
     end
     return #names > 0 and table.concat(names, ", ") or "aucun"
@@ -100,10 +100,16 @@ local function hookMasterLoot()
     end)
 end
 
-local function listen(event, handler)
-    if not ns.Events.On(event, handler) then
-        log.Trace("événement refusé :", event)
+--- T2: the addon gives the item itself (the real addon would do it from a button next to the soft reserves).
+local function give(args)
+    local slotArg, candidateArg = Util.SplitFirst(args)
+    local slot, candidateIndex = tonumber(slotArg), tonumber(candidateArg)
+    if not slot or not candidateIndex then
+        log.Fail("usage : /vxvtest loot give <emplacement> <n° du candidat>",
+            "(numéros affichés à l'ouverture du butin)")
+        return
     end
+    log.Call("GiveMasterLoot(" .. slot .. ", " .. candidateIndex .. ")", pcall(GiveMasterLoot, slot, candidateIndex))
 end
 
 local function status()
@@ -111,6 +117,8 @@ local function status()
     log.Info("instance", name, instanceType, "id", instanceId, "difficulté", difficultyId, difficultyName,
         "joueurs max", maxPlayers)
     log.Info(describeLootMethod())
+    local okMaster, isMasterLooter = Compat.IsMasterLooter()
+    log.Info("je suis maître du butin :", okMaster and Util.Safe(isMasterLooter) or "API absente")
     local ok, inProgress = Compat.IsEncounterInProgress()
     log.Info("rencontre en cours :", ok and Util.Safe(inProgress) or "API absente")
 end
@@ -119,16 +127,13 @@ ns.Registry.Register({
     id = "loot",
     description = "boss tués, méthode de butin, attributions (écoute passive en permanence)",
     Setup = function()
-        for event, level in pairs(PASSIVE_EVENTS) do
-            listen(event, function(...)
-                log[level](event, ...)
-            end)
-        end
-        listen("LOOT_OPENED", onLootOpened)
-        listen("LOOT_HISTORY_UPDATE_DROP", onLootHistoryDrop)
+        log.Journal(PASSIVE_EVENTS)
+        log.Listen("LOOT_OPENED", onLootOpened)
+        log.Listen("LOOT_HISTORY_UPDATE_DROP", onLootHistoryDrop)
         hookMasterLoot()
     end,
     commands = {
         { name = "status", run = status },
+        { name = "give", usage = "<emplacement> <n° du candidat>", run = give },
     },
 })

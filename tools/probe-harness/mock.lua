@@ -19,6 +19,10 @@ local KNOWN_EVENTS = {
     CHAT_MSG_ADDON = true, ENCOUNTER_START = true, ENCOUNTER_END = true, BOSS_KILL = true,
     LOOT_OPENED = true, LOOT_READY = true, CHAT_MSG_LOOT = true, GUILD_ROSTER_UPDATE = true,
     ENCOUNTER_LOOT_RECEIVED = true, LOOT_HISTORY_UPDATE_DROP = true,
+    PARTY_INVITE_REQUEST = true, GROUP_ROSTER_UPDATE = true, CHAT_MSG_SYSTEM = true, UI_ERROR_MESSAGE = true,
+    CHAT_MSG_RAID = true, CHAT_MSG_RAID_LEADER = true, CHAT_MSG_RAID_WARNING = true, CHAT_MSG_PARTY = true,
+    CHAT_MSG_PARTY_LEADER = true, CHAT_MSG_GUILD = true, PLAYER_DEAD = true, PLAYER_ALIVE = true,
+    PLAYER_UNGHOST = true, RESURRECT_REQUEST = true, TRADE_SKILL_SHOW = true,
 }
 -- Registering these fires ADDON_ACTION_FORBIDDEN synchronously, as the Forever client does.
 local FORBIDDEN_EVENTS = { COMBAT_LOG_EVENT_UNFILTERED = true }
@@ -27,7 +31,7 @@ local function noop() end
 local FRAME_NOOPS = {
     "SetSize", "SetPoint", "SetFrameStrata", "SetMovable", "EnableMouse", "RegisterForDrag", "StartMoving",
     "StopMovingOrSizing", "SetMultiLine", "SetAutoFocus", "SetFontObject", "SetWidth", "SetScrollChild",
-    "Show", "Hide", "SetFocus", "HighlightText",
+    "SetFocus", "HighlightText",
 }
 
 function CreateFrame()
@@ -45,6 +49,10 @@ function CreateFrame()
     function frame:UnregisterEvent(event) self.events[event] = nil end
     function frame:SetScript(name, fn) self.scripts[name] = fn end
     function frame:SetText(text) self.text = text end
+    function frame:SetShown(shown) self.shown = shown end
+    function frame:Show() self.shown = true end
+    function frame:Hide() self.shown = false end
+    function frame:IsShown() return self.shown end
     for _, method in ipairs(FRAME_NOOPS) do frame[method] = noop end
     frames[#frames + 1] = frame
     return frame
@@ -55,6 +63,9 @@ Enum = {
     SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3 },
     RegisterAddonMessagePrefixResult = { Success = 0 },
     LootMethod = { Freeforall = 0, Masterlooter = 2 },
+    DamageMeterType = { DamageDone = 0, HealingDone = 2 },
+    DamageMeterSessionType = { Overall = 0, Current = 1 },
+    TooltipDataType = { Unit = 2 },
 }
 
 local THROTTLE_AFTER = 20
@@ -69,8 +80,9 @@ C_ChatInfo = {
         Fire("CHAT_MSG_ADDON", prefix, text, channel, "Jean Dupont")
         return 0
     end,
+    SendChatMessage = function(text, channel) Fire("CHAT_MSG_" .. channel, text, "Jean Dupont") end,
 }
-C_PartyInfo = { GetLootMethod = function() return 2, 1, nil end, GiveMasterLootTo = function() end }
+C_PartyInfo = { GetLootMethod = function() return 2, 1, nil end, InviteUnit = noop, ConvertToRaid = noop }
 C_GuildInfo = { GuildRoster = function() Fire("GUILD_ROSTER_UPDATE") end }
 C_LootHistory = {
     GetSortedInfoForDrop = function(_, lootListId)
@@ -81,7 +93,20 @@ C_LootHistory = {
         }
     end,
 }
-C_Timer = { After = function(_, fn) fn() end }
+-- Timers fire at once; tickers fire on Tick(), called by the scenario.
+local tickers = {}
+C_Timer = {
+    After = function(_, fn) fn() end,
+    NewTicker = function(_, fn)
+        local ticker = { fn = fn }
+        function ticker:Cancel() tickers[self] = nil end
+        tickers[ticker] = true
+        return ticker
+    end,
+}
+function Tick()
+    for ticker in pairs(tickers) do ticker.fn() end
+end
 
 GetBuildInfo = function() return "1.60.1", "70170", "Oct 1 2026", 16001 end
 IsInInstance = function() return true, "raid" end
@@ -112,7 +137,88 @@ GetNumLootItems = function() return 1 end
 GetLootSlotLink = function() return "|cffa335ee|Hitem:1|h[Epee]|h|r" end
 GetMasterLootCandidate = function(_, index) return index <= 2 and ("Joueur " .. index) or nil end
 GiveMasterLoot = noop
-hooksecurefunc = function(name, post)
-    local original = _G[name]
-    _G[name] = function(...) original(...); post(...) end
+IsMasterLooter = function() return true end
+hooksecurefunc = function(target, name, post)
+    if type(target) == "string" then
+        target, name, post = _G, target, name
+    end
+    local original = target[name]
+    target[name] = function(...) original(...); post(...) end
+end
+
+-- Group, rolls, deaths (T1, T3, T5, T6). The scenario changes DeadUnits to simulate deaths.
+DeadUnits = {}
+GetNumGroupMembers = function() return 2 end
+UnitIsGroupLeader = function() return true end
+UnitIsGroupAssistant = function() return false end
+UnitIsPlayer = function() return true end
+UnitIsDeadOrGhost = function(unit) return DeadUnits[unit] or false end
+RANDOM_ROLL_RESULT = "%s obtient un %d (%d-%d)."
+RandomRoll = function(low, high) Fire("CHAT_MSG_SYSTEM", RANDOM_ROLL_RESULT:format("Jean Dupont", 42, low, high)) end
+
+-- Counters (T8). The scenario changes StatisticValues to simulate a kill.
+StatisticValues = { [1197] = 10, [1198] = 4 }
+GetStatisticsCategoryList = function() return { 130 } end
+GetCategoryNumAchievements = function() return 2 end
+GetAchievementInfo = function(_, index)
+    return 1196 + index, index == 1 and "Créatures tuées" or "Victoires donnant de l'expérience"
+end
+GetStatistic = function(id) return tostring(StatisticValues[id]) end
+GetPVPLifetimeStats = function() return 3 end
+
+-- Damage meter (T7)
+C_DamageMeter = {
+    IsDamageMeterAvailable = function() return true end,
+    GetAvailableCombatSessions = function() return { { sessionID = 1, name = "Combat" } } end,
+    GetCombatSessionFromType = function()
+        return { totalAmount = 1000, combatSources = { { name = "Jean Dupont", totalAmount = 600 } } }
+    end,
+}
+
+-- Display (T9): hooks run at once on a fake tooltip and on a normal then a secret guild message.
+local fakeTooltip = { GetUnit = function() return "Jean Dupont", "target" end, AddLine = noop }
+TooltipDataProcessor = { AddTooltipPostCall = function(_, fn) fn(fakeTooltip) end }
+ChatFrameUtil = {
+    AddMessageEventFilter = function(event, filter)
+        filter({}, event, "bonjour", "Jean Dupont")
+        filter({}, event, "SECRET", "Jean Dupont")
+    end,
+}
+C_AddOns = { IsAddOnLoaded = function() return false, false end }
+CommunitiesMemberListEntryMixin = { SetMember = noop }
+FakeRosterEntry = { NameFrame = { Name = { GetText = function() return "Jean Dupont" end, SetText = noop } } }
+
+-- Professions (T10): modern API; the scenario removes it to run the classic one.
+GetProfessions = function() return 1, nil, nil, 4, 5 end
+GetProfessionInfo = function(index) return "Métier " .. index, "icon", 150, 300, 10, 0, 164 end
+GetNumSkillLines = function() return 2 end
+GetSkillLineInfo = function(index)
+    if index == 1 then return "Métiers", true end
+    return "Forge", false, false, 150, 0, 0, 300
+end
+C_TradeSkillUI = {
+    GetAllRecipeIDs = function() return { 1, 2 } end,
+    GetRecipeInfo = function(id) return { name = "Recette " .. id, learned = id == 1 } end,
+    GetBaseProfessionInfo = function() return { professionName = "Forge" } end,
+}
+GetNumTradeSkills = function() return 3 end
+GetTradeSkillInfo = function(index)
+    if index == 1 then return "Armes", "header" end
+    return "Recette " .. index, "optimal"
+end
+GetTradeSkillLine = function() return "Forge", 150, 300 end
+
+-- Must stay last: every global created from here on comes from the addon or the scenario.
+local mockGlobals = {}
+function NewGlobals()
+    local names = {}
+    for name in pairs(_G) do
+        if not mockGlobals[name] then
+            names[#names + 1] = name
+        end
+    end
+    return table.concat(names, " ")
+end
+for name in pairs(_G) do
+    mockGlobals[name] = true
 end

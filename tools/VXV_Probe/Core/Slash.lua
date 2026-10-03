@@ -1,9 +1,14 @@
 local _, ns = ...
 
 --- /vxvtest: built-in journal commands, then "/vxvtest <test> <command> [args]".
+--- "/vxvtest later <test> <command> [args]" runs the command a few seconds later, outside the player's click:
+--- the way the real addon acts when it reacts to an event. The game blocks some actions that do not come from a click.
 local Log, Registry, Util = ns.Log, ns.Registry, ns.Util
 
 local DEFAULT_LOG_LINES = 20
+local LATER_DELAY_SECONDS = 3
+
+local dispatch
 
 local function printTestHelp(test)
     print(string.format("  |cff14b8a6%s|r : %s", test.id, test.description))
@@ -13,7 +18,7 @@ local function printTestHelp(test)
 end
 
 local function printHelp()
-    print("|cff14b8a6VXV_Probe|r : /vxvtest log [n] | report | clear | verbose")
+    print("|cff14b8a6VXV_Probe|r : /vxvtest log [n] | report | clear | verbose | later <test> <commande>")
     for _, test in ipairs(Registry.All()) do
         printTestHelp(test)
     end
@@ -47,10 +52,16 @@ local BUILTINS = {
     verbose = function()
         print("VXV_Probe : mode détaillé " .. (Log.ToggleVerbose() and "activé" or "désactivé") .. ".")
     end,
+    later = function(args)
+        print(string.format("VXV_Probe : « %s » lancé dans %d s, sans clic.", args, LATER_DELAY_SECONDS))
+        C_Timer.After(LATER_DELAY_SECONDS, function()
+            Log.Record("later", "info", "commande différée :", args)
+            dispatch(args)
+        end)
+    end,
 }
 
-SLASH_VXVPROBE1 = "/vxvtest"
-SlashCmdList.VXVPROBE = function(input)
+dispatch = function(input)
     local first, rest = Util.SplitFirst(input)
     first = first:lower()
 
@@ -71,3 +82,6 @@ SlashCmdList.VXVPROBE = function(input)
     end
     command.run(args)
 end
+
+SLASH_VXVPROBE1 = "/vxvtest"
+SlashCmdList.VXVPROBE = dispatch

@@ -15,8 +15,16 @@ local FUNCTIONS = {
     -- Names and guild roster (0.5)
     "UnitName", "UnitFullName", "GetUnitName", "Ambiguate", "issecretvalue",
     "C_GuildInfo.GuildRoster", "GetNumGuildMembers", "GetGuildRosterInfo", "C_Club",
+    -- Group, rolls, chat (T1, T3, T4, T5)
+    "C_PartyInfo.InviteUnit", "InviteUnit", "C_PartyInfo.ConvertToRaid", "ConvertToRaid", "IsMasterLooter",
+    "C_ChatInfo.SendChatMessage", "SendChatMessage", "RandomRoll", "RANDOM_ROLL_RESULT",
+    -- Deaths, meter, counters (T6, T7, T8)
+    "UnitIsDeadOrGhost", "C_DamageMeter", "GetStatisticsCategoryList", "GetStatistic", "GetPVPLifetimeStats",
+    -- Display and professions (T9, T10)
+    "TooltipDataProcessor", "ChatFrameUtil", "ChatFrame_AddMessageEventFilter", "CommunitiesMemberListEntryMixin",
+    "GetProfessions", "GetNumSkillLines", "C_TradeSkillUI", "GetNumTradeSkills",
     -- Misc
-    "C_Timer.After", "hooksecurefunc",
+    "C_Timer.After", "C_Timer.NewTicker", "hooksecurefunc",
 }
 
 local EVENTS = {
@@ -26,6 +34,10 @@ local EVENTS = {
     "CHAT_MSG_LOOT", "START_LOOT_ROLL", "ENCOUNTER_LOOT_RECEIVED",
     "LOOT_HISTORY_UPDATE_DROP", "LOOT_HISTORY_UPDATE_ENCOUNTER", "PARTY_LOOT_METHOD_CHANGED",
     "GUILD_ROSTER_UPDATE", "COMBAT_LOG_EVENT_UNFILTERED",
+    "PARTY_INVITE_REQUEST", "GROUP_ROSTER_UPDATE", "CHAT_MSG_SYSTEM", "UI_ERROR_MESSAGE",
+    "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST", "RESURRECT_REQUEST",
+    "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER", "CHAT_MSG_RAID_WARNING",
+    "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_UPDATE",
 }
 
 local function checkBuild()
