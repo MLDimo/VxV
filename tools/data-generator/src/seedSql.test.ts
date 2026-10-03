@@ -106,8 +106,8 @@ describe("renderSeedSql applied to a migrated database", () => {
       insert into members (id, discord_id, discord_name) values ('00000000-0000-0000-0000-000000000001', '1', 'Officier');
       insert into characters (id, first_name, last_name, class) values ('00000000-0000-0000-0000-000000000002', 'Ðéjà', 'Vu', 'ROGUE');
       insert into events (id, starts_at, created_by) values ('00000000-0000-0000-0000-000000000003', now(), '00000000-0000-0000-0000-000000000001');
-      insert into loots (event_id, encounter_id, item_id, character_id, looted_at)
-        values ('00000000-0000-0000-0000-000000000003', 3493, 271096, '00000000-0000-0000-0000-000000000002', now());
+      insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
+        values ('00000000-0000-0000-0000-000000000003', 3493, 271096, '00000000-0000-0000-0000-000000000002', 'free_roll', now());
     `);
     const withoutFaldrim: Raid = { ...salleDesThanes, bosses: salleDesThanes.bosses.slice(1) };
     await expect(sync([withoutFaldrim])).rejects.toThrow(/foreign key/);

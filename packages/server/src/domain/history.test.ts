@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { softReserveRespected, type SoftReservedLoot } from "./history.ts";
+import { softReserveRespected, type LootRecord } from "./history.ts";
 
-const loot: SoftReservedLoot = {
+const loot: LootRecord = {
   eventId: "e",
   eventStartsAt: new Date(),
   raids: ["Onyxia"],
@@ -10,6 +10,7 @@ const loot: SoftReservedLoot = {
   winnerName: "Ðéjà Vu",
   winnerClass: "ROGUE",
   lootedAt: new Date(),
+  method: "soft_reserve",
   softReservedBy: ["Eole Hermes", "Ðéjà Vu"],
 };
 

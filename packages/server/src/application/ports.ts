@@ -1,6 +1,6 @@
 import type { Character } from "../domain/characters.ts";
 import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
-import type { SoftReservedLoot } from "../domain/history.ts";
+import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { RosterEntry } from "../domain/roster.ts";
@@ -84,8 +84,8 @@ export interface BossLootRepository {
 export interface LootHistoryRepository {
   /** For each item, how many characters signed up to the event already received it. */
   countSignedUpOwners(eventId: string): Promise<Map<number, number>>;
-  /** Loots of items soft-reserved for their event, latest first. */
-  listSoftReserved(limit: number): Promise<SoftReservedLoot[]>;
+  /** Loots given by one of the methods, latest first. */
+  list(limit: number, methods: readonly LootMethod[]): Promise<LootRecord[]>;
 }
 
 export interface SoftReserveRepository {

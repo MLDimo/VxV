@@ -117,6 +117,25 @@ describe("initial schema", () => {
     });
   });
 
+  describe("loots", () => {
+    it("requires how the item was given", async () => {
+      const { encounterId } = await insertRaidWithBoss(database);
+      const memberId = await insertMember(database, "1");
+      const characterId = await insertCharacter(database, { firstName: "Ðéjà", lastName: "Vu", memberId });
+      const eventId = await insertEvent(database, memberId);
+      const recordLoot = (method: string | null) =>
+        database.query(
+          `insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
+           values ($1, $2, $3, $4, $5, now())`,
+          [eventId, encounterId, ONYXIA_HEAD_ITEM_ID, characterId, method],
+        );
+
+      await expect(recordLoot(null)).rejects.toThrow(/null value/);
+      await expect(recordLoot("gift")).rejects.toThrow(/invalid input value/);
+      await expect(recordLoot("free_roll")).resolves.toBeDefined();
+    });
+  });
+
   describe("sign-ups", () => {
     it("allows a single sign-up per member and event, whatever the character", async () => {
       const memberId = await insertMember(database, "1");

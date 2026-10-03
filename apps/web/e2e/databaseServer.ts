@@ -102,8 +102,8 @@ const DURGEN = 3496;
 await app.softReserves.setMine(lockedMember.member, historyEventId, [String(BOTTINES)]);
 // Loots are recorded by the addon from P6 on; until then the tests insert them directly.
 await database.query(
-  `insert into loots (event_id, encounter_id, item_id, character_id, looted_at)
-   values ($1, $2, $3, $4, now()), ($1, $5, $6, $7, now())`,
+  `insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
+   values ($1, $2, $3, $4, 'soft_reserve', now()), ($1, $5, $6, $7, 'free_roll', now())`,
   [historyEventId, PILLAGE, BOTTINES, duneSable.id, DURGEN, JAMBIERES, cielGris.id],
 );
 

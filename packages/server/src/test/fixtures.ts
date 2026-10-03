@@ -1,4 +1,5 @@
 import type { Character } from "../domain/characters.ts";
+import type { LootMethod } from "../domain/history.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { eventRepository } from "../infrastructure/postgres/events.ts";
@@ -62,10 +63,11 @@ export async function createRaidWithLoot(sql: SqlClient): Promise<void> {
 /** A loot already received by a character during an event. */
 export async function recordLoot(
   sql: SqlClient,
-  loot: { eventId: string; encounterId: number; itemId: number; characterId: string },
+  loot: { eventId: string; encounterId: number; itemId: number; characterId: string; method?: LootMethod },
 ): Promise<void> {
   await sql.query(
-    "insert into loots (event_id, encounter_id, item_id, character_id, looted_at) values ($1, $2, $3, $4, now())",
-    [loot.eventId, loot.encounterId, loot.itemId, loot.characterId],
+    `insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
+     values ($1, $2, $3, $4, $5, now())`,
+    [loot.eventId, loot.encounterId, loot.itemId, loot.characterId, loot.method ?? "soft_reserve"],
   );
 }
