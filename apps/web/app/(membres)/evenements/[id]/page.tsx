@@ -4,21 +4,26 @@ import { notFound } from "next/navigation";
 import { EventSignups } from "@/components/EventSignups";
 import { formatEventDate, raidTitle, softReserveCount } from "@/components/format";
 import { SignupForm } from "@/components/SignupForm";
+import { SoftReserveBoardForm } from "@/components/SoftReserveBoardForm";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, member] = await Promise.all([params, requireMember()]);
-  const { events, signups, characters } = getApplication();
+  const { events, signups, characters, softReserves } = getApplication();
   const event = await events.getEvent(id);
   if (event === undefined) {
     notFound();
   }
-  const [eventSignups, mine, ownCharacters] = await Promise.all([
+  const [eventSignups, board, ownCharacters] = await Promise.all([
     signups.listForEvent(event.id),
-    signups.findMine(member, event.id),
+    softReserves.getBoard(member, event.id),
     characters.listMine(member),
   ]);
+  if (board === undefined) {
+    notFound();
+  }
+  const mine = board.mySignup;
   const signupCharacters = ownCharacters
     .filter((character) => character.inGuild)
     .map((character) => ({ id: character.id, name: fullName(character), characterClass: character.characterClass }));
@@ -42,6 +47,17 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         ) : (
           <SignupForm eventId={event.id} characters={signupCharacters} current={mine} maxSpecLength={MAX_SPEC_LENGTH} />
         )}
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold">Soft reserves</h2>
+        <SoftReserveBoardForm
+          key={mine?.characterId ?? "none"}
+          eventId={event.id}
+          items={board.items}
+          allowance={board.allowance}
+          canReserve={mine !== undefined}
+        />
       </section>
 
       <EventSignups signups={eventSignups} />

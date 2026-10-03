@@ -38,4 +38,6 @@ export interface E2ESeed {
   sessions: E2ESessions;
   /** Event on La salle des Thanes, reserved to the sign-up tests. */
   signupEventId: string;
+  /** Event on La salle des Thanes where the officer (Ciel Gris) is already signed up, for the soft reserve tests. */
+  softReserveEventId: string;
 }
