@@ -19,6 +19,9 @@ export const WEB_ENVIRONMENT = {
   DISCORD_ROLE_GM: DISCORD_ROLES.gm,
 };
 
+/** Guild characters imported before the tests (accents included, as in the game). */
+export const SEED_ROSTER = ["Aubé;Clairval;PRIEST", "Brume;Noire;MAGE", "Ciel;Gris;WARRIOR"];
+
 export interface E2ESessions {
   officer: string;
   member: string;

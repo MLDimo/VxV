@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { SEED_ROSTER } from "./environment";
 import { signInAs } from "./sessions";
 
 test.describe.serial("guild roster import", () => {
@@ -17,13 +18,15 @@ test.describe.serial("guild roster import", () => {
 
   test("imports the roster and records it in the journal", async ({ page }) => {
     await page.goto("/officiers/liste-de-guilde");
-    await page.getByLabel("Liste copiée depuis l'addon").fill("VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nEole;Hermes;WARRIOR");
+    const roster = ["VXV-ROSTER-1", ...SEED_ROSTER, "Ðéjà;Vu;ROGUE", "Eole;Hermes;WARRIOR"].join("\n");
+    await page.getByLabel("Liste copiée depuis l'addon").fill(roster);
     await page.getByLabel("Motif (visible dans le journal)").fill("Première liste de la guilde");
     await page.getByRole("button", { name: "Importer" }).click();
     await expect(page.getByRole("status")).toContainText("Liste importée : 2 ajoutés");
 
     await page.getByRole("link", { name: "Journal" }).click();
-    await expect(page.getByText("Import de la liste de guilde")).toBeVisible();
-    await expect(page.getByText("Motif : Première liste de la guilde")).toBeVisible();
+    const entry = page.getByRole("listitem").filter({ hasText: "Motif : Première liste de la guilde" });
+    await expect(entry).toContainText("Import de la liste de guilde");
+    await expect(entry).toContainText("2 ajoutés");
   });
 });

@@ -1,23 +1,19 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { describeRosterImport } from "@/components/journalEntries";
 import type { ActionState } from "@/components/actionState";
-import { toErrorState } from "@/server/actionErrors";
+import { describeRosterImport } from "@/components/journalEntries";
 import { getApplication } from "@/server/application";
+import { runFormAction } from "@/server/formActions";
 import { requireOfficer } from "@/server/session";
 
 export async function importRoster(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  try {
+  return runFormAction(async () => {
     const summary = await getApplication().roster.importRoster(
       officer,
       String(form.get("roster") ?? ""),
       String(form.get("reason") ?? ""),
     );
-    revalidatePath("/journal");
-    return { status: "success", messages: [`Liste importée : ${describeRosterImport(summary)}.`] };
-  } catch (error) {
-    return toErrorState(error);
-  }
+    return `Liste importée : ${describeRosterImport(summary)}.`;
+  }, ["/journal", "/personnages"]);
 }

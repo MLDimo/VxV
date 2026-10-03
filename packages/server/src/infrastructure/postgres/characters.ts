@@ -24,13 +24,46 @@ function toCharacter(row: CharacterRow): Character {
   };
 }
 
+const COLUMNS = "id, first_name, last_name, class, member_id, is_main, in_guild";
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function characterRepository(sql: SqlClient): CharacterRepository {
+  const select = async (where: string, params: unknown[] = []) =>
+    (await sql.query<CharacterRow>(`select ${COLUMNS} from characters ${where}`, params)).map(toCharacter);
+
   return {
-    async listAll() {
-      const rows = await sql.query<CharacterRow>(
-        "select id, first_name, last_name, class, member_id, is_main, in_guild from characters",
-      );
-      return rows.map(toCharacter);
+    listAll() {
+      return select("");
+    },
+
+    async findById(characterId) {
+      if (!UUID.test(characterId)) {
+        return undefined;
+      }
+      const [character] = await select("where id = $1", [characterId]);
+      return character;
+    },
+
+    listAvailable() {
+      return select("where in_guild and member_id is null order by first_name, last_name");
+    },
+
+    listByMember(memberId) {
+      return select("where member_id = $1 order by is_main desc, first_name, last_name", [memberId]);
+    },
+
+    async link(characterId, memberId) {
+      await sql.query("update characters set member_id = $2 where id = $1", [characterId, memberId]);
+    },
+
+    async unlink(characterId) {
+      await sql.query("update characters set member_id = null, is_main = false where id = $1", [characterId]);
+    },
+
+    async setMain(memberId, characterId) {
+      // Two statements: the one-main-per-member index is checked row by row.
+      await sql.query("update characters set is_main = false where member_id = $1 and is_main", [memberId]);
+      await sql.query("update characters set is_main = true where id = $1 and member_id = $2", [characterId, memberId]);
     },
 
     async add(entries) {
