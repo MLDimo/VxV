@@ -3,6 +3,7 @@ import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
+import type { RaidReminder, ReminderTarget } from "../domain/reminders.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
 import type { LootItem, PastEventForItem, SoftReserve } from "../domain/softReserves.ts";
@@ -66,11 +67,16 @@ export interface EventRepository {
   /** Events starting after the given instant, soonest first. */
   listStartingAfter(instant: Date): Promise<RaidEvent[]>;
   setDiscordMessage(eventId: string, messageId: string): Promise<void>;
+  /** Events starting after "from" and up to "until" that were not reminded yet, soonest first. */
+  listToRemind(from: Date, until: Date): Promise<RaidEvent[]>;
+  markReminded(eventId: string, at: Date): Promise<void>;
 }
 
 export interface SignupRepository {
   /** Tanks, then healers, then DPS, by character name. */
   listByEvent(eventId: string): Promise<Signup[]>;
+  /** The signed-up members' Discord ids, answers and whether they chose soft reserves. */
+  listReminderTargets(eventId: string): Promise<ReminderTarget[]>;
   findByMember(eventId: string, memberId: string): Promise<Signup | undefined>;
   /** Creates the sign-up of this character, or updates it. */
   save(signup: SignupChoice & { eventId: string; memberId: string }): Promise<void>;
@@ -146,4 +152,6 @@ export interface RaidAnnouncer {
   publish(raid: AnnouncedRaid): Promise<string>;
   /** Refreshes the message; false when it no longer exists (deleted on Discord). */
   update(messageId: string, raid: AnnouncedRaid): Promise<boolean>;
+  /** Reminds the signed-up members of the raid, in the raid channel. */
+  remind(reminder: RaidReminder): Promise<void>;
 }

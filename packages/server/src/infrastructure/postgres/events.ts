@@ -54,6 +54,19 @@ export function eventRepository(sql: SqlClient): EventRepository {
       await sql.query("update events set discord_message_id = $2 where id = $1", [eventId, messageId]);
     },
 
+    async listToRemind(from, until) {
+      const rows = await sql.query<EventRow>(
+        `${SELECT_EVENTS} where events.starts_at > $1 and events.starts_at <= $2 and events.reminded_at is null
+         group by events.id order by events.starts_at`,
+        [from, until],
+      );
+      return rows.map(toEvent);
+    },
+
+    async markReminded(eventId, at) {
+      await sql.query("update events set reminded_at = $2 where id = $1", [eventId, at]);
+    },
+
     async listStartingAfter(instant) {
       const rows = await sql.query<EventRow>(
         `${SELECT_EVENTS} where events.starts_at > $1 group by events.id order by events.starts_at`,

@@ -1,5 +1,6 @@
 import { createDiscordRest, DiscordApiError, type DiscordRestOptions, type RaidAnnouncer } from "@vxv/server";
 import { raidMessage } from "./raidMessage.ts";
+import { reminderMessage } from "./reminderMessage.ts";
 
 const HTTP_NOT_FOUND = 404;
 
@@ -16,6 +17,10 @@ export function createDiscordRaidAnnouncer({
         body: raidMessage(raid, siteUrl),
       });
       return message.id;
+    },
+
+    async remind(reminder) {
+      await request("POST", `/channels/${channelId}/messages`, { body: reminderMessage(reminder, siteUrl) });
     },
 
     async update(messageId, raid) {

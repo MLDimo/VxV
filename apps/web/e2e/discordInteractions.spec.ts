@@ -1,7 +1,7 @@
 import { autocomplete, buttonClick, formSubmission, slashCommand, type TestActor } from "@vxv/bot/testing";
 import { expect, test, type APIRequestContext } from "@playwright/test";
 import { DISCORD, DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
-import { discordEventMessage, discordMemberState } from "./fakeDiscord";
+import { discordEventMessage, discordMemberState, discordMessages } from "./fakeDiscord";
 import { signInAs } from "./sessions";
 
 const ENDPOINT = "/api/discord/interactions";
@@ -142,4 +142,18 @@ test.describe.serial("Discord bot", () => {
     const message = await discordEventMessage(request, discordRaidId);
     expect(message?.embed?.fields[0]).toEqual({ name: "🛡️ Tank · 1", value: "Ciel Gris (Protection)", inline: true });
   });
+});
+
+test("the daily task reminds tonight's raid on Discord, once, and only when Vercel calls it", async ({ request }) => {
+  const endpoint = "/api/cron/reminders";
+  expect((await request.get(endpoint)).status()).toBe(401);
+
+  const authorization = { authorization: `Bearer ${WEB_ENVIRONMENT.CRON_SECRET}` };
+  const first = await request.get(endpoint, { headers: authorization });
+  expect(await first.json()).toEqual({ reminded: 1 });
+  const reminder = (await discordMessages(request)).find((message) => String(message.body.content).startsWith("⏰"));
+  expect(reminder?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID);
+  expect(reminder?.body.content).toContain("Inscrits : <@500>");
+
+  expect(await (await request.get(endpoint, { headers: authorization })).json()).toEqual({ reminded: 0 });
 });

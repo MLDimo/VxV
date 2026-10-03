@@ -18,6 +18,7 @@ export const DISCORD = createTestSigner(Buffer.alloc(32, 7));
 export const WEB_ENVIRONMENT = {
   DATABASE_URL: `postgresql://postgres@127.0.0.1:${DATABASE_PORT}/postgres`,
   SITE_URL: `http://localhost:${WEB_PORT}`,
+  CRON_SECRET: "e2e-cron-secret-e2e-cron-secret-e2e",
   DISCORD_CLIENT_ID: "1",
   DISCORD_CLIENT_SECRET: "e2e",
   DISCORD_PUBLIC_KEY: DISCORD.publicKeyHex,

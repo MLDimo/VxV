@@ -22,6 +22,7 @@ function createRecordingChannel() {
       shown.set(messageId, raid);
       return messageId;
     },
+    async remind() {},
     async update(messageId, raid) {
       if (!shown.has(messageId)) {
         return false;

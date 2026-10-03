@@ -45,6 +45,7 @@ export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/disc
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
 export type { AnnouncedRaid, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+export type { RaidReminder } from "./domain/reminders.ts";
 export {
   createDiscordRest,
   DiscordApiError,

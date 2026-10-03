@@ -13,9 +13,14 @@ export async function discordMemberState(
   }>;
 }
 
+/** Every message the bot published, in order. */
+export async function discordMessages(request: APIRequestContext): Promise<FakeMessage[]> {
+  return (await request.get(`${FAKE_DISCORD_URL}/messages`)).json() as Promise<FakeMessage[]>;
+}
+
 /** The sign-up message the bot published for an event, found by the exact event link it carries. */
 export async function discordEventMessage(request: APIRequestContext, eventId: string) {
-  const messages = (await (await request.get(`${FAKE_DISCORD_URL}/messages`)).json()) as FakeMessage[];
+  const messages = await discordMessages(request);
   const link = `/evenements/${eventId}"`;
   const message = messages.find((candidate) => JSON.stringify(candidate.body).includes(link));
   const embeds = message?.body.embeds as { title: string; fields: { name: string; value: string }[] }[] | undefined;

@@ -8,6 +8,7 @@ const discordPublicKey = z.string().regex(/^[0-9a-f]{64}$/i, "doit être la clé
 const environmentSchema = z.object({
   DATABASE_URL: z.url(),
   SITE_URL: z.url(),
+  CRON_SECRET: z.string().min(32, "doit compter au moins 32 caractères"),
   DISCORD_CLIENT_ID: discordId,
   DISCORD_CLIENT_SECRET: z.string().min(1),
   DISCORD_PUBLIC_KEY: discordPublicKey,
@@ -26,6 +27,8 @@ export interface WebConfig {
   databaseUrl: string;
   /** Public address of the website, for the links in the bot's messages. */
   siteUrl: string;
+  /** Sent by Vercel to the scheduled tasks. */
+  cronSecret: string;
   discord: {
     clientId: string;
     clientSecret: string;
@@ -53,6 +56,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
   return {
     databaseUrl: env.DATABASE_URL,
     siteUrl: env.SITE_URL,
+    cronSecret: env.CRON_SECRET,
     discord: {
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
