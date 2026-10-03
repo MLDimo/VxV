@@ -10,8 +10,8 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 - **P0 Validation technique** : terminée, y compris la distribution par le maître du butin et les tests complémentaires T1 à T10 du 3 octobre. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`. Le harnais vérifie aussi la longueur des lignes et les globales autorisées de `.luacheckrc`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
-- **P2 API et site** : code terminé (2.1 à 2.10, plus les décisions du 3 octobre : rôles cumulables, mode d'attribution des loots et historique complet, présence au raid et SR+ ; 25 tests de bout en bout). Validation en attente : application Discord, identifiants du serveur et des rôles, secrets Vercel (`docs/environnements.md`).
-- P3 à P11 : pas commencées.
+- **P2 API et site** : terminée et validée en conditions réelles le 3 octobre (connexion Discord, liste de guilde, personnage, événement, inscription, SR, journal sur https://vxv-web.vercel.app). Inclut les décisions du 3 octobre : rôles cumulables, tout membre du serveur Discord est membre de la guilde, mode d'attribution des loots et historique complet, présence au raid et SR+ ; 25 tests de bout en bout.
+- P3 à P15 : pas commencées.
 
 ## Structure du dépôt
 
