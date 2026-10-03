@@ -7,7 +7,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 
 ## État d'avancement
 
-- **P0 Validation technique** : validée, y compris la distribution par le maître du butin. Des tests complémentaires du 3 octobre, il reste les morts du groupe (T6) et le compteur de dégâts en groupe (T7), avant la fin de la bêta le 21 octobre. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
+- **P0 Validation technique** : terminée, y compris la distribution par le maître du butin et les tests complémentaires T1 à T10 du 3 octobre. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`. Le harnais vérifie aussi la longueur des lignes et les globales autorisées de `.luacheckrc`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
 - **P2 API et site** : code terminé (2.1 à 2.10, 23 tests de bout en bout). Validation en attente : application Discord, identifiants du serveur et des rôles, secrets Vercel (`docs/environnements.md`).
@@ -120,7 +120,8 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Sans clic du joueur (réaction à un événement) : `C_PartyInfo.InviteUnit`, `C_PartyInfo.ConvertToRaid`, `C_ChatInfo.SendChatMessage` (hors boss) et `RandomRoll` fonctionnent.
 - `/roll` : lu dans CHAT_MSG_SYSTEM avec le format du jeu `RANDOM_ROLL_RESULT`, pour tous les joueurs.
 - Pendant une rencontre de boss : envoi de chat bloqué (ADDON_ACTION_BLOCKED, même depuis un clic), messages du groupe et messages système secrets (`/roll` compris). Tout redevient normal après ENCOUNTER_END.
-- Compteur de dégâts du jeu (`C_DamageMeter`) : secret pendant le combat, lisible après.
+- Compteur de dégâts du jeu (`C_DamageMeter`) : secret pendant le combat, lisible après pour tout le groupe ; nom secret pour un joueur qui a quitté le groupe.
+- Morts du groupe : `UnitIsDeadOrGhost` et les noms des membres restent lisibles pendant un boss.
 - Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.
 - Métiers : `GetProfessions` ; recettes connues via `C_TradeSkillUI`, quand la fenêtre du métier est ouverte.
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
