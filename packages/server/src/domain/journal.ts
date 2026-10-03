@@ -1,5 +1,5 @@
 /** Officer actions recorded in the journal. Each new officer action adds its name here. */
-export type JournalAction = "roster.import" | "event.create";
+export type JournalAction = "roster.import" | "event.create" | "exclusion.add" | "exclusion.remove";
 
 export interface NewJournalEntry {
   actorId: string;

@@ -51,21 +51,23 @@ export function SoftReserveBoardForm({
           <ul className="mt-2 divide-y divide-zinc-800 rounded border border-zinc-800">
             {group.items.map((item) => (
               <li key={item.itemId} className="px-4 py-2">
-                <label className="flex flex-wrap items-center gap-3">
-                  <input
-                    type="checkbox"
-                    name="itemIds"
-                    value={item.itemId}
-                    checked={chosen.has(item.itemId)}
-                    disabled={!canReserve || item.excluded || (full && !chosen.has(item.itemId))}
-                    onChange={(event) => toggle(item.itemId, event.target.checked)}
-                  />
-                  <span className={item.excluded ? "text-zinc-500 line-through" : ""}>{item.name}</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="itemIds"
+                      value={item.itemId}
+                      checked={chosen.has(item.itemId)}
+                      disabled={!canReserve || item.excluded || (full && !chosen.has(item.itemId))}
+                      onChange={(event) => toggle(item.itemId, event.target.checked)}
+                    />
+                    <span className={item.excluded ? "text-zinc-500 line-through" : ""}>{item.name}</span>
+                  </label>
                   {item.excluded && <span className="text-xs text-amber-400">exclu par les officiers</span>}
                   <span className="ml-auto text-xs text-zinc-400">
                     {softReserveCount(item.reservedBy.length)} · {item.alreadyOwnedBy} l&apos;ont déjà
                   </span>
-                </label>
+                </div>
                 {item.reservedBy.length > 0 && (
                   <p className="mt-1 flex flex-wrap gap-x-3 pl-7 text-sm">
                     {item.reservedBy.map((reserver) => (

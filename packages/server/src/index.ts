@@ -3,6 +3,7 @@ export { NotGuildMemberError, SESSION_DURATION_MS, type SignedIn } from "./appli
 export { ApplicationError, ForbiddenError, ValidationError } from "./application/errors.ts";
 export type { DiscordIdentity } from "./application/ports.ts";
 export type { EventCreationRecord } from "./application/events.ts";
+export type { ExclusionRecord } from "./application/exclusions.ts";
 export type { SoftReserveBoard } from "./application/softReserves.ts";
 export { fullName, type Character } from "./domain/characters.ts";
 export {

@@ -9,7 +9,7 @@
   "scripts": {
     "generate": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit -p .",
-    "test": "vitest run --hookTimeout=30000 --testTimeout=30000"
+    "test": "vitest run --maxWorkers=2 --hookTimeout=30000 --testTimeout=30000"
   },
   "dependencies": {
     "@vxv/raid-data": "*"

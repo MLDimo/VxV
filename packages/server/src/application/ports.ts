@@ -89,11 +89,14 @@ export interface SoftReserveRepository {
   listByEvent(eventId: string): Promise<SoftReserve[]>;
   /** The character's soft reserves for the event become exactly these items. */
   replaceForCharacter(eventId: string, characterId: string, itemIds: readonly number[]): Promise<void>;
+  deleteForItem(eventId: string, itemId: number): Promise<void>;
 }
 
 export interface ExclusionRepository {
   /** Items the officers excluded from soft reserves for this event. */
   listByEvent(eventId: string): Promise<Set<number>>;
+  add(eventId: string, itemId: number): Promise<void>;
+  remove(eventId: string, itemId: number): Promise<void>;
 }
 
 export interface Repositories {

@@ -37,5 +37,9 @@ export function softReserveRepository(sql: SqlClient): SoftReserveRepository {
         [eventId, characterId, itemIds],
       );
     },
+
+    async deleteForItem(eventId, itemId) {
+      await sql.query("delete from soft_reserves where event_id = $1 and item_id = $2", [eventId, itemId]);
+    },
   };
 }

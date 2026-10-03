@@ -1,7 +1,8 @@
-import { fullName, MAX_SPEC_LENGTH } from "@vxv/server";
+import { canManageRaids, fullName, MAX_SPEC_LENGTH } from "@vxv/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EventSignups } from "@/components/EventSignups";
+import { ExclusionForm } from "@/components/ExclusionForm";
 import { formatEventDate, raidTitle, softReserveCount } from "@/components/format";
 import { SignupForm } from "@/components/SignupForm";
 import { SoftReserveBoardForm } from "@/components/SoftReserveBoardForm";
@@ -59,6 +60,16 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           canReserve={mine !== undefined}
         />
       </section>
+
+      {canManageRaids(member.role) && (
+        <section className="mt-8 rounded border border-amber-900/60 p-4">
+          <h2 className="text-lg font-semibold">Officiers · exclusions</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Exclure un objet retire les SR déjà posées dessus. Chaque changement est inscrit au journal.
+          </p>
+          <ExclusionForm eventId={event.id} items={board.items} />
+        </section>
+      )}
 
       <EventSignups signups={eventSignups} />
     </>
