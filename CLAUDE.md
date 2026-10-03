@@ -94,7 +94,7 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Paquets internes consommés depuis leurs sources TypeScript (`exports` vers `src/index.ts`), sans étape de build. Scripts lancés avec `tsx`.
 - ESLint (`typescript-eslint` strict) et Prettier (largeur 120) sur tout le code. Markdown et Lua ne sont pas formatés par Prettier.
 - `npm run check` = formatage, lint, typage, tests unitaires, tests de bout en bout. C'est la commande de la CI et du hook `pre-push`.
-- Tests unitaires avec Vitest, à côté du code testé (`*.test.ts`). Les paquets qui démarrent PGlite (PostgreSQL en WebAssembly) portent les délais de test à 30 s : son démarrage est lent sur une machine chargée.
+- Tests unitaires avec Vitest, à côté du code testé (`*.test.ts`). Les paquets qui démarrent PGlite (PostgreSQL en WebAssembly) limitent Vitest à 2 processus et portent les délais à 30 s : chaque instance coûte de la mémoire, et un poste de 8 Go sature au-delà.
 - Tests de bout en bout avec Playwright (`apps/web/e2e/*.spec.ts`) : le site construit (`next start`) sur une base PGlite migrée et préparée par les vrais cas d'usage. Chaque parcours visible par un joueur ou un officier y a au moins un test.
 
 ## Base de données (Supabase)

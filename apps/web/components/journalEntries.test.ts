@@ -34,4 +34,26 @@ describe("describeJournalEntry", () => {
     };
     expect(describeJournalEntry(entry)).toBe("Mont Hyjal + Onyxia, le 10/12/2026 21:00, 2 SR par joueur");
   });
+
+  it("names the excluded item, its event and the removed reserves", () => {
+    const entry: JournalEntry = {
+      id: "3",
+      occurredAt: new Date(),
+      actorName: "Officier",
+      action: "exclusion.add",
+      entity: "item",
+      entityId: "e/20",
+      before: null,
+      after: {
+        itemName: "Tête d'Onyxia",
+        raids: ["Onyxia"],
+        eventStartsAt: "2026-12-10T20:00:00.000Z",
+        removedSoftReserves: ["Ðéjà Vu", "Eole Hermes"],
+      },
+      reason: "Tank",
+    };
+    expect(describeJournalEntry(entry)).toBe(
+      "« Tête d'Onyxia » (Onyxia, 10/12/2026 21:00) ; SR retirées : Ðéjà Vu, Eole Hermes",
+    );
+  });
 });
