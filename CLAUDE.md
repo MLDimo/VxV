@@ -7,7 +7,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 
 ## État d'avancement
 
-- **P0 Validation technique** : validée sauf la distribution par le maître du butin et les tests complémentaires T1 à T10 (décisions du 3 octobre), à faire avant la fin de la bêta le 21 octobre. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
+- **P0 Validation technique** : validée, y compris la distribution par le maître du butin. Des tests complémentaires du 3 octobre, il reste le don d'un objet par l'addon (T2), le chat pendant un boss (T4), les morts du groupe (T6) et le compteur de dégâts en groupe (T7), avant la fin de la bêta le 21 octobre. Sonde `tools/VXV_Probe`, protocole et rapport dans `docs/phase-0/`.
   Toute modification de la sonde passe `npm run check` avant `tools/install-probe.sh`. Le harnais vérifie aussi la longueur des lignes et les globales autorisées de `.luacheckrc`.
 - **P1 Fondations** : terminée. Bases Supabase `vxv-test` et `vxv-prod` créées et déployées. CurseForge et Wago à activer quand les projets existeront.
 - **P2 API et site** : code terminé (2.1 à 2.10, 23 tests de bout en bout). Validation en attente : application Discord, identifiants du serveur et des rôles, secrets Vercel (`docs/environnements.md`).
@@ -116,5 +116,10 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Messages addon : 255 octets maximum (au-delà, tronqués sans erreur), 10 envois d'affilée par préfixe puis 1 par seconde, et bloqués pendant une rencontre de boss uniquement (`AddOnMessageLockdown`, verrou levé juste après ENCOUNTER_END). Expéditeur au format « Prénom Nom ». Sur GUILD, l'expéditeur ne reçoit pas ses propres messages (contrairement à PARTY).
 - Boss tué = `ENCOUNTER_END` avec succès ; `BOSS_KILL` et `ENCOUNTER_LOOT_RECEIVED` ne se déclenchent pas.
 - Gagnant d'un objet en butin de groupe : `C_LootHistory.GetSortedInfoForDrop` (nom, classe, GUID, jet).
-- Maître du butin : interface classique présente (`MasterLooterFrame`, `GiveMasterLoot`). Liste de guilde : `GetGuildRosterInfo`, pas plus d'une demande toutes les 10 s.
+- Maître du butin : interface classique présente (`MasterLooterFrame`, `GiveMasterLoot`, captable par `hooksecurefunc`). Liste de guilde : `GetGuildRosterInfo`, pas plus d'une demande toutes les 10 s.
+- Sans clic du joueur (réaction à un événement) : `C_PartyInfo.InviteUnit`, `C_PartyInfo.ConvertToRaid`, `C_ChatInfo.SendChatMessage` (hors boss) et `RandomRoll` fonctionnent.
+- `/roll` : lu dans CHAT_MSG_SYSTEM avec le format du jeu `RANDOM_ROLL_RESULT`, pour tous les joueurs.
+- Compteur de dégâts du jeu (`C_DamageMeter`) : secret pendant le combat, lisible après.
+- Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.
+- Métiers : `GetProfessions` ; recettes connues via `C_TradeSkillUI`, quand la fenêtre du métier est ouverte.
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
