@@ -11,14 +11,14 @@ export interface Member {
   roles: readonly MemberRole[];
 }
 
-/** Discord role id that grants each guild role. */
-export type DiscordRoleMapping = Readonly<Record<MemberRole, string>>;
+/** Roles granted by a Discord role. Everybody on the guild's Discord server is a member, without any role. */
+export type GrantedRole = Exclude<MemberRole, "member">;
 
-/**
- * Every guild role granted by the user's Discord roles, in MEMBER_ROLES order. Empty when none of them is a guild
- * role: the user is not part of the guild and may not sign in.
- */
+/** Discord role id that grants each role above member. */
+export type DiscordRoleMapping = Readonly<Record<GrantedRole, string>>;
+
+/** Guild roles of a user on the guild's Discord server, in MEMBER_ROLES order: member, plus their granted roles. */
 export function rolesFromDiscordRoles(discordRoleIds: readonly string[], mapping: DiscordRoleMapping): MemberRole[] {
   const held = new Set(discordRoleIds);
-  return MEMBER_ROLES.filter((role) => held.has(mapping[role]));
+  return MEMBER_ROLES.filter((role) => role === "member" || held.has(mapping[role]));
 }

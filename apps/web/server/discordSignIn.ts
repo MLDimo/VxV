@@ -1,5 +1,4 @@
 import type { DiscordIdentity, SignedIn } from "@vxv/server";
-import { NotGuildMemberError } from "@vxv/server";
 
 /** What Discord tells about the user inside the guild server, or undefined when they are not on it. */
 export interface DiscordGuildMember {
@@ -38,12 +37,5 @@ export async function completeDiscordSignIn(
   if (member === undefined) {
     return { kind: "notGuildMember" };
   }
-  try {
-    return { kind: "signedIn", session: await dependencies.signIn(member.identity, member.roleIds) };
-  } catch (error) {
-    if (error instanceof NotGuildMemberError) {
-      return { kind: "notGuildMember" };
-    }
-    throw error;
-  }
+  return { kind: "signedIn", session: await dependencies.signIn(member.identity, member.roleIds) };
 }

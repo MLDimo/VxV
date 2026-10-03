@@ -23,11 +23,11 @@ const signIn = (discordId: string, discordName: string, ...roles: (keyof typeof 
     roles.map((role) => DISCORD_ROLES[role]),
   );
 // Roles are cumulative: the test officer is also treasurer.
-const officer = await signIn("100", "Officier Test", "member", "officer", "treasurer");
-const member = await signIn("200", "Membre Test", "member");
-const newcomer = await signIn("300", "Nouveau Membre", "member");
-const leavingMember = await signIn("400", "Membre Sortant", "member");
-const lockedMember = await signIn("500", "Membre Verrouillé", "member");
+const officer = await signIn("100", "Officier Test", "officer", "treasurer");
+const member = await signIn("200", "Membre Test");
+const newcomer = await signIn("300", "Nouveau Membre");
+const leavingMember = await signIn("400", "Membre Sortant");
+const lockedMember = await signIn("500", "Membre Verrouillé");
 
 await app.roster.importRoster(officer.member, ["VXV-ROSTER-1", ...SEED_ROSTER].join("\n"), "Liste de départ des tests");
 async function seedCharacter(firstName: string) {

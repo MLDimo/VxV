@@ -1,4 +1,4 @@
-import { NotGuildMemberError, type SignedIn } from "@vxv/server";
+import type { SignedIn } from "@vxv/server";
 import { describe, expect, it, vi } from "vitest";
 import { completeDiscordSignIn, type DiscordGuildMember, type DiscordSignInDependencies } from "./discordSignIn";
 
@@ -44,15 +44,6 @@ describe("completeDiscordSignIn", () => {
     const deps = dependencies({ fetchGuildMember: vi.fn(async () => undefined) });
     expect(await completeDiscordSignIn(validRequest, deps)).toEqual({ kind: "notGuildMember" });
     expect(deps.signIn).not.toHaveBeenCalled();
-  });
-
-  it("refuses a user on the server without a guild role", async () => {
-    const deps = dependencies({
-      signIn: vi.fn(async () => {
-        throw new NotGuildMemberError();
-      }),
-    });
-    expect(await completeDiscordSignIn(validRequest, deps)).toEqual({ kind: "notGuildMember" });
   });
 
   it("lets unexpected failures surface", async () => {

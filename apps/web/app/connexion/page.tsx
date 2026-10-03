@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentMember } from "@/server/session";
 
 const ERROR_MESSAGES: Record<string, string> = {
-  "non-membre": "Ce compte Discord n'a aucun rôle de la guilde sur notre serveur Discord.",
+  "non-membre": "Ce compte Discord n'est pas sur le serveur Discord de la guilde.",
   requete: "La connexion a été interrompue. Merci de réessayer.",
 };
 

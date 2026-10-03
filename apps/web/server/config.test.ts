@@ -6,7 +6,6 @@ const environment = {
   DISCORD_CLIENT_ID: "111",
   DISCORD_CLIENT_SECRET: "secret",
   DISCORD_GUILD_ID: "222",
-  DISCORD_ROLE_MEMBER: "1",
   DISCORD_ROLE_TREASURER: "2",
   DISCORD_ROLE_OFFICER: "3",
   DISCORD_ROLE_GM: "4",
@@ -20,7 +19,7 @@ describe("parseConfig", () => {
         clientId: "111",
         clientSecret: "secret",
         guildId: "222",
-        roles: { member: "1", treasurer: "2", officer: "3", gm: "4" },
+        roles: { treasurer: "2", officer: "3", gm: "4" },
       },
     });
   });

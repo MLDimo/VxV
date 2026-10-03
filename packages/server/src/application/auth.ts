@@ -5,13 +5,6 @@ import { generateSessionToken, sessionIdFromToken } from "./sessionTokens.ts";
 /** Guild roles are read from Discord at sign-in, so a session is kept short to pick up role changes. */
 export const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
-export class NotGuildMemberError extends Error {
-  constructor() {
-    super("Ce compte Discord n'a aucun rôle de la guilde sur le serveur.");
-    this.name = "NotGuildMemberError";
-  }
-}
-
 export interface AuthDependencies {
   unitOfWork: UnitOfWork;
   clock: Clock;
@@ -26,12 +19,9 @@ export interface SignedIn {
 
 export function createAuth({ unitOfWork, clock, discordRoles }: AuthDependencies) {
   return {
-    /** Opens a session for a Discord user who holds a guild role, recording their current name and roles. */
+    /** Opens a session for a user on the guild's Discord server, recording their current name and roles. */
     async signIn(identity: DiscordIdentity, discordRoleIds: readonly string[]): Promise<SignedIn> {
       const roles = rolesFromDiscordRoles(discordRoleIds, discordRoles);
-      if (roles.length === 0) {
-        throw new NotGuildMemberError();
-      }
       const token = generateSessionToken();
       const expiresAt = new Date(clock().getTime() + SESSION_DURATION_MS);
       const member = await unitOfWork.run(async ({ members, sessions }) => {

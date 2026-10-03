@@ -1,5 +1,5 @@
 export { createApplication, type Application, type ApplicationConfig } from "./application.ts";
-export { NotGuildMemberError, SESSION_DURATION_MS, type SignedIn } from "./application/auth.ts";
+export { SESSION_DURATION_MS, type SignedIn } from "./application/auth.ts";
 export { ApplicationError, ForbiddenError, ValidationError } from "./application/errors.ts";
 export type { DiscordIdentity } from "./application/ports.ts";
 export type { EventCreationRecord } from "./application/events.ts";
@@ -32,7 +32,13 @@ export {
   type SignupRole,
   type SignupStatus,
 } from "./domain/signups.ts";
-export { MEMBER_ROLES, type DiscordRoleMapping, type Member, type MemberRole } from "./domain/members.ts";
+export {
+  MEMBER_ROLES,
+  type DiscordRoleMapping,
+  type GrantedRole,
+  type Member,
+  type MemberRole,
+} from "./domain/members.ts";
 export { canManageRaids } from "./domain/permissions.ts";
 export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastructure/sql.ts";
 export type { BoardItem, LootItem, Reserver } from "./domain/softReserves.ts";
