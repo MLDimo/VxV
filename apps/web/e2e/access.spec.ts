@@ -25,3 +25,11 @@ test("signing out ends the session", async ({ page, context }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/connexion$/);
 });
+
+test("an unknown event shows a French not-found page", async ({ page, context }) => {
+  await signInAs(context, "member");
+  await page.goto("/evenements/00000000-0000-0000-0000-000000000000");
+  await expect(page.getByRole("heading", { name: "Page introuvable" })).toBeVisible();
+  await page.goto("/evenements/pas-un-identifiant");
+  await expect(page.getByRole("heading", { name: "Page introuvable" })).toBeVisible();
+});
