@@ -57,6 +57,16 @@ function Util.EnumName(enumName, value)
     return Util.Safe(value)
 end
 
+--- Returns the keys of a table as sorted strings.
+function Util.SortedKeys(source)
+    local keys = {}
+    for key in pairs(source) do
+        keys[#keys + 1] = tostring(key)
+    end
+    table.sort(keys)
+    return keys
+end
+
 --- Splits "word rest of text" into "word" and "rest of text" (empty strings when absent).
 function Util.SplitFirst(text)
     local first, rest = (text or ""):match("^%s*(%S*)%s*(.-)%s*$")

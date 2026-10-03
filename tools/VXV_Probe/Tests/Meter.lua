@@ -14,21 +14,12 @@ local function meterApi()
     log.Fail("C_DamageMeter absent : pas de compteur de dégâts lisible")
 end
 
-local function sortedKeys(source)
-    local keys = {}
-    for key in pairs(source) do
-        keys[#keys + 1] = tostring(key)
-    end
-    table.sort(keys)
-    return keys
-end
-
 local function list()
     local api = meterApi()
     if not api then
         return
     end
-    log.Info("fonctions C_DamageMeter :", table.concat(sortedKeys(api), ", "))
+    log.Info("fonctions C_DamageMeter :", table.concat(Util.SortedKeys(api), ", "))
     for name, codes in pairs(Enum) do
         if name:find("DamageMeter", 1, true) then
             log.Info("Enum." .. name, codes)

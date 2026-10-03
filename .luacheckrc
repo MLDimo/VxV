@@ -15,11 +15,11 @@ globals = {
 
 -- WoW client API used in read-only mode.
 read_globals = {
-    "C_ChatInfo", "C_DamageMeter", "C_GuildInfo", "C_PartyInfo", "C_Timer",
-    "ChatFontNormal", "CommunitiesMemberListEntryMixin", "CreateFrame", "Enum", "GameTooltip", "GetBuildInfo",
-    "GetGuildRosterInfo", "GetInstanceInfo", "GetLootSlotLink", "GetNumGroupMembers", "GetNumGuildMembers",
-    "GetNumLootItems", "GetTime", "GiveMasterLoot", "InCombatLockdown", "IsInGroup", "IsInGuild", "IsInInstance",
-    "IsInRaid", "LE_PARTY_CATEGORY_INSTANCE", "RANDOM_ROLL_RESULT", "UIParent", "UnitFullName",
+    "C_ChatInfo", "C_DamageMeter", "C_GuildInfo", "C_PartyInfo", "C_Timer", "ChatFontNormal", "CommunitiesFrame",
+    "CommunitiesMemberListEntryMixin", "CreateFrame", "Enum", "GameTooltip", "GetBuildInfo", "GetGuildRosterInfo",
+    "GetInstanceInfo", "GetLootSlotLink", "GetNumGroupMembers", "GetNumGuildMembers", "GetNumLootItems", "GetTime",
+    "GiveMasterLoot", "InCombatLockdown", "IsInGroup", "IsInGuild", "IsInInstance", "IsInRaid",
+    "LE_PARTY_CATEGORY_INSTANCE", "RANDOM_ROLL_RESULT", "ScrollUtil", "UIParent", "UnitFullName",
     "UnitIsDeadOrGhost", "UnitIsGroupAssistant", "UnitIsGroupLeader", "UnitIsPlayer", "UnitName",
     "date", "hooksecurefunc", "issecretvalue", "strsplit", "time",
 }

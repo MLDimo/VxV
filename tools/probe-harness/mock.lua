@@ -186,7 +186,15 @@ ChatFrameUtil = {
 }
 C_AddOns = { IsAddOnLoaded = function() return false, false end }
 CommunitiesMemberListEntryMixin = { SetMember = noop }
+CommunitiesFrame = false -- the scenario sets it to simulate the modern guild window
 FakeRosterEntry = { NameFrame = { Name = { GetText = function() return "Jean Dupont" end, SetText = noop } } }
+-- Rows filled by the list: one with a name, one whose structure is unknown.
+ScrollUtil = {
+    AddInitializedFrameCallback = function(_, callback)
+        callback(FakeRosterEntry)
+        callback({ Unknown = true })
+    end,
+}
 
 -- Professions (T10): modern API; the scenario removes it to run the classic one.
 GetProfessions = function() return 1, nil, nil, 4, 5 end

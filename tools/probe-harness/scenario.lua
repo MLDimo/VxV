@@ -45,6 +45,9 @@ run("display on")
 CommunitiesMemberListEntryMixin = { SetMember = function() end }
 Fire("ADDON_LOADED", "Blizzard_Communities")
 CommunitiesMemberListEntryMixin.SetMember(FakeRosterEntry)
+-- Same with the modern guild window, whose list exposes a scroll box.
+CommunitiesFrame = { MemberList = { ScrollBox = {} } }
+Fire("ADDON_LOADED", "Blizzard_Communities")
 
 -- Professions: window opened, then the classic API only.
 Fire("TRADE_SKILL_SHOW")

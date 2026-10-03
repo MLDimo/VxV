@@ -37,4 +37,5 @@ Source : document « VXV — Ajouts au plan » et réponses du propriétaire.
 T1 invitations et passage en raid, T2 butin du maître du butin, T3 lecture des `/roll`, T4 messages dans le canal raid,
 T5 roll par un bouton, T6 morts et résurrections, T7 compteur de dégâts et de soins, T8 compteurs du jeu,
 T9 affichage (infobulles, liste de guilde, canal de guilde), T10 recettes de métier.
-Si T7 échoue, les titres de dégâts et de soins sont abandonnés. Si les kills gris ne sont pas comptables, la mission est abandonnée.
+Si T7 échoue, les titres de dégâts et de soins sont abandonnés.
+La mission « tuer des monstres gris » est abandonnée (décision du 3 octobre) : T8 vérifie seulement que les statistiques du jeu sont lisibles.

@@ -1,7 +1,7 @@
 local _, ns = ...
 
 --- T8: the game's own counters (statistics, PvP kills) missions and titles would rely on.
---- "diff" shows what an action changed, e.g. whether killing a grey monster is counted.
+--- "diff" shows which counters an action changed.
 local Compat, Util = ns.Compat, ns.Util
 local log = ns.Log.For("counters")
 
@@ -61,7 +61,7 @@ local function diff()
     local counters = readCounters()
     if not snapshot then
         snapshot = counters
-        log.Info("référence enregistrée : faire l'action à mesurer (ex. tuer un monstre gris),",
+        log.Info("référence enregistrée : faire l'action à mesurer (ex. tuer un monstre),",
             "puis retaper la commande")
         return
     end

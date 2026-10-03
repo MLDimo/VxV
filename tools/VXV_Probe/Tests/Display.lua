@@ -12,11 +12,11 @@ local GUILD_UI_ADDONS = { COMMUNITIES_ADDON, "Blizzard_GuildUI" }
 local installed = false
 local reported = {}
 
---- Hooks run at every tooltip or message: only the first success of each display is journaled.
-local function reportOnce(display, ...)
+--- Hooks run at every tooltip or message: only the first result of each display is journaled.
+local function reportOnce(level, display, ...)
     if not reported[display] then
         reported[display] = true
-        log.Ok(display .. " :", ...)
+        log[level](display .. " :", ...)
     end
 end
 
@@ -33,7 +33,7 @@ local function decorateTooltip(tooltip)
         return
     end
     tooltip:AddLine(TEST_TITLE)
-    reportOnce("infobulle", "titre ajouté pour", (select(2, Compat.GetUnitName(unit, true))))
+    reportOnce("Ok", "infobulle", "titre ajouté pour", (select(2, Compat.GetUnitName(unit, true))))
 end
 
 local function hookTooltip()
@@ -50,7 +50,7 @@ local function decorateGuildMessage(_, _, text, ...)
     if Util.IsSecret(text) then
         return false
     end
-    reportOnce("canal de guilde", "message préfixé par", TEST_TITLE)
+    reportOnce("Ok", "canal de guilde", "message préfixé par", TEST_TITLE)
     return false, TEST_TITLE .. " " .. text, ...
 end
 
@@ -67,13 +67,26 @@ local function decorateRosterEntry(entry)
     local nameText = entry.NameFrame and entry.NameFrame.Name
     local text = nameText and nameText:GetText()
     if Util.IsSecret(text) or type(text) ~= "string" then
+        reportOnce("Fail", "liste de guilde, nom introuvable", "champs de la ligne :",
+            table.concat(Util.SortedKeys(entry), ", "))
         return
     end
     nameText:SetText(text .. " " .. TEST_TITLE)
-    reportOnce("liste de guilde", "titre ajouté à", text)
+    reportOnce("Ok", "liste de guilde", "titre ajouté à", text)
+end
+
+--- Preferred: the list's own callback, run after each row is filled, also for the rows already created.
+local function hookRosterRows(scrollBox)
+    log.Call("liste de guilde : accroche des lignes (ScrollUtil.AddInitializedFrameCallback)",
+        pcall(ScrollUtil.AddInitializedFrameCallback, scrollBox, decorateRosterEntry, reported, true))
 end
 
 local function hookRoster()
+    local memberList = CommunitiesFrame and CommunitiesFrame.MemberList
+    if memberList and memberList.ScrollBox and ScrollUtil and ScrollUtil.AddInitializedFrameCallback then
+        hookRosterRows(memberList.ScrollBox)
+        return
+    end
     local mixin = CommunitiesMemberListEntryMixin
     if type(mixin) ~= "table" or type(mixin.SetMember) ~= "function" then
         log.Fail("liste de guilde : CommunitiesMemberListEntryMixin.SetMember absente")
@@ -83,7 +96,7 @@ local function hookRoster()
         pcall(hooksecurefunc, mixin, "SetMember", decorateRosterEntry))
 end
 
---- The guild window is loaded on demand: its rows copy the hook only if it is set before they are created.
+--- The guild window may be loaded on demand: hook it as soon as it exists.
 local function hookRosterWhenLoaded()
     local _, loaded = Compat.IsAddOnLoaded(COMMUNITIES_ADDON)
     if loaded then
