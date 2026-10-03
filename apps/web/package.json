@@ -25,7 +25,9 @@
     "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "tailwindcss": "^4.3.3",
-    "@vxv/database": "*"
+    "@vxv/data-generator": "*",
+    "@vxv/database": "*",
+    "@vxv/raid-data": "*",
+    "tailwindcss": "^4.3.3"
   }
 }

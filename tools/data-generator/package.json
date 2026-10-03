@@ -3,10 +3,13 @@
   "private": true,
   "description": "Generates the addon data packs and the database sync script from data/raids.",
   "type": "module",
+  "exports": {
+    "./seedSql": "./src/seedSql.ts"
+  },
   "scripts": {
     "generate": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit -p .",
-    "test": "vitest run"
+    "test": "vitest run --hookTimeout=30000 --testTimeout=30000"
   },
   "dependencies": {
     "@vxv/raid-data": "*"

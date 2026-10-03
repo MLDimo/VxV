@@ -1,5 +1,6 @@
 import { createAuth } from "./application/auth.ts";
 import { createCharacters } from "./application/characters.ts";
+import { createEvents } from "./application/events.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRoster } from "./application/roster.ts";
 import type { Clock } from "./application/ports.ts";
@@ -20,6 +21,7 @@ export function createApplication({ sql, discordRoles, clock = () => new Date() 
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     roster: createRoster({ unitOfWork }),
     characters: createCharacters({ unitOfWork }),
+    events: createEvents({ unitOfWork, clock }),
     journal: createJournal({ unitOfWork }),
   };
 }

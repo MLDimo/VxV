@@ -2,7 +2,15 @@ export { createApplication, type Application, type ApplicationConfig } from "./a
 export { NotGuildMemberError, SESSION_DURATION_MS, type SignedIn } from "./application/auth.ts";
 export { ApplicationError, ForbiddenError, ValidationError } from "./application/errors.ts";
 export type { DiscordIdentity } from "./application/ports.ts";
+export type { EventCreationRecord } from "./application/events.ts";
 export { fullName, type Character } from "./domain/characters.ts";
+export {
+  DEFAULT_SOFT_RESERVES,
+  MAX_SOFT_RESERVES,
+  type NewRaidEvent,
+  type RaidEvent,
+  type RaidSummary,
+} from "./domain/events.ts";
 export type { JournalAction, JournalEntry } from "./domain/journal.ts";
 export { ROSTER_HEADER, RosterFormatError, type RosterImportSummary } from "./domain/roster.ts";
 export { MEMBER_ROLES, type DiscordRoleMapping, type Member, type MemberRole } from "./domain/members.ts";
