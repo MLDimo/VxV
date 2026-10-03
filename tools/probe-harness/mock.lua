@@ -188,11 +188,14 @@ C_AddOns = { IsAddOnLoaded = function() return false, false end }
 CommunitiesMemberListEntryMixin = { SetMember = noop }
 CommunitiesFrame = false -- the scenario sets it to simulate the modern guild window
 FakeRosterEntry = { NameFrame = { Name = { GetText = function() return "Jean Dupont" end, SetText = noop } } }
--- Rows filled by the list: one with a name, one whose structure is unknown.
+-- Rows filled by the list, passed after the owner as on Forever: one with a name, one of unknown structure,
+-- then an existing row passed alone, and a value that is not a row.
 ScrollUtil = {
-    AddInitializedFrameCallback = function(_, callback)
+    AddInitializedFrameCallback = function(_, callback, owner)
+        callback(owner, FakeRosterEntry)
+        callback(owner, { Unknown = true })
         callback(FakeRosterEntry)
-        callback({ Unknown = true })
+        callback(owner, nil)
     end,
 }
 
