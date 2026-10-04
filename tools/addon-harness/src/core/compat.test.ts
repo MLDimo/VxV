@@ -19,9 +19,11 @@ function compatAliases(): [string, string[]][] {
 describe("Blizzard API of VXV_Core", () => {
   it("reads directly only what was measured on WoW Forever; the rest goes through Compat", () => {
     const allowed = new Set([...LUA_ENVIRONMENT, ...foreverApi(), ...luacheckRules().allowedGlobals]);
+    // A namespace (C_Timer) is fine when the fields read from it (C_Timer.After) were measured.
+    const isMeasuredNamespace = (name: string) => [...allowed].some((path) => path.startsWith(`${name}.`));
     const unmeasured = readTocFiles(CORE_DIR).flatMap((file) =>
       [...globalReferences(readFileSync(join(CORE_DIR, file), "utf8"))]
-        .filter((name) => !allowed.has(name) && !allowed.has(name.split(".")[0] ?? ""))
+        .filter((name) => !allowed.has(name) && !allowed.has(name.split(".")[0] ?? "") && !isMeasuredNamespace(name))
         .map((name) => `${file}: ${name}`),
     );
     expect(unmeasured).toEqual([]);
@@ -50,10 +52,12 @@ describe("Compat", () => {
     const modernAndOld =
       'C_ChatInfo = { SendAddonMessage = function() return 0 end } SendAddonMessage = function() return "old" end';
     expect(compat(modernAndOld, 'SendAddonMessage("VXV", "x", "GUILD")')).toEqual([true, 0]);
-    expect(compat('SendAddonMessage = function() return "old" end', 'SendAddonMessage("VXV", "x", "GUILD")')).toEqual([
-      true,
-      "old",
-    ]);
+    expect(
+      compat(
+        'C_ChatInfo = nil SendAddonMessage = function() return "old" end',
+        'SendAddonMessage("VXV", "x", "GUILD")',
+      ),
+    ).toEqual([true, "old"]);
   });
 
   it('answers "API absente" instead of a Lua error when the client has none', () => {

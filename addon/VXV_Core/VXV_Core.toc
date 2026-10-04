@@ -8,6 +8,7 @@
 # Core: generic tooling, no feature logic.
 Core\Version.lua
 Core\Util.lua
+Core\Chat.lua
 Core\Compat.lua
 Core\Call.lua
 Core\Events.lua
@@ -15,6 +16,10 @@ Core\Bus.lua
 Core\Storage.lua
 Core\Modules.lua
 Core\Names.lua
+Core\Serializer.lua
+Core\SendQueue.lua
+Core\Comm.lua
+Core\Presence.lua
 Core\Api.lua
 
 # Interface: window, home tab, /vxv, minimap icon.
@@ -22,5 +27,6 @@ UI\Window.lua
 UI\HomeTab.lua
 UI\Slash.lua
 UI\MinimapButton.lua
+UI\Ping.lua
 
 Bootstrap.lua

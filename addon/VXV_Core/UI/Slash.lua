@@ -4,9 +4,8 @@ local _, ns = ...
 local Slash = {}
 ns.Slash = Slash
 
-local Window = ns.Window
+local Chat, Window = ns.Chat, ns.Window
 
-local PREFIX = "|cff14b8a6VXV|r "
 local commands = {}
 
 --- Adds "/vxv <name>"; usage describes it in the help.
@@ -14,19 +13,15 @@ function Slash.Register(name, usage, run)
     commands[name] = { usage = usage, run = run }
 end
 
-function Slash.Print(message)
-    print(PREFIX .. message)
-end
-
 local function help()
-    Slash.Print("/vxv : ouvrir ou fermer la fenêtre")
+    Chat.Print("/vxv : ouvrir ou fermer la fenêtre")
     local names = {}
     for name in pairs(commands) do
         names[#names + 1] = name
     end
     table.sort(names)
     for _, name in ipairs(names) do
-        Slash.Print(string.format("/vxv %s : %s", name, commands[name].usage))
+        Chat.Print(string.format("/vxv %s : %s", name, commands[name].usage))
     end
 end
 

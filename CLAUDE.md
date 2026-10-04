@@ -18,7 +18,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - inscription par bouton, synchronisée avec le site dans les deux sens ;
   - rappel quotidien (tâche Vercel, 8 h UTC).
   Validation en attente : essai réel sur le serveur avec un second compte.
-- **P4 Addon : VXV_Core** : en cours. 4.1 socle (bundle `addon/VXV_Core`, modules, bus, stockage versionné, banc d'essai `tools/addon-harness`), 4.2 couche Compat (API mesurées en P0 ; `GetGuildInfo`, `UnitClass` et `GetCursorPosition` à confirmer en jeu), 4.3 interface (fenêtre à onglets, `/vxv`, icône de minimap). Essai en jeu : `tools/install-addon.sh`.
+- **P4 Addon : VXV_Core** : en cours. 4.1 socle (bundle `addon/VXV_Core`, modules, bus, stockage versionné, banc d'essai `tools/addon-harness`), 4.2 couche Compat (API mesurées en P0 ; `GetGuildInfo`, `UnitClass` et `GetCursorPosition` à confirmer en jeu), 4.3 interface (fenêtre à onglets, `/vxv`, icône de minimap), 4.6 communication (sérialisation, morceaux de 255 octets, file 10 + 1/s et pause pendant les boss, versions, présence, `/vxv ping`). Compression et relais entre joueurs reportés à la synchro de la P7, leur premier usage. Essai en jeu : `tools/install-addon.sh`.
 - P5 à P15 : pas commencées.
 
 ## Structure du dépôt
