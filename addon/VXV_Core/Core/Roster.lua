@@ -8,7 +8,8 @@ ns.Roster = Roster
 local Compat, Names, Util = ns.Compat, ns.Names, ns.Util
 
 local HEADER = "VXV-ROSTER-1"
--- Position of the class token among the values of GetGuildRosterInfo.
+-- Positions of the online flag and of the class token among the values of GetGuildRosterInfo.
+local ONLINE_INDEX = 9
 local CLASS_TOKEN_INDEX = 11
 
 --- The export text of the members ({ name, class }), and how many were left out for lacking a last name.
@@ -25,7 +26,7 @@ function Roster.Format(members)
     return table.concat(lines, "\n"), skipped
 end
 
---- The members the client knows, with readable names and classes.
+--- The members the client knows ({ name, class, online }), with readable names and classes.
 function Roster.Read()
     local members = {}
     local ok, total = Compat.GetNumGuildMembers()
@@ -33,7 +34,7 @@ function Roster.Read()
         local info = { select(2, Compat.GetGuildRosterInfo(index)) }
         local name, class = info[1], info[CLASS_TOKEN_INDEX]
         if type(name) == "string" and type(class) == "string" and not Util.IsSecret(name) then
-            members[#members + 1] = { name = name, class = class }
+            members[#members + 1] = { name = name, class = class, online = info[ONLINE_INDEX] == true }
         end
     end
     return members

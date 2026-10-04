@@ -3,8 +3,11 @@ import type { LoadedAddon } from "../addon.ts";
 import { ONYXIA_NIGHT, startRaid, websiteText } from "./fixtures.ts";
 
 const PREFIX = "|cff14b8a6VXV|r ";
-const ROWS =
-  "local _, ns = ... return ns.RaidView.Rows(ns.RaidData.Current(), VXV.PlayerName(), select(2, ns.RaidData.Text()))";
+const ROWS = `
+  local _, ns = ...
+  local _, sender = ns.RaidData.Text()
+  return ns.RaidView.Rows({ event = ns.RaidData.Current(), player = VXV.PlayerName(), sender = sender })
+`;
 const ICON = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:";
 const NOT_OFFICER =
   "Seuls les officiers chargent les données, et ce personnage n'est pas lié à un officier sur le site.";

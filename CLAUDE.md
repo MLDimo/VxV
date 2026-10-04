@@ -24,7 +24,13 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - 4.6 communication : morceaux de 255 octets, file 10 + 1/s et pause pendant les boss, versions, présence, `/vxv ping` ;
   - 4.7 filtre de guilde (`Core/Config.lua` : VXV sur Forever, THE DALIRANAS sur la bêta) et export `/vxv liste`, importé sur le site.
   Compression et relais entre joueurs reportés à la synchro de la P7, leur premier usage. Installation : `tools/install-addon.sh`.
-- P5 à P15 : pas commencées.
+- **P5 Addon : onglet Raid** : code terminé (bundle `addon/VXV_Raid`, 79 tests du banc ; export du site sur la page de l'événement) :
+  - le site produit les données de l'événement (`VXV-RAID-1`, officiers seulement), qu'un officier colle en jeu (`/vxv importer`) ;
+  - onglet Raid : inscrits (icône de rôle, couleur et classe au survol), mes SR, SR du raid avec SR+, objets exclus, modifications avec motif ;
+  - diffusion à la guilde, relais vers qui se connecte plus tard, avertissement des modifications, rappel aux officiers quand leurs données datent d'avant le verrouillage des SR ;
+  - invitations : ouverture par un officier, Rejoindre (invitation automatique des inscrits attendus avec leur personnage principal, demandes pour les autres), Inviter tout le roster, passage en raid à la première acceptation.
+  Validation en attente : essai en jeu à deux joueurs au moins avant la fin de la bêta, puis un raid de 40 formé sans invitation manuelle.
+- P6 à P15 : pas commencées.
 
 ## Structure du dépôt
 
@@ -64,7 +70,8 @@ La table complète est dans le README. Règles :
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
 - Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-1`, puis une ligne par enregistrement (événement, officiers, objets, inscrits, journal), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent à la demande.
-- `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (enregistrement des modules, bus d'événements interne). Les bundles ne voient rien d'autre du socle.
+- `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
+- Confiance entre addons : les données d'un événement ne sont gardées que si leur expéditeur figure parmi les officiers nommés par le site, dans les nouvelles données comme dans celles déjà gardées.
 - Données sauvegardées (`VXV_DB`) : numéro de schéma, et migrations appliquées au chargement ; une migration publiée ne change plus.
 - Un fichier = une responsabilité. Module exposé via `ns.<Module>` ; dépendances lues en tête de fichier (`local Util = ns.Util`).
 - Nommage : `PascalCase` pour modules et fonctions publiques, `camelCase` pour locales, `UPPER_SNAKE_CASE` pour constantes. Pas de nombre magique.
