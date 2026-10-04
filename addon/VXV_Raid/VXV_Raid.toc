@@ -11,11 +11,14 @@ EventData.lua
 RaidData.lua
 Group.lua
 Reserves.lua
+Attribution.lua
+Rolls.lua
 Sharing.lua
 Notices.lua
 Freshness.lua
 Invitations.lua
 BossLoot.lua
+Distribution.lua
 
 # Interface: the Raid tab and the import of the data.
 UI\RowList.lua

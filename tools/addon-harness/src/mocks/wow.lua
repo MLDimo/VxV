@@ -321,6 +321,15 @@ C_PartyInfo.GetLootMethod = function()
     end
     return 2, partyIndex, Group.raid and partyIndex ~= nil and partyIndex + 1 or nil
 end
+--- Master loot candidates of the open corpse, by index, and the items given: { slot, name }.
+LootCandidates = {}
+Given = {}
+function GetMasterLootCandidate(_, index) return LootCandidates[index] end
+function GiveMasterLoot(slot, index) Given[#Given + 1] = { slot = slot, name = LootCandidates[index] } end
+--- /roll: the game's format of the result, and the rolls the player asked for: { low, high }.
+RANDOM_ROLL_RESULT = "%s obtient un %d (%d-%d)."
+Rolled = {}
+function RandomRoll(low, high) Rolled[#Rolled + 1] = { low = low, high = high } end
 --- Test helper: these players accepted the invitation; the client tells the addons.
 function JoinGroup(...)
     for _, name in ipairs({ ... }) do
