@@ -178,15 +178,21 @@ local function addJournal(rows, event)
     end
 end
 
---- Rows of the tab: { kind = "title" | "header" | "line", text, tooltip = { title, lines } or nil }.
-function RaidView.Rows(event, playerName)
+--- When and from whom the data came.
+local function origin(event, sender)
+    local when = Labels.DateTime(event.exportedAt)
+    return sender and string.format("données de %s, copiées le %s", sender, when) or ("données copiées le " .. when)
+end
+
+--- Rows of the tab: { kind = "title" | "header" | "line", text, tooltip = { title, lines } or nil }, for the
+--- player named playerName, the data having been sent by sender.
+function RaidView.Rows(event, playerName, sender)
     if event == nil then
         return { row("line", NO_EVENT[1]), row("line", NO_EVENT[2]) }
     end
     local rows = {
         row("title", event.title .. " · " .. Labels.DateTime(event.startsAt)),
-        row("line", string.format("%d SR par joueur · données copiées le %s", event.softReservesPerPlayer,
-            Labels.DateTime(event.exportedAt))),
+        row("line", string.format("%d SR par joueur · %s", event.softReservesPerPlayer, origin(event, sender))),
     }
     addSignups(rows, event)
     addMyReserves(rows, event, playerName)

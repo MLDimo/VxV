@@ -12,10 +12,16 @@ end
 
 -- Lua 5.1 globals that Lua 5.3 moved or removed.
 unpack = table.unpack
--- Date functions WoW keeps from the os library, which it removes. The test client lives in UTC.
-time = os.time
+-- Date functions WoW keeps from the os library, which it removes. The test client lives in UTC, and its
+-- time() follows the client's clock (Clock, below).
+time = function(fields)
+    if fields ~= nil then
+        return os.time(fields)
+    end
+    return Clock.epoch + Clock.now
+end
 -- fengari reads "!" (UTC) for "*t" only: the UTC wall clock goes through a local time with the same fields.
-date = function(format, seconds) return os.date(format, os.time(os.date("!*t", seconds or os.time()))) end
+date = function(format, seconds) return os.date(format, os.time(os.date("!*t", seconds or time()))) end
 math.atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
 
 local frames = {}
@@ -186,7 +192,8 @@ InCombat = false
 function InCombatLockdown() return InCombat end
 
 -- Time: the client's clock, in seconds, moved forward by the tests (AdvanceTime runs the timers due).
-Clock = { now = 1000 }
+-- time() is epoch + now: at start, 10 December 2026 at 12:00 UTC, the day of the tests' raid.
+Clock = { now = 1000, epoch = 1796903000 }
 function GetTime()
     return Clock.now
 end

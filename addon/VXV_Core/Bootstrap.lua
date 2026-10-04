@@ -10,10 +10,10 @@ ns.Events.On("ADDON_LOADED", function(name)
 end)
 
 ns.Bus.On("guild.confirmed", function()
-    ns.Modules.Start()
-    ns.MinimapButton.Create()
     ns.Comm.Start()
     ns.Presence.Announce()
+    ns.Modules.Start()
+    ns.MinimapButton.Create()
 end)
 
 ns.Events.On("PLAYER_LOGIN", function()

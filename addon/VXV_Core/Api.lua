@@ -16,6 +16,12 @@ VXV = {
     --- (owner, anchor, title, lines) and (): the game's tooltip.
     ShowTooltip = ns.Tooltip.Show,
     HideTooltip = ns.Tooltip.Hide,
+    --- (kind, payload): data of any size to every member connected with VXV, this player included; and
+    --- (kind, handler(payload, sender)) to receive them. Kinds start with the bundle's name ("raid.data").
+    Broadcast = ns.Comm.Broadcast,
+    OnMessage = ns.Comm.On,
+    --- Names of the members connected with VXV, this player included, in alphabetical order.
+    Online = ns.Presence.Online,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

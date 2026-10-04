@@ -5,10 +5,13 @@
 ## Version: @project-version@
 ## Dependencies: VXV_Core
 
-# The event's data, as the website exports it.
+# The event's data, as the website exports it, and how they travel in the guild.
 Labels.lua
 EventData.lua
 RaidData.lua
+Sharing.lua
+Notices.lua
+Freshness.lua
 
 # Interface: the Raid tab and the import of the data.
 UI\RaidView.lua
