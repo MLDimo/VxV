@@ -9,6 +9,7 @@
     "export-probe": "tsx src/exportProbe.ts"
   },
   "devDependencies": {
+    "@vxv/server": "*",
     "fengari": "^0.1.5",
     "luaparse": "0.3.1"
   }

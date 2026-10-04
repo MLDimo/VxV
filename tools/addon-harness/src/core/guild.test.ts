@@ -53,25 +53,25 @@ describe("guild roster export", () => {
       { name = "Thom Leboss", class = "PRIEST" },
       { name = "Marie", class = "MAGE" },
   }`;
-  const COPIED = "return VXV_CopyWindow.editBox:GetText()";
+  const COPIED = "return VXV_TextWindow.editBox:GetText()";
 
   it("puts the roster in the website's format in a window ready to copy, leaving out names without last name", () => {
     const { client } = startCore();
     client(MEMBERS);
     client('Printed = {} SlashCmdList.VXV("liste")');
     expect(client(COPIED)).toBe("VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nThom;Leboss;PRIEST");
-    expect(client("return { VXV_CopyWindow:IsShown(), VXV_CopyWindow.editBox.highlighted }")).toEqual([true, true]);
+    expect(client("return { VXV_TextWindow:IsShown(), VXV_TextWindow.editBox.highlighted }")).toEqual([true, true]);
     expect(client("return Printed")).toEqual([
       "|cff14b8a6VXV|r Liste de 2 personnages prête : Ctrl+C, puis colle-la dans la page Liste de guilde du site.",
       "|cff14b8a6VXV|r 1 personnage laissé de côté, faute de nom de famille.",
     ]);
-    expect(client("return UISpecialFrames")).toContain("VXV_CopyWindow");
+    expect(client("return UISpecialFrames")).toContain("VXV_TextWindow");
   });
 
   it("asks for the roster when the client has none yet, and exports it when it arrives", () => {
     const { client } = startCore();
     client('SlashCmdList.VXV("liste")');
-    expect(client("return VXV_CopyWindow")).toBeUndefined();
+    expect(client("return VXV_TextWindow")).toBeUndefined();
     client(`${MEMBERS} Fire("GUILD_ROSTER_UPDATE")`);
     expect(client(COPIED)).toContain("Thom;Leboss;PRIEST");
   });

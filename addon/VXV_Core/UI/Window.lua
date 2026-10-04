@@ -28,7 +28,7 @@ local function selectTab(chosen)
         if isChosen and tab.content == nil then
             tab.content = CreateFrame("Frame", nil, frame)
             tab.content:SetPoint("TOPLEFT", INSET, -(TITLE_HEIGHT + TAB_HEIGHT + INSET))
-            tab.content:SetPoint("BOTTOMRIGHT", -INSET, INSET)
+            tab.content:SetSize(WIDTH - 2 * INSET, HEIGHT - TITLE_HEIGHT - TAB_HEIGHT - 3 * INSET)
             tab.module.tab.Build(tab.content)
         end
         if tab.content ~= nil then

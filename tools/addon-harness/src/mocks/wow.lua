@@ -12,9 +12,10 @@ end
 
 -- Lua 5.1 globals that Lua 5.3 moved or removed.
 unpack = table.unpack
--- Date functions WoW keeps from the os library, which it removes.
+-- Date functions WoW keeps from the os library, which it removes. The test client lives in UTC.
 time = os.time
-date = os.date
+-- fengari reads "!" (UTC) for "*t" only: the UTC wall clock goes through a local time with the same fields.
+date = function(format, seconds) return os.date(format, os.time(os.date("!*t", seconds or os.time()))) end
 math.atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
 
 local frames = {}
@@ -64,6 +65,8 @@ local function newFontString()
     function fontString:SetText(text) self.text = text end
     function fontString:GetText() return self.text end
     function fontString:SetJustifyH(justify) self.justify = justify end
+    function fontString:SetWordWrap(wrap) self.wordWrap = wrap end
+    function fontString:SetFontObject(font) self.font = font end
     return fontString
 end
 
@@ -97,8 +100,9 @@ function CreateFrame(kind, name, parent, template)
     function frame:RegisterForClicks(...) self.clickButtons = { ... } end
     function frame:StartMoving() end
     function frame:StopMovingOrSizing() end
-    function frame:CreateFontString()
+    function frame:CreateFontString(_, _, template)
         local fontString = newFontString()
+        fontString.font = template
         self.children[#self.children + 1] = fontString
         return fontString
     end
@@ -110,6 +114,7 @@ function CreateFrame(kind, name, parent, template)
     function frame:SetText(text) self.text = text end
     function frame:GetText() return self.text end
     function frame:SetMultiLine(multiLine) self.multiLine = multiLine end
+    function frame:SetMaxLetters(maxLetters) self.maxLetters = maxLetters end
     function frame:SetAutoFocus(autoFocus) self.autoFocus = autoFocus end
     function frame:SetFontObject(font) self.font = font end
     function frame:SetFocus() self.focused = true end
@@ -136,6 +141,19 @@ function CreateFrame(kind, name, parent, template)
     return frame
 end
 
+--- Test helper: the first widget under the frame, depth first, for which test(widget) is true.
+function FindWidget(frame, test)
+    for _, child in ipairs(frame.children or {}) do
+        if test(child) then
+            return child
+        end
+        local found = FindWidget(child, test)
+        if found ~= nil then
+            return found
+        end
+    end
+end
+
 function geterrorhandler()
     return function(message)
         ReportedErrors[#ReportedErrors + 1] = tostring(message)
@@ -157,7 +175,8 @@ Minimap:SetSize(140, 140)
 Minimap.centerX, Minimap.centerY = 1000, 700
 GameTooltip = CreateFrame("Frame", "GameTooltip", UIParent)
 GameTooltip.lines = {}
-function GameTooltip:SetOwner(owner) self.owner = owner end
+-- Like the game, a new owner starts an empty tooltip.
+function GameTooltip:SetOwner(owner, anchor) self.owner, self.anchor, self.lines = owner, anchor, {} end
 function GameTooltip:AddLine(text) self.lines[#self.lines + 1] = text end
 --- Where the cursor is, in screen pixels; tests move it.
 Cursor = { x = 0, y = 0 }
