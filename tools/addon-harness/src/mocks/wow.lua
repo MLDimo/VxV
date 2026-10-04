@@ -184,6 +184,7 @@ GameTooltip.lines = {}
 -- Like the game, a new owner starts an empty tooltip.
 function GameTooltip:SetOwner(owner, anchor) self.owner, self.anchor, self.lines = owner, anchor, {} end
 function GameTooltip:AddLine(text) self.lines[#self.lines + 1] = text end
+function GameTooltip:SetHyperlink(link) self.link = link end
 --- Where the cursor is, in screen pixels; tests move it.
 Cursor = { x = 0, y = 0 }
 function GetCursorPosition() return Cursor.x, Cursor.y end
@@ -243,7 +244,10 @@ C_ChatInfo = {
         return Enum.SendAddonMessageResult.Success
     end,
     InChatMessagingLockdown = function() return ChatLockdown end,
+    SendChatMessage = function(text, chatType) ChatSent[#ChatSent + 1] = { text = text, channel = chatType } end,
 }
+--- Messages the player wrote in a chat channel: { text, channel }.
+ChatSent = {}
 
 --- Hands this client's sent messages to the test as hexadecimal (exact bytes), and forgets them.
 function TakeSentMessages()
@@ -296,6 +300,27 @@ C_PartyInfo = {
         ConvertedToRaid = ConvertedToRaid + 1
     end,
 }
+--- Loot: the master looter's name (nil without master loot), and the links of the items in the open corpse.
+MasterLooter = nil
+CorpseLinks = {}
+--- A link as the client writes it.
+function ItemLink(itemId, name) return "|cffa335ee|Hitem:" .. itemId .. "::::::::60:::::|h[" .. name .. "]|h|r" end
+function GetNumLootItems() return #CorpseLinks end
+function GetLootSlotLink(slot) return CorpseLinks[slot] end
+function IsMasterLooter() return MasterLooter ~= nil and MasterLooter == Player.name end
+--- Master loot: the party index (0 for the player) and the raid index (raid1 is the player) of the master looter.
+C_PartyInfo.GetLootMethod = function()
+    if MasterLooter == nil then
+        return 0
+    end
+    local partyIndex = MasterLooter == Player.name and 0 or nil
+    for index, name in ipairs(Group.members) do
+        if name == MasterLooter then
+            partyIndex = index
+        end
+    end
+    return 2, partyIndex, Group.raid and partyIndex ~= nil and partyIndex + 1 or nil
+end
 --- Test helper: these players accepted the invitation; the client tells the addons.
 function JoinGroup(...)
     for _, name in ipairs({ ... }) do

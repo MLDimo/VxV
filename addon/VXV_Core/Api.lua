@@ -14,19 +14,26 @@ VXV = {
     Count = ns.Util.Count,
     --- (label, confirm(text)): a window to paste a text into, closed when confirm returns true.
     ShowPasteWindow = ns.TextWindow.ShowPaste,
-    --- (owner, anchor, title, lines) and (): the game's tooltip.
+    --- (owner, anchor, title, lines), (owner, anchor, item link) and (): the game's tooltip.
     ShowTooltip = ns.Tooltip.Show,
+    ShowItemTooltip = ns.Tooltip.ShowLink,
     HideTooltip = ns.Tooltip.Hide,
     --- (kind, payload): data of any size to every member connected with VXV, this player included; and
     --- (kind, handler(payload, sender)) to receive them. Kinds start with the bundle's name ("raid.data").
     Broadcast = ns.Comm.Broadcast,
     OnMessage = ns.Comm.On,
+    --- (text): an announcement in the group's channel, held during a boss encounter.
+    SayToGroup = ns.GroupChat.Say,
+    --- The Blizzard API whose names vary, with the pcall contract (ok, ...): see Core/Compat.lua.
+    Compat = ns.Compat,
     --- Names of the members connected with VXV, this player included, in alphabetical order.
     Online = ns.Presence.Online,
     --- (event, handler(...)): a game event, among those measured on WoW Forever.
     OnEvent = ns.Events.On,
     --- The guild members the client knows: { name, class, online }.
     GuildMembers = ns.Roster.Read,
+    --- (value): true when the client hides the value (secret): it may be neither compared nor stored.
+    IsSecret = ns.Util.IsSecret,
     --- "Prénom Nom" of a unit ("raid3", "party1"…), or nil when the client has none or hides it.
     NameOfUnit = ns.Names.OfUnit,
     --- "Prénom Nom" of the player, or nil before the player is in the world.

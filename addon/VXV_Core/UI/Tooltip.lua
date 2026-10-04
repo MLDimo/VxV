@@ -23,6 +23,17 @@ function Tooltip.Show(owner, anchor, title, lines)
     tooltip:Show()
 end
 
+--- Shows the game's own tooltip of an item link ("|Hitem:…|h[Nom]|h") next to the owner frame.
+function Tooltip.ShowLink(owner, anchor, link)
+    local tooltip = Compat.Resolve("GameTooltip")
+    if tooltip == nil then
+        return
+    end
+    tooltip:SetOwner(owner, anchor)
+    tooltip:SetHyperlink(link)
+    tooltip:Show()
+end
+
 function Tooltip.Hide()
     local tooltip = Compat.Resolve("GameTooltip")
     if tooltip ~= nil then
