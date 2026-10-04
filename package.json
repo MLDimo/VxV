@@ -12,7 +12,7 @@
     "supabase",
     "tools/addon-release",
     "tools/data-generator",
-    "tools/probe-harness"
+    "tools/addon-harness"
   ],
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
@@ -22,7 +22,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run test:e2e",
-    "export:probe": "npm run export -w @vxv/probe-harness --",
+    "export:probe": "npm run export-probe -w @vxv/addon-harness --",
     "generate": "npm run generate -w @vxv/data-generator",
     "release:prepare": "npm run prepare-release -w @vxv/addon-release --",
     "build": "npm run build --workspaces --if-present",
@@ -34,7 +34,6 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.8",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.13.0",
     "prettier": "^3.9.9",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",

@@ -18,7 +18,8 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - inscription par bouton, synchronisée avec le site dans les deux sens ;
   - rappel quotidien (tâche Vercel, 8 h UTC).
   Validation en attente : essai réel sur le serveur avec un second compte.
-- P4 à P15 : pas commencées.
+- **P4 Addon : VXV_Core** : en cours. 4.1 socle (bundle `addon/VXV_Core`, modules, bus, stockage versionné, banc d'essai `tools/addon-harness`).
+- P5 à P15 : pas commencées.
 
 ## Structure du dépôt
 
@@ -56,7 +57,9 @@ La table complète est dans le README. Règles :
 - Code, noms et commentaires en anglais. Textes affichés aux joueurs en français.
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
-- Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Dépendance vers `VXV_Core` et chargement à la demande : ajoutés en P4 quand le socle existera.
+- Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent à la demande.
+- `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (enregistrement des modules, bus d'événements interne). Les bundles ne voient rien d'autre du socle.
+- Données sauvegardées (`VXV_DB`) : numéro de schéma, et migrations appliquées au chargement ; une migration publiée ne change plus.
 - Un fichier = une responsabilité. Module exposé via `ns.<Module>` ; dépendances lues en tête de fichier (`local Util = ns.Util`).
 - Nommage : `PascalCase` pour modules et fonctions publiques, `camelCase` pour locales, `UPPER_SNAKE_CASE` pour constantes. Pas de nombre magique.
 - Indentation 4 espaces, 120 caractères max, lint via `.luacheckrc`.
@@ -85,7 +88,7 @@ Chaque famille d'erreur courante des addons doit être couverte par un test auto
 | Troncature d'un nom accentué au milieu d'un caractère | Découpage UTF-8 sûr | Tests sur des noms comme « Ðéjà Vu » |
 | Ordre de chargement des bundles | Dépendances déclarées dans les `.toc` | Chargement des bundles dans l'ordre du client par le simulateur |
 
-Outil : le simulateur de client de `tools/probe-harness` (fengari + API simulée) deviendra le banc de test de l'addon, enrichi de ces scénarios.
+Outil : le banc d'essai `tools/addon-harness` (fengari + client simulé, tests Vitest) charge chaque addon comme le jeu, d'après son `.toc`, et porte ces scénarios.
 
 ## Architecture du serveur (`@vxv/server`)
 

@@ -1,7 +1,6 @@
 import js from "@eslint/js";
 import prettier from "eslint-config-prettier";
 import nextVitals from "eslint-config-next/core-web-vitals";
-import globals from "globals";
 import tseslint from "typescript-eslint";
 
 const WEB_FILES = ["apps/web/**/*.{ts,tsx}"];
@@ -52,11 +51,6 @@ export default tseslint.config(
         { patterns: [{ group: ["**/infrastructure/**", "pg"], message: "Use cases only depend on ports." }] },
       ],
     },
-  },
-  {
-    files: ["tools/probe-harness/**/*.js"],
-    languageOptions: { sourceType: "commonjs", globals: globals.node },
-    rules: { "@typescript-eslint/no-require-imports": "off" },
   },
   prettier,
 );

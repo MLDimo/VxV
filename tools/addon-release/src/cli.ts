@@ -3,8 +3,8 @@ import { releaseVersion } from "./releaseVersion.ts";
 
 const REPOSITORY = new URL("../../../", import.meta.url);
 
-/** Addon bundle sources. Hand-written bundles (addon/) will join the generated packs in P4. */
-const SOURCES = [new URL("dist/generated/addon/", REPOSITORY)];
+/** Addon bundle sources: the hand-written bundles, then the generated raid data packs. */
+const SOURCES = [new URL("addon/", REPOSITORY), new URL("dist/generated/addon/", REPOSITORY)];
 const TARGET = new URL("dist/release/VXV/", REPOSITORY);
 
 const [input] = process.argv.slice(2);

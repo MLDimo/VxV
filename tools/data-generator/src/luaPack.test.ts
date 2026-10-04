@@ -28,6 +28,8 @@ describe("renderLuaPack", () => {
     expect(lines).toContain(`## Interface: ${ADDON_INTERFACE}`);
     expect(lines).toContain("## Title: VXV Data - La salle des Thanes");
     expect(lines).toContain("## Version: @project-version@");
+    expect(lines).toContain("## Dependencies: VXV_Core");
+    expect(lines).toContain("## LoadOnDemand: 1");
     expect(lines).toContain("Data.lua");
   });
 

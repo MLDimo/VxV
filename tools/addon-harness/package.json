@@ -1,0 +1,15 @@
+{
+  "name": "@vxv/addon-harness",
+  "private": true,
+  "description": "Runs the addons outside the game on a mocked client: conventions, scenarios and unit tests; probe journal export.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "export-probe": "tsx src/exportProbe.ts"
+  },
+  "devDependencies": {
+    "fengari": "^0.1.5",
+    "luaparse": "0.3.1"
+  }
+}

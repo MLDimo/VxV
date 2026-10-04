@@ -1,0 +1,35 @@
+/**
+ * Game events seen firing on the WoW Forever beta during phase 0 (docs/phase-0/sessions). An addon that
+ * registers any other event risks a Lua error on an unknown event, or a silent refusal.
+ */
+export const FOREVER_EVENTS = new Set([
+  "ADDON_LOADED",
+  "PLAYER_LOGIN",
+  "CHAT_MSG_ADDON",
+  "CHAT_MSG_SYSTEM",
+  "CHAT_MSG_LOOT",
+  "CHAT_MSG_GUILD",
+  "CHAT_MSG_PARTY",
+  "CHAT_MSG_PARTY_LEADER",
+  "CHAT_MSG_RAID",
+  "CHAT_MSG_RAID_LEADER",
+  "ENCOUNTER_START",
+  "ENCOUNTER_END",
+  "LOOT_READY",
+  "LOOT_OPENED",
+  "LOOT_SLOT_CLEARED",
+  "LOOT_CLOSED",
+  "OPEN_MASTER_LOOT_LIST",
+  "START_LOOT_ROLL",
+  "LOOT_HISTORY_UPDATE_DROP",
+  "LOOT_HISTORY_UPDATE_ENCOUNTER",
+  "PARTY_LOOT_METHOD_CHANGED",
+  "GUILD_ROSTER_UPDATE",
+  "GROUP_ROSTER_UPDATE",
+  "UI_ERROR_MESSAGE",
+  "PLAYER_DEAD",
+  "PLAYER_ALIVE",
+  "PLAYER_UNGHOST",
+  "RESURRECT_REQUEST",
+  "TRADE_SKILL_SHOW",
+]);

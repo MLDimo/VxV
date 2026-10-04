@@ -218,18 +218,3 @@ GetTradeSkillInfo = function(index)
     return "Recette " .. index, "optimal"
 end
 GetTradeSkillLine = function() return "Forge", 150, 300 end
-
--- Must stay last: every global created from here on comes from the addon or the scenario.
-local mockGlobals = {}
-function NewGlobals()
-    local names = {}
-    for name in pairs(_G) do
-        if not mockGlobals[name] then
-            names[#names + 1] = name
-        end
-    end
-    return table.concat(names, " ")
-end
-for name in pairs(_G) do
-    mockGlobals[name] = true
-end

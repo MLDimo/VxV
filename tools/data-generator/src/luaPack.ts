@@ -26,6 +26,9 @@ function renderToc(raid: Raid): string {
     `## Notes: Données du raid ${raid.name} pour VXV (fichier généré)`,
     "## Author: VXV",
     "## Version: @project-version@",
+    // Loaded by VXV_Core when a raid needs it, never at login.
+    "## Dependencies: VXV_Core",
+    "## LoadOnDemand: 1",
     "",
     DATA_FILE,
     "",

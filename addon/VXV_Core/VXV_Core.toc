@@ -1,0 +1,16 @@
+## Interface: 16001
+## Title: VXV
+## Notes: Outil de la guilde VXV : raids, soft reserves et loot.
+## Author: VXV
+## Version: @project-version@
+## SavedVariables: VXV_DB
+
+# Core: generic tooling, no feature logic.
+Core\Call.lua
+Core\Events.lua
+Core\Bus.lua
+Core\Storage.lua
+Core\Modules.lua
+Core\Api.lua
+
+Bootstrap.lua
