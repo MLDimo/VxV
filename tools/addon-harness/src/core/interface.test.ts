@@ -30,7 +30,11 @@ describe("VXV_Core interface", () => {
       exists: true,
       shown: true,
       tabs: ["Accueil"],
-      texts: ["VXV @project-version@", expect.stringContaining("Raids, soft reserves et loot")],
+      texts: [
+        "VXV @project-version@",
+        expect.stringContaining("Raids, soft reserves et loot"),
+        "Connectés avec VXV (1) : Ðéjà Vu",
+      ],
     });
     expect(client("return UISpecialFrames")).toEqual(["VXV_Window"]);
     client('SlashCmdList.VXV("")');
@@ -41,12 +45,12 @@ describe("VXV_Core interface", () => {
     const { client } = startCore();
     client('SlashCmdList.VXV("aide")');
     client('SlashCmdList.VXV("inconnue")');
-    expect(client("return Printed")).toEqual([
+    const help = [
       "|cff14b8a6VXV|r /vxv : ouvrir ou fermer la fenêtre",
       "|cff14b8a6VXV|r /vxv aide : afficher ces commandes",
-      "|cff14b8a6VXV|r /vxv : ouvrir ou fermer la fenêtre",
-      "|cff14b8a6VXV|r /vxv aide : afficher ces commandes",
-    ]);
+      "|cff14b8a6VXV|r /vxv ping : vérifier qui reçoit les messages de VXV",
+    ];
+    expect(client("return Printed")).toEqual([...help, ...help]);
   });
 
   it("reopens the window where the player left it", () => {

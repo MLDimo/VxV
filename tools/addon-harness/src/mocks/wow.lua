@@ -12,6 +12,9 @@ end
 
 -- Lua 5.1 globals that Lua 5.3 moved or removed.
 unpack = table.unpack
+-- Date functions WoW keeps from the os library, which it removes.
+time = os.time
+date = os.date
 math.atan2 = math.atan2 or function(y, x) return math.atan(y, x) end
 
 local frames = {}
@@ -156,3 +159,86 @@ function GetCursorPosition() return Cursor.x, Cursor.y end
 --- Whether the player is in combat; tests set it.
 InCombat = false
 function InCombatLockdown() return InCombat end
+
+-- Time: the client's clock, in seconds, moved forward by the tests (AdvanceTime runs the timers due).
+Clock = { now = 1000 }
+function GetTime()
+    return Clock.now
+end
+local timers = {}
+C_Timer = {
+    After = function(seconds, callback)
+        timers[#timers + 1] = { at = Clock.now + seconds, callback = callback }
+    end,
+}
+function AdvanceTime(seconds)
+    local target = Clock.now + seconds
+    while true do
+        table.sort(timers, function(left, right) return left.at < right.at end)
+        local due = timers[1]
+        if due == nil or due.at > target then
+            break
+        end
+        table.remove(timers, 1)
+        Clock.now = due.at
+        due.callback()
+    end
+    Clock.now = target
+end
+
+-- Addon messages: what this client sent, for the tests to deliver to the other players' clients.
+Enum = { SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3 } }
+SentAddonMessages = {}
+--- Messages longer than the 255 bytes the server carries (it would cut them silently).
+OversizedMessages = {}
+--- How many more messages the server accepts before answering "throttled"; nil for no limit.
+ServerCredit = nil
+--- True during a boss encounter: the client refuses addon messages.
+ChatLockdown = false
+C_ChatInfo = {
+    RegisterAddonMessagePrefix = function() return 0 end,
+    SendAddonMessage = function(prefix, text, channel, target)
+        if #text > 255 then
+            OversizedMessages[#OversizedMessages + 1] = text
+        end
+        if ServerCredit ~= nil then
+            if ServerCredit <= 0 then
+                return Enum.SendAddonMessageResult.AddonMessageThrottle
+            end
+            ServerCredit = ServerCredit - 1
+        end
+        SentAddonMessages[#SentAddonMessages + 1] = { prefix = prefix, text = text, channel = channel, target = target }
+        return Enum.SendAddonMessageResult.Success
+    end,
+    InChatMessagingLockdown = function() return ChatLockdown end,
+}
+
+--- Hands this client's sent messages to the test as hexadecimal (exact bytes), and forgets them.
+function TakeSentMessages()
+    local taken = {}
+    for index, message in ipairs(SentAddonMessages) do
+        taken[index] = {
+            prefix = message.prefix,
+            channel = message.channel,
+            target = message.target,
+            hex = (message.text:gsub(".", function(byte) return string.format("%02x", byte:byte()) end)),
+        }
+    end
+    SentAddonMessages = {}
+    return taken
+end
+
+function FromHex(hex)
+    return (hex:gsub("%x%x", function(pair) return string.char(tonumber(pair, 16)) end))
+end
+
+-- The player of this client.
+Player = { name = "Ðéjà Vu", inGuild = true }
+function GetUnitName(unit)
+    if unit == "player" then
+        return Player.name
+    end
+end
+function IsInGuild()
+    return Player.inGuild
+end

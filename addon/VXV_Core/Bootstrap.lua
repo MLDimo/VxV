@@ -11,4 +11,8 @@ end)
 ns.Events.On("PLAYER_LOGIN", function()
     ns.Modules.Start()
     ns.MinimapButton.Create()
+    ns.Comm.Start()
+    if IsInGuild() then
+        ns.Presence.Announce()
+    end
 end)
