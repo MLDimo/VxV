@@ -1,18 +1,10 @@
 import type { RaidEvent } from "../domain/events.ts";
+import type { ExclusionRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import type { LootItem } from "../domain/softReserves.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Repositories, UnitOfWork } from "./ports.ts";
-
-/** What the journal keeps about an exclusion change. */
-export interface ExclusionRecord {
-  itemName: string;
-  raids: string[];
-  eventStartsAt: string;
-  /** Characters whose soft reserve on the item was removed by the exclusion. */
-  removedSoftReserves: string[];
-}
 
 async function findEventItem(
   repositories: Repositories,

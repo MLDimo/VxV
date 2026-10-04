@@ -1,4 +1,5 @@
 import type { RaidEvent } from "../domain/events.ts";
+import type { SoftReserveOverrideRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import type { Signup } from "../domain/signups.ts";
 import {
@@ -19,15 +20,6 @@ export interface SoftReserveBoard {
   mySignup: Signup | undefined;
   lockAt: Date;
   locked: boolean;
-}
-
-/** What the journal keeps about an officer's correction of a player's soft reserves. */
-export interface SoftReserveOverrideRecord {
-  characterName: string;
-  raids: string[];
-  eventStartsAt: string;
-  before: string[];
-  after: string[];
 }
 
 async function requireEvent(repositories: Repositories, eventId: string): Promise<RaidEvent> {
@@ -55,6 +47,22 @@ async function checkChoice(repositories: Repositories, event: RaidEvent, itemIds
   return { itemIds: check.itemIds, loot };
 }
 
+/** The event's loot with everyone's soft reserves and their SR+ bonus; "mine" marks the given character's. */
+export async function loadBoardItems(
+  repositories: Repositories,
+  event: RaidEvent,
+  myCharacterId: string | undefined,
+): Promise<BoardItem[]> {
+  const [loot, reserves, excludedItemIds, ownersByItem, pastEventsByReserve] = await Promise.all([
+    repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id)),
+    repositories.softReserves.listByEvent(event.id),
+    repositories.exclusions.listByEvent(event.id),
+    repositories.lootHistory.countSignedUpOwners(event.id),
+    repositories.lootHistory.pastEventsForReserves(event.id),
+  ]);
+  return buildBoard({ loot, reserves, excludedItemIds, ownersByItem, pastEventsByReserve, myCharacterId });
+}
+
 export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
   return {
     /** The event's loot with everyone's soft reserves: visible to the whole guild. */
@@ -64,24 +72,10 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
         if (event === undefined) {
           return undefined;
         }
-        const [loot, reserves, excludedItemIds, ownersByItem, pastEventsByReserve, mySignup] = await Promise.all([
-          repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id)),
-          repositories.softReserves.listByEvent(event.id),
-          repositories.exclusions.listByEvent(event.id),
-          repositories.lootHistory.countSignedUpOwners(event.id),
-          repositories.lootHistory.pastEventsForReserves(event.id),
-          repositories.signups.findByMember(event.id, member.id),
-        ]);
+        const mySignup = await repositories.signups.findByMember(event.id, member.id);
         return {
           allowance: event.softReservesPerPlayer,
-          items: buildBoard({
-            loot,
-            reserves,
-            excludedItemIds,
-            ownersByItem,
-            pastEventsByReserve,
-            myCharacterId: mySignup?.characterId,
-          }),
+          items: await loadBoardItems(repositories, event, mySignup?.characterId),
           mySignup,
           lockAt: softReservesLockAt(event.startsAt),
           locked: areSoftReservesLocked(event.startsAt, clock()),

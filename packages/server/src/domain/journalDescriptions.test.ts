@@ -1,6 +1,6 @@
-import type { JournalEntry } from "@vxv/server";
 import { describe, expect, it } from "vitest";
-import { describeJournalEntry } from "./journalEntries";
+import type { JournalEntry } from "./journal.ts";
+import { describeJournalEntry } from "./journalDescriptions.ts";
 
 describe("describeJournalEntry", () => {
   it("summarizes a roster import", () => {

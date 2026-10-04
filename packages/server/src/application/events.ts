@@ -48,10 +48,3 @@ export function createEvents({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cl
     },
   };
 }
-
-/** What the journal keeps about a created event. */
-export interface EventCreationRecord {
-  startsAt: string;
-  raids: string[];
-  softReservesPerPlayer: number;
-}

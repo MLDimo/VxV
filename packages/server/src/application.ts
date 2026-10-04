@@ -1,3 +1,4 @@
+import { createAddonExport } from "./application/addonExport.ts";
 import { createAuth } from "./application/auth.ts";
 import { createCharacters } from "./application/characters.ts";
 import { createDiscordProfiles } from "./application/discordProfiles.ts";
@@ -47,6 +48,7 @@ export function createApplication({
     exclusions: createExclusions({ unitOfWork }),
     history: createHistory({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
+    addonExport: createAddonExport({ unitOfWork, clock }),
   };
 }
 

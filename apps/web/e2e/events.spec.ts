@@ -20,7 +20,7 @@ test.describe.serial("raid events", () => {
 
     await expect(page.getByRole("heading", { name: "La salle des Thanes" })).toBeVisible();
     await expect(page.getByText("jeudi 12 décembre 2030 à 21:00")).toBeVisible();
-    await expect(page.getByText("2 SR par joueur")).toBeVisible();
+    await expect(page.getByText("2 SR par joueur", { exact: true })).toBeVisible();
     const message = await discordEventMessage(request, page.url().split("/").pop() ?? "");
     expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID);
     expect(message?.embed?.title).toBe("La salle des Thanes");

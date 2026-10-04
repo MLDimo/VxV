@@ -1,7 +1,7 @@
 "use server";
 
 import type { ActionState } from "@/components/actionState";
-import { describeRosterImport } from "@/components/journalEntries";
+import { describeRosterImport } from "@vxv/server/domain/journalDescriptions";
 import { getApplication } from "@/server/application";
 import { runFormAction } from "@/server/formActions";
 import { requireOfficer } from "@/server/session";

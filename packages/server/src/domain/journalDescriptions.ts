@@ -3,10 +3,10 @@ import type {
   ExclusionRecord,
   JournalAction,
   JournalEntry,
-  RosterImportSummary,
   SoftReserveOverrideRecord,
-} from "@vxv/server";
-import { count, formatDateTime, raidTitle, softReserveCount } from "./format";
+} from "./journal.ts";
+import { count, formatDateTime, raidTitle, softReserveCount } from "./labels.ts";
+import type { RosterImportSummary } from "./roster.ts";
 
 export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "roster.import": "Import de la liste de guilde",
@@ -46,7 +46,7 @@ function describeOverride(override: SoftReserveOverrideRecord): string {
   return `SR de ${override.characterName} (${where}) : avant ${itemList(override.before)} ; après ${itemList(override.after)}`;
 }
 
-/** One-line description of what an officer action changed. */
+/** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
     case "roster.import":

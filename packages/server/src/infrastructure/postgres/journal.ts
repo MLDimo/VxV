@@ -28,6 +28,11 @@ function toEntry(row: JournalRow): JournalEntry {
   };
 }
 
+const SELECT_ENTRIES = `
+  select journal.id::text as id, occurred_at, members.discord_name as actor_name, action, entity, entity_id,
+         before, after, reason
+  from journal join members on members.id = journal.actor_id`;
+
 export function journalRepository(sql: SqlClient): JournalRepository {
   return {
     async record(entry) {
@@ -47,13 +52,15 @@ export function journalRepository(sql: SqlClient): JournalRepository {
     },
 
     async listRecent(limit) {
+      const rows = await sql.query<JournalRow>(`${SELECT_ENTRIES} order by journal.id desc limit $1`, [limit]);
+      return rows.map(toEntry);
+    },
+
+    async listForEvent(eventId) {
+      // Entries about an event carry its id, alone or followed by "/" and what changed (item, character).
       const rows = await sql.query<JournalRow>(
-        `select journal.id::text as id, occurred_at, members.discord_name as actor_name, action, entity,
-                entity_id, before, after, reason
-         from journal join members on members.id = journal.actor_id
-         order by journal.id desc
-         limit $1`,
-        [limit],
+        `${SELECT_ENTRIES} where entity_id = $1 or starts_with(entity_id, $1 || '/') order by journal.id`,
+        [eventId],
       );
       return rows.map(toEntry);
     },

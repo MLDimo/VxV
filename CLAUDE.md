@@ -62,6 +62,7 @@ La table complète est dans le README. Règles :
 - Code, noms et commentaires en anglais. Textes affichés aux joueurs en français.
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
+- Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-1`, puis une ligne par enregistrement (événement, officiers, objets, inscrits, journal), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent à la demande.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (enregistrement des modules, bus d'événements interne). Les bundles ne voient rien d'autre du socle.
 - Données sauvegardées (`VXV_DB`) : numéro de schéma, et migrations appliquées au chargement ; une migration publiée ne change plus.

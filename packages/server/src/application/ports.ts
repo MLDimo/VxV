@@ -24,6 +24,7 @@ export interface MemberRepository {
   /** Creates the member on first sign-in, or refreshes their Discord name and guild roles. */
   saveFromDiscord(identity: DiscordIdentity, roles: readonly MemberRole[]): Promise<Member>;
   findById(id: string): Promise<Member | undefined>;
+  listAll(): Promise<Member[]>;
 }
 
 export interface SessionRepository {
@@ -54,6 +55,8 @@ export interface JournalRepository {
   record(entry: NewJournalEntry): Promise<void>;
   /** Latest entries first. */
   listRecent(limit: number): Promise<JournalEntry[]>;
+  /** Entries about the event (its creation, exclusions, soft reserve corrections), oldest first. */
+  listForEvent(eventId: string): Promise<JournalEntry[]>;
 }
 
 export interface RaidRepository {

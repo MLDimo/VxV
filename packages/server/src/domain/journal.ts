@@ -17,3 +17,28 @@ export interface JournalEntry extends Omit<NewJournalEntry, "actorId"> {
   occurredAt: Date;
   actorName: string;
 }
+
+/** What the journal keeps about a created event. */
+export interface EventCreationRecord {
+  startsAt: string;
+  raids: string[];
+  softReservesPerPlayer: number;
+}
+
+/** What the journal keeps about an exclusion change. */
+export interface ExclusionRecord {
+  itemName: string;
+  raids: string[];
+  eventStartsAt: string;
+  /** Characters whose soft reserve on the item was removed by the exclusion. */
+  removedSoftReserves: string[];
+}
+
+/** What the journal keeps about an officer's correction of a player's soft reserves. */
+export interface SoftReserveOverrideRecord {
+  characterName: string;
+  raids: string[];
+  eventStartsAt: string;
+  before: string[];
+  after: string[];
+}

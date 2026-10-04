@@ -31,5 +31,9 @@ export function memberRepository(sql: SqlClient): MemberRepository {
       const [row] = await sql.query<MemberRow>(`select ${COLUMNS} from members where id = $1`, [id]);
       return row && toMember(row);
     },
+
+    async listAll() {
+      return (await sql.query<MemberRow>(`select ${COLUMNS} from members order by discord_name`)).map(toMember);
+    },
   };
 }

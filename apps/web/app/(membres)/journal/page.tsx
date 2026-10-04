@@ -1,4 +1,4 @@
-import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "@/components/journalEntries";
+import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "@vxv/server/domain/journalDescriptions";
 import { formatDateTime } from "@/components/format";
 import { getApplication } from "@/server/application";
 
