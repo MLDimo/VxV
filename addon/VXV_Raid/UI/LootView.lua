@@ -9,12 +9,6 @@ ns.LootView = LootView
 local Attribution, Labels, Reserves = ns.Attribution, ns.Labels, ns.Reserves
 
 local GREY = "|cff808080%s|r"
-local METHODS = {
-    soft_reserve = "SR",
-    soft_reserve_plus = "SR+",
-    free_roll = "roll libre",
-    loot_council = "loot council",
-}
 
 local function bonusText(bonus)
     return bonus > 0 and (" +" .. bonus) or ""
@@ -80,7 +74,7 @@ local function addMasterLooter(rows, active, inGroup)
     end
     if active.result ~= nil then
         rows[#rows + 1] = { kind = "line", text = string.format("Gagnant : %s (%s)", active.result.winner,
-            METHODS[active.result.method]) }
+            Labels.Method(active.result.method)) }
     elseif active.plan.mode == "council" then
         addCouncilChoice(rows, inGroup)
     end

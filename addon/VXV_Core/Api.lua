@@ -12,8 +12,10 @@ VXV = {
     --- A message in the chat, under the VXV prefix; and (value, singular, plural) for "3 invitations".
     Print = ns.Chat.Print,
     Count = ns.Util.Count,
-    --- (label, confirm(text)): a window to paste a text into, closed when confirm returns true.
+    --- (label, confirm(text)): a window to paste a text into, closed when confirm returns true; and (text): a
+    --- window showing a text selected, ready for Ctrl+C.
     ShowPasteWindow = ns.TextWindow.ShowPaste,
+    ShowCopyWindow = ns.TextWindow.ShowCopy,
     --- (owner, anchor, title, lines), (owner, anchor, item link) and (): the game's tooltip.
     ShowTooltip = ns.Tooltip.Show,
     ShowItemTooltip = ns.Tooltip.ShowLink,

@@ -32,6 +32,13 @@ Labels.STATUS_ORDER = { "present", "late", "maybe", "bench", "absent" }
 local COMING = { present = true, late = true }
 
 local DATE_TIME = "%d/%m %H:%M"
+-- How an item was given, as the website names it.
+local METHODS = {
+    soft_reserve = "SR",
+    soft_reserve_plus = "SR+",
+    free_roll = "roll libre",
+    loot_council = "loot council",
+}
 
 function Labels.ClassName(token)
     local class = CLASSES[token]
@@ -55,6 +62,10 @@ end
 
 function Labels.IsComing(status)
     return COMING[status] == true
+end
+
+function Labels.Method(method)
+    return METHODS[method] or tostring(method)
 end
 
 --- "10/12 21:00", in the player's time.
