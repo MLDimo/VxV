@@ -11,7 +11,10 @@ function inventoried(): string[] {
   );
 }
 
-/** Called by the probe in game without error, beyond its inventory (docs/phase-0/sessions, 2 and 3 October). */
+/**
+ * Called in game without error, beyond the probe's inventory: by the probe (docs/phase-0/sessions, 2 and 3 October)
+ * and by VXV_Core during the in-game validation of P4 (4 October).
+ */
 const USED_IN_GAME = [
   "CreateFrame",
   "UIParent",
@@ -41,6 +44,8 @@ const USED_IN_GAME = [
   "RandomRoll",
   "RANDOM_ROLL_RESULT",
   "Enum",
+  "GetGuildInfo",
+  "GetCursorPosition",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */
@@ -78,9 +83,6 @@ export const LUA_ENVIRONMENT = new Set([
 export function foreverApi(): Set<string> {
   return new Set([...inventoried(), ...USED_IN_GAME]);
 }
-
-/** Compat wrappers whose functions phase 0 did not measure: to confirm during the in-game validation of P4. */
-export const NOT_YET_MEASURED = new Set(["GetGuildInfo", "UnitClass", "GetCursorPosition"]);
 
 /** Compat wrappers for functions that other addons define, absent from a client without them. */
 export const OPTIONAL_API = new Set(["GetMinimapShape"]);

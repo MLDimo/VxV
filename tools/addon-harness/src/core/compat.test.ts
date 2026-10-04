@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readTocFiles } from "../addon.ts";
 import { luacheckRules } from "../conventions.ts";
 import { CORE_DIR, startCore } from "../core.ts";
-import { foreverApi, LUA_ENVIRONMENT, NOT_YET_MEASURED, OPTIONAL_API } from "../foreverApi.ts";
+import { foreverApi, LUA_ENVIRONMENT, OPTIONAL_API } from "../foreverApi.ts";
 import { globalReferences } from "../globalReads.ts";
 
 /** Compat's wrappers and their candidate functions, as written in Compat.lua. */
@@ -29,12 +29,12 @@ describe("Blizzard API of VXV_Core", () => {
     expect(unmeasured).toEqual([]);
   });
 
-  it("gives every Compat wrapper a function measured on Forever, or lists it as not yet measured or optional", () => {
+  it("gives every Compat wrapper a function measured on Forever, or lists it as optional", () => {
     const measured = foreverApi();
     const aliases = compatAliases();
     expect(aliases.length).toBeGreaterThan(0);
     const unproven = aliases
-      .filter(([name]) => !NOT_YET_MEASURED.has(name) && !OPTIONAL_API.has(name))
+      .filter(([name]) => !OPTIONAL_API.has(name))
       .filter(([, candidates]) => !candidates.some((path) => measured.has(path)))
       .map(([name]) => name);
     expect(unproven).toEqual([]);
@@ -61,7 +61,7 @@ describe("Compat", () => {
   });
 
   it('answers "API absente" instead of a Lua error when the client has none', () => {
-    expect(compat("", "UnitClass('player')")).toEqual([false, "API absente"]);
+    expect(compat("GetGuildInfo = nil", 'GetGuildInfo("player")')).toEqual([false, "API absente"]);
   });
 
   it("turns an error inside the client function into a refusal", () => {

@@ -8,13 +8,13 @@ ns.Compat = Compat
 
 local MISSING_API = "API absente"
 
---- Wrapper name -> candidate functions, tried in order. Measured on WoW Forever in phase 0, unless noted.
+--- Wrapper name -> candidate functions, tried in order. Measured on WoW Forever (phase 0, in-game validation
+--- of P4), unless noted.
 local ALIASES = {
-    -- Names and classes
+    -- Names
     GetUnitName = { "GetUnitName" },
-    UnitClass = { "UnitClass" }, -- not measured yet
     -- Guild
-    GetGuildInfo = { "GetGuildInfo" }, -- not measured yet
+    GetGuildInfo = { "GetGuildInfo" },
     RequestGuildRoster = { "C_GuildInfo.GuildRoster", "GuildRoster" },
     GetNumGuildMembers = { "GetNumGuildMembers" },
     GetGuildRosterInfo = { "GetGuildRosterInfo" },
@@ -29,7 +29,7 @@ local ALIASES = {
     GiveMasterLoot = { "GiveMasterLoot" },
     GetSortedInfoForDrop = { "C_LootHistory.GetSortedInfoForDrop" },
     -- Interface
-    GetCursorPosition = { "GetCursorPosition" }, -- not measured yet
+    GetCursorPosition = { "GetCursorPosition" },
     GetMinimapShape = { "GetMinimapShape" }, -- optional: defined by minimap addons only
 }
 
