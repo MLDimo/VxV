@@ -1,6 +1,7 @@
 local ADDON_NAME, ns = ...
 
---- Entry point, loaded last: the saved data when the addon loads, then the modules once in the world.
+--- Entry point, loaded last: the saved data when the addon loads, then, once in the world and confirmed as a
+--- member of the guild, the modules, the minimap icon and the communication with the other members.
 
 ns.Events.On("ADDON_LOADED", function(name)
     if name == ADDON_NAME then
@@ -8,11 +9,13 @@ ns.Events.On("ADDON_LOADED", function(name)
     end
 end)
 
-ns.Events.On("PLAYER_LOGIN", function()
+ns.Bus.On("guild.confirmed", function()
     ns.Modules.Start()
     ns.MinimapButton.Create()
     ns.Comm.Start()
-    if IsInGuild() then
-        ns.Presence.Announce()
-    end
+    ns.Presence.Announce()
+end)
+
+ns.Events.On("PLAYER_LOGIN", function()
+    ns.Guild.Start()
 end)

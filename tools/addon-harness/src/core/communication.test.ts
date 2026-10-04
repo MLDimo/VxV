@@ -129,13 +129,14 @@ describe("send queue", () => {
   });
 
   it("waits during a boss encounter, and sends when it ends", () => {
-    const { core, client } = startCore({ inGuild: false });
+    const { core, client } = startCore();
+    const before = Number(sentCount(client));
     client("ChatLockdown = true");
     core.run('local _, ns = ... ns.Comm.Broadcast("note", { boss = true })');
     client("AdvanceTime(30)");
-    expect(sentCount(client)).toBe(0);
+    expect(sentCount(client)).toBe(before);
     client('ChatLockdown = false Fire("ENCOUNTER_END", 3493, "Faldrim", 1, 5, 1)');
-    expect(sentCount(client)).toBe(1);
+    expect(sentCount(client)).toBe(before + 1);
   });
 });
 

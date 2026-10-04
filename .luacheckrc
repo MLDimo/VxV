@@ -11,6 +11,7 @@ globals = {
     "VXV_DB",
     "VXV",
     "VXV_Window",
+    "VXV_CopyWindow",
     "SLASH_VXV1",
     "SLASH_VXVPROBE1",
     "SlashCmdList",

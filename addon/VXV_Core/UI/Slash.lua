@@ -4,7 +4,9 @@ local _, ns = ...
 local Slash = {}
 ns.Slash = Slash
 
-local Chat, Window = ns.Chat, ns.Window
+local Chat, Guild, Window = ns.Chat, ns.Guild, ns.Window
+
+local RESERVED = "VXV est réservé aux membres de la guilde."
 
 local commands = {}
 
@@ -27,6 +29,10 @@ end
 
 SLASH_VXV1 = "/vxv"
 SlashCmdList.VXV = function(input)
+    if not Guild.IsMember() then
+        Chat.Print(RESERVED)
+        return
+    end
     local name, rest = (input or ""):match("^%s*(%S*)%s*(.-)%s*$")
     local command = commands[name:lower()]
     if name == "" then

@@ -48,6 +48,7 @@ describe("VXV_Core interface", () => {
     const help = [
       "|cff14b8a6VXV|r /vxv : ouvrir ou fermer la fenêtre",
       "|cff14b8a6VXV|r /vxv aide : afficher ces commandes",
+      "|cff14b8a6VXV|r /vxv liste : exporter la liste de guilde pour le site (import réservé aux officiers)",
       "|cff14b8a6VXV|r /vxv ping : vérifier qui reçoit les messages de VXV",
     ];
     expect(client("return Printed")).toEqual([...help, ...help]);

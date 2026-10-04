@@ -18,3 +18,8 @@ function Util.Safe(value)
     end
     return tostring(value)
 end
+
+--- "1 personnage", "3 personnages": French agreement of a counted word.
+function Util.Count(value, singular, plural)
+    return value .. " " .. (value == 1 and singular or plural or singular .. "s")
+end
