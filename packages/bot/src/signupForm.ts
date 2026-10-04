@@ -1,16 +1,16 @@
 import { fullName, type Application, type Character, type Member, type RaidEvent, type Signup } from "@vxv/server";
 import { classLabel } from "@vxv/server/domain/characterClasses";
 import { raidTitle, ROLE_LABELS, SPEC_SUGGESTIONS, STATUS_LABELS } from "@vxv/server/domain/labels";
-import { MAX_SPEC_LENGTH, SIGNUP_ROLES, SIGNUP_STATUSES, type SignupStatus } from "@vxv/server/domain/signups";
+import { SIGNUP_ROLES, SIGNUP_STATUSES, type SignupStatus } from "@vxv/server/domain/signups";
 import {
   ComponentType,
   InteractionResponseType,
-  TextInputStyle,
   type APIInteractionResponse,
   type APIMessageComponentGuildInteraction,
   type APIModalInteractionResponseCallbackData,
   type APIModalSubmissionComponent,
   type APIModalSubmitGuildInteraction,
+  type APISelectMenuOption,
 } from "discord-api-types/v10";
 import type { BotContext } from "./commands.ts";
 import { actingMember } from "./members.ts";
@@ -24,6 +24,38 @@ const FIELDS = { character: "character", role: "role", status: "status", spec: "
 const MAX_TITLE_LENGTH = 45;
 const MAX_OPTIONS = 25;
 const DEFAULT_STATUS: SignupStatus = "present";
+/** A spec option carries its class, so that a spec of another class than the character's is refused. */
+const SPEC_VALUE_SEPARATOR = "|";
+const WRONG_CLASS_SPEC =
+  "Cette spécialisation n'est pas celle de la classe du personnage choisi : choisis-en une autre.";
+
+/** The usual specs of the member's classes (the chosen character's first), and the current spec if it is another. */
+function specOptions(
+  characters: readonly Character[],
+  chosen: Character | undefined,
+  current: Signup | undefined,
+): APISelectMenuOption[] {
+  const classes = [...new Set([chosen, ...characters].flatMap((character) => character?.characterClass ?? []))];
+  const options = classes.flatMap((characterClass) =>
+    (SPEC_SUGGESTIONS[characterClass] ?? []).map((spec) => ({
+      label: classes.length > 1 ? `${spec} · ${classLabel(characterClass)}` : spec,
+      value: `${characterClass}${SPEC_VALUE_SEPARATOR}${spec}`,
+      default: spec === current?.spec && characterClass === current.characterClass,
+    })),
+  );
+  const listed = options.some((option) => option.default);
+  const custom =
+    current === undefined || listed
+      ? []
+      : [{ label: current.spec, value: `${SPEC_VALUE_SEPARATOR}${current.spec}`, default: true }];
+  return [...custom, ...options].slice(0, MAX_OPTIONS);
+}
+
+/** The spec of an option, and its class when it is a usual spec. */
+function readSpec(value: string): { characterClass: string; spec: string } {
+  const [characterClass = "", ...spec] = value.split(SPEC_VALUE_SEPARATOR);
+  return { characterClass, spec: spec.join(SPEC_VALUE_SEPARATOR) };
+}
 
 /** One modal holds the whole sign-up: character, role, status and specialisation, filled with the current one. */
 export function signupForm(
@@ -35,7 +67,6 @@ export function signupForm(
     characters.find((character) => character.id === current?.characterId) ??
     characters.find((character) => character.isMain) ??
     characters[0];
-  const suggestions = SPEC_SUGGESTIONS[chosen?.characterClass ?? ""] ?? [];
   const status = current?.status ?? DEFAULT_STATUS;
   return {
     custom_id: `${SIGNUP_FORM_PREFIX}${event.id}`,
@@ -80,12 +111,9 @@ export function signupForm(
         type: ComponentType.Label,
         label: "Spécialisation",
         component: {
-          type: ComponentType.TextInput,
+          type: ComponentType.StringSelect,
           custom_id: FIELDS.spec,
-          style: TextInputStyle.Short,
-          max_length: MAX_SPEC_LENGTH,
-          value: current?.spec,
-          placeholder: suggestions.length > 0 ? `ex. ${suggestions.join(", ")}` : undefined,
+          options: specOptions(characters, chosen, current),
         },
       },
     ],
@@ -142,10 +170,16 @@ export async function submitSignupForm(
 ): Promise<APIInteractionResponse> {
   const values = submittedValues(interaction.data.components);
   const member = await actingMember(interaction, app);
+  const characterId = values.get(FIELDS.character) ?? "";
+  const { characterClass, spec } = readSpec(values.get(FIELDS.spec) ?? "");
+  const character = (await app.characters.listMine(member)).find((candidate) => candidate.id === characterId);
+  if (characterClass !== "" && character !== undefined && character.characterClass !== characterClass) {
+    return ephemeral(WRONG_CLASS_SPEC);
+  }
   await app.signups.signUp(member, eventId, {
-    characterId: values.get(FIELDS.character) ?? "",
+    characterId,
     role: values.get(FIELDS.role) ?? "",
-    spec: values.get(FIELDS.spec) ?? "",
+    spec,
     status: values.get(FIELDS.status) ?? "",
   });
   return ephemeral(await describeSignup(app, member, eventId));

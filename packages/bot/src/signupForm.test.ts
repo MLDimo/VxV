@@ -6,6 +6,7 @@ import {
   InteractionResponseType,
   type APIInteractionResponse,
   type APIModalInteractionResponseCallbackData,
+  type APISelectMenuOption,
 } from "discord-api-types/v10";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext } from "./commands.ts";
@@ -17,6 +18,7 @@ import { buttonClick, formSubmission, type TestActor } from "./testing.ts";
 const ME: TestActor = { userId: "200", name: "Déjà", channelId: "raids" };
 const NEWCOMER: TestActor = { userId: "300", name: "Nouveau", channelId: "raids" };
 const NEXT_YEAR = new Date().getUTCFullYear() + 1;
+const WRONG_CLASS = "Cette spécialisation n'est pas celle de la classe du personnage choisi : choisis-en une autre.";
 
 function contentOf(response: APIInteractionResponse): string | undefined {
   return "data" in response && response.data !== undefined && "content" in response.data
@@ -24,19 +26,21 @@ function contentOf(response: APIInteractionResponse): string | undefined {
     : undefined;
 }
 
-/** The value of each field of a form: the default option of a select, or the prefilled text. */
+/** The options of each select menu of a form, by field. */
+function selects(form: APIModalInteractionResponseCallbackData): Record<string, APISelectMenuOption[]> {
+  return Object.fromEntries(
+    form.components.flatMap((container) =>
+      container.type === ComponentType.Label && container.component.type === ComponentType.StringSelect
+        ? [[container.component.custom_id, container.component.options]]
+        : [],
+    ),
+  );
+}
+
+/** The option chosen in advance in each select menu. */
 function prefilled(form: APIModalInteractionResponseCallbackData): Record<string, string | undefined> {
   return Object.fromEntries(
-    form.components.flatMap((container) => {
-      if (container.type !== ComponentType.Label) {
-        return [];
-      }
-      const field = container.component;
-      if (field.type === ComponentType.StringSelect) {
-        return [[field.custom_id, field.options.find((option) => option.default)?.label]];
-      }
-      return field.type === ComponentType.TextInput ? [[field.custom_id, field.value ?? field.placeholder]] : [];
-    }),
+    Object.entries(selects(form)).map(([field, options]) => [field, options.find((option) => option.default)?.label]),
   );
 }
 
@@ -47,6 +51,8 @@ describe("sign-up by Discord buttons", () => {
   let context: BotContext;
   let eventId: string;
   let deja: Character;
+
+  const identifyMe = (): Promise<Member> => app.auth.identify({ discordId: ME.userId, discordName: ME.name }, []);
 
   beforeEach(async () => {
     ({ app, database, discord, context } = await createTestApplication(["Ðéjà;Vu;ROGUE", "Eole;Hermes;DRUID"]));
@@ -71,46 +77,79 @@ describe("sign-up by Discord buttons", () => {
     await database.close();
   });
 
-  const identifyMe = (): Promise<Member> => app.auth.identify({ discordId: ME.userId, discordName: ME.name }, []);
-  const open = (actor = ME) =>
+  const open = async (actor = ME) =>
     openSignupForm(buttonClick(`${SIGNUP_BUTTON_PREFIX}${eventId}`, actor), context, eventId);
   const formOf = (response: APIInteractionResponse) => {
     expect(response.type).toBe(InteractionResponseType.Modal);
     return (response as { data: APIModalInteractionResponseCallbackData }).data;
   };
-  const send = (selects: Record<string, string>, spec: string) =>
-    submitSignupForm(
-      formSubmission(`${SIGNUP_FORM_PREFIX}${eventId}`, { selects, texts: { spec } }, ME),
-      context,
-      eventId,
+  /** Sends the form with the given choices; "spec" is the value of a spec option. */
+  const send = async (choices: { role: string; status: string; spec: string }) =>
+    contentOf(
+      await submitSignupForm(
+        formSubmission(
+          `${SIGNUP_FORM_PREFIX}${eventId}`,
+          { selects: { character: deja.id, ...choices }, texts: {} },
+          ME,
+        ),
+        context,
+        eventId,
+      ),
     );
 
-  it("opens a form with the main chosen, present by default, and spec suggestions for the class", async () => {
+  it("opens a form with the main chosen, present by default, and the specs of the member's classes", async () => {
     const form = formOf(await open());
     expect(form.title).toBe("Inscription · Onyxia");
     expect(prefilled(form)).toEqual({
       character: "Ðéjà Vu · Voleur",
       role: undefined,
       status: "Présent",
-      spec: "ex. Assassinat, Combat, Finesse",
+      spec: undefined,
     });
+    expect(selects(form).spec?.map((option) => option.label)).toEqual([
+      "Assassinat · Voleur",
+      "Combat · Voleur",
+      "Finesse · Voleur",
+      "Équilibre · Druide",
+      "Combat farouche · Druide",
+      "Restauration · Druide",
+    ]);
   });
 
   it("saves the sign-up like the website, and updates the raid's message", async () => {
-    const reply = await send({ character: deja.id, role: "dps", status: "late" }, "Combat");
-    expect(contentOf(reply)).toBe("Inscription enregistrée : Ðéjà Vu, DPS (Combat), En retard.");
-    expect(await app.signups.findMine(await identifyMe(), eventId)).toMatchObject({ role: "dps", status: "late" });
+    expect(await send({ role: "dps", status: "late", spec: "ROGUE|Combat" })).toBe(
+      "Inscription enregistrée : Ðéjà Vu, DPS (Combat), En retard.",
+    );
+    expect(await app.signups.findMine(await identifyMe(), eventId)).toMatchObject({ role: "dps", spec: "Combat" });
     expect(JSON.stringify(discord.messages()[0]?.body)).toContain("Ðéjà Vu (Combat) ⏰");
   });
 
   it("fills the form with the current sign-up when the member comes back", async () => {
-    await send({ character: deja.id, role: "tank", status: "maybe" }, "Protection");
+    await send({ role: "tank", status: "maybe", spec: "ROGUE|Finesse" });
     expect(prefilled(formOf(await open()))).toEqual({
       character: "Ðéjà Vu · Voleur",
       role: "🛡️ Tank",
       status: "Peut-être",
-      spec: "Protection",
+      spec: "Finesse · Voleur",
     });
+  });
+
+  it("keeps a spec typed on the website, outside the usual ones", async () => {
+    await app.signups.signUp(await identifyMe(), eventId, {
+      characterId: deja.id,
+      role: "dps",
+      spec: "Dagues",
+      status: "present",
+    });
+    expect(prefilled(formOf(await open())).spec).toBe("Dagues");
+    expect(await send({ role: "dps", status: "present", spec: "|Dagues" })).toBe(
+      "Inscription enregistrée : Ðéjà Vu, DPS (Dagues), Présent.",
+    );
+  });
+
+  it("refuses a spec of another class than the chosen character's", async () => {
+    expect(await send({ role: "healer", status: "present", spec: "DRUID|Restauration" })).toBe(WRONG_CLASS);
+    expect(await app.signups.findMine(await identifyMe(), eventId)).toBeUndefined();
   });
 
   it("tells a member without character to link one first", async () => {
@@ -119,9 +158,7 @@ describe("sign-up by Discord buttons", () => {
     );
   });
 
-  it("refuses an incomplete form with the website's message", async () => {
-    await expect(send({ character: deja.id, role: "dps", status: "present" }, "  ")).rejects.toThrow(
-      /Indiquez votre spécialisation/,
-    );
+  it("refuses a form without spec with the website's message", async () => {
+    await expect(send({ role: "dps", status: "present", spec: "" })).rejects.toThrow(/Indiquez votre spécialisation/);
   });
 });
