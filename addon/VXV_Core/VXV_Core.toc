@@ -22,6 +22,7 @@ Core\Roster.lua
 Core\Serializer.lua
 Core\SendQueue.lua
 Core\Comm.lua
+Core\GroupChat.lua
 Core\Presence.lua
 
 # Interface: window, home tab, /vxv, minimap icon.

@@ -5,7 +5,7 @@ local _, ns = ...
 local RaidView = {}
 ns.RaidView = RaidView
 
-local Labels = ns.Labels
+local Labels, Reserves = ns.Labels, ns.Reserves
 
 local NO_EVENT = {
     "Aucun raid chargé pour l'instant.",
@@ -101,30 +101,9 @@ local function addMyReserves(rows, event, playerName)
     rows[#rows + 1] = row("line", "Tu n'es pas inscrit avec ce personnage.")
 end
 
---- Reservers of each item: { signup, bonus }, highest bonus first, then by name.
-local function reserversByItem(event)
-    local byItem = {}
-    for _, signup in ipairs(event.signups) do
-        for _, reserve in ipairs(signup.reserves) do
-            local list = byItem[reserve.itemId] or {}
-            list[#list + 1] = { signup = signup, bonus = reserve.bonus }
-            byItem[reserve.itemId] = list
-        end
-    end
-    for _, list in pairs(byItem) do
-        table.sort(list, function(left, right)
-            if left.bonus ~= right.bonus then
-                return left.bonus > right.bonus
-            end
-            return left.signup.name < right.signup.name
-        end)
-    end
-    return byItem
-end
-
 local function addRaidReserves(rows, event)
     rows[#rows + 1] = row("header", "SR du raid")
-    local byItem, any = reserversByItem(event), false
+    local byItem, any = Reserves.ByItem(event), false
     for _, itemId in ipairs(event.itemOrder) do
         local reservers = byItem[itemId]
         if reservers ~= nil then

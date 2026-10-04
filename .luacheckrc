@@ -12,6 +12,7 @@ globals = {
     "VXV",
     "VXV_Window",
     "VXV_TextWindow",
+    "VXV_LootPanel",
     "SLASH_VXV1",
     "SLASH_VXVPROBE1",
     "SlashCmdList",

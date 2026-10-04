@@ -7,10 +7,10 @@ local _, ns = ...
 local Invitations = {}
 ns.Invitations = Invitations
 
-local Labels, RaidData = ns.Labels, ns.RaidData
+local Group, Labels, RaidData = ns.Group, ns.Labels, ns.RaidData
 
 local OPEN, JOIN, REPLY, ASK = "raid.open", "raid.join", "raid.reply", "raid.ask"
-local MAX_PARTY, MAX_RAID = 5, 40
+local MAX_PARTY, MAX_RAID = Group.MAX_PARTY, Group.MAX_RAID
 local INVITE_GAP_SECONDS = 0.2
 local ANSWER_WAIT_SECONDS = 10
 
@@ -44,22 +44,6 @@ end
 
 local function changed()
     VXV.Emit("raid.invitations")
-end
-
---- Names of the players in the group, this player included.
-local function groupNames()
-    local names = {}
-    local unit, count = "party", MAX_PARTY - 1
-    if IsInRaid() then
-        unit, count = "raid", GetNumGroupMembers()
-    end
-    for index = 1, IsInGroup() and count or 0 do
-        local name = VXV.NameOfUnit(unit .. index)
-        if name ~= nil then
-            names[name] = true
-        end
-    end
-    return names
 end
 
 local function canInvite()
@@ -103,7 +87,7 @@ local function pump()
         return
     end
     table.remove(queue, 1)
-    if not groupNames()[name] then
+    if not Group.Names()[name] then
         C_PartyInfo.InviteUnit(name)
         if not IsInRaid() then
             invitedBeforeRaid = invitedBeforeRaid + 1
@@ -192,7 +176,7 @@ function Invitations.InviteAll()
     if leader ~= me() then
         open()
     end
-    local online, inGroup, offline, invited = onlineNames(), groupNames(), {}, 0
+    local online, inGroup, offline, invited = onlineNames(), Group.Names(), {}, 0
     for _, signup in ipairs(RaidData.Current().signups) do
         if Invitations.IsAutomatic(signup) and signup.name ~= me() and not inGroup[signup.name] then
             if online[signup.name] then
@@ -228,7 +212,7 @@ function Invitations.Join()
         VXV.Print(NOT_OPEN)
         return
     end
-    if groupNames()[leader] then
+    if Group.Names()[leader] then
         VXV.Print(ALREADY)
         return
     end
@@ -259,7 +243,7 @@ local function addRequest(name, reason)
 end
 
 local function answerJoin(sender)
-    if groupNames()[sender] then
+    if Group.Names()[sender] then
         return ALREADY
     end
     if IsInRaid() and GetNumGroupMembers() >= MAX_RAID then

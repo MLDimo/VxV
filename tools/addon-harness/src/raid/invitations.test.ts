@@ -89,7 +89,7 @@ describe("forming the raid", () => {
 
     const officer = guild.player(OFFICER);
     const requestRow = `FindWidget(VXV_Window, function(widget)
-        return widget.invite == "Aube Claire" and widget.shown
+        return widget.row ~= nil and widget.row.invite == "Aube Claire" and widget.shown
     end)`;
     expect(officer.client(`return ${requestRow}.label.text`)).toBe("Aube Claire · pas inscrit");
     officer.client(`${requestRow}:Run("OnMouseUp")`);

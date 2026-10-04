@@ -22,6 +22,8 @@ local ALIASES = {
     RegisterAddonMessagePrefix = { "C_ChatInfo.RegisterAddonMessagePrefix", "RegisterAddonMessagePrefix" },
     SendAddonMessage = { "C_ChatInfo.SendAddonMessage", "SendAddonMessage" },
     InChatMessagingLockdown = { "C_ChatInfo.InChatMessagingLockdown" },
+    SendChatMessage = { "C_ChatInfo.SendChatMessage", "SendChatMessage" },
+    RandomRoll = { "RandomRoll" },
     -- Loot
     GetLootMethod = { "C_PartyInfo.GetLootMethod", "GetLootMethod" },
     IsMasterLooter = { "IsMasterLooter" },
