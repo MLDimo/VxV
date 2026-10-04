@@ -8,6 +8,8 @@ globals = {
     "VXV_ProbeDB",
     "VXV_ProbeInbox",
     "VXV_RaidData",
+    "VXV_DB",
+    "VXV",
     "SLASH_VXVPROBE1",
     "SlashCmdList",
     "UISpecialFrames",
@@ -21,5 +23,5 @@ read_globals = {
     "GiveMasterLoot", "InCombatLockdown", "IsInGroup", "IsInGuild", "IsInInstance", "IsInRaid",
     "LE_PARTY_CATEGORY_INSTANCE", "RANDOM_ROLL_RESULT", "ScrollUtil", "UIParent", "UnitFullName",
     "UnitIsDeadOrGhost", "UnitIsGroupAssistant", "UnitIsGroupLeader", "UnitIsPlayer", "UnitName",
-    "date", "hooksecurefunc", "issecretvalue", "strsplit", "time",
+    "date", "geterrorhandler", "hooksecurefunc", "issecretvalue", "strsplit", "time",
 }
