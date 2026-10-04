@@ -1,4 +1,5 @@
 import { GUILD_TIME_ZONE } from "./dateTime.ts";
+import type { LootMethod } from "./history.ts";
 import type { SignupRole, SignupStatus } from "./signups.ts";
 
 /** French wording shared by the website and the bot. */
@@ -34,6 +35,17 @@ export function formatEventDate(date: Date): string {
   return EVENT_DATE.format(date);
 }
 
+const MS_PER_MINUTE = 60 * 1000;
+const MINUTES_PER_HOUR = 60;
+
+/** "1 h 05", "45 min". */
+export function formatDuration(durationMs: number): string {
+  const minutes = Math.round(durationMs / MS_PER_MINUTE);
+  const hours = Math.floor(minutes / MINUTES_PER_HOUR);
+  const rest = minutes % MINUTES_PER_HOUR;
+  return hours > 0 ? `${String(hours)} h ${String(rest).padStart(2, "0")}` : `${String(minutes)} min`;
+}
+
 /** Raids of an evening joined in one title: "Onyxia + Mont Hyjal". */
 export function raidTitle(raidNames: readonly string[]): string {
   return raidNames.join(" + ");
@@ -43,6 +55,13 @@ export const ROLE_LABELS: Record<SignupRole, { label: string; icon: string }> = 
   tank: { label: "Tank", icon: "🛡️" },
   healer: { label: "Soigneur", icon: "✚" },
   dps: { label: "DPS", icon: "⚔️" },
+};
+
+export const LOOT_METHOD_LABELS: Record<LootMethod, string> = {
+  soft_reserve: "SR",
+  soft_reserve_plus: "SR+",
+  free_roll: "Roll libre",
+  loot_council: "Loot council",
 };
 
 export const STATUS_LABELS: Record<SignupStatus, string> = {

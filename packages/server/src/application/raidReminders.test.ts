@@ -27,6 +27,7 @@ describe("raid reminders", () => {
       remind: async (reminder) => {
         reminded.push(reminder);
       },
+      recap: async () => {},
     };
     reminders = createRaidReminders({ unitOfWork: createUnitOfWork(sql), announcer });
     await createRaidWithLoot(sql);

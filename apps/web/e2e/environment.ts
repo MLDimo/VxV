@@ -69,4 +69,6 @@ export interface E2ESeed {
   historyEventId: string;
   /** Event where Dune Sable reserves an item missed at an earlier raid: SR+ +10. */
   bonusEventId: string;
+  /** Event without sign-ups, whose raid log the tests import. */
+  raidLogEventId: string;
 }

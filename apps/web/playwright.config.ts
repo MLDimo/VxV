@@ -10,9 +10,10 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: { baseURL: `http://localhost:${WEB_PORT}` },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // Discord first: preparing the database imports raid logs, whose recap the bot publishes.
   webServer: [
-    { command: "tsx e2e/databaseServer.ts", port: DATABASE_PORT, reuseExistingServer: false },
     { command: "tsx e2e/fakeDiscordServer.ts", port: FAKE_DISCORD_PORT, reuseExistingServer: false },
+    { command: "tsx e2e/databaseServer.ts", port: DATABASE_PORT, reuseExistingServer: false },
     {
       command: `next start --port ${WEB_PORT}`,
       url: `http://localhost:${WEB_PORT}/connexion`,

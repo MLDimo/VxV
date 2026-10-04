@@ -2,6 +2,7 @@ export { createApplication, type Application, type ApplicationConfig } from "./a
 export { SESSION_DURATION_MS, type SignedIn } from "./application/auth.ts";
 export { ApplicationError, ForbiddenError, ValidationError } from "./application/errors.ts";
 export type { DiscordIdentity } from "./application/ports.ts";
+export type { RaidLogImportSummary } from "./application/raidLogs.ts";
 export type { SoftReserveBoard } from "./application/softReserves.ts";
 export { fullName, type Character } from "./domain/characters.ts";
 export {
@@ -26,6 +27,7 @@ export type {
   SoftReserveOverrideRecord,
 } from "./domain/journal.ts";
 export { ROSTER_HEADER, RosterFormatError, type RosterImportSummary } from "./domain/roster.ts";
+export { TextFormatError } from "./domain/textFormat.ts";
 export {
   composition,
   MAX_SPEC_LENGTH,
@@ -49,6 +51,8 @@ export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/disc
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
 export type { AnnouncedRaid, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+export { RaidLogFormatError } from "./domain/raidLog.ts";
+export type { RaidRecap } from "./domain/raidRecap.ts";
 export type { RaidReminder } from "./domain/reminders.ts";
 export {
   createDiscordRest,

@@ -67,6 +67,18 @@ export function eventRepository(sql: SqlClient): EventRepository {
       await sql.query("update events set reminded_at = $2 where id = $1", [eventId, at]);
     },
 
+    async isRecapPosted(eventId) {
+      const rows = await sql.query<{ posted: boolean }>(
+        "select recap_posted_at is not null as posted from events where id = $1",
+        [eventId],
+      );
+      return rows[0]?.posted ?? false;
+    },
+
+    async markRecapPosted(eventId, at) {
+      await sql.query("update events set recap_posted_at = $2 where id = $1", [eventId, at]);
+    },
+
     async listStartingAfter(instant) {
       const rows = await sql.query<EventRow>(
         `${SELECT_EVENTS} where events.starts_at > $1 group by events.id order by events.starts_at`,

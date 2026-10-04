@@ -1,11 +1,11 @@
 import "server-only";
-import { ApplicationError, RosterFormatError } from "@vxv/server";
+import { ApplicationError, TextFormatError } from "@vxv/server";
 import { revalidatePath } from "next/cache";
 import type { ActionState } from "@/components/actionState";
 
 /** Turns a refusal of the application into messages for the user; unexpected errors keep propagating. */
 export function toErrorState(error: unknown): ActionState {
-  if (error instanceof RosterFormatError) {
+  if (error instanceof TextFormatError) {
     return { status: "error", messages: [...error.problems] };
   }
   if (error instanceof ApplicationError) {

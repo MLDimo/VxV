@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AddonExport } from "@/components/AddonExport";
 import { EventSignups } from "@/components/EventSignups";
 import { ExclusionForm } from "@/components/ExclusionForm";
+import { RaidLogImportForm } from "@/components/RaidLogImportForm";
 import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@/components/format";
 import { SignupForm } from "@/components/SignupForm";
 import { SoftReserveBoardForm } from "@/components/SoftReserveBoardForm";
@@ -75,6 +76,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             chaque changement, au plus tard une fois les SR verrouillées.
           </p>
           <AddonExport text={addonText} />
+          <h3 className="mt-8 font-semibold">Après le raid</h3>
+          <p className="mt-1 text-sm text-zinc-400">
+            Collez le journal exporté par l&apos;addon (onglet Butin) : présents et objets donnés sont enregistrés, et
+            le récap part sur Discord. Un nouvel import n&apos;ajoute que ce qui manque.
+          </p>
+          <RaidLogImportForm eventId={event.id} />
         </section>
       )}
 

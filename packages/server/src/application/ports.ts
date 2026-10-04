@@ -3,6 +3,7 @@ import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
+import type { RaidRecap } from "../domain/raidRecap.ts";
 import type { RaidReminder, ReminderTarget } from "../domain/reminders.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
@@ -62,6 +63,8 @@ export interface JournalRepository {
 export interface RaidRepository {
   /** Raids known from data/raids, by name. */
   listAll(): Promise<RaidSummary[]>;
+  /** Bosses of these raids, by raid then position. */
+  listBosses(raidIds: readonly string[]): Promise<{ encounterId: number; name: string }[]>;
 }
 
 export interface EventRepository {
@@ -73,6 +76,9 @@ export interface EventRepository {
   /** Events starting after "from" and up to "until" that were not reminded yet, soonest first. */
   listToRemind(from: Date, until: Date): Promise<RaidEvent[]>;
   markReminded(eventId: string, at: Date): Promise<void>;
+  /** Whether the raid's recap was published on Discord already. */
+  isRecapPosted(eventId: string): Promise<boolean>;
+  markRecapPosted(eventId: string, at: Date): Promise<void>;
 }
 
 export interface SignupRepository {
@@ -114,6 +120,23 @@ export interface ExclusionRepository {
   remove(eventId: string, itemId: number): Promise<void>;
 }
 
+/** A give read in a raid's log, matched with the guild's characters. */
+export interface NewLoot {
+  encounterId: number;
+  itemId: number;
+  characterId: string;
+  method: LootMethod;
+  lootedAt: Date;
+}
+
+/** What the addon recorded during a raid: who was present, and the items given. */
+export interface RaidRecordRepository {
+  /** Characters present at the event; those already recorded stay. */
+  recordAttendance(eventId: string, characterIds: readonly string[]): Promise<void>;
+  /** Adds the gives the event does not have yet (same item, boss and instant), and returns those added. */
+  addLoots(eventId: string, loots: readonly NewLoot[]): Promise<NewLoot[]>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
@@ -126,6 +149,7 @@ export interface Repositories {
   lootHistory: LootHistoryRepository;
   softReserves: SoftReserveRepository;
   exclusions: ExclusionRepository;
+  raidRecords: RaidRecordRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */
@@ -157,4 +181,6 @@ export interface RaidAnnouncer {
   update(messageId: string, raid: AnnouncedRaid): Promise<boolean>;
   /** Reminds the signed-up members of the raid, in the raid channel. */
   remind(reminder: RaidReminder): Promise<void>;
+  /** Publishes the end-of-raid recap, in the raid channel. */
+  recap(recap: RaidRecap): Promise<void>;
 }

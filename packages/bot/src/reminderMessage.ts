@@ -2,11 +2,9 @@ import type { RaidReminder } from "@vxv/server";
 import { raidTitle } from "@vxv/server/domain/labels";
 import { softReservesLockAt } from "@vxv/server/domain/softReserves";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
+import { timestamp } from "./discordText.ts";
 import { eventUrl } from "./raidMessage.ts";
 
-const MS_PER_SECOND = 1000;
-
-const timestamp = (date: Date, style: "F" | "R" | "t") => `<t:${Math.floor(date.getTime() / MS_PER_SECOND)}:${style}>`;
 const mentions = (discordIds: readonly string[]) => discordIds.map((discordId) => `<@${discordId}>`).join(" ");
 
 /** The reminder of a raid: who is expected, and who still has soft reserves to choose before the lock. */

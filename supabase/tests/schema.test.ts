@@ -134,6 +134,24 @@ describe("initial schema", () => {
       await expect(recordLoot("gift")).rejects.toThrow(/invalid input value/);
       await expect(recordLoot("free_roll")).resolves.toBeDefined();
     });
+
+    it("records a give once: same item of the same boss at the same instant, whoever won it", async () => {
+      const { encounterId } = await insertRaidWithBoss(database);
+      const memberId = await insertMember(database, "1");
+      const deja = await insertCharacter(database, { firstName: "Ðéjà", lastName: "Vu", memberId });
+      const thom = await insertCharacter(database, { firstName: "Thom", lastName: "Leboss" });
+      const eventId = await insertEvent(database, memberId);
+      const give = (characterId: string, lootedAt: string) =>
+        database.query(
+          `insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
+           values ($1, $2, $3, $4, 'free_roll', $5)`,
+          [eventId, encounterId, ONYXIA_HEAD_ITEM_ID, characterId, lootedAt],
+        );
+
+      await expect(give(deja, "2026-12-10T21:00:00Z")).resolves.toBeDefined();
+      await expect(give(thom, "2026-12-10T21:00:00Z")).rejects.toThrow(/loots_one_give/);
+      await expect(give(thom, "2026-12-10T21:05:00Z")).resolves.toBeDefined();
+    });
   });
 
   describe("attendance", () => {

@@ -2,7 +2,7 @@ import { SOFT_RESERVE_METHODS, softReserveRespected, type LootRecord } from "@vx
 import Link from "next/link";
 import { CharacterName } from "@/components/CharacterName";
 import { formatDateTime, formatEventDate, raidTitle } from "@/components/format";
-import { LOOT_METHOD_LABELS } from "@/components/lootLabels";
+import { LOOT_METHOD_LABELS } from "@vxv/server/domain/labels";
 import { getApplication } from "@/server/application";
 
 const SOFT_RESERVE_FILTER = "sr";

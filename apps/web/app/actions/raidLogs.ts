@@ -1,0 +1,21 @@
+"use server";
+
+import type { ActionState } from "@/components/actionState";
+import { describeRaidLogImport } from "@vxv/server/domain/journalDescriptions";
+import { getApplication } from "@/server/application";
+import { runFormAction } from "@/server/formActions";
+import { requireOfficer } from "@/server/session";
+
+export async function importRaidLog(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const officer = await requireOfficer();
+  const eventId = String(form.get("eventId") ?? "");
+  return runFormAction(async () => {
+    const summary = await getApplication().raidLogs.importLog(
+      officer,
+      eventId,
+      String(form.get("log") ?? ""),
+      String(form.get("reason") ?? ""),
+    );
+    return `Journal importé : ${describeRaidLogImport(summary)}.`;
+  }, [`/evenements/${eventId}`, "/historique", "/journal"]);
+}
