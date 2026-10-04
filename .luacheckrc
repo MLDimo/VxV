@@ -10,6 +10,8 @@ globals = {
     "VXV_RaidData",
     "VXV_DB",
     "VXV",
+    "VXV_Window",
+    "SLASH_VXV1",
     "SLASH_VXVPROBE1",
     "SlashCmdList",
     "UISpecialFrames",

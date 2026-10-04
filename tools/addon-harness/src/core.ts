@@ -28,7 +28,11 @@ export function startCore({ savedVariables, beforeLogin = false }: CoreStart = {
     core,
     client,
     newGlobals,
-    errors: () => client("return ReportedErrors"),
+    /** Errors reported to the game's error handler (BugSack), always as a list. */
+    errors: (): string[] => {
+      const reported = client("return ReportedErrors");
+      return Array.isArray(reported) ? reported.map(String) : [];
+    },
     registeredEvents: () => Object.keys(client("return RegisteredEvents") as Record<string, boolean>).sort(),
   };
 }

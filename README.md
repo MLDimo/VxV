@@ -34,6 +34,7 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `tools/VXV_Probe` | Addon de test de la Phase 0, jamais distribué | P0 |
 | `tools/addon-harness` | Banc d'essai des addons hors du jeu, sur un client simulé (`npm test`), et export du journal de la sonde (`npm run export:probe -- <fichier>`) | P0, P4 |
 | `tools/install-probe.sh` | Copie la sonde dans le dossier AddOns d'un client | P0 |
+| `tools/install-addon.sh` | Construit l'addon comme une publication (version de développement) et l'installe dans un client | P4 |
 | `tools/write-inbox.sh` | Simule le compagnon pour le test fichiers | P0 |
 | `tools/deploy-database.sh` | Déploie la base : migrations puis données de raid ([environnements](docs/environnements.md)) | P1.7 |
 | `docs/` | Rapports, protocoles et notices | toutes |

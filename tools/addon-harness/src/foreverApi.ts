@@ -80,4 +80,7 @@ export function foreverApi(): Set<string> {
 }
 
 /** Compat wrappers whose functions phase 0 did not measure: to confirm during the in-game validation of P4. */
-export const NOT_YET_MEASURED = new Set(["GetGuildInfo", "UnitClass"]);
+export const NOT_YET_MEASURED = new Set(["GetGuildInfo", "UnitClass", "GetCursorPosition"]);
+
+/** Compat wrappers for functions that other addons define, absent from a client without them. */
+export const OPTIONAL_API = new Set(["GetMinimapShape"]);

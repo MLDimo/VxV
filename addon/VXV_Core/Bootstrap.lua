@@ -10,4 +10,5 @@ end)
 
 ns.Events.On("PLAYER_LOGIN", function()
     ns.Modules.Start()
+    ns.MinimapButton.Create()
 end)
