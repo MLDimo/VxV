@@ -18,12 +18,12 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - inscription par bouton, synchronisée avec le site dans les deux sens ;
   - rappel quotidien (tâche Vercel, 8 h UTC).
   Validation en attente : essai réel sur le serveur avec un second compte.
-- **P4 Addon : VXV_Core** : code terminé (`addon/VXV_Core`, 53 tests du banc `tools/addon-harness`) :
+- **P4 Addon : VXV_Core** : code terminé (`addon/VXV_Core`, 55 tests du banc `tools/addon-harness`) :
   - 4.1 socle (modules, bus, stockage versionné) et 4.2 Compat sur les API mesurées en P0 ;
   - 4.3 interface : fenêtre à onglets, `/vxv`, icône de minimap ;
   - 4.6 communication : morceaux de 255 octets, file 10 + 1/s et pause pendant les boss, versions, présence, `/vxv ping` ;
   - 4.7 filtre de guilde et export `/vxv liste`.
-  Compression et relais entre joueurs reportés à la synchro de la P7, leur premier usage. Validation en attente : noms exacts de la guilde (`Core/Config.lua`, provisoire), puis essai en jeu à deux joueurs au moins avant la fin de la bêta (21 octobre). Installation : `tools/install-addon.sh`.
+  Compression et relais entre joueurs reportés à la synchro de la P7, leur premier usage. Guildes autorisées dans `Core/Config.lua` : VXV (Forever) et THE DALIRANAS (bêta). Validation en attente : essai en jeu à deux joueurs au moins avant la fin de la bêta (21 octobre). Installation : `tools/install-addon.sh`.
 - P5 à P15 : pas commencées.
 
 ## Structure du dépôt
