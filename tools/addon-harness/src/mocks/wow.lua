@@ -42,3 +42,9 @@ function geterrorhandler()
         ReportedErrors[#ReportedErrors + 1] = tostring(message)
     end
 end
+
+--- A value the client flags as secret (Midnight-era restriction), as returned for enemy names in combat.
+SECRET = setmetatable({}, { __tostring = function() return "SECRET" end })
+function issecretvalue(value)
+    return value == SECRET
+end

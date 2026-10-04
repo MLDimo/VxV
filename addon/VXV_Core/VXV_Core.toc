@@ -6,11 +6,14 @@
 ## SavedVariables: VXV_DB
 
 # Core: generic tooling, no feature logic.
+Core\Util.lua
+Core\Compat.lua
 Core\Call.lua
 Core\Events.lua
 Core\Bus.lua
 Core\Storage.lua
 Core\Modules.lua
+Core\Names.lua
 Core\Api.lua
 
 Bootstrap.lua
