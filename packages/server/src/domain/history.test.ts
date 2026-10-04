@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { softReserveRespected, type LootRecord } from "./history.ts";
 
 const loot: LootRecord = {
+  id: "l1",
   eventId: "e",
   eventStartsAt: new Date(),
   raids: ["Onyxia"],

@@ -1,3 +1,5 @@
+import type { LootMethod } from "./history.ts";
+
 /** Officer actions recorded in the journal. Each new officer action adds its name here. */
 export type JournalAction =
   | "roster.import"
@@ -6,7 +8,8 @@ export type JournalAction =
   | "exclusion.remove"
   | "softReserve.override"
   | "raid.import"
-  | "loot.council";
+  | "loot.council"
+  | "loot.correct";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -58,6 +61,15 @@ export interface LootCouncilRecord {
   characterName: string;
   raids: string[];
   eventStartsAt: string;
+}
+
+/** What the journal keeps about an officer's correction of a loot: winner and method, before and after. */
+export interface LootCorrectionRecord {
+  itemName: string;
+  raids: string[];
+  eventStartsAt: string;
+  before: { winnerName: string; method: LootMethod };
+  after: { winnerName: string; method: LootMethod };
 }
 
 /** What the journal keeps about an officer's correction of a player's soft reserves. */

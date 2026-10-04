@@ -87,12 +87,12 @@ await app.signups.signUp(lockedMember.member, lockedEventId, {
   spec: "Précision",
   status: "present",
 });
-const brassards = 271096;
+const BRASSARDS = 271096;
 await app.softReserves.override(
   officer.member,
   lockedEventId,
   duneSable.id,
-  [String(brassards)],
+  [String(BRASSARDS)],
   "SR de départ des tests",
 );
 
@@ -143,7 +143,14 @@ const reserveJambieres = async (eventId: string) => {
 };
 const bonusPastEventId = await createThanesEvent("2031-03-05T20:00:00Z", "Raid précédent des tests de SR+");
 await reserveJambieres(bonusPastEventId);
-await importRaidLog(bonusPastEventId, ["P;Dune Sable"], "Raid précédent des tests de SR+");
+// The Brassards given to Ciel Gris at that raid are the loot the correction tests correct.
+const FALDRIM = 3493;
+const PAST_RAID_NIGHT = Date.UTC(2031, 2, 5, 21) / 1000;
+await importRaidLog(
+  bonusPastEventId,
+  ["P;Dune Sable", `L;${String(FALDRIM)};${String(BRASSARDS)};Ciel Gris;free_roll;${String(PAST_RAID_NIGHT)}`],
+  "Raid précédent des tests de SR+",
+);
 const bonusEventId = await createThanesEvent("2031-03-12T20:00:00Z", "Événement des tests de SR+");
 await reserveJambieres(bonusEventId);
 const raidLogEventId = await createThanesEvent("2031-04-02T20:00:00Z", "Événement des tests du journal de raid");

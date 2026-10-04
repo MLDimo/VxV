@@ -1,9 +1,11 @@
-import { SOFT_RESERVE_METHODS, softReserveRespected, type LootRecord } from "@vxv/server";
+import { canManageRaids, fullName, SOFT_RESERVE_METHODS, softReserveRespected, type LootRecord } from "@vxv/server";
 import Link from "next/link";
 import { CharacterName } from "@/components/CharacterName";
+import { LootCorrectionForm } from "@/components/LootCorrectionForm";
 import { formatDateTime, formatEventDate, raidTitle } from "@/components/format";
 import { LOOT_METHOD_LABELS } from "@vxv/server/domain/labels";
 import { getApplication } from "@/server/application";
+import { requireMember } from "@/server/session";
 
 const SOFT_RESERVE_FILTER = "sr";
 
@@ -54,8 +56,15 @@ function SoftReserveOutcome({ loot }: { loot: LootRecord }) {
 }
 
 export default async function HistoryPage({ searchParams }: { searchParams: Promise<{ filtre?: string }> }) {
-  const softReserveOnly = (await searchParams).filtre === SOFT_RESERVE_FILTER;
-  const events = groupByEvent(await getApplication().history.listLoots({ softReserveOnly }));
+  const [{ filtre }, member] = await Promise.all([searchParams, requireMember()]);
+  const softReserveOnly = filtre === SOFT_RESERVE_FILTER;
+  const { history, characters } = getApplication();
+  const isOfficer = canManageRaids(member.roles);
+  const [loots, guild] = await Promise.all([
+    history.listLoots({ softReserveOnly }),
+    isOfficer ? characters.listInGuild() : [],
+  ]);
+  const events = groupByEvent(loots);
   return (
     <>
       <h1 className="text-2xl font-bold">Historique des loots</h1>
@@ -68,6 +77,21 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
           SR uniquement
         </FilterLink>
       </nav>
+      {isOfficer && loots.length > 0 && (
+        <section className="mt-6 rounded border border-amber-900/60 p-4">
+          <h2 className="text-lg font-semibold">Officiers · corriger un loot</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Chaque correction est inscrite au journal, et un nouvel import du journal du raid la garde.
+          </p>
+          <LootCorrectionForm
+            loots={loots.map((loot) => ({
+              id: loot.id,
+              label: `${loot.itemName} · ${loot.winnerName} (${LOOT_METHOD_LABELS[loot.method]}) · ${formatDateTime(loot.lootedAt)}`,
+            }))}
+            characters={guild.map((character) => ({ id: character.id, name: fullName(character) }))}
+          />
+        </section>
+      )}
       {events.length === 0 ? (
         <p className="mt-8 text-zinc-500">Aucun loot enregistré pour l&apos;instant.</p>
       ) : (

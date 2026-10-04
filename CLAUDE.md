@@ -30,7 +30,13 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - diffusion à la guilde, relais vers qui se connecte plus tard, avertissement des modifications, rappel aux officiers quand leurs données datent d'avant le verrouillage des SR ;
   - invitations : ouverture par un officier, Rejoindre (invitation automatique des inscrits attendus avec leur personnage principal, demandes pour les autres), Inviter tout le roster, passage en raid à la première acceptation.
   Validation en attente : essai en jeu à deux joueurs au moins avant la fin de la bêta, puis un raid de 40 formé sans invitation manuelle.
-- P6 à P15 : pas commencées.
+- **P6 Assistant d'attribution + historique** : code terminé (bundle `addon/VXV_Raid`, 100 tests du banc ; import du journal et corrections sur le site) :
+  - butin du boss montré à tout le raid avec ses SR, quand le maître du butin ouvre le corps ;
+  - attribution selon les règles du plan (une SR : sans roll ; plusieurs : roll entre elles avec SR+ ; aucune : roll libre ; objet exclu : loot council), message pour chacun, rolls suivis en direct, annonces dans le canal du groupe, don d'un clic ;
+  - journal du raid en jeu (boss, présents, morts, objets, diffusé par le maître du butin), onglet Butin, export `VXV-LOG-1` ;
+  - import du journal sur le site (présents et objets, qui nourrissent le SR+), corrections par un officier avec motif, récap de fin de raid publié par le bot.
+  Validation en attente : un raid réel enregistré sans saisie manuelle (raids ouverts le 9 décembre ; répétition en donjon avec maître du butin possible avant la fin de la bêta).
+- P7 à P15 : pas commencées.
 
 ## Structure du dépôt
 

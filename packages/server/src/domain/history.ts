@@ -8,6 +8,7 @@ export const SOFT_RESERVE_METHODS: readonly LootMethod[] = ["soft_reserve", "sof
 
 /** A loot of a past raid, with how it was given and who had soft-reserved the item for that event. */
 export interface LootRecord {
+  id: string;
   eventId: string;
   eventStartsAt: Date;
   raids: string[];

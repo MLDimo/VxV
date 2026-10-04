@@ -1,4 +1,4 @@
-import type { Character } from "../domain/characters.ts";
+import { fullName, type Character } from "../domain/characters.ts";
 import { linkRefusal, ownershipRefusal } from "../domain/characterLinks.ts";
 import type { Member } from "../domain/members.ts";
 import { ValidationError } from "./errors.ts";
@@ -23,6 +23,14 @@ export function createCharacters({ unitOfWork }: { unitOfWork: UnitOfWork }) {
 
     listAvailable(): Promise<Character[]> {
       return unitOfWork.run(({ characters }) => characters.listAvailable());
+    },
+
+    /** The guild's characters, by name: whom an officer may name as a loot's winner. */
+    async listInGuild(): Promise<Character[]> {
+      const all = await unitOfWork.run(({ characters }) => characters.listAll());
+      return all
+        .filter((character) => character.inGuild)
+        .sort((left, right) => fullName(left).localeCompare(fullName(right)));
     },
 
     link(member: Member, characterId: string, asMain: boolean): Promise<void> {
