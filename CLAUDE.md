@@ -18,7 +18,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - inscription par bouton, synchronisée avec le site dans les deux sens ;
   - rappel quotidien (tâche Vercel, 8 h UTC).
   Validation en attente : essai réel sur le serveur avec un second compte.
-- **P4 Addon : VXV_Core** : en cours. 4.1 socle (bundle `addon/VXV_Core`, modules, bus, stockage versionné, banc d'essai `tools/addon-harness`).
+- **P4 Addon : VXV_Core** : en cours. 4.1 socle (bundle `addon/VXV_Core`, modules, bus, stockage versionné, banc d'essai `tools/addon-harness`), 4.2 couche Compat (API mesurées en P0 ; `GetGuildInfo` et `UnitClass` à confirmer en jeu).
 - P5 à P15 : pas commencées.
 
 ## Structure du dépôt
