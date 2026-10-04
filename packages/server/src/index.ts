@@ -2,9 +2,7 @@ export { createApplication, type Application, type ApplicationConfig } from "./a
 export { SESSION_DURATION_MS, type SignedIn } from "./application/auth.ts";
 export { ApplicationError, ForbiddenError, ValidationError } from "./application/errors.ts";
 export type { DiscordIdentity } from "./application/ports.ts";
-export type { EventCreationRecord } from "./application/events.ts";
-export type { ExclusionRecord } from "./application/exclusions.ts";
-export type { SoftReserveBoard, SoftReserveOverrideRecord } from "./application/softReserves.ts";
+export type { SoftReserveBoard } from "./application/softReserves.ts";
 export { fullName, type Character } from "./domain/characters.ts";
 export {
   LOOT_METHODS,
@@ -20,7 +18,13 @@ export {
   type RaidEvent,
   type RaidSummary,
 } from "./domain/events.ts";
-export type { JournalAction, JournalEntry } from "./domain/journal.ts";
+export type {
+  EventCreationRecord,
+  ExclusionRecord,
+  JournalAction,
+  JournalEntry,
+  SoftReserveOverrideRecord,
+} from "./domain/journal.ts";
 export { ROSTER_HEADER, RosterFormatError, type RosterImportSummary } from "./domain/roster.ts";
 export {
   composition,

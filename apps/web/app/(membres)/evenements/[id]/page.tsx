@@ -1,6 +1,7 @@
 import { canManageRaids, fullName, MAX_SPEC_LENGTH } from "@vxv/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AddonExport } from "@/components/AddonExport";
 import { EventSignups } from "@/components/EventSignups";
 import { ExclusionForm } from "@/components/ExclusionForm";
 import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@/components/format";
@@ -12,15 +13,17 @@ import { requireMember } from "@/server/session";
 
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, member] = await Promise.all([params, requireMember()]);
-  const { events, signups, characters, softReserves } = getApplication();
+  const { events, signups, characters, softReserves, addonExport } = getApplication();
   const event = await events.getEvent(id);
   if (event === undefined) {
     notFound();
   }
-  const [eventSignups, board, ownCharacters] = await Promise.all([
+  const isOfficer = canManageRaids(member.roles);
+  const [eventSignups, board, ownCharacters, addonText] = await Promise.all([
     signups.listForEvent(event.id),
     softReserves.getBoard(member, event.id),
     characters.listMine(member),
+    isOfficer ? addonExport.exportEvent(member, event.id) : undefined,
   ]);
   if (board === undefined) {
     notFound();
@@ -64,7 +67,18 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         />
       </section>
 
-      {canManageRaids(member.roles) && (
+      {addonText !== undefined && (
+        <section className="mt-8 rounded border border-amber-900/60 p-4">
+          <h2 className="text-lg font-semibold">Officiers · addon</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Collez ces données dans l&apos;addon : il les transmet à toute la guilde connectée. Recopiez-les après
+            chaque changement, au plus tard une fois les SR verrouillées.
+          </p>
+          <AddonExport text={addonText} />
+        </section>
+      )}
+
+      {isOfficer && (
         <section className="mt-8 rounded border border-amber-900/60 p-4">
           <h2 className="text-lg font-semibold">Officiers · exclusions et corrections</h2>
           <p className="mt-1 text-sm text-zinc-400">
