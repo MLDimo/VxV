@@ -5,12 +5,15 @@ local _, ns = ...
 local Storage = {}
 ns.Storage = Storage
 
-local SCHEMA_VERSION = 1
+local SCHEMA_VERSION = 2
 
 --- MIGRATIONS[n] upgrades the data saved with schema n - 1 to schema n. A published migration never changes.
 local MIGRATIONS = {
     [1] = function(db)
         db.modules = {}
+    end,
+    [2] = function(db)
+        db.ui = {}
     end,
 }
 
@@ -25,6 +28,16 @@ function Storage.Load(saved)
         db.schemaVersion = target
     end
     return db
+end
+
+--- Settings of one interface element (window, minimap icon), created empty the first time.
+function Storage.Interface(element)
+    if type(db.ui) ~= "table" then
+        db.ui = {}
+    end
+    local settings = db.ui[element] or {}
+    db.ui[element] = settings
+    return settings
 end
 
 --- The saved data of one module, created empty the first time.

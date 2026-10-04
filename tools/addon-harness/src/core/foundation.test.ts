@@ -6,17 +6,28 @@ import { FOREVER_EVENTS } from "../forever.ts";
 describe("VXV_Core foundation", () => {
   describe("saved data", () => {
     it("starts empty at the first installation, with the current schema", () => {
-      const { client } = startCore();
-      expect(client("return VXV_DB")).toEqual({ schemaVersion: 1, modules: {} });
+      const { client } = startCore({ beforeLogin: true });
+      expect(client("return VXV_DB")).toEqual({ schemaVersion: 2, modules: {}, ui: {} });
     });
 
     it("upgrades data saved before any schema, keeping it", () => {
-      const { client } = startCore({ savedVariables: '{ note = "gardée" }' });
-      expect(client("return VXV_DB")).toEqual({ schemaVersion: 1, modules: {}, note: "gardée" });
+      const { client } = startCore({ savedVariables: '{ note = "gardée" }', beforeLogin: true });
+      expect(client("return VXV_DB")).toEqual({ schemaVersion: 2, modules: {}, ui: {}, note: "gardée" });
+    });
+
+    it("upgrades the data of the previous schema step by step, keeping the modules' data", () => {
+      const { client } = startCore({
+        savedVariables: "{ schemaVersion = 1, modules = { raid = { x = 1 } } }",
+        beforeLogin: true,
+      });
+      expect(client("return VXV_DB")).toEqual({ schemaVersion: 2, modules: { raid: { x: 1 } }, ui: {} });
     });
 
     it("leaves untouched the data of a newer version of the addon", () => {
-      const { client } = startCore({ savedVariables: "{ schemaVersion = 7, modules = { raid = { x = 1 } } }" });
+      const { client } = startCore({
+        savedVariables: "{ schemaVersion = 7, modules = { raid = { x = 1 } } }",
+        beforeLogin: true,
+      });
       expect(client("return VXV_DB")).toEqual({ schemaVersion: 7, modules: { raid: { x: 1 } } });
     });
   });

@@ -28,10 +28,14 @@ local ALIASES = {
     GetMasterLootCandidate = { "GetMasterLootCandidate" },
     GiveMasterLoot = { "GiveMasterLoot" },
     GetSortedInfoForDrop = { "C_LootHistory.GetSortedInfoForDrop" },
+    -- Interface
+    GetCursorPosition = { "GetCursorPosition" }, -- not measured yet
+    GetMinimapShape = { "GetMinimapShape" }, -- optional: defined by minimap addons only
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.
-local function resolve(path)
+--- The way to interface objects phase 0 did not measure (Minimap, GameTooltip…): absent means nil, not an error.
+function Compat.Resolve(path)
     local value = _G
     for key in path:gmatch("[^%.]+") do
         if type(value) ~= "table" then
@@ -44,7 +48,7 @@ end
 
 local function firstFunction(paths)
     for _, path in ipairs(paths) do
-        local candidate = resolve(path)
+        local candidate = Compat.Resolve(path)
         if type(candidate) == "function" then
             return candidate
         end
