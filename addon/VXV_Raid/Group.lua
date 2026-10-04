@@ -6,22 +6,33 @@ ns.Group = Group
 
 Group.MAX_PARTY, Group.MAX_RAID = 5, 40
 
---- Names of the group's members, this player included; empty outside a group.
-function Group.Names()
-    local names = {}
+--- The group's members, this player included: { unit, name }; empty outside a group.
+function Group.Members()
+    local members = {}
     if not IsInGroup() then
-        return names
+        return members
     end
     local unit, count = "raid", GetNumGroupMembers()
     if not IsInRaid() then
         -- Party units are the other players; the player is "player".
         unit, count = "party", Group.MAX_PARTY - 1
-        names[VXV.PlayerName() or ""] = true
+        members[1] = { unit = "player", name = VXV.PlayerName() }
     end
     for index = 1, count do
         local name = VXV.NameOfUnit(unit .. index)
         if name ~= nil then
-            names[name] = true
+            members[#members + 1] = { unit = unit .. index, name = name }
+        end
+    end
+    return members
+end
+
+--- Names of the group's members, as a set.
+function Group.Names()
+    local names = {}
+    for _, member in ipairs(Group.Members()) do
+        if member.name ~= nil then
+            names[member.name] = true
         end
     end
     return names

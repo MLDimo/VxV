@@ -19,13 +19,16 @@ Freshness.lua
 Invitations.lua
 BossLoot.lua
 Distribution.lua
+RaidLog.lua
 
 # Interface: the Raid tab and the import of the data.
 UI\RowList.lua
 UI\RaidView.lua
 UI\LootView.lua
+UI\LogView.lua
 UI\Import.lua
 UI\RaidTab.lua
 UI\LootPanel.lua
+UI\LootTab.lua
 
 Bootstrap.lua

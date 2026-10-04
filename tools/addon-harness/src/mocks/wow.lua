@@ -326,6 +326,18 @@ LootCandidates = {}
 Given = {}
 function GetMasterLootCandidate(_, index) return LootCandidates[index] end
 function GiveMasterLoot(slot, index) Given[#Given + 1] = { slot = slot, name = LootCandidates[index] } end
+--- Dead players, by name; tests set it.
+Dead = {}
+function UnitIsDeadOrGhost(unit) return Dead[GetUnitName(unit) or ""] == true end
+--- A secure hook runs after the original function, with its arguments, and changes nothing of its results.
+function hooksecurefunc(name, hook)
+    local original = _G[name]
+    _G[name] = function(...)
+        local results = { original(...) }
+        hook(...)
+        return unpack(results)
+    end
+end
 --- /roll: the game's format of the result, and the rolls the player asked for: { low, high }.
 RANDOM_ROLL_RESULT = "%s obtient un %d (%d-%d)."
 Rolled = {}
