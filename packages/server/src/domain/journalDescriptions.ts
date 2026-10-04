@@ -3,11 +3,12 @@ import type {
   ExclusionRecord,
   JournalAction,
   JournalEntry,
+  LootCorrectionRecord,
   LootCouncilRecord,
   RaidLogImportRecord,
   SoftReserveOverrideRecord,
 } from "./journal.ts";
-import { count, formatDateTime, raidTitle, softReserveCount } from "./labels.ts";
+import { count, formatDateTime, LOOT_METHOD_LABELS, raidTitle, softReserveCount } from "./labels.ts";
 import type { RosterImportSummary } from "./roster.ts";
 
 export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
@@ -18,6 +19,7 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "softReserve.override": "SR corrigées par un officier",
   "raid.import": "Import du journal d'un raid",
   "loot.council": "Objet attribué au loot council",
+  "loot.correct": "Loot corrigé par un officier",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -73,6 +75,13 @@ function describeLootCouncil(record: LootCouncilRecord): string {
   return `Objet « ${record.itemName} » attribué à ${record.characterName} au loot council (${where})`;
 }
 
+function describeLootCorrection(record: LootCorrectionRecord): string {
+  const where = `${raidTitle(record.raids)}, ${formatDateTime(new Date(record.eventStartsAt))}`;
+  const side = ({ winnerName, method }: LootCorrectionRecord["before"]) =>
+    `${winnerName} (${LOOT_METHOD_LABELS[method]})`;
+  return `« ${record.itemName} » (${where}) : ${side(record.before)} → ${side(record.after)}`;
+}
+
 /** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -91,5 +100,7 @@ export function describeJournalEntry(entry: JournalEntry): string {
     }
     case "loot.council":
       return describeLootCouncil(entry.after as LootCouncilRecord);
+    case "loot.correct":
+      return describeLootCorrection(entry.after as LootCorrectionRecord);
   }
 }

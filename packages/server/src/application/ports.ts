@@ -102,6 +102,10 @@ export interface LootHistoryRepository {
   countSignedUpOwners(eventId: string): Promise<Map<number, number>>;
   /** Loots given by one of the methods, latest first. */
   list(limit: number, methods: readonly LootMethod[]): Promise<LootRecord[]>;
+  /** Undefined when the id is unknown or malformed. */
+  findById(lootId: string): Promise<LootRecord | undefined>;
+  /** An officer's correction: who received the item, and how it was given. */
+  correct(lootId: string, characterId: string, method: LootMethod): Promise<void>;
   /** For each soft reserve of the event (by reserveKey), what happened at every earlier event, newest first. */
   pastEventsForReserves(eventId: string): Promise<Map<string, PastEventForItem[]>>;
 }
