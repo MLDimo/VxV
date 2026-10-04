@@ -23,15 +23,17 @@ Core\Serializer.lua
 Core\SendQueue.lua
 Core\Comm.lua
 Core\Presence.lua
-Core\Api.lua
 
 # Interface: window, home tab, /vxv, minimap icon.
 UI\Window.lua
+UI\Tooltip.lua
+UI\TextWindow.lua
 UI\HomeTab.lua
 UI\Slash.lua
 UI\MinimapButton.lua
 UI\Ping.lua
-UI\CopyWindow.lua
 UI\RosterExport.lua
 
+# Public API of the bundles, then start-up.
+Api.lua
 Bootstrap.lua

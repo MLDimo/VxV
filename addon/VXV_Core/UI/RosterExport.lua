@@ -2,8 +2,8 @@ local _, ns = ...
 
 --- /vxv liste: the guild roster for the website's "Liste de guilde" page. Any member may export it: the
 --- website lets officers only import it, since rights are checked by the server.
-local Chat, Compat, CopyWindow, Events = ns.Chat, ns.Compat, ns.CopyWindow, ns.Events
-local Roster, Slash, Util = ns.Roster, ns.Slash, ns.Util
+local Chat, Compat, Events, Roster = ns.Chat, ns.Compat, ns.Events, ns.Roster
+local Slash, TextWindow, Util = ns.Slash, ns.TextWindow, ns.Util
 
 local READY = "Liste de %s prête : Ctrl+C, puis colle-la dans la page Liste de guilde du site."
 
@@ -11,7 +11,7 @@ local waiting = false
 
 local function export()
     local text, skipped = Roster.Format(Roster.Read())
-    CopyWindow.Show(text)
+    TextWindow.ShowCopy(text)
     local _, count = text:gsub("\n", "")
     Chat.Print(READY:format(Util.Count(count, "personnage")))
     if skipped > 0 then

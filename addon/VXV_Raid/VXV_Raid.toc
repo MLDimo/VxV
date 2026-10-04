@@ -1,0 +1,18 @@
+## Interface: 16001
+## Title: VXV Raid
+## Notes: Onglet Raid de VXV : inscrits, soft reserves et modifications de l'événement.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The event's data, as the website exports it.
+Labels.lua
+EventData.lua
+RaidData.lua
+
+# Interface: the Raid tab and the import of the data.
+UI\RaidView.lua
+UI\Import.lua
+UI\RaidTab.lua
+
+Bootstrap.lua
