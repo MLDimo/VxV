@@ -9,8 +9,9 @@ VXV = {
     Emit = ns.Bus.Emit,
     --- "/vxv <name>", listed by "/vxv aide".
     RegisterCommand = ns.Slash.Register,
-    --- A message in the chat, under the VXV prefix.
+    --- A message in the chat, under the VXV prefix; and (value, singular, plural) for "3 invitations".
     Print = ns.Chat.Print,
+    Count = ns.Util.Count,
     --- (label, confirm(text)): a window to paste a text into, closed when confirm returns true.
     ShowPasteWindow = ns.TextWindow.ShowPaste,
     --- (owner, anchor, title, lines) and (): the game's tooltip.
@@ -22,6 +23,12 @@ VXV = {
     OnMessage = ns.Comm.On,
     --- Names of the members connected with VXV, this player included, in alphabetical order.
     Online = ns.Presence.Online,
+    --- (event, handler(...)): a game event, among those measured on WoW Forever.
+    OnEvent = ns.Events.On,
+    --- The guild members the client knows: { name, class, online }.
+    GuildMembers = ns.Roster.Read,
+    --- "Prénom Nom" of a unit ("raid3", "party1"…), or nil when the client has none or hides it.
+    NameOfUnit = ns.Names.OfUnit,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

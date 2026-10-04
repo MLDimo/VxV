@@ -12,6 +12,7 @@ RaidData.lua
 Sharing.lua
 Notices.lua
 Freshness.lua
+Invitations.lua
 
 # Interface: the Raid tab and the import of the data.
 UI\RaidView.lua

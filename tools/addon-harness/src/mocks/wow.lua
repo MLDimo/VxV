@@ -266,10 +266,42 @@ end
 
 -- The player of this client.
 Player = { name = "Ðéjà Vu", inGuild = true }
+--- The player's group, set by the tests: the other members' names, whether it is a raid, and who leads.
+--- Raid units start with the player (raid1), party units are the others (party1 to party4).
+Group = { members = {}, raid = false, leader = true }
 function GetUnitName(unit)
     if unit == "player" then
         return Player.name
     end
+    local kind, index = unit:match("^(%a+)(%d+)$")
+    index = tonumber(index)
+    if kind == "party" and not Group.raid then
+        return Group.members[index]
+    elseif kind == "raid" and Group.raid then
+        return index == 1 and Player.name or Group.members[index - 1]
+    end
+end
+function IsInGroup() return #Group.members > 0 end
+function IsInRaid() return Group.raid end
+function GetNumGroupMembers() return #Group.members > 0 and #Group.members + 1 or 0 end
+function UnitIsGroupLeader(unit) return unit == "player" and Group.leader end
+function UnitIsGroupAssistant() return false end
+--- Invitations the player sent, in order, and how many times the group became a raid.
+Invited = {}
+ConvertedToRaid = 0
+C_PartyInfo = {
+    InviteUnit = function(name) Invited[#Invited + 1] = name end,
+    ConvertToRaid = function()
+        Group.raid = true
+        ConvertedToRaid = ConvertedToRaid + 1
+    end,
+}
+--- Test helper: these players accepted the invitation; the client tells the addons.
+function JoinGroup(...)
+    for _, name in ipairs({ ... }) do
+        Group.members[#Group.members + 1] = name
+    end
+    Fire("GROUP_ROSTER_UPDATE")
 end
 function IsInGuild()
     return Player.inGuild
@@ -295,6 +327,6 @@ function GetNumGuildMembers()
 end
 function GetGuildRosterInfo(index)
     local member = MockGuildMembers[index]
-    return member.name, "Membre", 3, 60, "Classe", "", "", "", true, 0, member.class
+    return member.name, "Membre", 3, 60, "Classe", "", "", "", member.online ~= false, 0, member.class
 end
 ChatFontNormal = {}

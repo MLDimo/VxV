@@ -184,16 +184,33 @@ local function origin(event, sender)
     return sender and string.format("données de %s, copiées le %s", sender, when) or ("données copiées le " .. when)
 end
 
---- Rows of the tab: { kind = "title" | "header" | "line", text, tooltip = { title, lines } or nil }, for the
---- player named playerName, the data having been sent by sender.
-function RaidView.Rows(event, playerName, sender)
+local function addRequests(rows, requests)
+    if #requests == 0 then
+        return
+    end
+    rows[#rows + 1] = row("header", string.format("Demandes pour rejoindre (%d)", #requests))
+    for _, request in ipairs(requests) do
+        local requestRow = row("line", request.name .. " · " .. request.reason, {
+            title = request.name,
+            lines = { request.reason, "Clic : inviter" },
+        })
+        requestRow.invite = request.name
+        rows[#rows + 1] = requestRow
+    end
+end
+
+--- Rows of the tab: { kind = "title" | "header" | "line", text, tooltip = { title, lines } or nil, invite = name
+--- or nil }. The view holds the event, the player's name, who sent the data and the requests to join.
+function RaidView.Rows(view)
+    local event, playerName = view.event, view.player
     if event == nil then
         return { row("line", NO_EVENT[1]), row("line", NO_EVENT[2]) }
     end
     local rows = {
         row("title", event.title .. " · " .. Labels.DateTime(event.startsAt)),
-        row("line", string.format("%d SR par joueur · %s", event.softReservesPerPlayer, origin(event, sender))),
+        row("line", string.format("%d SR par joueur · %s", event.softReservesPerPlayer, origin(event, view.sender))),
     }
+    addRequests(rows, view.requests or {})
     addSignups(rows, event)
     addMyReserves(rows, event, playerName)
     addRaidReserves(rows, event)
