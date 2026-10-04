@@ -21,8 +21,8 @@ describe("guild filter", () => {
     return started;
   };
 
-  it("starts everything for a member of the guild", () => {
-    const { client } = startIn("");
+  it.each(["VXV", "The Daliranas", "THE DALIRANAS"])("starts everything for a member of the guild %s", (name) => {
+    const { client } = startIn(`GuildInfo.name = "${name}"`);
     expect(client(STARTED)).toEqual({ module: true, icon: true, announced: true });
   });
 

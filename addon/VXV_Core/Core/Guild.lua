@@ -15,7 +15,7 @@ local function guildName()
     end
     local ok, name = Compat.GetGuildInfo("player")
     if ok and type(name) == "string" and not Util.IsSecret(name) then
-        return name
+        return name:upper()
     end
 end
 
