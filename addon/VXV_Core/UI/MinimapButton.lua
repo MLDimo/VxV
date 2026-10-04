@@ -5,7 +5,7 @@ local _, ns = ...
 local MinimapButton = {}
 ns.MinimapButton = MinimapButton
 
-local Compat, Storage, Window = ns.Compat, ns.Storage, ns.Window
+local Compat, Storage, Tooltip, Window = ns.Compat, ns.Storage, ns.Tooltip, ns.Window
 
 local DEFAULT_ANGLE = 225
 local SIZE = 31
@@ -73,22 +73,7 @@ local function cursorAngle(minimap)
 end
 
 local function showTooltip(button)
-    local tooltip = Compat.Resolve("GameTooltip")
-    if tooltip == nil then
-        return
-    end
-    tooltip:SetOwner(button, "ANCHOR_LEFT")
-    tooltip:SetText("VXV")
-    tooltip:AddLine("Clic : ouvrir ou fermer la fenêtre", 1, 1, 1)
-    tooltip:AddLine("Glisser : déplacer l'icône", 1, 1, 1)
-    tooltip:Show()
-end
-
-local function hideTooltip()
-    local tooltip = Compat.Resolve("GameTooltip")
-    if tooltip ~= nil then
-        tooltip:Hide()
-    end
+    Tooltip.Show(button, "ANCHOR_LEFT", "VXV", { "Clic : ouvrir ou fermer la fenêtre", "Glisser : déplacer l'icône" })
 end
 
 local function addTexture(button, path, size, layer)
@@ -115,9 +100,9 @@ function MinimapButton.Create()
     button:RegisterForDrag("LeftButton")
     button:SetScript("OnClick", Window.Toggle)
     button:SetScript("OnEnter", showTooltip)
-    button:SetScript("OnLeave", hideTooltip)
+    button:SetScript("OnLeave", Tooltip.Hide)
     button:SetScript("OnDragStart", function()
-        hideTooltip()
+        Tooltip.Hide()
         button:SetScript("OnUpdate", function()
             local angle = cursorAngle(minimap)
             if angle ~= nil then

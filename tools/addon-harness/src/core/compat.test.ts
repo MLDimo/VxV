@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { readTocFiles } from "../addon.ts";
-import { luacheckRules } from "../conventions.ts";
+import { addonDirectories, luacheckRules } from "../conventions.ts";
 import { CORE_DIR, startCore } from "../core.ts";
 import { foreverApi, LUA_ENVIRONMENT, OPTIONAL_API } from "../foreverApi.ts";
 import { globalReferences } from "../globalReads.ts";
@@ -16,18 +16,22 @@ function compatAliases(): [string, string[]][] {
   ]);
 }
 
-describe("Blizzard API of VXV_Core", () => {
-  it("reads directly only what was measured on WoW Forever; the rest goes through Compat", () => {
-    const allowed = new Set([...LUA_ENVIRONMENT, ...foreverApi(), ...luacheckRules().allowedGlobals]);
-    // A namespace (C_Timer) is fine when the fields read from it (C_Timer.After) were measured.
-    const isMeasuredNamespace = (name: string) => [...allowed].some((path) => path.startsWith(`${name}.`));
-    const unmeasured = readTocFiles(CORE_DIR).flatMap((file) =>
-      [...globalReferences(readFileSync(join(CORE_DIR, file), "utf8"))]
-        .filter((name) => !allowed.has(name) && !allowed.has(name.split(".")[0] ?? "") && !isMeasuredNamespace(name))
-        .map((name) => `${file}: ${name}`),
-    );
-    expect(unmeasured).toEqual([]);
-  });
+describe("Blizzard API of the bundles", () => {
+  const bundles = addonDirectories().filter((directory) => directory.includes("/addon/"));
+  it.each(bundles.map((directory) => [basename(directory), directory]))(
+    "%s reads directly only what was measured on WoW Forever; the rest goes through Compat",
+    (_, directory) => {
+      const allowed = new Set([...LUA_ENVIRONMENT, ...foreverApi(), ...luacheckRules().allowedGlobals]);
+      // A namespace (C_Timer) is fine when the fields read from it (C_Timer.After) were measured.
+      const isMeasuredNamespace = (name: string) => [...allowed].some((path) => path.startsWith(`${name}.`));
+      const unmeasured = readTocFiles(directory).flatMap((file) =>
+        [...globalReferences(readFileSync(join(directory, file), "utf8"))]
+          .filter((name) => !allowed.has(name) && !allowed.has(name.split(".")[0] ?? "") && !isMeasuredNamespace(name))
+          .map((name) => `${file}: ${name}`),
+      );
+      expect(unmeasured).toEqual([]);
+    },
+  );
 
   it("gives every Compat wrapper a function measured on Forever, or lists it as optional", () => {
     const measured = foreverApi();
