@@ -115,7 +115,10 @@ test.describe.serial("Discord bot", () => {
       request,
       formSubmission(
         form.data.custom_id,
-        { selects: { character: characterId, role: "healer", status: "present" }, texts: { spec: "Restauration" } },
+        {
+          selects: { character: characterId, role: "healer", status: "present", spec: "DRUID|Restauration" },
+          texts: {},
+        },
         raider,
       ),
     );
