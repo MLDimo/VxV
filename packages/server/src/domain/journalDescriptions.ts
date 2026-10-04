@@ -3,6 +3,8 @@ import type {
   ExclusionRecord,
   JournalAction,
   JournalEntry,
+  LootCouncilRecord,
+  RaidLogImportRecord,
   SoftReserveOverrideRecord,
 } from "./journal.ts";
 import { count, formatDateTime, raidTitle, softReserveCount } from "./labels.ts";
@@ -14,6 +16,8 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "exclusion.add": "Objet exclu des SR",
   "exclusion.remove": "Objet de nouveau réservable",
   "softReserve.override": "SR corrigées par un officier",
+  "raid.import": "Import du journal d'un raid",
+  "loot.council": "Objet attribué au loot council",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -46,6 +50,29 @@ function describeOverride(override: SoftReserveOverrideRecord): string {
   return `SR de ${override.characterName} (${where}) : avant ${itemList(override.before)} ; après ${itemList(override.after)}`;
 }
 
+/** "2 boss tués, 12 présents, 5 objets ajoutés", then what the website did not know. */
+export function describeRaidLogImport(record: Omit<RaidLogImportRecord, "raids" | "eventStartsAt">): string {
+  const parts = [
+    `${count(record.kills, "boss", "boss")} tué${record.kills === 1 ? "" : "s"}`,
+    count(record.present, "présent"),
+    count(record.loots, "objet ajouté", "objets ajoutés"),
+  ];
+  if (record.unknownCharacters.length > 0) {
+    parts.push(`personnages inconnus de la liste de guilde : ${record.unknownCharacters.join(", ")}`);
+  }
+  if (record.unknownLoots > 0) {
+    parts.push(
+      count(record.unknownLoots, "objet hors des raids de l'événement", "objets hors des raids de l'événement"),
+    );
+  }
+  return parts.join(", ");
+}
+
+function describeLootCouncil(record: LootCouncilRecord): string {
+  const where = `${raidTitle(record.raids)}, ${formatDateTime(new Date(record.eventStartsAt))}`;
+  return `Objet « ${record.itemName} » attribué à ${record.characterName} au loot council (${where})`;
+}
+
 /** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -58,5 +85,11 @@ export function describeJournalEntry(entry: JournalEntry): string {
       return describeExclusion(entry.after as ExclusionRecord);
     case "softReserve.override":
       return describeOverride(entry.after as SoftReserveOverrideRecord);
+    case "raid.import": {
+      const record = entry.after as RaidLogImportRecord;
+      return `${raidTitle(record.raids)}, ${formatDateTime(new Date(record.eventStartsAt))} : ${describeRaidLogImport(record)}`;
+    }
+    case "loot.council":
+      return describeLootCouncil(entry.after as LootCouncilRecord);
   }
 }

@@ -7,6 +7,7 @@ import { createExclusions } from "./application/exclusions.ts";
 import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
+import { createRaidLogs } from "./application/raidLogs.ts";
 import { createRaidReminders } from "./application/raidReminders.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
@@ -49,6 +50,7 @@ export function createApplication({
     history: createHistory({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
     addonExport: createAddonExport({ unitOfWork, clock }),
+    raidLogs: createRaidLogs({ unitOfWork, announcer, clock }),
   };
 }
 

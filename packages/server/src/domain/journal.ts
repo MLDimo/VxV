@@ -1,6 +1,12 @@
 /** Officer actions recorded in the journal. Each new officer action adds its name here. */
 export type JournalAction =
-  "roster.import" | "event.create" | "exclusion.add" | "exclusion.remove" | "softReserve.override";
+  | "roster.import"
+  | "event.create"
+  | "exclusion.add"
+  | "exclusion.remove"
+  | "softReserve.override"
+  | "raid.import"
+  | "loot.council";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -32,6 +38,26 @@ export interface ExclusionRecord {
   eventStartsAt: string;
   /** Characters whose soft reserve on the item was removed by the exclusion. */
   removedSoftReserves: string[];
+}
+
+/** What the journal keeps about the import of a raid's log from the addon. */
+export interface RaidLogImportRecord {
+  raids: string[];
+  eventStartsAt: string;
+  kills: number;
+  present: number;
+  /** Gives added by this import: the others were known already. */
+  loots: number;
+  unknownCharacters: string[];
+  unknownLoots: number;
+}
+
+/** What the journal keeps about an item the organisation gave (loot council). */
+export interface LootCouncilRecord {
+  itemName: string;
+  characterName: string;
+  raids: string[];
+  eventStartsAt: string;
 }
 
 /** What the journal keeps about an officer's correction of a player's soft reserves. */

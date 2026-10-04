@@ -1,4 +1,5 @@
 import { fullName, type Character, type CharacterName } from "./characters.ts";
+import { TextFormatError } from "./textFormat.ts";
 
 /** First line of a roster exported by the officers' addon; the number is the format version. */
 export const ROSTER_HEADER = "VXV-ROSTER-1";
@@ -11,12 +12,7 @@ export interface RosterEntry extends CharacterName {
   characterClass: string;
 }
 
-export class RosterFormatError extends Error {
-  constructor(readonly problems: readonly string[]) {
-    super(problems.join("\n"));
-    this.name = "RosterFormatError";
-  }
-}
+export class RosterFormatError extends TextFormatError {}
 
 function characterKey(character: CharacterName): string {
   return fullName(character);

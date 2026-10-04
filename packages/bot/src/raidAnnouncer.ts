@@ -1,10 +1,11 @@
 import { createDiscordRest, DiscordApiError, type DiscordRestOptions, type RaidAnnouncer } from "@vxv/server";
 import { raidMessage } from "./raidMessage.ts";
+import { recapMessage } from "./recapMessage.ts";
 import { reminderMessage } from "./reminderMessage.ts";
 
 const HTTP_NOT_FOUND = 404;
 
-/** Publishes and updates the events' sign-up messages in the guild's raid channel. */
+/** The guild's raid channel: the events' sign-up messages, the reminders and the end-of-raid recaps. */
 export function createDiscordRaidAnnouncer({
   channelId,
   siteUrl,
@@ -21,6 +22,10 @@ export function createDiscordRaidAnnouncer({
 
     async remind(reminder) {
       await request("POST", `/channels/${channelId}/messages`, { body: reminderMessage(reminder, siteUrl) });
+    },
+
+    async recap(recap) {
+      await request("POST", `/channels/${channelId}/messages`, { body: recapMessage(recap, siteUrl) });
     },
 
     async update(messageId, raid) {

@@ -112,11 +112,17 @@ const PILLAGE = 3494;
 const JAMBIERES = 270260;
 const DURGEN = 3496;
 await app.softReserves.setMine(lockedMember.member, historyEventId, [String(BOTTINES)]);
-// Loots are recorded by the addon from P6 on; until then the tests insert them directly.
-await database.query(
-  `insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
-   values ($1, $2, $3, $4, 'soft_reserve', now()), ($1, $5, $6, $7, 'free_roll', now())`,
-  [historyEventId, PILLAGE, BOTTINES, duneSable.id, DURGEN, JAMBIERES, cielGris.id],
+/** The log the addon exports after a raid (VXV-LOG-1), imported as an officer would. */
+const importRaidLog = (eventId: string, lines: readonly string[], reason: string) =>
+  app.raidLogs.importLog(officer.member, eventId, ["VXV-LOG-1", `R;${eventId};;`, ...lines].join("\n"), reason);
+const RAID_NIGHT = Date.UTC(2031, 1, 5, 21) / 1000;
+await importRaidLog(
+  historyEventId,
+  [
+    `L;${String(PILLAGE)};${String(BOTTINES)};Dune Sable;soft_reserve;${String(RAID_NIGHT)}`,
+    `L;${String(DURGEN)};${String(JAMBIERES)};Ciel Gris;free_roll;${String(RAID_NIGHT + 60)}`,
+  ],
+  "Raid des tests d'historique",
 );
 
 // SR+: Dune Sable reserved the Jambières at an earlier raid, was present and did not get them.
@@ -137,13 +143,10 @@ const reserveJambieres = async (eventId: string) => {
 };
 const bonusPastEventId = await createThanesEvent("2031-03-05T20:00:00Z", "Raid précédent des tests de SR+");
 await reserveJambieres(bonusPastEventId);
-// Attendance is recorded by the addon from P6 on; until then the tests insert it directly.
-await database.query("insert into event_attendance (event_id, character_id) values ($1, $2)", [
-  bonusPastEventId,
-  duneSable.id,
-]);
+await importRaidLog(bonusPastEventId, ["P;Dune Sable"], "Raid précédent des tests de SR+");
 const bonusEventId = await createThanesEvent("2031-03-12T20:00:00Z", "Événement des tests de SR+");
 await reserveJambieres(bonusEventId);
+const raidLogEventId = await createThanesEvent("2031-04-02T20:00:00Z", "Événement des tests du journal de raid");
 
 const seed: E2ESeed = {
   sessions: {
@@ -159,6 +162,7 @@ const seed: E2ESeed = {
   lockedEventId,
   historyEventId,
   bonusEventId,
+  raidLogEventId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 

@@ -7,6 +7,7 @@ import { exclusionRepository } from "./exclusions.ts";
 import { journalRepository } from "./journal.ts";
 import { lootHistoryRepository } from "./lootHistory.ts";
 import { memberRepository } from "./members.ts";
+import { raidRecordRepository } from "./raidRecords.ts";
 import { raidRepository } from "./raids.ts";
 import { sessionRepository } from "./sessions.ts";
 import { signupRepository } from "./signups.ts";
@@ -25,6 +26,7 @@ function createRepositories(sql: SqlClient): Repositories {
     lootHistory: lootHistoryRepository(sql),
     softReserves: softReserveRepository(sql),
     exclusions: exclusionRepository(sql),
+    raidRecords: raidRecordRepository(sql),
   };
 }
 

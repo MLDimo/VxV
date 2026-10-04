@@ -8,9 +8,9 @@ import {
   type APIEmbedField,
   type RESTPostAPIChannelMessageJSONBody,
 } from "discord-api-types/v10";
+import { timestamp } from "./discordText.ts";
 
 const EMBED_COLOR = 0x14b8a6;
-const MS_PER_SECOND = 1000;
 /** Discord's limit for the text of an embed field. */
 const MAX_FIELD_LENGTH = 1024;
 const NOBODY = "—";
@@ -51,7 +51,6 @@ function classSummary(byClass: Record<string, number>): string {
 
 /** The event's sign-up message: date, soft reserves, composition by role and class, other answers. */
 export function raidMessage({ event, signups }: AnnouncedRaid, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
-  const start = Math.floor(event.startsAt.getTime() / MS_PER_SECOND);
   const coming = signups.filter((signup) => isComing(signup.status));
   const { byClass } = composition(signups);
   const roleFields: APIEmbedField[] = SIGNUP_ROLES.map((role) => {
@@ -74,7 +73,7 @@ export function raidMessage({ event, signups }: AnnouncedRaid, siteUrl: string):
       {
         title: raidTitle(event.raids.map((raid) => raid.name)),
         url,
-        description: `📅 <t:${start}:F> (<t:${start}:R>)\n🎯 ${softReserveCount(event.softReservesPerPlayer)} par joueur`,
+        description: `📅 ${timestamp(event.startsAt, "F")} (${timestamp(event.startsAt, "R")})\n🎯 ${softReserveCount(event.softReservesPerPlayer)} par joueur`,
         color: EMBED_COLOR,
         fields: [...roleFields, { name: "Classes", value: classSummary(byClass) }, ...otherFields],
         footer: { text: "Inscris-toi avec le bouton ci-dessous, ou sur le site." },

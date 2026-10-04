@@ -1,3 +1,4 @@
+import { parseRaidLog } from "@vxv/server/domain/raidLog";
 import { describe, expect, it } from "vitest";
 import { startRaid, websiteText } from "./fixtures.ts";
 import { killAndOpen, link, LINKS, OFFICER, raidWithData, settle, type Guild } from "./raidGroup.ts";
@@ -112,6 +113,26 @@ describe("record of the raid", () => {
         'return FindWidget(VXV_Window, function(widget) return widget.text == "Exporter pour le site" end).shown',
       ),
     ).toBe(false);
+  });
+
+  it("exports a log the website reads (contract VXV-LOG-1)", () => {
+    const officer = playOnyxia().player(OFFICER);
+    officer.client(OPEN_LOOT_TAB);
+    officer.client(
+      'FindWidget(VXV_Window, function(widget) return widget.text == "Exporter pour le site" end):Run("OnClick")',
+    );
+    const log = parseRaidLog(officer.client("return VXV_TextWindow.editBox:GetText()") as string);
+    expect(log).toMatchObject({
+      eventId: "e1",
+      kills: [{ encounterId: 1084 }],
+      present: ["Aube Claire", "Thom Leboss", OFFICER],
+      loots: [
+        { encounterId: 1084, itemId: 20, winner: "Thom Leboss", method: "soft_reserve_plus" },
+        { encounterId: 1084, itemId: 99, winner: "Aube Claire", method: "loot_council" },
+      ],
+      deaths: [{ name: "Thom Leboss", count: 1 }],
+    });
+    expect(log.startedAt?.getTime()).toBeLessThanOrEqual(log.endedAt?.getTime() ?? 0);
   });
 
   it("ignores a give that does not come from the master looter", () => {
