@@ -61,7 +61,7 @@ describe("Compat", () => {
   });
 
   it('answers "API absente" instead of a Lua error when the client has none', () => {
-    expect(compat("", "GetGuildInfo('player')")).toEqual([false, "API absente"]);
+    expect(compat("", "UnitClass('player')")).toEqual([false, "API absente"]);
   });
 
   it("turns an error inside the client function into a refusal", () => {

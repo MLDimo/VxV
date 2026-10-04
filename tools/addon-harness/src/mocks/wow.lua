@@ -109,6 +109,12 @@ function CreateFrame(kind, name, parent, template)
     end
     function frame:SetText(text) self.text = text end
     function frame:GetText() return self.text end
+    function frame:SetMultiLine(multiLine) self.multiLine = multiLine end
+    function frame:SetAutoFocus(autoFocus) self.autoFocus = autoFocus end
+    function frame:SetFontObject(font) self.font = font end
+    function frame:SetFocus() self.focused = true end
+    function frame:HighlightText() self.highlighted = true end
+    function frame:SetScrollChild(child) self.scrollChild = child end
     function frame:Enable() self.enabled = true end
     function frame:Disable() self.enabled = false end
     function frame:IsEnabled() return self.enabled end
@@ -242,3 +248,27 @@ end
 function IsInGuild()
     return Player.inGuild
 end
+
+-- The player's guild: its name as the client reports it (known = false until the first roster update), and
+-- its members ({ name, class }). C_GuildInfo.GuildRoster only counts requests: tests fire GUILD_ROSTER_UPDATE.
+GuildInfo = { name = "VXV", known = true }
+MockGuildMembers = {}
+GuildRosterRequests = 0
+function GetGuildInfo(unit)
+    if unit == "player" and Player.inGuild and GuildInfo.known then
+        return GuildInfo.name, "Membre", 3
+    end
+end
+C_GuildInfo = {
+    GuildRoster = function()
+        GuildRosterRequests = GuildRosterRequests + 1
+    end,
+}
+function GetNumGuildMembers()
+    return #MockGuildMembers, #MockGuildMembers
+end
+function GetGuildRosterInfo(index)
+    local member = MockGuildMembers[index]
+    return member.name, "Membre", 3, 60, "Classe", "", "", "", true, 0, member.class
+end
+ChatFontNormal = {}
