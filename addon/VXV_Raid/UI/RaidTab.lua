@@ -43,7 +43,8 @@ local function canImport()
 end
 
 local function render()
-    local rows = RaidView.Rows(RaidData.Current(), VXV.PlayerName())
+    local _, sender = RaidData.Text()
+    local rows = RaidView.Rows(RaidData.Current(), VXV.PlayerName(), sender)
     for index, data in ipairs(rows) do
         local frame = rowFrames[index] or newRow(index)
         frame.label:SetFontObject(FONTS[data.kind])

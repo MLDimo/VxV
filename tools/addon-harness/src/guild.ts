@@ -9,7 +9,8 @@ interface SentMessage {
 
 /** Several players, each on their own client with VXV_Core, and the server between them. */
 export function startGuild(names: readonly string[], options: Omit<CoreStart, "playerName"> = {}) {
-  const players = names.map((name) => ({ name, ...startCore({ ...options, playerName: name }) }));
+  const start = (name: string) => ({ name, ...startCore({ ...options, playerName: name }) });
+  const players = names.map(start);
 
   const recipients = (sender: string, message: SentMessage) => {
     switch (message.channel) {
@@ -31,6 +32,18 @@ export function startGuild(names: readonly string[], options: Omit<CoreStart, "p
         throw new Error(`${name} is not in the guild`);
       }
       return found;
+    },
+    /** A player who logs in later, on their own client. */
+    join(name: string) {
+      const player = start(name);
+      players.push(player);
+      return player;
+    },
+    /** Moves every client's clock forward, running their timers. */
+    advanceTime(seconds: number) {
+      for (const player of players) {
+        player.client(`AdvanceTime(${seconds})`);
+      }
     },
     /** Carries every message sent until nobody answers anymore; returns how many were carried. */
     deliver(): number {

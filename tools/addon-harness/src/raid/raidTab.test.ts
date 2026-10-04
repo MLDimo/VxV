@@ -3,7 +3,8 @@ import type { LoadedAddon } from "../addon.ts";
 import { ONYXIA_NIGHT, startRaid, websiteText } from "./fixtures.ts";
 
 const PREFIX = "|cff14b8a6VXV|r ";
-const ROWS = "local _, ns = ... return ns.RaidView.Rows(ns.RaidData.Current(), VXV.PlayerName())";
+const ROWS =
+  "local _, ns = ... return ns.RaidView.Rows(ns.RaidData.Current(), VXV.PlayerName(), select(2, ns.RaidData.Text()))";
 const ICON = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:";
 const NOT_OFFICER =
   "Seuls les officiers chargent les données, et ce personnage n'est pas lié à un officier sur le site.";
@@ -47,7 +48,7 @@ describe("Raid tab", () => {
     expect(client("return VXV_TextWindow:IsShown()")).toBe(false);
     expect(rowsOf(raid).map(({ kind, text }) => [kind, text])).toEqual([
       ["title", "Onyxia · 10/12 20:00"],
-      ["line", "2 SR par joueur · données copiées le 10/12 19:45"],
+      ["line", "2 SR par joueur · données de Ðéjà Vu, copiées le 10/12 19:45"],
       ["header", "Inscrits (2 attendus sur 3)"],
       ["line", "Tanks 0 · Soigneurs 1 · DPS 1"],
       ["line", `${ICON}20:39:22:41|t |cfffff468Ðéjà Vu|r · Combat`],

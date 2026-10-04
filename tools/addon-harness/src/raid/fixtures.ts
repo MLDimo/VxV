@@ -98,6 +98,12 @@ export function websiteText(facts: AddonEventFacts = ONYXIA_NIGHT): string {
   return formatAddonEvent(facts);
 }
 
+/** Pastes the text in the window of /vxv importer and clicks Charger. */
+export function importText(client: (code: string) => unknown, text: string): void {
+  client('SlashCmdList.VXV("importer")');
+  client(`VXV_TextWindow.editBox:SetText(${JSON.stringify(text)}) VXV_TextWindow.button:Run("OnClick")`);
+}
+
 /** VXV_Core and VXV_Raid on a mocked client, as the game loads them. */
 export function startRaid(options: CoreStart = {}) {
   const started = startCore({ ...options, bundles: ["VXV_Raid"] });
@@ -108,10 +114,8 @@ export function startRaid(options: CoreStart = {}) {
   return {
     ...started,
     raid,
-    /** Pastes the text in the window of /vxv importer and clicks Charger. */
-    importText(text: string) {
-      started.client('SlashCmdList.VXV("importer")');
-      started.client(`VXV_TextWindow.editBox:SetText(${JSON.stringify(text)}) VXV_TextWindow.button:Run("OnClick")`);
+    importText: (text: string) => {
+      importText(started.client, text);
     },
   };
 }
