@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Addon VXV — Ranking</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.bgflag{position:absolute;inset:0;background:url(/_blob/bca5e978c6d5b9512acd411a794baf80) 41% 60%/250% auto no-repeat;opacity:.3;image-rendering:pixelated}
+.tab{min-height:36px;padding:0 12px;border:0;background:#2a1a10;color:#d9c39a;font:600 15px 'Pixelify Sans',sans-serif;box-shadow:0 0 0 2px #0d0912,inset 0 -3px 0 #1a0f08}
+.cat{min-height:32px;padding:0 12px;border:0;font:600 15px 'Pixelify Sans',sans-serif;cursor:pointer}
+.per{min-height:28px;padding:0 10px;border:0;font:700 12px Manrope,sans-serif;cursor:pointer}
+.panel{background:rgba(18,13,26,.88);box-shadow:0 0 0 2px #0d0912,0 0 0 4px #5b3a1c;padding:14px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.ptitle{font-family:'Pixelify Sans',sans-serif;font-weight:700;font-size:16px;color:#f8e7c0;display:flex;align-items:center;gap:8px;padding-bottom:4px}
+.ptitle small{margin-left:auto;font-family:Manrope,sans-serif;font-size:11px;font-weight:700;color:#a49bbd}
+.banner{position:relative;clip-path:polygon(0 0,100% 0,100% 100%,50% 90%,0 100%);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 10px 0;box-sizing:border-box;background-image:linear-gradient(90deg,rgba(0,0,0,.18),rgba(255,255,255,.08) 40%,rgba(0,0,0,.15))}
+.banner:before{content:'';position:absolute;inset:0 8px;border-left:4px solid var(--m);border-right:4px solid var(--m);pointer-events:none}
+.medal{width:46px;height:46px;display:flex;align-items:center;justify-content:center;font:700 26px 'Pixelify Sans',sans-serif;color:#120a1c;box-shadow:0 0 0 2px #0d0912,inset -4px -4px 0 rgba(0,0,0,.25),inset 4px 4px 0 rgba(255,255,255,.4)}
+.ring{position:absolute;top:-6px;width:10px;height:14px;background:#8a5a2a;box-shadow:0 0 0 2px #0d0912}
+.sway{transform-origin:top center;animation:sway 5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+@media (prefers-reduced-motion: reduce){.sway{animation:none}}
+</style>
+</helmet>
+<div style="width: 1000px; height: 680px; position: relative; overflow: hidden; background: #0e0a16; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 7px #8a5a2a, inset 0 0 0 10px #0d0912, inset 0 0 0 12px #5b3a1c; font-family: Manrope, sans-serif; color: #ece7f6">
+  <div class="bgflag"></div>
+  <div style="position: absolute; inset: 0; background: radial-gradient(420px 320px at 26% 62%, rgba(255,160,60,.16), transparent 70%), linear-gradient(180deg, rgba(14,10,22,.55), rgba(14,10,22,.9))"></div>
+
+  <div style="position: relative; display: flex; flex-direction: column; height: 100%">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 0">
+      <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px #a35cff">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 800; letter-spacing: .14em; font-size: 16px">VXV</span>
+      <div role="tablist" aria-label="Onglets" style="display: flex; gap: 2px; margin-left: 18px">
+        <button class="tab" type="button" role="tab">Taverne</button>
+        <button class="tab" type="button" role="tab">Raid</button>
+        <button class="tab" type="button" role="tab">Le Dé Pipé</button>
+        <button class="tab" type="button" role="tab">Quêtes</button>
+        <button class="tab" type="button" role="tab" aria-selected="true" style="background: #4a2a6a; color: #fff; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c">Ranking</button>
+        <button class="tab" type="button" role="tab">Artisans</button>
+        <button class="tab" type="button" role="tab">Journal</button>
+      </div>
+    </div>
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, #a35cff 20%, #e0479e 80%, transparent)"></div>
+
+    <div style="display: flex; align-items: flex-end; gap: 18px; padding: 14px 22px 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #f2c94c">Au-dessus de la cheminée</span>
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 30px; line-height: 1; color: #f4effc">Ranking</span>
+      </div>
+      <div role="tablist" aria-label="Classements" style="display: flex; gap: 4px; padding-bottom: 2px">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+          <button class="cat" type="button" role="tab" aria-selected="{{c.sel}}" onClick="{{c.pick}}" style="color: {{c.color}}; background: {{c.bg}}; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 {{c.line}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+      <div role="group" aria-label="Période" style="margin-left: auto; display: flex; gap: 2px; padding: 2px; background: #1a0f0a; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #5b3a1c; margin-bottom: 4px">
+        <sc-for list="{{periods}}" as="p" hint-placeholder-count="3">
+          <button class="per" type="button" aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="color: {{p.color}}; background: {{p.bg}}">{{p.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; padding: 0 22px 20px">
+
+      <div style="display: flex; flex-direction: column; gap: 16px; min-height: 0">
+      <div style="position: relative; display: flex; align-items: flex-start; justify-content: center; gap: 18px; padding-top: 6px">
+        <div style="position: absolute; top: 0; left: 6px; right: 6px; height: 10px; background: #5b3a1c; box-shadow: 0 0 0 2px #0d0912, inset 0 3px 0 #8a5a2a"></div>
+        <span style="position: absolute; top: -4px; left: 0; width: 14px; height: 18px; background: #f2c94c; box-shadow: 0 0 0 2px #0d0912"></span>
+        <span style="position: absolute; top: -4px; right: 0; width: 14px; height: 18px; background: #f2c94c; box-shadow: 0 0 0 2px #0d0912"></span>
+        <sc-for list="{{podium}}" as="p" hint-placeholder-count="3">
+          <div class="sway" style="position: relative; width: 150px; margin-top: 10px; animation-delay: {{p.delay}}">
+            <span class="ring" style="left: 26px"></span><span class="ring" style="right: 26px"></span>
+            <div class="banner" style="--m: {{p.metal}}; width: 150px; height: {{p.bannerH}}; background-color: {{p.color}}">
+              <span style="font-size: 10px; font-weight: 800; letter-spacing: .2em; color: #120a1c">{{p.label}}</span>
+              <span class="medal" style="background: {{p.metal}}">{{p.rank}}</span>
+              <img src="{{p.avatar}}" alt="Avatar de {{p.name}}" style="width: 72px; height: 72px; display: block; image-rendering: pixelated; background: #141828; box-shadow: 0 0 0 3px #0d0912, 0 0 0 5px {{p.metal}}; margin-top: 6px">
+              <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 21px; color: #120a1c">{{p.name}}</b>
+              <span style="font-size: 11px; font-weight: 800; color: #5a0f3a; text-align: center; min-height: 14px">{{p.title}}</span>
+              <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 19px; color: #f4effc; background: #120a1c; padding: 2px 8px">{{p.net}}</b>
+                          </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <section class="panel" style="margin-top: auto">
+        <span class="ptitle">Records de la saison</span>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{records}}" as="r" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; background: rgba(10,6,16,.55); box-shadow: inset 0 0 0 1px #2e2442">
+              <span style="font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #a49bbd">{{r.label}}</span>
+              <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 17px; color: #f2c94c">{{r.value}}</b>
+              <span style="font-size: 12px; font-weight: 700; color: {{r.color}}">{{r.who}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+      </div>
+
+      <section class="panel">
+        <span class="ptitle">Suite du classement<small>{{metric}}</small></span>
+        <sc-for list="{{rest}}" as="r" hint-placeholder-count="8">
+          <div style="display: grid; grid-template-columns: 24px 32px minmax(0, 1fr) 80px 64px; align-items: center; gap: 10px; min-height: 42px; padding: 0 8px; background: {{r.bg}}; box-shadow: inset 0 0 0 1px #2e2442">
+            <b style="font-family: 'Pixelify Sans', sans-serif; color: #a49bbd">{{r.rank}}</b>
+            <img src="{{r.avatar}}" alt="" style="width: 32px; height: 32px; display: block; image-rendering: pixelated; background: #141828; box-shadow: 0 0 0 2px {{r.color}}">
+            <span style="display: flex; flex-direction: column; min-width: 0"><b style="color: {{r.color}}; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</b><span style="font-size: 11px; color: #ff8cc8">{{r.title}}</span></span>
+            <span style="height: 6px; background: #2a2238; overflow: hidden"><span style="display: block; height: 100%; width: {{r.bar}}; background: {{r.barColor}}"></span></span>
+            <b style="text-align: right; font-family: 'Pixelify Sans', sans-serif; font-size: 15px; color: {{r.netColor}}">{{r.net}}</b>
+          </div>
+        </sc-for>
+        <div style="margin-top: auto; display: grid; grid-template-columns: 24px 32px minmax(0, 1fr) 80px 64px; align-items: center; gap: 10px; min-height: 42px; padding: 0 8px; background: rgba(163,92,255,.16); box-shadow: inset 0 0 0 2px #a35cff">
+          <b style="font-family: 'Pixelify Sans', sans-serif; color: #cfa8ff">14</b>
+          <img src="/_blob/f9955d4888789440c99d8bfad6ca086a" alt="" style="width: 32px; height: 32px; display: block; image-rendering: pixelated; background: #141828; box-shadow: 0 0 0 2px #AAD372">
+          <span style="display: flex; flex-direction: column"><b style="color: #AAD372; font-size: 14px">Toi · Grakk</b><span style="font-size: 11px; color: #a49bbd">ta position</span></span>
+          <span style="height: 6px; background: #2a2238"><span style="display: block; height: 100%; width: 88%; background: #f19a9a"></span></span>
+          <b style="text-align: right; font-family: 'Pixelify Sans', sans-serif; font-size: 15px; color: #f19a9a">−960</b>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":680}}'>
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = { cat: 'Paris', period: 'Saison 2' }; }
+  renderVals() {
+    const { cat, period } = this.state;
+    const metrics = { 'Paris': 'gain net · ' + period, 'Deathroll': 'gain net · ' + period, 'Quêtes': 'quêtes gagnées · ' + period, 'Présence': 'raids présents · ' + period, 'Titres': 'titres détenus · ' + period };
+    const cats = Object.keys(metrics).map(label => {
+      const on = label === cat;
+      return { label, sel: on ? 'true' : 'false', color: on ? '#fff' : '#d9c39a', bg: on ? '#4a2a6a' : '#2a1a10', line: on ? '#f2c94c' : '#1a0f08', pick: () => this.setState({ cat: label }) };
+    });
+    const periods = ['Toujours', 'Mois', 'Saison 2'].map(label => {
+      const on = label === period;
+      return { label, pressed: on ? 'true' : 'false', color: on ? '#120a1c' : '#d9c39a', bg: on ? '#f2c94c' : 'transparent', pick: () => this.setState({ period: label }) };
+    });
+    return {
+      cats, periods, metric: metrics[cat],
+      records: [
+        { label: 'Plus gros gain', value: '+900 po', who: 'Vorn', color: '#C69B6D' },
+        { label: 'Plus grosse perte', value: '−650 po', who: 'Morgane', color: '#8788EE' },
+        { label: 'Paris joués', value: '142', who: 'Thessa', color: '#FF7C0A' }
+      ],
+      podium: [
+        { avatar: '/_blob/54c90808d352016a2eb4c48a4be4f0a3', rank: 2, name: 'Thessa', title: '', net: '+1 840 po', color: '#FF7C0A', metal: '#d9dbe6', label: 'ARGENT', bannerH: '300px', delay: '-1.2s' },
+        { avatar: '/_blob/a49fa972bbc013029a5f8bbd0ad62315', rank: 1, name: 'Vorn', title: '◆ Roi du gambling', net: '+3 215 po', color: '#C69B6D', metal: '#f2c94c', label: 'OR', bannerH: '330px', delay: '0s' },
+        { avatar: '/_blob/bff73a6368d8998c25ac31fd5fa428eb', rank: 3, name: 'Kaelys', title: '◆ Il cheat c’est sûr', net: '+1 120 po', color: '#3FC7EB', metal: '#d08a5a', label: 'BRONZE', bannerH: '280px', delay: '-2.4s' }
+      ],
+      rest: [
+        { avatar: '/_blob/a49fa972bbc013029a5f8bbd0ad62315', rank: 4, name: 'Kaeldor', title: '', color: '#C69B6D', net: '+310', netColor: '#7ee2a0', bar: '30%', barColor: '#7ee2a0', bg: 'rgba(163,92,255,.06)' },
+        { avatar: '/_blob/f9955d4888789440c99d8bfad6ca086a', rank: 5, name: 'Sira', title: '◆ Numéro UNO', color: '#AAD372', net: '+120', netColor: '#7ee2a0', bar: '14%', barColor: '#7ee2a0', bg: 'rgba(10,6,16,.4)' },
+        { avatar: '/_blob/e64ba55514f8d40965beae3f09cf595c', rank: 6, name: 'Elyra', title: '◆ Lève toi copaing', color: '#FFFFFF', net: '0', netColor: '#c9c2ea', bar: '2%', barColor: '#c9c2ea', bg: 'rgba(163,92,255,.06)' },
+        { avatar: '/_blob/8f759db3a3a565f7fe41e5c356648b97', rank: 7, name: 'Ulric', title: '', color: '#0070DD', net: '−180', netColor: '#f19a9a', bar: '18%', barColor: '#f19a9a', bg: 'rgba(10,6,16,.4)' },
+        { avatar: '/_blob/e64ba55514f8d40965beae3f09cf595c', rank: 8, name: 'Brakka', title: '', color: '#FFFFFF', net: '−420', netColor: '#f19a9a', bar: '40%', barColor: '#f19a9a', bg: 'rgba(163,92,255,.06)' },
+        { avatar: '/_blob/31795322e5c75ae9d4f56747935f288d', rank: 9, name: 'Morgane', title: '◆ Roi de la dette', color: '#8788EE', net: '−690', netColor: '#f19a9a', bar: '62%', barColor: '#f19a9a', bg: 'rgba(10,6,16,.4)' },
+        { avatar: '/_blob/7f168a1738c4a7b037d7a26c3bdfa5ea', rank: 10, name: 'Zul\u2019rak', title: '', color: '#FFF468', net: '−720', netColor: '#f19a9a', bar: '66%', barColor: '#f19a9a', bg: 'rgba(163,92,255,.06)' },
+        { avatar: '/_blob/31795322e5c75ae9d4f56747935f288d', rank: 11, name: 'Nekh', title: '◆ Loser', color: '#8788EE', net: '−810', netColor: '#f19a9a', bar: '74%', barColor: '#f19a9a', bg: 'rgba(10,6,16,.4)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

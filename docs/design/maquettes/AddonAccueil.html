@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Addon VXV — Salle de guilde</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.px{image-rendering:pixelated}
+.layer{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.tab{min-height:36px;padding:0 12px;border:0;background:#2a1a10;color:#d9c39a;font:600 15px 'Pixelify Sans',sans-serif;box-shadow:0 0 0 2px #0d0912,inset 0 -3px 0 #1a0f08}
+.spot{position:absolute;display:block;border:0;padding:0;background:transparent;cursor:pointer}
+.spot .glow{position:absolute;inset:0;opacity:0;transition:opacity .2s;box-shadow:0 0 0 3px #f2c94c,0 0 24px 4px rgba(163,92,255,.65);background:rgba(163,92,255,.10)}
+.spot:hover .glow,.spot:focus-visible .glow{opacity:1}
+.plaque{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:14px;color:#f8e7c0;background:#3a2414;padding:4px 10px;box-shadow:0 0 0 2px #1a0f08,0 0 0 4px #8a5a2a}
+.plaque.low{bottom:auto;top:36%}
+.plaque.door{bottom:66%}
+.plaque.q{bottom:calc(100% - 10px)}
+.plaque.table{bottom:auto;top:80%}
+.spot:hover .plaque,.spot:focus-visible .plaque{background:#4a2a6a;box-shadow:0 0 0 2px #1a0f08,0 0 0 4px #f2c94c;color:#fff}
+.badge{position:absolute;right:-8px;top:-8px;min-width:20px;height:20px;padding:0 4px;box-sizing:border-box;background:#e0479e;color:#fff;font:700 12px Manrope,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #0d0912}
+.flick{animation:flick 1.6s steps(4) infinite}
+@keyframes flick{0%{opacity:.55}25%{opacity:.8}50%{opacity:.6}75%{opacity:.9}100%{opacity:.55}}
+.pulse{animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.flick,.pulse{animation:none}}
+</style>
+</helmet>
+<div style="width: 1000px; height: 680px; position: relative; overflow: hidden; background: #0e0a16; border: 0; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 7px #8a5a2a, inset 0 0 0 10px #0d0912, inset 0 0 0 12px #5b3a1c; font-family: Manrope, sans-serif; color: #ece7f6">
+  <div style="position: absolute; inset: 12px; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 10px; background: #1a0f0a">
+      <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="" style="width: 30px; height: 30px; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #a35cff">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 700; letter-spacing: .08em; font-size: 20px">VXV</span>
+      <div role="tablist" aria-label="Onglets" style="display: flex; gap: 6px; margin-left: 14px">
+        <button class="tab" type="button" role="tab" aria-selected="true" style="background: #4a2a6a; color: #fff; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c">Taverne</button>
+        <button class="tab" type="button" role="tab">Raid</button>
+        <button class="tab" type="button" role="tab">Le Dé Pipé</button>
+        <button class="tab" type="button" role="tab">Quêtes</button>
+        <button class="tab" type="button" role="tab">Ranking</button>
+        <button class="tab" type="button" role="tab">Artisans</button>
+        <button class="tab" type="button" role="tab">Journal</button>
+      </div>
+      <button type="button" aria-label="Fermer" style="margin-left: auto; width: 30px; height: 30px; border: 0; background: #3a2414; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #8a5a2a; color: #f8e7c0; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="1" y="1" width="3" height="3" fill="currentColor"></rect><rect x="4" y="4" width="3" height="3" fill="currentColor"></rect><rect x="7" y="7" width="3" height="3" fill="currentColor"></rect><rect x="10" y="10" width="3" height="3" fill="currentColor"></rect><rect x="10" y="1" width="3" height="3" fill="currentColor"></rect><rect x="7" y="4" width="3" height="3" fill="currentColor"></rect><rect x="4" y="7" width="3" height="3" fill="currentColor"></rect><rect x="1" y="10" width="3" height="3" fill="currentColor"></rect></svg></button>
+    </div>
+    <div style="height: 4px; background: #5b3a1c"></div>
+
+    <div onMouseMove="{{onMove}}" onMouseLeave="{{onLeave}}" style="position: relative; flex: none; height: 413px; overflow: hidden; background: #0d0912; container-type: inline-size">
+      <img class="layer" src="/_blob/bca5e978c6d5b9512acd411a794baf80" alt="La taverne de la guilde VXV" style="position: absolute; left: -1.5%; top: -1.5%; width: 103%; height: 103%; image-rendering: pixelated; transform: {{backT}}">
+      <div class="flick" style="position: absolute; left: 36%; top: 60%; width: 11%; height: 24%; background: radial-gradient(closest-side, rgba(255,160,60,.45), transparent); mix-blend-mode: screen; pointer-events: none"></div>
+      <div class="pulse" style="position: absolute; left: 74.5%; top: 46%; width: 9%; height: 46%; background: radial-gradient(closest-side, rgba(255,90,200,.4), transparent); mix-blend-mode: screen; pointer-events: none"></div>
+      <div class="flick" style="position: absolute; left: 89%; top: 56%; width: 9%; height: 24%; background: radial-gradient(closest-side, rgba(255,150,50,.45), transparent); mix-blend-mode: screen; pointer-events: none"></div>
+      <div aria-label="Top 3 des parieurs" style="position: absolute; left: 36.9%; top: 29.4%; width: 9.2%; height: 3.6%; display: flex; align-items: center; justify-content: center; font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 0.85cqw; letter-spacing: .08em; color: #f8e7c0; pointer-events: none">TOP PARIEURS</div>
+      <div style="position: absolute; left: 38.9%; top: 35.3%; width: 6.9%; height: 4.6%; display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 0.95cqw; pointer-events: none"><b style="color: #C69B6D">Vorn</b><span style="color: #f2c94c">+3215</span></div>
+      <div style="position: absolute; left: 38.9%; top: 41.2%; width: 6.9%; height: 4.6%; display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 0.95cqw; pointer-events: none"><b style="color: #FF7C0A">Thessa</b><span style="color: #d9dbe6">+1840</span></div>
+      <div style="position: absolute; left: 38.9%; top: 47.1%; width: 6.9%; height: 4.6%; display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 0.95cqw; pointer-events: none"><b style="color: #3FC7EB">Kaelys</b><span style="color: #e0a070">+1120</span></div>
+      <div style="position: absolute; left: 22.4%; top: 38.6%; width: 4.4%; height: 9%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2cqw; text-align: center; font-family: 'Pixelify Sans', sans-serif; font-size: 0.62cqw; line-height: 1.1; color: #3a2614; pointer-events: none"><b>Le Grand Pêcheur</b><span style="color: #8a1f2c">1400 po</span></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(130% 100% at 50% 45%, transparent 60%, rgba(13,9,18,.6) 100%)"></div>
+      <button class="spot" type="button" style="left: 0.5%; top: 22%; width: 18%; height: 72%"><span class="glow"></span><span class="plaque low">Journal</span></button>
+      <button class="spot" type="button" style="left: 17.3%; top: 27%; width: 13%; height: 27%"><span class="glow"></span><span class="plaque q">Quêtes</span><span class="badge">1</span></button>
+      <button class="spot" type="button" style="left: 34.6%; top: 26%; width: 14.5%; height: 58%"><span class="glow"></span><span class="plaque">Ranking</span></button>
+      <button class="spot" type="button" style="left: 49.5%; top: 57%; width: 24%; height: 36%"><span class="glow"></span><span class="plaque table">Raid</span><span class="badge">!</span></button>
+      <button class="spot" type="button" style="left: 73.5%; top: 21%; width: 11%; height: 68%"><span class="glow"></span><span class="plaque door">Le Dé Pipé</span><span class="badge">2</span></button>
+      <button class="spot" type="button" style="left: 85.5%; top: 22%; width: 14%; height: 72%"><span class="glow"></span><span class="plaque low">Artisans</span></button>
+
+    </div>
+
+
+    <div style="flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 14px; background: #120c18">
+      <div style="padding: 12px 14px; background: #1a1222; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #5b3a1c; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Pixelify Sans', sans-serif; font-size: 13px; color: #e0479e">Salle de guerre</span><b style="font-size: 15px">Jeu. 21h00 · 37/40</b><span style="font-size: 12px; color: #f2c94c">SR à choisir avant 20h30</span></div>
+      <div style="padding: 12px 14px; background: #1a1222; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #5b3a1c; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Pixelify Sans', sans-serif; font-size: 13px; color: #e0479e">Quête en cours</span><b style="font-size: 15px">Le Grand Pêcheur</b><span style="font-size: 12px; color: #c9c2ea">Tu es 5e · 90 prises</span></div>
+      <div style="padding: 12px 14px; background: #1a1222; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #5b3a1c; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Pixelify Sans', sans-serif; font-size: 13px; color: #e0479e">Le Dé Pipé</span><b style="font-size: 15px">2 paris ouverts</b><span style="font-size: 12px; color: #c9c2ea">Sira te défie · 200 po</span></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px; padding: 10px 14px; background: #1a0f0a; box-shadow: 0 -4px 0 #5b3a1c; font-size: 13px; color: #d9c39a">
+      <span>Survole un lieu pour l'éclairer · clique pour entrer</span>
+      <span style="margin-left: auto">Données à jour · il y a 12 min</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":680}}'>
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = { mx: 0, my: 0 }; }
+  renderVals() {
+    const { mx, my } = this.state;
+    return {
+      backT: 'translate3d(' + (mx * -6) + 'px,' + (my * -4) + 'px,0)',
+      frontT: 'translate3d(' + (mx * -12) + 'px,' + (my * -6) + 'px,0)',
+      onMove: (e) => { const r = e.currentTarget.getBoundingClientRect(); this.setState({ mx: ((e.clientX - r.left) / r.width - 0.5) * 2, my: ((e.clientY - r.top) / r.height - 0.5) * 2 }); },
+      onLeave: () => this.setState({ mx: 0, my: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>

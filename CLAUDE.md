@@ -36,7 +36,17 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - journal du raid en jeu (boss, présents, morts, objets, diffusé par le maître du butin), onglet Butin, export `VXV-LOG-1` ;
   - import du journal sur le site (présents et objets, qui nourrissent le SR+), corrections par un officier avec motif, récap de fin de raid publié par le bot.
   Validation en attente : un raid réel enregistré sans saisie manuelle (raids ouverts le 9 décembre ; répétition en donjon avec maître du butin possible avant la fin de la bêta).
+- **Habillage (charte « La Taverne »)** : en cours, avant la P7 (`docs/plan/decisions-2026-10-05.md`). Socle : référence `docs/design/`, jetons `packages/design`, polices et images du site.
 - P7 à P15 : pas commencées.
+
+## Design (charte « La Taverne »)
+
+- Référence : `docs/design/VXV_Design_Spec.md`, captures et maquettes ; décisions : `docs/plan/decisions-2026-10-05.md`.
+- Jetons dans `packages/design/src/tokens.ts`, seule source des couleurs et des polices. `npm run generate` écrit `tokens.css` (thème Tailwind du site) ; un test vérifie que le fichier généré est à jour.
+- Pixel art : aucun arrondi (retirés du thème), reliefs en anneaux d'ombres pleines, survol prune et or, zones officier à liseré or.
+- Pixelify Sans pour les titres, onglets, plaques, boutons et gros chiffres ; Manrope pour le texte. Polices et images servies par le site (`apps/web/public`), licences OFL à côté des polices.
+- Un lieu = un onglet, même nom partout : Taverne, Raid, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal.
+- Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
 
 ## Structure du dépôt
 

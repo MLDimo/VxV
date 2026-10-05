@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VXV — La taverne</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0d0912}
+a{color:#cfa8ff}a:hover{color:#f4effc}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.layer{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.spot{position:absolute;display:block;text-decoration:none;outline:none}
+.spot .glow{position:absolute;inset:0;opacity:0;transition:opacity .2s;box-shadow:0 0 0 3px #f2c94c,0 0 30px 6px rgba(163,92,255,.65);background:rgba(163,92,255,.10)}
+.spot:hover .glow,.spot:focus-visible .glow{opacity:1}
+.plaque{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:16px;color:#f8e7c0;background:#3a2414;padding:6px 12px;box-shadow:0 0 0 3px #1a0f08,0 0 0 6px #8a5a2a,0 6px 0 6px rgba(0,0,0,.35);transition:transform .2s}
+.plaque.low{bottom:auto;top:36%}
+.plaque.door{bottom:66%}
+.plaque.q{bottom:calc(100% - 10px)}
+.plaque.table{bottom:auto;top:80%}
+.spot:hover .plaque,.spot:focus-visible .plaque{transform:translateX(-50%) translateY(-4px);color:#fff;background:#4a2a6a;box-shadow:0 0 0 3px #1a0f08,0 0 0 6px #f2c94c,0 6px 0 6px rgba(0,0,0,.35)}
+.plaque small{display:block;font-family:Manrope,sans-serif;font-size:11px;font-weight:700;color:#d9c39a;text-align:center}
+.flick{animation:flick 1.6s steps(4) infinite}
+@keyframes flick{0%{opacity:.55}25%{opacity:.8}50%{opacity:.6}75%{opacity:.9}100%{opacity:.55}}
+.pulse{animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:.8}}
+.pxbox{background:#1a1222;box-shadow:0 0 0 3px #0d0912,0 0 0 6px #5b3a1c,0 0 0 9px #0d0912}
+.pxbtn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:18px;color:#fff;text-decoration:none;background:#8a3ffc;box-shadow:inset -4px -4px 0 #5a1fb0,inset 4px 4px 0 #b98cff,0 0 0 3px #0d0912}
+.pxbtn:hover{color:#fff;background:#9a55ff}
+.pxbtn.gold{background:#c9952f;color:#1a0f04;box-shadow:inset -4px -4px 0 #8a6420,inset 4px 4px 0 #f8dc8a,0 0 0 3px #0d0912}
+.navlink{font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:17px;color:#e9dcc0;text-decoration:none}
+.navlink:hover{color:#f2c94c}
+.burger{display:none}
+@media (max-width: 860px){
+  .desknav{display:none !important}
+  .burger{display:inline-flex}
+  .scenewrap{overflow-x:auto}
+  .scene{min-width:900px}
+}
+@media (prefers-reduced-motion: reduce){.flick,.pulse{animation:none}}
+</style>
+</helmet>
+<div style="font-family: Manrope, sans-serif; color: #ece7f6; background: #0d0912; min-height: 100vh">
+
+  <header style="position: relative; z-index: 20; background: #1a0f0a; box-shadow: 0 3px 0 #0d0912, 0 6px 0 #5b3a1c">
+    <div style="max-width: 1360px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 24px">
+      <a href="#" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+        <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="Emblème VXV" style="width: 42px; height: 42px; object-fit: cover; box-shadow: 0 0 0 3px #0d0912, 0 0 0 5px #a35cff">
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: .08em; color: #f4effc">VXV</span>
+      </a>
+      <nav class="desknav" aria-label="Navigation principale" style="display: flex; flex-wrap: wrap; gap: 22px; flex: 1">
+        <a class="navlink" href="#">Raid</a>
+        <a class="navlink" href="#">Quêtes</a>
+        <a class="navlink" href="#">Le Dé Pipé</a>
+        <a class="navlink" href="#">Ranking</a>
+        <a class="navlink" href="#">Artisans</a>
+        <a class="navlink" href="#">Journal</a>
+      </nav>
+      <a class="pxbtn desknav" href="#" style="font-size: 16px; min-height: 44px">Connexion Discord</a>
+      <button class="burger" type="button" onClick="{{toggle}}" aria-label="Ouvrir le menu" aria-expanded="{{openStr}}" style="margin-left: auto; width: 48px; height: 48px; border: 0; background: #3a2414; box-shadow: 0 0 0 3px #0d0912, 0 0 0 6px #8a5a2a; align-items: center; justify-content: center; cursor: pointer">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="3" fill="#f8e7c0"></rect><rect x="3" y="11" width="18" height="3" fill="#f8e7c0"></rect><rect x="3" y="17" width="18" height="3" fill="#f8e7c0"></rect></svg>
+      </button>
+    </div>
+    <sc-if value="{{open}}" hint-placeholder-val="{{ false }}">
+      <nav aria-label="Menu mobile" style="background: #24160d; box-shadow: 0 6px 0 #5b3a1c; padding: 10px 20px 18px; display: flex; flex-direction: column; gap: 4px">
+        <sc-for list="{{menu}}" as="m" hint-placeholder-count="6">
+          <a href="#" style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 14px; font-family: 'Pixelify Sans', sans-serif; font-size: 20px; color: #f8e7c0; text-decoration: none; border-bottom: 2px dashed #5b3a1c"><span>{{m.label}}</span><span style="font-family: Manrope, sans-serif; font-size: 12px; color: #c9a87a">{{m.sub}}</span></a>
+        </sc-for>
+        <a class="pxbtn" href="#" style="margin-top: 12px">Connexion Discord</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <section class="scenewrap" aria-label="La taverne de VXV : cliquez sur un lieu" onMouseMove="{{onMove}}" onMouseLeave="{{onLeave}}" style="position: relative; overflow: hidden; background: #0d0912">
+    <div class="scene" style="position: relative; max-width: 1920px; margin: 0 auto; aspect-ratio: 1589 / 672; overflow: hidden; container-type: inline-size">
+      <img class="layer" src="/_blob/bca5e978c6d5b9512acd411a794baf80" alt="La taverne de la guilde VXV" style="position: absolute; left: -1.5%; top: -1.5%; width: 103%; height: 103%; image-rendering: pixelated; transform: {{backT}}">
+      <div class="flick" style="position: absolute; left: 36%; top: 60%; width: 11%; height: 24%; background: radial-gradient(closest-side, rgba(255,160,60,.45), transparent); mix-blend-mode: screen; pointer-events: none"></div>
+      <div class="pulse" style="position: absolute; left: 74.5%; top: 46%; width: 9%; height: 46%; background: radial-gradient(closest-side, rgba(255,90,200,.4), transparent); mix-blend-mode: screen; pointer-events: none"></div>
+      <div class="flick" style="position: absolute; left: 89%; top: 56%; width: 9%; height: 24%; background: radial-gradient(closest-side, rgba(255,150,50,.45), transparent); mix-blend-mode: screen; pointer-events: none"></div>
+      <div aria-label="Top 3 des parieurs" style="position: absolute; left: 36.9%; top: 29.4%; width: 9.2%; height: 3.6%; display: flex; align-items: center; justify-content: center; font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 0.85cqw; letter-spacing: .08em; color: #f8e7c0; pointer-events: none">TOP PARIEURS</div>
+      <div style="position: absolute; left: 38.9%; top: 35.3%; width: 6.9%; height: 4.6%; display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 0.95cqw; pointer-events: none"><b style="color: #C69B6D">Vorn</b><span style="color: #f2c94c">+3215</span></div>
+      <div style="position: absolute; left: 38.9%; top: 41.2%; width: 6.9%; height: 4.6%; display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 0.95cqw; pointer-events: none"><b style="color: #FF7C0A">Thessa</b><span style="color: #d9dbe6">+1840</span></div>
+      <div style="position: absolute; left: 38.9%; top: 47.1%; width: 6.9%; height: 4.6%; display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 0.95cqw; pointer-events: none"><b style="color: #3FC7EB">Kaelys</b><span style="color: #e0a070">+1120</span></div>
+      <div style="position: absolute; left: 22.4%; top: 38.6%; width: 4.4%; height: 9%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2cqw; text-align: center; font-family: 'Pixelify Sans', sans-serif; font-size: 0.62cqw; line-height: 1.1; color: #3a2614; pointer-events: none"><b>Le Grand Pêcheur</b><span style="color: #8a1f2c">1400 po</span></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(130% 100% at 50% 45%, transparent 60%, rgba(13,9,18,.6) 100%)"></div>
+      <a class="spot" href="#" style="left: 0.5%; top: 22%; width: 18%; height: 72%"><span class="glow"></span><span class="plaque low">Journal<small>Caisse &amp; historique</small></span></a>
+      <a class="spot" href="#" style="left: 17.3%; top: 27%; width: 13%; height: 27%"><span class="glow"></span><span class="plaque q">Quêtes<small>Missions</small></span></a>
+      <a class="spot" href="#" style="left: 34.6%; top: 26%; width: 14.5%; height: 58%"><span class="glow"></span><span class="plaque">Ranking<small>Classements &amp; titres</small></span></a>
+      <a class="spot" href="#" style="left: 49.5%; top: 57%; width: 24%; height: 36%"><span class="glow"></span><span class="plaque table">Raid<small>Raids &amp; SR</small></span></a>
+      <a class="spot" href="#" style="left: 73.5%; top: 21%; width: 11%; height: 68%"><span class="glow"></span><span class="plaque door">Le Dé Pipé<small>Paris &amp; deathroll</small></span></a>
+      <a class="spot" href="#" style="left: 85.5%; top: 22%; width: 14%; height: 72%"><span class="glow"></span><span class="plaque low">Artisans<small>Forge &amp; métiers</small></span></a>
+
+    </div>
+  </section>
+
+  <main style="max-width: 1360px; margin: 0 auto; padding: 48px 20px 56px; box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px">
+    <article class="pxbox" style="padding: 22px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 15px; color: #e0479e">Prochain raid</span>
+      <h2 style="margin: 0; font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 28px; color: #f4effc">Jeu. 8 oct. · 21h00</h2>
+      <p style="margin: 0; font-size: 15px; color: #c9c2ea">Cœur du Magma + Onyxia · 37 / 40 inscrits</p>
+      <div style="display: flex; gap: 18px; font-weight: 800"><span style="color: #8fb4ff">3 tanks</span><span style="color: #7ee2a0">8 heals</span><span style="color: #ff9b9b">26 DPS</span></div>
+      <a class="pxbtn" href="#" style="align-self: flex-start">Choisir mes SR</a>
+    </article>
+    <article class="pxbox" style="padding: 22px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 15px; color: #e0479e">Quête de la semaine</span>
+      <h2 style="margin: 0; font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 28px; color: #f4effc">Le Grand Pêcheur</h2>
+      <p style="margin: 0; font-size: 15px; color: #c9c2ea">En tête : <b style="color: #AAD372">Sira</b> · 412 prises · fin dans 3 j</p>
+      <div style="display: flex; gap: 10px; font-weight: 800; color: #f2c94c"><span>1 400 po</span><span style="color: #d9b45a">400</span><span style="color: #b8964a">200</span></div>
+      <a class="pxbtn gold" href="#" style="align-self: flex-start">Voir le tableau</a>
+    </article>
+    <article class="pxbox" style="padding: 22px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 15px; color: #e0479e">Le Dé Pipé</span>
+      <h2 style="margin: 0; font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 28px; color: #f4effc">Qui meurt en premier ?</h2>
+      <p style="margin: 0; font-size: 15px; color: #c9c2ea">Tank × 4,5 · Heal × 3,0 · DPS mêlée × 2,1</p>
+      <p style="margin: 0; font-size: 14px; color: #a49bbd">Deathroll en cours : <b style="color: #3FC7EB">Kaelys</b> vs <b style="color: #C69B6D">Vorn</b> · 500 po</p>
+      <a class="pxbtn" href="#" style="align-self: flex-start">Entrer</a>
+    </article>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1090}}'>
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = { mx: 0, my: 0, open: false }; }
+  renderVals() {
+    const { mx, my, open } = this.state;
+    return {
+      backT: 'translate3d(' + (mx * -10) + 'px,' + (my * -6) + 'px,0)',
+      frontT: 'translate3d(' + (mx * -22) + 'px,' + (my * -10) + 'px,0)',
+      open, openStr: open ? 'true' : 'false',
+      toggle: () => this.setState({ open: !this.state.open }),
+      menu: [
+        { label: 'Raid', sub: 'Raids & SR' },
+        { label: 'Quêtes', sub: 'Missions' },
+        { label: 'Le Dé Pipé', sub: 'Paris & deathroll' },
+        { label: 'Ranking', sub: 'Classements & titres' },
+        { label: 'Journal', sub: 'Caisse & historique' },
+        { label: 'Artisans', sub: 'Forge & métiers' }
+      ],
+      onMove: (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        this.setState({ mx: ((e.clientX - r.left) / r.width - 0.5) * 2, my: ((e.clientY - r.top) / r.height - 0.5) * 2 });
+      },
+      onLeave: () => this.setState({ mx: 0, my: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>
