@@ -9,11 +9,11 @@ VXV.RegisterModule({
         ns.Sharing.Start()
         ns.Freshness.Start()
     end,
-    tab = { title = "Raid", Build = ns.RaidTab.Build },
+    tab = { place = "raid", Build = ns.RaidTab.Build },
 })
 
 VXV.RegisterModule({
     id = "loot",
-    name = "Butin",
-    tab = { title = "Butin", Build = ns.LootTab.Build },
+    name = "Journal",
+    tab = { place = "journal", Build = ns.LootTab.Build },
 })

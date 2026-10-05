@@ -38,6 +38,8 @@ VXV = {
     IsSecret = ns.Util.IsSecret,
     --- "Prénom Nom" of a unit ("raid3", "party1"…), or nil when the client has none or hides it.
     NameOfUnit = ns.Names.OfUnit,
+    --- (name, class token): the name in the game's class color, else the charter's.
+    ClassColored = ns.Theme.ClassColored,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")
