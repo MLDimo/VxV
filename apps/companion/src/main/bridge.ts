@@ -11,6 +11,8 @@ export interface CompanionBridge {
   setLaunchAtLogin(on: boolean): Promise<void>;
   syncNow(): Promise<void>;
   openSite(): Promise<void>;
+  /** Installs the newer version (Windows), or opens the page to download it (Mac). */
+  update(): Promise<void>;
 }
 
 /** The player's actions, by name, with their arguments. */

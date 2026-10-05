@@ -23,9 +23,9 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - 4.3 interface : fenêtre à onglets, `/vxv`, icône de minimap déplaçable ;
   - 4.6 communication : morceaux de 255 octets, file 10 + 1/s et pause pendant les boss, versions, présence, `/vxv ping` ;
   - 4.7 filtre de guilde (`Core/Config.lua` : VXV sur Forever, THE DALIRANAS sur la bêta) et export `/vxv liste`, importé sur le site.
-  Compression et relais entre joueurs reportés à la synchro de la P7, leur premier usage. Installation : `tools/install-addon.sh`.
+  Relais entre joueurs fait en P7 (changements faits en jeu, relayés par un officier) ; compression inutile (données de quelques Ko). Installation : `tools/install-addon.sh`.
 - **P5 Addon : onglet Raid** : code terminé (bundle `addon/VXV_Raid`, 79 tests du banc ; export du site sur la page de l'événement) :
-  - le site produit les données de l'événement (`VXV-RAID-1`, officiers seulement), qu'un officier colle en jeu (`/vxv importer`) ;
+  - le site produit les données de l'événement (`VXV-RAID-2` depuis la P7, officiers seulement), qu'un officier colle en jeu (`/vxv importer`) ;
   - onglet Raid : inscrits (icône de rôle, couleur et classe au survol), mes SR, SR du raid avec SR+, objets exclus, modifications avec motif ;
   - diffusion à la guilde, relais vers qui se connecte plus tard, avertissement des modifications, rappel aux officiers quand leurs données datent d'avant le verrouillage des SR ;
   - invitations : ouverture par un officier, Rejoindre (invitation automatique des inscrits attendus avec leur personnage principal, demandes pour les autres), Inviter tout le roster, passage en raid à la première acceptation.
@@ -45,7 +45,14 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - addon : mode réduit 420×600 (bouton de l'en-tête, `/vxv` rouvre le dernier mode) ; son onglet Raid montre le prochain boss de l'instance (packs de données), son butin avec les SR et une alerte quand le joueur y a une SR ;
   - laissés pour plus tard : badges sur les plaques (« ! », nombre d'éléments en attente), avatars (P7 : race et sexe transmis par l'addon), filtres du Journal.
   Validation en attente : le mode réduit en jeu, dans « La salle des Thanes » (seul pack de la bêta).
-- P7 à P15 : pas commencées.
+- **P7 App compagnon** : code terminé (`apps/companion`, guide `docs/compagnon.md`) :
+  - 7.1 et 7.2 : application Electron (Windows et Mac) dans la charte, icône près de l'horloge, démarrage avec l'ordinateur, détection des versions du jeu où l'addon est installé, liaison au compte en un clic (navigateur, PKCE, jeton haché côté site, rôles relus sur Discord chaque heure) ; installeurs non signés (signature ad hoc sur Mac), mises à jour depuis le dépôt public `MLDimo/vxv-compagnon` (automatiques sous Windows, annoncées sur Mac), page « Compagnon » du site ;
+  - 7.3 descente : bundle `VXV_Sync`, prochain événement écrit toutes les 5 minutes, lu au `/reload` ; un officier le transmet à la guilde ;
+  - 7.4 remontée : boîte d'envoi `VXV_SyncDB` (liste de guilde, journaux de raid, race et sexe des personnages), lue sans exécution (`@vxv/lua`) après chaque `/reload` ou déconnexion ; récap Discord publié le lendemain (tâche de 7 h UTC) ;
+  - 7.5 modifications en jeu : inscription, SR et exclusions depuis l'écran Raid, en attente puis confirmées ou refusées (lignes `C` de `VXV-RAID-2`), relayées par un officier équipé pour les membres sans compagnon ;
+  - 7.6 robustesse : droits vérifiés par le site, dédoublonnage (journaux, liste plus ancienne ou incomplète, changements par identifiant).
+  En attente : le jeton `COMPANION_RELEASES_TOKEN` (voir le guide) pour publier la première version, puis un essai réel (liaison, `/reload`, envoi) avant la fin de la bêta.
+- P8 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
 
@@ -87,7 +94,7 @@ La table complète est dans le README. Règles :
 - `npm run check` lance toutes les vérifications. Le hook `pre-push` (activé par `npm install`) bloque tout push si l'une échoue. Ne jamais le contourner (`--no-verify` interdit).
 - `main` n'est pas protégée côté GitHub (offre gratuite, dépôt privé) : la discipline repose sur le hook et la CI.
 - À chaque push, décider explicitement si la nouveauté mérite un test unitaire, et le justifier dans la pull request.
-- Flux GitHub : `tests.yml` (réutilisable, seul endroit où sont définis les tests) ; `ci.yml` (demandes de fusion et `main` : tests puis déploiement du site) ; `deploy-database.yml` ; `release-addon.yml`. Tout déploiement dépend de `tests.yml`.
+- Flux GitHub : `tests.yml` (réutilisable, seul endroit où sont définis les tests) ; `ci.yml` (demandes de fusion et `main` : tests puis déploiement du site) ; `deploy-database.yml` ; `release-addon.yml` ; `release-companion.yml` (étiquettes `compagnon-v<semver>`, installeurs publiés dans `MLDimo/vxv-compagnon`). Tout déploiement dépend de `tests.yml`.
 - Versions de l'addon : étiquettes `v<semver>` sur `main`. Aucune étiquette avant que l'addon soit utilisable (P4 au plus tôt).
 
 ## Conventions Lua (addons)
@@ -96,7 +103,8 @@ La table complète est dans le README. Règles :
 - Code, noms et commentaires en anglais. Textes affichés aux joueurs en français.
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
-- Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-1`, puis une ligne par enregistrement (événement, officiers, objets, inscrits, journal), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
+- Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-2`, puis une ligne par enregistrement (événement avec ses raids, officiers, objets, inscrits, journal, réponses aux changements faits en jeu), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
+- Compagnon (P7) : il écrit `VXV_Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit `VXV_SyncDB` sans l'exécuter ; contrats décrits dans `addon/VXV_Sync/Companion.lua` et `Outbox.lua`. Les autres bundles passent par le bus du socle : `sync.inbox` (données apportées), `sync.put` (kind, clé, valeur à envoyer), `modules.started` (tous les modules démarrés).
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-1`, puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
@@ -148,6 +156,7 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - ESLint (`typescript-eslint` strict) et Prettier (largeur 120) sur tout le code. Markdown et Lua ne sont pas formatés par Prettier.
 - `npm run check` = formatage, lint, typage, tests unitaires, tests de bout en bout. C'est la commande de la CI et du hook `pre-push`.
 - Tests unitaires avec Vitest, à côté du code testé (`*.test.ts`). Les paquets qui démarrent PGlite (PostgreSQL en WebAssembly) limitent Vitest à 2 processus et portent les délais à 30 s : chaque instance coûte de la mémoire, et un poste de 8 Go sature au-delà.
+- Compagnon (`apps/companion`) : mêmes couches que le serveur (`domain`, `application` avec ses ports, `infrastructure`), plus `main` (Electron) et `renderer` (fenêtre). esbuild regroupe tout dans `dist`, l'application n'embarque aucun `node_modules` ; Electron est épinglé à une version exacte (electron-builder l'exige). Fenêtre isolée : `contextIsolation`, `sandbox`, CSP stricte, actions nommées vérifiées par le processus principal.
 - Tests de bout en bout avec Playwright (`apps/web/e2e/*.spec.ts`) : le site construit (`next start`) sur une base PGlite migrée et préparée par les vrais cas d'usage. Chaque parcours visible par un joueur ou un officier y a au moins un test.
 
 ## Base de données (Supabase)

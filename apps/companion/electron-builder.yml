@@ -1,0 +1,38 @@
+# Installers of the companion (P7.1), built by .github/workflows/release-companion.yml: Windows (NSIS, installed for
+# the player alone, without administrator rights) and Mac (DMG, Intel and Apple chips). No certificate yet (decision
+# of 5 October): Windows warns at the first launch, and a Mac asks once to allow the app.
+appId: com.mldimo.vxv.compagnon
+productName: VXV Compagnon
+directories:
+  output: release
+  buildResources: build
+# esbuild bundles everything into dist/: the app needs no node_modules.
+files:
+  - dist/**
+  - package.json
+win:
+  target: nsis
+nsis:
+  oneClick: true
+  perMachine: false
+  # The same names at every version: the website links to the latest release's files.
+  artifactName: VXV-Compagnon-Setup.${ext}
+mac:
+  target:
+    - target: dmg
+      arch: universal
+    # The updates of a Mac read the zip's checksum.
+    - target: zip
+      arch: universal
+  category: public.app-category.games
+  artifactName: VXV-Compagnon-mac.${ext}
+  # Ad-hoc signature: without any, macOS calls a downloaded app for Apple chips damaged.
+  identity: "-"
+  hardenedRuntime: false
+dmg:
+  artifactName: VXV-Compagnon.${ext}
+# The updates come from the public repository of the releases: the code's repository stays private.
+publish:
+  provider: github
+  owner: MLDimo
+  repo: vxv-compagnon

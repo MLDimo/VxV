@@ -170,10 +170,33 @@ function footer(state: CompanionState): HTMLElement {
 
 let shown: CompanionState | undefined;
 
+/** A newer version of the companion: installed in one click (Windows), or downloaded (Mac). */
+function updateBanner(state: CompanionState): HTMLElement[] {
+  const { update } = state;
+  if (update === undefined) {
+    return [];
+  }
+  return [
+    element(
+      "div",
+      { class: "update" },
+      element("span", {}, `Nouvelle version ${update.version}${update.ready ? " prête" : ""}.`),
+      button("pixel", update.ready ? "Redémarrer" : "Télécharger", vxv.update),
+    ),
+  ];
+}
+
 function render(state: CompanionState): void {
   shown = state;
   const notice = state.notice === undefined ? [] : [element("p", { class: "notice", role: "alert" }, state.notice)];
-  app.replaceChildren(...notice, accountPanel(state), gamePanel(state), ...syncPanel(state), footer(state));
+  app.replaceChildren(
+    ...updateBanner(state),
+    ...notice,
+    accountPanel(state),
+    gamePanel(state),
+    ...syncPanel(state),
+    footer(state),
+  );
 }
 
 vxv.onState(render);
