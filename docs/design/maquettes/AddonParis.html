@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Addon VXV — Le Dé Pipé</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.bgflag{position:absolute;inset:0;background:url(/_blob/bca5e978c6d5b9512acd411a794baf80) 80% 75%/250% auto no-repeat;opacity:.32;image-rendering:pixelated}
+.tab{min-height:36px;padding:0 12px;border:0;background:#2a1a10;color:#d9c39a;font:600 15px 'Pixelify Sans',sans-serif;box-shadow:0 0 0 2px #0d0912,inset 0 -3px 0 #1a0f08}
+.sub{min-height:32px;padding:0 14px;border:0;font:600 15px 'Pixelify Sans',sans-serif;cursor:pointer}
+.panel{background:rgba(18,13,26,.88);box-shadow:0 0 0 2px #0d0912,0 0 0 4px #5b3a1c;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.ptitle{font-family:'Pixelify Sans',sans-serif;font-weight:700;font-size:16px;color:#f8e7c0;display:flex;align-items:center;gap:8px}
+.ptitle small{margin-left:auto;font-family:Manrope,sans-serif;font-size:11px;font-weight:700;color:#a49bbd}
+.felt{background:radial-gradient(120% 90% at 50% 0%,#3b1c5e 0%,#24123b 55%,#170c27 100%);box-shadow:0 0 0 2px #0d0912,0 0 0 4px #5b3a1c,inset 0 0 0 3px #2a1a0c,inset 0 0 0 4px rgba(242,201,76,.35)}
+.pxbtn{display:flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:0;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:16px;color:#fff;background:#8a3ffc;box-shadow:inset -3px -3px 0 #5a1fb0,inset 3px 3px 0 #b98cff,0 0 0 2px #0d0912;cursor:pointer}
+.goldbtn{display:flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:0;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:16px;color:#f2c94c;background:#3a2414;box-shadow:inset -3px -3px 0 #1a0f08,inset 3px 3px 0 #8a5a2a,0 0 0 2px #0d0912;cursor:pointer}
+.opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border:0;cursor:pointer;font-family:Manrope,sans-serif}
+.coin{width:52px;height:52px;display:flex;align-items:center;justify-content:center;font:700 15px 'Pixelify Sans',sans-serif;color:#1a1206;background:#f2c94c;box-shadow:inset -3px -3px 0 #b8860b,inset 3px 3px 0 #fff2b0,0 0 0 2px #1a1206}
+.amt{min-height:30px;min-width:52px;padding:0 8px;border:0;font:700 13px Manrope,sans-serif;cursor:pointer}
+.odd{min-height:30px;padding:0 10px;border:0;font:700 12px Manrope,sans-serif;color:#f2c94c;background:#2a1a10;box-shadow:0 0 0 2px #0d0912,inset 0 0 0 1px #8a5a2a;cursor:pointer}
+.live{width:8px;height:8px;background:#ff3b5c;box-shadow:0 0 10px #ff3b5c;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.3}}
+@media (prefers-reduced-motion: reduce){.live{animation:none}}
+</style>
+</helmet>
+<div style="width: 1000px; height: 680px; position: relative; overflow: hidden; background: #0e0a16; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 7px #8a5a2a, inset 0 0 0 10px #0d0912, inset 0 0 0 12px #5b3a1c; font-family: Manrope, sans-serif; color: #ece7f6">
+  <div class="bgflag"></div>
+  <div style="position: absolute; inset: 0; background: radial-gradient(500px 340px at 80% 20%, rgba(255,90,200,.14), transparent 70%), linear-gradient(180deg, rgba(14,10,22,.55), rgba(14,10,22,.92))"></div>
+
+  <div style="position: relative; display: flex; flex-direction: column; height: 100%">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 0">
+      <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px #a35cff">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 800; letter-spacing: .14em; font-size: 16px">VXV</span>
+      <div role="tablist" aria-label="Onglets" style="display: flex; gap: 2px; margin-left: 18px">
+        <button class="tab" type="button" role="tab">Taverne</button>
+        <button class="tab" type="button" role="tab">Raid</button>
+        <button class="tab" type="button" role="tab" aria-selected="true" style="background: #4a2a6a; color: #fff; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c">Le Dé Pipé</button>
+        <button class="tab" type="button" role="tab">Quêtes</button>
+        <button class="tab" type="button" role="tab">Ranking</button>
+        <button class="tab" type="button" role="tab">Artisans</button>
+        <button class="tab" type="button" role="tab">Journal</button>
+      </div>
+    </div>
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, #a35cff 20%, #e0479e 80%, transparent)"></div>
+
+    <div style="display: flex; align-items: flex-end; gap: 18px; padding: 14px 22px 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #ff5ac8">La salle de jeu</span>
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 30px; line-height: 1; color: #f4effc">Le Dé Pipé</span>
+      </div>
+      <div role="tablist" aria-label="Jeux" style="display: flex; gap: 4px; padding-bottom: 2px">
+        <button class="sub" type="button" role="tab" aria-selected="true" style="color: #fff; background: #4a2a6a; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c">Paris</button>
+        <button class="sub" type="button" role="tab" style="color: #d9c39a; background: #2a1a10; box-shadow: 0 0 0 2px #0d0912">Deathroll</button>
+      </div>
+      <div style="margin-left: auto; display: flex; gap: 8px; padding-bottom: 2px">
+        <span style="padding: 5px 10px; background: rgba(126,226,160,.14); color: #7ee2a0; font-size: 12px; font-weight: 800">Dette : aucune</span>
+        <span style="padding: 5px 10px; background: rgba(242,201,76,.14); color: #f2c94c; font-size: 12px; font-weight: 800">10 % pour la caisse</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; padding: 0 22px 20px">
+
+      <section class="felt" style="padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 0">
+        <div class="ptitle" style="color: #f8dc8a">Paris ouverts<small style="color: #c9b48a">pari mutuel · cotes en direct</small></div>
+        <div style="padding: 14px; background: rgba(10,6,16,.55); box-shadow: inset 0 0 0 1px rgba(242,201,76,.3); display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; justify-content: space-between; gap: 10px"><b style="font-size: 15px; color: #f4effc">Qui meurt en premier sur Ragnaros ?</b><span style="font-size: 12px; font-weight: 700; color: #f2c94c; white-space: nowrap">ferme dans 1 h 12</span></div>
+          <div role="radiogroup" aria-label="Choix" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+            <sc-for list="{{odds}}" as="o" hint-placeholder-count="3">
+              <button class="opt" type="button" role="radio" aria-checked="{{o.checked}}" onClick="{{o.pick}}" style="background: {{o.bg}}; box-shadow: 0 0 0 2px #0d0912, inset 0 0 0 2px {{o.ring}}">
+                <span class="coin">{{o.cote}}</span>
+                <b style="font-size: 13px; color: #f4effc">{{o.label}}</b>
+                <span style="font-size: 11px; color: #c9b48a">{{o.pot}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px">
+            <span style="font-size: 12px; font-weight: 700; color: #c9b48a; margin-right: 4px">Ma mise</span>
+            <sc-for list="{{amounts}}" as="a" hint-placeholder-count="4">
+              <button class="amt" type="button" aria-pressed="{{a.pressed}}" onClick="{{a.pick}}" style="color: {{a.color}}; background: {{a.bg}}; box-shadow: 0 0 0 2px #0d0912, inset 0 0 0 1px {{a.ring}}">{{a.label}}</button>
+            </sc-for>
+            <span style="margin-left: auto; font-size: 12px; color: #c9c2ea">Gain possible <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 16px; color: #7ee2a0">{{gain}}</b></span>
+          </div>
+          <button class="pxbtn" type="button">{{betLabel}}</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{others}}" as="q" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(10,6,16,.45); box-shadow: inset 0 0 0 1px rgba(242,201,76,.15)">
+              <span style="flex: 1; font-size: 13px; font-weight: 700; color: #f4effc">{{q.label}}</span>
+              <button class="odd" type="button">Oui × {{q.yes}}</button>
+              <button class="odd" type="button">Non × {{q.no}}</button>
+            </div>
+          </sc-for>
+        </div>
+        <span style="margin-top: auto; font-size: 11px; color: #c9b48a">Cagnotte totale 1 000 po · les cotes bougent avec les mises jusqu'à la fermeture.</span>
+      </section>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; min-height: 0">
+        <section class="panel" style="box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #b0306e; background: rgba(40,10,24,.9)">
+          <span class="ptitle" style="color: #ffb3d6"><span class="live"></span>Deathroll en direct<small style="color: #d9a3b8">1 contre 1</small></span>
+          <div style="display: flex; align-items: center; justify-content: space-between; font-family: 'Pixelify Sans', sans-serif; font-size: 20px"><b style="color: #3FC7EB">Kaelys</b><span style="font-size: 16px; color: #e0479e">VS</span><b style="color: #C69B6D">Vorn</b></div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: #d9a3b8"><span>Mise 500 po</span><span>Plage restante <b style="color: #fff">0 – 47</b></span></div>
+          <span style="height: 6px; background: #2a1020"><span style="display: block; height: 100%; width: 72%; background: linear-gradient(90deg, #a35cff, #ff3b5c)"></span></span>
+          <button class="goldbtn" type="button" style="color: #ffd1e6">Regarder la partie</button>
+        </section>
+
+        <section class="panel" style="flex: 1">
+          <span class="ptitle">Défis en attente</span>
+          <sc-for list="{{duels}}" as="d" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(10,6,16,.55); box-shadow: inset 0 0 0 1px #2e2442">
+              <b style="color: {{d.color}}">{{d.from}}</b><span style="font-size: 12px; color: #a49bbd">{{d.verb}}</span>
+              <b style="margin-left: auto; font-family: 'Pixelify Sans', sans-serif; color: #f2c94c">{{d.stake}}</b>
+              <sc-if value="{{d.mine}}" hint-placeholder-val="{{ true }}"><button class="pxbtn" type="button" style="min-height: 30px; font-size: 13px; padding: 0 10px">Accepter</button></sc-if>
+              <sc-if value="{{d.other}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #a49bbd">en attente</span></sc-if>
+            </div>
+          </sc-for>
+          <button class="goldbtn" type="button" style="margin-top: auto">Lancer un défi</button>
+        </section>
+
+        <section class="panel">
+          <span class="ptitle">Mes paris<small>saison 2</small></span>
+          <div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: #c9c2ea">2 en cours · 150 po misés</span><b style="color: #7ee2a0">+ 640 po net</b></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":680}}'>
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = { pick: 0, amount: 50 }; }
+  renderVals() {
+    const { pick, amount } = this.state;
+    const base = [
+      { label: 'Un tank', cote: 4.5, pot: '200 po · 5 parieurs' },
+      { label: 'Un soigneur', cote: 3.0, pot: '300 po · 7 parieurs' },
+      { label: 'Un DPS mêlée', cote: 2.1, pot: '420 po · 9 parieurs' }
+    ];
+    const fmt = n => String(n).replace('.', ',');
+    const odds = base.map((o, i) => {
+      const on = i === pick;
+      return { label: o.label, pot: o.pot, cote: '× ' + fmt(o.cote.toFixed(1)), checked: on ? 'true' : 'false', bg: on ? 'rgba(242,201,76,.14)' : 'rgba(10,6,16,.4)', ring: on ? '#f2c94c' : 'rgba(242,201,76,.18)', pick: () => this.setState({ pick: i }) };
+    });
+    const amounts = [10, 50, 100, 500].map(v => {
+      const on = v === amount;
+      return { label: v + ' po', pressed: on ? 'true' : 'false', color: on ? '#120a1c' : '#f2c94c', bg: on ? '#f2c94c' : '#2a1a10', ring: on ? '#f2c94c' : '#8a5a2a', pick: () => this.setState({ amount: v }) };
+    });
+    const gain = Math.round(amount * base[pick].cote);
+    return {
+      odds, amounts,
+      gain: gain.toLocaleString('fr-FR') + ' po',
+      betLabel: 'Miser ' + amount + ' po sur « ' + base[pick].label + ' »',
+      others: [
+        { label: 'Onyxia tombe au premier essai ?', yes: '1,6', no: '2,4' },
+        { label: 'Raid terminé en moins de 2 h 30 ?', yes: '2,1', no: '1,7' }
+      ],
+      duels: [
+        { from: 'Sira', color: '#AAD372', verb: 'te défie', stake: '200 po', mine: true, other: false },
+        { from: 'Kaeldor', color: '#C69B6D', verb: 'défie Grommak', stake: '1 000 po', mine: false, other: true }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

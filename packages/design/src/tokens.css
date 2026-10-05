@@ -1,0 +1,105 @@
+/* Generated from packages/design/src/tokens.ts by npm run generate: do not edit. */
+
+@font-face {
+  font-family: "Pixelify Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/pixelify-sans-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pixelify Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/pixelify-sans-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pixelify Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/pixelify-sans-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/manrope-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/manrope-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/manrope-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/manrope-latin-800-normal.woff2") format("woff2");
+}
+
+@theme {
+  --font-pixel: "Pixelify Sans", monospace;
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --color-amethyst: #a35cff;
+  --color-amethyst-button: #8a3ffc;
+  --color-amethyst-shade: #5a1fb0;
+  --color-amethyst-light: #b98cff;
+  --color-sakura: #e0479e;
+  --color-sakura-light: #ff8cc8;
+  --color-gold: #f2c94c;
+  --color-gold-shade: #b8860b;
+  --color-gold-light: #fff2b0;
+  --color-night: #0b0814;
+  --color-night-window: #0e0a16;
+  --color-ink: #0d0912;
+  --color-panel: rgba(18, 13, 26, 0.88);
+  --color-panel-officer: rgba(42, 26, 10, 0.9);
+  --color-ivory: #f4effc;
+  --color-lavender: #c9c2ea;
+  --color-muted: #a49bbd;
+  --color-line: #2e2442;
+  --color-gain: #7ee2a0;
+  --color-loss: #f19a9a;
+  --color-epic: #c58bff;
+  --color-wood-night: #1a0f0a;
+  --color-wood: #3a2414;
+  --color-wood-shade: #1a0f08;
+  --color-wood-tab: #2a1a10;
+  --color-beam: #5b3a1c;
+  --color-copper: #8a5a2a;
+  --color-plum: #4a2a6a;
+  --color-parchment: #f8e7c0;
+  --color-old-paper: #d9c39a;
+  --color-ink-brown: #3a2614;
+  --color-ember: #ffa03c;
+  --color-neon: #ff5ac8;
+  --color-class-warrior: #c69b6d;
+  --color-class-paladin: #f48cba;
+  --color-class-hunter: #aad372;
+  --color-class-rogue: #fff468;
+  --color-class-priest: #ffffff;
+  --color-class-shaman: #0070dd;
+  --color-class-mage: #3fc7eb;
+  --color-class-warlock: #8788ee;
+  --color-class-druid: #ff7c0a;
+  --radius-*: initial;
+}

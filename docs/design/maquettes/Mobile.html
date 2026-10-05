@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VXV — Site mobile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.px{image-rendering:pixelated}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:118px;text-decoration:none;background-image:url(/_blob/bca5e978c6d5b9512acd411a794baf80);background-repeat:no-repeat;image-rendering:pixelated;box-shadow:0 0 0 3px #0d0912,0 0 0 6px #5b3a1c}
+.tile span{display:block;padding:6px 8px;background:linear-gradient(0deg,rgba(13,9,18,.95),rgba(13,9,18,.55));font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:16px;color:#f8e7c0}
+.tile small{display:block;font-family:Manrope,sans-serif;font-size:11px;font-weight:700;color:#d9c39a}
+.pxbtn{display:flex;align-items:center;justify-content:center;min-height:48px;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:18px;color:#fff;text-decoration:none;background:#8a3ffc;box-shadow:inset -4px -4px 0 #5a1fb0,inset 4px 4px 0 #b98cff,0 0 0 3px #0d0912}
+.flick{animation:flick 1.6s steps(4) infinite}
+@keyframes flick{0%{opacity:.5}25%{opacity:.8}50%{opacity:.6}75%{opacity:.9}100%{opacity:.5}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0d0912; color: #ece7f6; font-family: Manrope, sans-serif">
+
+  <header style="display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 14px; background: #1a0f0a; box-shadow: 0 3px 0 #0d0912, 0 6px 0 #5b3a1c; position: relative; z-index: 3">
+    <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="Emblème VXV" style="width: 36px; height: 36px; object-fit: cover; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #a35cff">
+    <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: .08em">VXV</span>
+    <button type="button" onClick="{{toggle}}" aria-label="{{burgerLabel}}" aria-expanded="{{openStr}}" style="margin-left: auto; width: 48px; height: 48px; border: 0; background: #3a2414; box-shadow: 0 0 0 3px #0d0912, 0 0 0 6px #8a5a2a; display: flex; align-items: center; justify-content: center; cursor: pointer">
+      <sc-if value="{{closed}}" hint-placeholder-val="{{ true }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="3" fill="#f8e7c0"></rect><rect x="3" y="11" width="18" height="3" fill="#f8e7c0"></rect><rect x="3" y="17" width="18" height="3" fill="#f8e7c0"></rect></svg>
+      </sc-if>
+      <sc-if value="{{open}}" hint-placeholder-val="{{ false }}">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="3" fill="#f2c94c"></rect><rect x="8" y="8" width="3" height="3" fill="#f2c94c"></rect><rect x="11" y="11" width="3" height="3" fill="#f2c94c"></rect><rect x="14" y="14" width="3" height="3" fill="#f2c94c"></rect><rect x="17" y="17" width="3" height="3" fill="#f2c94c"></rect><rect x="17" y="5" width="3" height="3" fill="#f2c94c"></rect><rect x="14" y="8" width="3" height="3" fill="#f2c94c"></rect><rect x="8" y="14" width="3" height="3" fill="#f2c94c"></rect><rect x="5" y="17" width="3" height="3" fill="#f2c94c"></rect></svg>
+      </sc-if>
+    </button>
+  </header>
+
+  <div style="position: relative; height: 196px; overflow-x: auto; overflow-y: hidden; background: #0d0912">
+    <div style="position: relative; width: 463px; height: 196px">
+      <img src="/_blob/bca5e978c6d5b9512acd411a794baf80" alt="La taverne de la guilde VXV" style="position: absolute; left: 0; top: 0; width: 463px; height: 196px">
+      <div class="flick" style="position: absolute; left: 36%; top: 60%; width: 11%; height: 24%; background: radial-gradient(closest-side, rgba(255,160,60,.45), transparent); mix-blend-mode: screen"></div>
+    </div>
+    <span style="position: absolute; right: 10px; bottom: 8px; padding: 4px 8px; font-size: 11px; font-weight: 700; color: #f8e7c0; background: rgba(13,9,18,.8)">Glisse pour explorer →</span>
+  </div>
+
+  <div style="padding: 18px 16px 0; display: flex; flex-direction: column; gap: 18px">
+    <div style="padding: 14px; background: #1a1222; box-shadow: 0 0 0 3px #0d0912, 0 0 0 6px #5b3a1c; display: flex; align-items: center; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-size: 13px; color: #e0479e">Prochain raid</span>
+        <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 20px">Jeu. 8 oct. · 21h00</b>
+        <span style="font-size: 12px; color: #c9c2ea">37 / 40 · SR verrouillées dans 2 j</span>
+      </div>
+      <a class="pxbtn" href="#" style="padding: 0 14px; font-size: 16px">Mes SR</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; padding: 3px">
+      <a class="tile" href="#" style="background-size: 1100px auto; background-position: -560px -300px"><span>Raid<small>Raids &amp; SR</small></span></a>
+      <a class="tile" href="#" style="background-size: 1100px auto; background-position: -175px -125px"><span>Quêtes<small>Missions</small></span></a>
+      <a class="tile" href="#" style="background-size: 1100px auto; background-position: -790px -230px"><span>Le Dé Pipé<small>Paris &amp; deathroll</small></span></a>
+      <a class="tile" href="#" style="background-size: 1100px auto; background-position: -370px -130px"><span>Ranking<small>Classements</small></span></a>
+      <a class="tile" href="#" style="background-size: 1100px auto; background-position: -935px -300px"><span>Artisans<small>Forge &amp; métiers</small></span></a>
+      <a class="tile" href="#" style="background-size: 1100px auto; background-position: -10px -220px"><span>Journal<small>Caisse &amp; historique</small></span></a>
+    </div>
+  </div>
+
+  <sc-if value="{{open}}" hint-placeholder-val="{{ false }}">
+    <nav aria-label="Menu" style="position: absolute; left: 0; right: 0; top: 70px; bottom: 0; z-index: 2; background: #24160d; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 6px #5b3a1c; padding: 18px 20px; display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{menu}}" as="m" hint-placeholder-count="7">
+        <a href="#" style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 6px; font-family: 'Pixelify Sans', sans-serif; font-size: 22px; color: #f8e7c0; text-decoration: none; border-bottom: 2px dashed #5b3a1c"><span>{{m.label}}</span><span style="font-family: Manrope, sans-serif; font-size: 12px; font-weight: 700; color: #c9a87a">{{m.sub}}</span></a>
+      </sc-for>
+      <a class="pxbtn" href="#" style="margin-top: 18px">Connexion Discord</a>
+    </nav>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = { open: false }; }
+  renderVals() {
+    const open = this.state.open;
+    return {
+      open, closed: !open, openStr: open ? 'true' : 'false',
+      burgerLabel: open ? 'Fermer le menu' : 'Ouvrir le menu',
+      toggle: () => this.setState({ open: !this.state.open }),
+      menu: [
+        { label: 'Raid', sub: 'Raids & SR' },
+        { label: 'Quêtes', sub: 'Missions' },
+        { label: 'Le Dé Pipé', sub: 'Paris & deathroll' },
+        { label: 'Ranking', sub: 'Classements & titres' },
+        { label: 'Journal', sub: 'Caisse & historique' },
+        { label: 'Artisans', sub: 'Forge & métiers' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

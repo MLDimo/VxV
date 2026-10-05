@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Addon VXV — Journal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.bgflag{position:absolute;inset:0;background:url(/_blob/bca5e978c6d5b9512acd411a794baf80) 0% 70%/250% auto no-repeat;opacity:.3;image-rendering:pixelated}
+.tab{min-height:36px;padding:0 12px;border:0;background:#2a1a10;color:#d9c39a;font:600 15px 'Pixelify Sans',sans-serif;box-shadow:0 0 0 2px #0d0912,inset 0 -3px 0 #1a0f08}
+.page{position:relative;background:radial-gradient(circle at 30% 20%,#f3e7c9,#e2cfa3 70%,#cdb581);color:#3a2614;padding:18px 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden}
+.ruled{background:repeating-linear-gradient(180deg,transparent 0 31px,rgba(120,80,30,.22) 31px 32px),radial-gradient(circle at 30% 20%,#f3e7c9,#e2cfa3 70%,#cdb581)}
+.ph{font-family:'Pixelify Sans',sans-serif;font-weight:700;font-size:20px;color:#2a1a0c;display:flex;align-items:baseline;gap:8px}
+.ph small{margin-left:auto;font-family:Manrope,sans-serif;font-size:11px;font-weight:700;color:#6b4a2a}
+.chip{min-height:28px;padding:0 10px;border:0;font:700 12px Manrope,sans-serif;cursor:pointer}
+.stamp{padding:1px 6px;font-size:10px;font-weight:800;letter-spacing:.06em;border:1.5px solid currentColor}
+.pxbtn{display:flex;align-items:center;justify-content:center;min-height:38px;padding:0 14px;border:0;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:15px;color:#fff;background:#8a3ffc;box-shadow:inset -3px -3px 0 #5a1fb0,inset 3px 3px 0 #b98cff,0 0 0 2px #0d0912;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 1000px; height: 680px; position: relative; overflow: hidden; background: #0e0a16; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 7px #8a5a2a, inset 0 0 0 10px #0d0912, inset 0 0 0 12px #5b3a1c; font-family: Manrope, sans-serif; color: #ece7f6">
+  <div class="bgflag"></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,10,22,.5), rgba(14,10,22,.88))"></div>
+
+  <div style="position: relative; display: flex; flex-direction: column; height: 100%">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 0">
+      <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px #a35cff">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 800; letter-spacing: .14em; font-size: 16px">VXV</span>
+      <div role="tablist" aria-label="Onglets" style="display: flex; gap: 2px; margin-left: 18px">
+        <button class="tab" type="button" role="tab">Taverne</button>
+        <button class="tab" type="button" role="tab">Raid</button>
+        <button class="tab" type="button" role="tab">Le Dé Pipé</button>
+        <button class="tab" type="button" role="tab">Quêtes</button>
+        <button class="tab" type="button" role="tab">Ranking</button>
+        <button class="tab" type="button" role="tab">Artisans</button>
+        <button class="tab" type="button" role="tab" aria-selected="true" style="background: #4a2a6a; color: #fff; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c">Journal</button>
+      </div>
+    </div>
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, #a35cff 20%, #e0479e 80%, transparent)"></div>
+
+    <div style="flex: 1; min-height: 0; padding: 16px 22px 20px; display: flex">
+      <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); padding: 12px; background: linear-gradient(180deg, #4a2414, #2e140a); box-shadow: 0 0 0 3px #0d0912, 0 0 0 6px #8a5a2a, 0 18px 40px rgba(0,0,0,.6), inset 0 0 0 2px #6b3a1e">
+
+        <section class="page ruled" style="box-shadow: inset -24px 0 30px -18px rgba(70,40,10,.55)">
+          <div class="ph">La caisse de la guilde<small>visible par tous</small></div>
+          <div style="display: flex; align-items: flex-end; gap: 14px; padding: 8px 0 6px; border-bottom: 2px solid rgba(90,60,30,.35)">
+            <div style="display: flex; flex-direction: column">
+              <span style="font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #6b4a2a">Solde</span>
+              <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 40px; line-height: 1; color: #8a5a0e">12 480 po</b>
+            </div>
+            <div style="margin-left: auto; display: flex; flex-direction: column; gap: 2px; text-align: right; font-size: 12px; font-weight: 700">
+              <span style="color: #2e7a44">+ 3 215 po ce mois</span>
+              <span style="color: #8a1f2c">− 2 000 po ce mois</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0">
+            <sc-for list="{{moves}}" as="m" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 46px minmax(0, 1fr) 82px; gap: 8px; align-items: center; min-height: 32px; font-size: 12px">
+                <span style="color: #6b4a2a; font-weight: 700">{{m.date}}</span>
+                <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #3a2614">{{m.label}}</span>
+                <b style="text-align: right; font-family: 'Pixelify Sans', sans-serif; font-size: 14px; color: {{m.color}}">{{m.amount}}</b>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: auto; display: flex; align-items: center; gap: 12px">
+            <button class="pxbtn" type="button" style="flex: none; white-space: nowrap">Faire un don</button>
+            <span style="font-size: 11px; line-height: 1.4; color: #6b4a2a">Chaque mouvement est validé par le trésorier, avec un motif.</span>
+          </div>
+        </section>
+
+        <section class="page ruled" style="box-shadow: inset 24px 0 30px -18px rgba(70,40,10,.55)">
+          <div class="ph">Journal des officiers<small>non effaçable</small></div>
+          <div role="group" aria-label="Filtrer" style="display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{filters}}" as="f" hint-placeholder-count="6">
+              <button class="chip" type="button" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}" style="color: {{f.color}}; background: {{f.bg}}; box-shadow: inset 0 0 0 1.5px {{f.ring}}">{{f.label}}</button>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; min-height: 0">
+            <sc-for list="{{entries}}" as="e" hint-placeholder-count="5">
+              <div style="display: flex; flex-direction: column; gap: 3px; padding: 7px 0 8px; border-bottom: 1px dashed rgba(90,60,30,.4)">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 11px">
+                  <span class="stamp" style="color: {{e.tagColor}}">{{e.tag}}</span>
+                  <span style="color: #6b4a2a; font-weight: 700">{{e.when}}</span>
+                  <span style="margin-left: auto; color: #6b4a2a">par <b style="color: #3a2614">{{e.by}}</b></span>
+                </div>
+                <span style="font-size: 13px; font-weight: 700; color: #2a1a0c">{{e.what}}</span>
+                <span style="font-size: 12px; font-style: italic; color: #5a3e24">Motif : {{e.why}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":680}}'>
+class Component extends DCLogic {
+  constructor(props){ super(props); this.state = { filter: 'Tout' }; }
+  renderVals() {
+    const cur = this.state.filter;
+    const all = [
+      { tag: 'LOOT', cat: 'Loots', tagColor: '#7a2fe0', when: 'Jeu. 1 oct. · 23h12', by: 'Thessa', what: 'Œil de Sulfuras attribué à Vorn au loot council', why: 'Tank principal, objet hors SR' },
+      { tag: 'CAISSE', cat: 'Caisse', tagColor: '#8a5a0e', when: 'Mer. 30 sept. · 18h40', by: 'Thessa (trésorière)', what: 'Récompenses de « Chasseur de têtes » versées : 1 400 / 400 / 200 po', why: 'Quête terminée, résultat validé' },
+      { tag: 'QUÊTE', cat: 'Quêtes', tagColor: '#2e7a44', when: 'Mer. 30 sept. · 18h32', by: 'Grommak', what: 'Résultat de « Chasseur de têtes » validé · 1er Vorn (184 VH)', why: 'Fin de la quête de la semaine' },
+      { tag: 'PARI', cat: 'Paris', tagColor: '#b0306e', when: 'Mar. 29 sept. · 22h05', by: 'Grommak', what: 'Pari « Qui meurt en premier sur Ragnaros ? » annulé et remboursé', why: 'Raid interrompu, déconnexion du serveur' },
+      { tag: 'RAID', cat: 'Raid', tagColor: '#3a5aa0', when: 'Mar. 29 sept. · 20h58', by: 'Thessa', what: 'Raka invité manuellement (reroll)', why: 'Remplace un DPS absent' }
+    ];
+    const cats = ['Tout', 'Loots', 'Caisse', 'Quêtes', 'Paris', 'Raid'];
+    return {
+      filters: cats.map(c => { const on = c === cur; return { label: c, pressed: on ? 'true' : 'false', color: on ? '#f3e7ff' : '#5a3e24', bg: on ? '#4a2a6a' : 'rgba(255,255,255,.25)', ring: on ? '#4a2a6a' : 'rgba(90,60,30,.45)', pick: () => this.setState({ filter: c }) }; }),
+      entries: cur === 'Tout' ? all : all.filter(e => e.cat === cur),
+      moves: [
+        { date: '04/10', label: 'Commission 10 % · paris du Dé Pipé', amount: '+ 86 po', color: '#2e7a44' },
+        { date: '03/10', label: 'Don de Morgane', amount: '+ 500 po', color: '#2e7a44' },
+        { date: '01/10', label: 'Commission 10 % · deathroll Vorn vs Sira', amount: '+ 40 po', color: '#2e7a44' },
+        { date: '30/09', label: 'Récompenses · Chasseur de têtes', amount: '− 2 000 po', color: '#8a1f2c' },
+        { date: '30/09', label: 'Part non distribuée · Cœur de mineur', amount: '+ 200 po', color: '#2e7a44' },
+        { date: '28/09', label: 'Don de Kaeldor', amount: '+ 1 000 po', color: '#2e7a44' },
+        { date: '27/09', label: 'Commission 10 % · paris du Dé Pipé', amount: '+ 112 po', color: '#2e7a44' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

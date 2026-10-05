@@ -27,6 +27,7 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `apps/companion` | Application de bureau compagnon | P7 |
 | `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`…) | P1.5 puis P4 |
 | `packages/raid-data` | Schéma et validation des données de raid (`@vxv/raid-data`) | P1.4 |
+| `packages/design` | Jetons de la charte « La Taverne » (couleurs, polices) et thème du site généré (`@vxv/design`) | Habillage |
 | `data/raids` | Source des données de raid en JSON, une par raid ([format](data/raids/README.md)) | P1.4 |
 | `tools/data-generator` | Génère les packs de l'addon et le script SQL des raids dans `dist/generated` (`npm run generate`) | P1.5 |
 | `tools/addon-release` | Rassemble les dossiers de l'addon et inscrit la version (`npm run release:prepare -- v1.2.0`) | P1.6 |
@@ -37,7 +38,7 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `tools/install-addon.sh` | Construit l'addon comme une publication (version de développement) et l'installe dans un client | P4 |
 | `tools/write-inbox.sh` | Simule le compagnon pour le test fichiers | P0 |
 | `tools/deploy-database.sh` | Déploie la base : migrations puis données de raid ([environnements](docs/environnements.md)) | P1.7 |
-| `docs/` | Rapports, protocoles et notices | toutes |
+| `docs/` | Rapports, protocoles et notices ; `docs/design` : référence de la charte graphique | toutes |
 
 ## Publier l'addon
 

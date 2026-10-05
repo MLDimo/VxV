@@ -1,0 +1,15 @@
+{
+  "name": "@vxv/design",
+  "private": true,
+  "description": "VXV's design tokens (colors, fonts) from docs/design, and the styles generated from them.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "generate": "tsx src/generate.ts"
+  }
+}

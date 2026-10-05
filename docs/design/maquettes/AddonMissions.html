@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Addon VXV — Quêtes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.bgflag{position:absolute;inset:0;background:url(/_blob/bca5e978c6d5b9512acd411a794baf80) 22% 45%/250% auto no-repeat;opacity:.3;image-rendering:pixelated}
+.tab{min-height:36px;padding:0 12px;border:0;background:#2a1a10;color:#d9c39a;font:600 15px 'Pixelify Sans',sans-serif;box-shadow:0 0 0 2px #0d0912,inset 0 -3px 0 #1a0f08}
+.panel{background:rgba(18,13,26,.88);box-shadow:0 0 0 2px #0d0912,0 0 0 4px #5b3a1c;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.ptitle{font-family:'Pixelify Sans',sans-serif;font-weight:700;font-size:16px;color:#f8e7c0;display:flex;align-items:center;gap:8px}
+.ptitle small{margin-left:auto;font-family:Manrope,sans-serif;font-size:11px;font-weight:700;color:#a49bbd}
+.parch{position:relative;background:radial-gradient(circle at 30% 20%,#f3e7c9,#e2cfa3 70%,#cdb581);color:#3a2614;box-shadow:0 0 0 2px #0d0912,0 0 0 4px #8a5a2a,inset 0 0 30px rgba(120,80,30,.35)}
+.pin{position:absolute;top:-6px;left:50%;width:12px;height:12px;margin-left:-6px;background:#a35cff;box-shadow:0 0 0 2px #0d0912,inset -2px -2px 0 #5a1fb0,inset 2px 2px 0 #d6b3ff}
+.seal{width:72px;height:72px;box-sizing:border-box;border-radius:50%;border:3px solid #6a22c8;box-shadow:inset 0 0 0 3px rgba(243,231,201,.9),inset 0 0 0 5px #6a22c8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#6a22c8;transform:rotate(-14deg);opacity:.82;mix-blend-mode:multiply;-webkit-mask-image:radial-gradient(circle at 30% 70%,#000 55%,rgba(0,0,0,.75) 70%,#000 85%)}
+.seal b{font:700 20px/1 'Pixelify Sans',sans-serif;letter-spacing:.06em}
+.seal i{font:800 7px/1 Manrope,sans-serif;font-style:normal;letter-spacing:.18em}
+.prize{flex:1;padding:6px 8px;text-align:center;background:rgba(90,60,30,.12);box-shadow:inset 0 0 0 1px rgba(90,60,30,.4)}
+.stamp{position:absolute;right:10px;top:10px;transform:rotate(-10deg);border:2px solid #8a1f2c;color:#8a1f2c;font:700 11px 'Pixelify Sans',sans-serif;letter-spacing:.12em;padding:2px 6px}
+.goldbtn{display:flex;align-items:center;justify-content:center;min-height:36px;padding:0 14px;border:0;font-family:'Pixelify Sans',sans-serif;font-weight:600;font-size:15px;color:#f2c94c;background:#3a2414;box-shadow:inset -3px -3px 0 #1a0f08,inset 3px 3px 0 #8a5a2a,0 0 0 2px #0d0912;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 1000px; height: 680px; position: relative; overflow: hidden; background: #0e0a16; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 7px #8a5a2a, inset 0 0 0 10px #0d0912, inset 0 0 0 12px #5b3a1c; font-family: Manrope, sans-serif; color: #ece7f6">
+  <div class="bgflag"></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,10,22,.55), rgba(14,10,22,.9))"></div>
+
+  <div style="position: relative; display: flex; flex-direction: column; height: 100%">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px 0">
+      <img src="/_blob/b2d2692afb3c794bbdca84d87038ac16" alt="" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px #a35cff">
+      <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 800; letter-spacing: .14em; font-size: 16px">VXV</span>
+      <div role="tablist" aria-label="Onglets" style="display: flex; gap: 2px; margin-left: 18px">
+        <button class="tab" type="button" role="tab">Taverne</button>
+        <button class="tab" type="button" role="tab">Raid</button>
+        <button class="tab" type="button" role="tab">Le Dé Pipé</button>
+        <button class="tab" type="button" role="tab" aria-selected="true" style="background: #4a2a6a; color: #fff; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c">Quêtes</button>
+        <button class="tab" type="button" role="tab">Ranking</button>
+        <button class="tab" type="button" role="tab">Artisans</button>
+        <button class="tab" type="button" role="tab">Journal</button>
+      </div>
+    </div>
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, #a35cff 20%, #e0479e 80%, transparent)"></div>
+
+    <div style="display: flex; align-items: flex-end; gap: 16px; padding: 14px 22px 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #7ee2a0">Le tableau des quêtes</span>
+        <span style="font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 30px; line-height: 1; color: #f4effc">Quêtes</span>
+      </div>
+      <div style="margin-left: auto; display: flex; gap: 8px; padding-bottom: 2px">
+        <span style="padding: 5px 10px; background: rgba(126,226,160,.14); color: #7ee2a0; font-size: 12px; font-weight: 800">Toute la guilde participe</span>
+        <span style="padding: 5px 10px; background: rgba(242,201,76,.14); color: #f2c94c; font-size: 12px; font-weight: 800">Fin dans 3 j 04 h</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 230px; gap: 16px; padding: 0 22px 20px">
+
+      <article class="parch" style="padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 12px; min-height: 0">
+        <span class="pin"></span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #7a2fe0">Quête de la semaine · pêche</span>
+            <h2 style="margin: 0; font-family: 'Pixelify Sans', sans-serif; font-weight: 700; font-size: 26px; color: #2a1a0c">Le Grand Pêcheur</h2>
+          </div>
+          <div class="seal" aria-label="Tampon de la guilde VXV"><i>★ GUILDE ★</i><b>VXV</b><i>APPROUVÉ</i></div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #4a3220">La guilde récompense celui qui ramènera le plus de prises d'ici dimanche soir. Seules les pêches réussies comptent, main et rerolls additionnés.</p>
+        <div style="display: flex; gap: 8px">
+          <div class="prize"><span style="display: block; font-size: 10px; font-weight: 800; color: #6b4a2a">1er · 70 %</span><b style="font-family: 'Pixelify Sans', sans-serif; font-size: 17px; color: #8a5a0e">1 400 po</b></div>
+          <div class="prize"><span style="display: block; font-size: 10px; font-weight: 800; color: #6b4a2a">2e · 20 %</span><b style="font-family: 'Pixelify Sans', sans-serif; font-size: 17px; color: #8a5a0e">400 po</b></div>
+          <div class="prize"><span style="display: block; font-size: 10px; font-weight: 800; color: #6b4a2a">3e · 10 %</span><b style="font-family: 'Pixelify Sans', sans-serif; font-size: 17px; color: #8a5a0e">200 po</b></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px">
+          <sc-for list="{{lead}}" as="l" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 18px minmax(0, 1fr) 110px 36px; align-items: center; gap: 10px; min-height: 26px; padding: 0 6px; font-size: 13px; background: {{l.bg}}">
+              <b style="font-family: 'Pixelify Sans', sans-serif; color: #6b4a2a">{{l.rank}}</b>
+              <b style="color: {{l.color}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.name}}</b>
+              <span style="height: 6px; background: rgba(90,60,30,.22)"><span style="display: block; height: 100%; width: {{l.pct}}; background: #7a2fe0"></span></span>
+              <b style="text-align: right; font-family: 'Pixelify Sans', sans-serif; color: #2a1a0c">{{l.score}}</b>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: rgba(122,47,224,.10); box-shadow: inset 0 0 0 1px rgba(122,47,224,.4)">
+          <div style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+            <span style="font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #7a2fe0">Ta progression</span>
+            <span style="font-size: 13px; color: #2a1a0c">Encore <b>162 prises</b> pour monter sur le podium</span>
+          </div>
+          <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 22px; color: #7a2fe0">5e</b>
+        </div>
+        <div style="margin-top: auto; display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: #6b4a2a; border-top: 1px dashed rgba(90,60,30,.45); padding-top: 8px"><span>Égalité : le premier à atteindre le score</span><span>Score relevé à chaque connexion</span></div>
+      </article>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; min-height: 0">
+        <section class="panel">
+          <span class="ptitle">À venir<small>semaine prochaine</small></span>
+          <article class="parch" style="padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+            <span class="pin"></span>
+            <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 17px; color: #2a1a0c">La Main Verte</b>
+            <span style="font-size: 12px; color: #4a3220">Le plus d'herbes cueillies · <b style="color: #8a5a0e">1 500 po</b></span>
+          </article>
+        </section>
+        <section class="panel" style="flex: 1">
+          <span class="ptitle">Terminées</span>
+          <sc-for list="{{past}}" as="p" hint-placeholder-count="3">
+            <article class="parch" style="padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; filter: saturate(.75) brightness(.9)">
+              <span class="stamp">ACCOMPLIE</span>
+              <span style="font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #6b4a2a">{{p.when}}</span>
+              <b style="font-family: 'Pixelify Sans', sans-serif; font-size: 16px; color: #2a1a0c">{{p.name}}</b>
+              <span style="font-size: 12px; color: #4a3220">{{p.what}} · gagnée par <b style="color: {{p.color}}">{{p.winner}}</b> ({{p.score}})</span>
+            </article>
+          </sc-for>
+        </section>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; min-height: 0">
+        <section class="panel" style="flex: 1; box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #f2c94c; background: rgba(42,26,10,.9)">
+          <span class="ptitle" style="color: #f2c94c">Hall of fame</span>
+          <sc-for list="{{fame}}" as="f" hint-placeholder-count="5">
+            <div style="display: flex; flex-direction: column; gap: 1px; padding-bottom: 6px; border-bottom: 1px dashed rgba(242,201,76,.25)">
+              <div style="display: flex; align-items: baseline; gap: 6px"><b style="font-family: 'Pixelify Sans', sans-serif; color: #a49bbd">{{f.rank}}</b><b style="font-size: 14px; color: {{f.color}}">{{f.name}}</b><b style="margin-left: auto; font-family: 'Pixelify Sans', sans-serif; color: #f2c94c">{{f.wins}} ★</b></div>
+              <span style="font-size: 11px; color: #d9c39a">{{f.gold}} · pos. moy. {{f.avg}}</span>
+            </div>
+          </sc-for>
+        </section>
+        <section class="panel">
+          <span class="ptitle">Officier<small>visible par les officiers</small></span>
+          <button class="goldbtn" type="button">Publier une quête</button>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":680}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      lead: [
+        { rank: 1, name: 'Sira', color: '#4f6e1f', score: 412, pct: '100%', bg: 'transparent' },
+        { rank: 2, name: 'Thessa', color: '#b04f00', score: 338, pct: '82%', bg: 'transparent' },
+        { rank: 3, name: 'Ulric', color: '#0050a0', score: 251, pct: '61%', bg: 'transparent' },
+        { rank: 4, name: 'Kaeldor', color: '#7a5530', score: 164, pct: '40%', bg: 'transparent' },
+        { rank: 5, name: 'Toi · Grakk', color: '#7a2fe0', score: 90, pct: '22%', bg: 'rgba(122,47,224,.14)' }
+      ],
+      past: [
+        { when: 'Semaine dernière', name: 'Chasseur de têtes', what: 'Victoires honorables', winner: 'Vorn', color: '#7a5530', score: 184 },
+        { when: 'Il y a 2 semaines', name: 'Cœur de mineur', what: 'Filons extraits', winner: 'Kaeldor', color: '#7a5530', score: 312 },
+        { when: 'Il y a 3 semaines', name: 'Le Dépeceur', what: 'Peaux dépecées', winner: 'Sira', color: '#4f6e1f', score: 268 }
+      ],
+      fame: [
+        { rank: 1, name: 'Sira', color: '#AAD372', wins: 5, gold: '6 300 po', avg: '2,1' },
+        { rank: 2, name: 'Vorn', color: '#C69B6D', wins: 3, gold: '4 100 po', avg: '3,4' },
+        { rank: 3, name: 'Thessa', color: '#FF7C0A', wins: 2, gold: '3 050 po', avg: '2,8' },
+        { rank: 4, name: 'Kaeldor', color: '#C69B6D', wins: 1, gold: '1 600 po', avg: '4,6' },
+        { rank: 5, name: 'Kaelys', color: '#3FC7EB', wins: 0, gold: '600 po', avg: '5,2' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
