@@ -1,0 +1,191 @@
+/*
+ * The companion's window in the charter "La Taverne" (docs/design/VXV_Design_Spec.md): colors and fonts come from
+ * theme.css, generated from packages/design. Pixel art: no rounded corners, relief in rings of solid shadows.
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  padding: 20px;
+  background: var(--color-night);
+  color: var(--color-ivory);
+  font: 14px/1.5 var(--font-sans);
+  user-select: none;
+}
+
+.head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.emblem {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-amethyst);
+}
+
+.kicker {
+  color: var(--color-sakura);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.title {
+  font: 700 28px/1 var(--font-pixel);
+}
+
+#app {
+  display: grid;
+  gap: 20px;
+}
+
+.panel {
+  padding: 14px;
+  background: var(--color-panel);
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-beam);
+}
+
+.panel h2 {
+  margin-bottom: 8px;
+  font: 600 16px var(--font-pixel);
+}
+
+.panel p + p,
+.panel p + .actions,
+.panel ul + .actions {
+  margin-top: 10px;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.lavender {
+  color: var(--color-lavender);
+}
+
+.notice {
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--color-loss) 14%, transparent);
+  color: var(--color-loss);
+}
+
+.installations {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.installations strong {
+  color: var(--color-gain);
+}
+
+.path {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button-pixel {
+  padding: 8px 18px;
+  background: var(--color-amethyst-button);
+  color: #fff;
+  font-size: 16px;
+  box-shadow:
+    inset -3px -3px 0 var(--color-amethyst-shade),
+    inset 3px 3px 0 var(--color-amethyst-light),
+    0 0 0 2px var(--color-ink);
+}
+
+.button-wood {
+  padding: 6px 14px;
+  background: var(--color-wood);
+  color: var(--color-parchment);
+  font-size: 15px;
+  box-shadow:
+    inset -3px -3px 0 var(--color-wood-shade),
+    inset 3px 3px 0 var(--color-copper),
+    0 0 0 2px var(--color-ink);
+}
+
+/* Hover and keyboard focus look the same: plum with a gold ring. */
+.button-pixel:hover,
+.button-pixel:focus-visible {
+  background: var(--color-plum);
+  outline: none;
+  box-shadow:
+    inset -3px -3px 0 var(--color-amethyst-shade),
+    inset 3px 3px 0 var(--color-amethyst-light),
+    0 0 0 2px var(--color-gold);
+}
+
+.button-wood:hover,
+.button-wood:focus-visible {
+  background: var(--color-plum);
+  outline: none;
+  box-shadow:
+    inset -3px -3px 0 var(--color-wood-shade),
+    inset 3px 3px 0 var(--color-copper),
+    0 0 0 2px var(--color-gold);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.footer label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-lavender);
+  cursor: pointer;
+}
+
+.footer input {
+  accent-color: var(--color-amethyst);
+}
+
+.link {
+  padding: 0;
+  background: none;
+  color: var(--color-amethyst-light);
+  font: inherit;
+  text-decoration: underline;
+}

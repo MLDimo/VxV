@@ -1,0 +1,112 @@
+import type { CompanionState } from "../application/companion.ts";
+import type { CompanionBridge } from "../main/bridge.ts";
+
+declare global {
+  interface Window {
+    vxv: CompanionBridge;
+  }
+}
+
+const { vxv } = window;
+const app = document.getElementById("app") as HTMLElement;
+
+type Child = Node | string;
+
+/** An element with its attributes and children; texts are never read as HTML. */
+function element(tag: string, attributes: Record<string, string> = {}, ...children: Child[]): HTMLElement {
+  const created = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes)) {
+    created.setAttribute(name, value);
+  }
+  created.append(...children);
+  return created;
+}
+
+function button(kind: "pixel" | "wood" | "link", text: string, onClick: () => Promise<void>): HTMLElement {
+  const created = element("button", { type: "button", class: kind === "link" ? "link" : `button-${kind}` }, text);
+  created.addEventListener("click", () => void onClick());
+  return created;
+}
+
+function panel(title: string, ...children: Child[]): HTMLElement {
+  return element("section", { class: "panel" }, element("h2", {}, title), ...children);
+}
+
+const OFFICER_ROLES = new Set(["officer", "gm"]);
+
+function accountPanel(state: CompanionState): HTMLElement {
+  if (state.linking) {
+    return panel(
+      "Compte",
+      element("p", { class: "lavender" }, "Confirme la liaison dans ton navigateur, sur le site VXV…"),
+      element("div", { class: "actions" }, button("wood", "Annuler", vxv.cancelLink)),
+    );
+  }
+  if (state.account === undefined) {
+    return panel(
+      "Compte",
+      element(
+        "p",
+        { class: "lavender" },
+        "Relie le compagnon à ton compte Discord : il agira en ton nom auprès du site de la guilde.",
+      ),
+      element("div", { class: "actions" }, button("pixel", "Relier mon compte", vxv.link)),
+    );
+  }
+  const officer = state.account.roles.some((role) => OFFICER_ROLES.has(role));
+  return panel(
+    "Compte",
+    element("p", {}, "Relié à ", element("strong", {}, state.account.name), officer ? " · officier" : ""),
+    element("div", { class: "actions" }, button("wood", "Délier", vxv.unlink)),
+  );
+}
+
+/** "_classic_beta_" and the folder holding it, whatever the system's separator. */
+function splitFolder(path: string): [name: string, parent: string] {
+  const cut = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+  return [path.slice(cut + 1), path.slice(0, cut)];
+}
+
+function gamePanel(state: CompanionState): HTMLElement {
+  if (state.installations.length === 0) {
+    return panel(
+      "World of Warcraft",
+      element(
+        "p",
+        { class: "lavender" },
+        "Le jeu avec l'addon VXV est introuvable. Installe l'addon, puis indique le dossier du jeu.",
+      ),
+      element("div", { class: "actions" }, button("wood", "Choisir le dossier", vxv.chooseGameFolder)),
+    );
+  }
+  const versions = state.installations.map((path) => {
+    const [name, parent] = splitFolder(path);
+    return element("li", {}, element("strong", {}, name), element("div", { class: "path muted" }, parent));
+  });
+  return panel(
+    "World of Warcraft",
+    element("p", { class: "lavender" }, "Addon VXV trouvé :"),
+    element("ul", { class: "installations" }, ...versions),
+    element("div", { class: "actions" }, button("link", "Choisir un autre dossier", vxv.chooseGameFolder)),
+  );
+}
+
+function footer(state: CompanionState): HTMLElement {
+  const checkbox = element("input", { type: "checkbox" }) as HTMLInputElement;
+  checkbox.checked = state.settings.launchAtLogin;
+  checkbox.addEventListener("change", () => void vxv.setLaunchAtLogin(checkbox.checked));
+  return element(
+    "footer",
+    { class: "footer" },
+    element("label", {}, checkbox, "Lancer avec l'ordinateur"),
+    element("span", {}, `Version ${state.version} · `, button("link", "Ouvrir le site", vxv.openSite)),
+  );
+}
+
+function render(state: CompanionState): void {
+  const notice = state.notice === undefined ? [] : [element("p", { class: "notice", role: "alert" }, state.notice)];
+  app.replaceChildren(...notice, accountPanel(state), gamePanel(state), footer(state));
+}
+
+vxv.onState(render);
+void vxv.state().then(render);
