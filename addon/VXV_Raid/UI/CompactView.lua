@@ -6,54 +6,21 @@ local _, ns = ...
 local CompactView = {}
 ns.CompactView = CompactView
 
-local Labels, RaidView, Reserves = ns.Labels, ns.RaidView, ns.Reserves
+local Labels, RaidView = ns.Labels, ns.RaidView
 
 local Theme = VXV.Theme
 
 local NOT_IN_RAID = "Le prochain boss et son butin s'affichent dans l'instance du raid."
 local ALL_DOWN = "Tous les boss sont tombés."
 
-local function bonusText(bonus)
-    return bonus > 0 and ("+" .. bonus) or nil
-end
-
---- "SR : Kaelys (toi, +20), Elyra +10", the reservers in their class color; or why nobody reserves the item.
+--- "SR : Kaelys (toi, +20), Elyra +10"; or why nobody reserves the item.
 local function reservesText(event, itemId, player)
     local item = event and event.items[itemId]
     if item ~= nil and item.excluded then
         return "Hors SR · loot council"
     end
-    local names = {}
-    for _, reserver in ipairs(event and Reserves.For(event, itemId) or {}) do
-        local signup, bonus = reserver.signup, bonusText(reserver.bonus)
-        local name = Labels.Colored(signup.name, signup.class)
-        if signup.name == player then
-            name = name .. " (toi" .. (bonus and (", " .. bonus) or "") .. ")"
-        elseif bonus ~= nil then
-            name = name .. " " .. bonus
-        end
-        names[#names + 1] = name
-    end
-    return #names > 0 and ("SR : " .. table.concat(names, ", ")) or "Aucune SR · roll libre"
-end
-
---- The player's soft reserves on this boss: { title, text }, or nil.
-function CompactView.Alert(event, player, boss)
-    if event == nil or boss == nil then
-        return nil
-    end
-    local mine = {}
-    for _, item in ipairs(boss.loot) do
-        for _, reserver in ipairs(Reserves.For(event, item.itemId)) do
-            if reserver.signup.name == player then
-                mine[#mine + 1] = item.name .. (reserver.bonus > 0 and (" · SR+ " .. reserver.bonus) or "")
-            end
-        end
-    end
-    if #mine == 0 then
-        return nil
-    end
-    return { title = "Tu as une SR sur le prochain boss", text = boss.name .. " · " .. table.concat(mine, " · ") }
+    local names = RaidView.ReserverNames(event, itemId, player)
+    return names ~= nil and ("SR : " .. names) or "Aucune SR · roll libre"
 end
 
 --- The kicker over the loot, and its rows: one card per item of the next boss; outside the raid's instance, the

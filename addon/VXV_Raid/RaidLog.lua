@@ -122,6 +122,32 @@ VXV.OnEvent("ENCOUNTER_END", function(encounterId, boss, _, _, success)
     changed(log)
 end)
 
+--- Kills heard from the group (KillSharing.lua): those the current event's log misses, by encounter, in kill order.
+function RaidLog.AddKills(eventId, kills)
+    local log = RaidLog.Current()
+    if log == nil or log.eventId ~= eventId then
+        return
+    end
+    local known, added = {}, false
+    for _, kill in ipairs(log.kills) do
+        known[kill.encounterId] = true
+    end
+    for _, kill in ipairs(kills) do
+        local encounterId, at = tonumber(kill.encounterId), tonumber(kill.at)
+        if encounterId ~= nil and at ~= nil and not known[encounterId] then
+            known[encounterId] = true
+            log.kills[#log.kills + 1] = { encounterId = encounterId, boss = tostring(kill.boss), at = at }
+            added = true
+        end
+    end
+    if added then
+        table.sort(log.kills, function(left, right)
+            return left.at < right.at
+        end)
+        changed(log)
+    end
+end
+
 local function addLoot(eventId, loot)
     local log = saved and saved.logs[eventId]
     if log ~= nil then

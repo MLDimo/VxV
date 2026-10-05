@@ -7,8 +7,11 @@ VXV.RegisterModule({
         ns.RaidData.Restore(data)
         ns.RaidLog.Restore(data)
         ns.Changes.Restore(data)
+        ns.BossAlert.Restore(data)
         ns.Sharing.Start()
         ns.Freshness.Start()
+        ns.KillSharing.Start()
+        ns.BossAlert.Start()
     end,
     tab = {
         place = "raid",

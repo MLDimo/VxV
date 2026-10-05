@@ -5,8 +5,8 @@ local _, ns = ...
 local RaidView = {}
 ns.RaidView = RaidView
 
-local Changes, EventData, Labels, RaidData, Raids = ns.Changes, ns.EventData, ns.Labels, ns.RaidData, ns.Raids
-local Reserves = ns.Reserves
+local Changes, EventData, Labels, NextBoss = ns.Changes, ns.EventData, ns.Labels, ns.NextBoss
+local RaidData, RaidLog, Raids, Reserves = ns.RaidData, ns.RaidLog, ns.Raids, ns.Reserves
 
 local Theme = VXV.Theme
 
@@ -252,6 +252,46 @@ function RaidView.RaidReserves(event)
     end
     if #rows == 0 then
         rows[1] = row("line", "Aucune SR pour l'instant.")
+    end
+    return rows
+end
+
+--- "Kaelys (toi, +20), Elyra +10": the item's reservers in their class color, with their SR+ bonus; nil when none.
+function RaidView.ReserverNames(event, itemId, player)
+    local names = {}
+    for _, reserver in ipairs(event and Reserves.For(event, itemId) or {}) do
+        local signup = reserver.signup
+        local bonus = reserver.bonus > 0 and ("+" .. reserver.bonus) or nil
+        local name = Labels.Colored(signup.name, signup.class)
+        if signup.name == player then
+            name = name .. " (toi" .. (bonus and (", " .. bonus) or "") .. ")"
+        elseif bonus ~= nil then
+            name = name .. " " .. bonus
+        end
+        names[#names + 1] = name
+    end
+    return #names > 0 and table.concat(names, ", ") or nil
+end
+
+--- The next boss (P8.2) at the head of the raid's soft reserves: its loot, and who reserved each item. None
+--- without the raid's data pack, or once every boss fell.
+function RaidView.NextBoss(event, player)
+    local log = RaidLog.Current()
+    local found = event and NextBoss.Find(event, log and log.kills or {})
+    if found == nil or found.boss == nil then
+        return {}
+    end
+    local rows = { row("header", Theme.Colored("Prochain boss · " .. found.boss.name, "sakura")) }
+    for _, item in ipairs(found.boss.loot) do
+        local name, names = Theme.Colored(item.name, "epic"), RaidView.ReserverNames(event, item.itemId, player)
+        local listed = event.items[item.itemId]
+        if listed ~= nil and listed.excluded then
+            rows[#rows + 1] = row("line", name .. " · exclu des SR (loot council)")
+        elseif names ~= nil then
+            rows[#rows + 1] = row("line", name .. " : " .. names)
+        else
+            rows[#rows + 1] = row("line", name .. " · aucune SR (roll libre)")
+        end
     end
     return rows
 end

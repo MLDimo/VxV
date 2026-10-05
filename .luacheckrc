@@ -15,6 +15,7 @@ globals = {
     "VXV_TextWindow",
     "VXV_LootPanel",
     "VXV_CompactWindow",
+    "VXV_BossAlert",
     "SLASH_VXV1",
     "SLASH_VXVPROBE1",
     "SlashCmdList",
