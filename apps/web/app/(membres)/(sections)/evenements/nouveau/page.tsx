@@ -1,5 +1,6 @@
 import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES } from "@vxv/server";
 import { EventForm } from "@/components/EventForm";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireOfficer } from "@/server/session";
 
@@ -8,7 +9,7 @@ export default async function NewEventPage() {
   const raids = await getApplication().events.listRaids();
   return (
     <>
-      <h1 className="text-2xl font-bold">Créer un événement</h1>
+      <ScreenHeader kicker="Conseil de guerre · officiers" title="Créer un événement" />
       <EventForm raids={raids} defaultSoftReserves={DEFAULT_SOFT_RESERVES} maxSoftReserves={MAX_SOFT_RESERVES} />
     </>
   );

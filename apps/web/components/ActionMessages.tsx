@@ -5,9 +5,9 @@ export function ActionMessages({ state }: { state: ActionState }) {
   if (state.status === "idle") {
     return null;
   }
-  const colors = state.status === "success" ? "bg-emerald-950 text-emerald-200" : "bg-red-950 text-red-200";
+  const colors = state.status === "success" ? "bg-gain/14 text-gain" : "bg-loss/14 text-loss";
   return (
-    <ul className={`mt-4 space-y-1 rounded px-4 py-3 text-sm ${colors}`} role="status">
+    <ul className={`mt-4 space-y-1 px-4 py-3 text-sm ${colors}`} role="status">
       {state.messages.map((message) => (
         <li key={message}>{message}</li>
       ))}

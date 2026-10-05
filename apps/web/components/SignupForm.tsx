@@ -14,7 +14,7 @@ export interface SignupCharacter {
   characterClass: string;
 }
 
-const FIELD = "mt-1 block w-full rounded border border-zinc-700 bg-zinc-900 p-2";
+const FIELD = "field";
 
 export function SignupForm({
   eventId,
@@ -33,10 +33,10 @@ export function SignupForm({
   const characterClass = characters.find((character) => character.id === characterId)?.characterClass ?? "";
 
   return (
-    <form action={action} className="mt-4 grid gap-4 sm:grid-cols-2">
+    <form action={action} className="mt-4 grid gap-4">
       <input type="hidden" name="eventId" value={eventId} />
       <label className="block">
-        <span className="text-sm text-zinc-300">Personnage</span>
+        <span className="text-sm text-lavender">Personnage</span>
         <select
           name="characterId"
           value={characterId}
@@ -51,7 +51,7 @@ export function SignupForm({
         </select>
       </label>
       <label className="block">
-        <span className="text-sm text-zinc-300">Rôle</span>
+        <span className="text-sm text-lavender">Rôle</span>
         <select name="role" defaultValue={current?.role ?? "dps"} className={FIELD}>
           {SIGNUP_ROLES.map((role) => (
             <option key={role} value={role}>
@@ -61,7 +61,7 @@ export function SignupForm({
         </select>
       </label>
       <label className="block">
-        <span className="text-sm text-zinc-300">Spécialisation</span>
+        <span className="text-sm text-lavender">Spécialisation</span>
         <input
           name="spec"
           list={specListId}
@@ -77,7 +77,7 @@ export function SignupForm({
         </datalist>
       </label>
       <label className="block">
-        <span className="text-sm text-zinc-300">Statut</span>
+        <span className="text-sm text-lavender">Statut</span>
         <select name="status" defaultValue={current?.status ?? "present"} className={FIELD}>
           {SIGNUP_STATUSES.map((status) => (
             <option key={status} value={status}>
@@ -86,12 +86,8 @@ export function SignupForm({
           ))}
         </select>
       </label>
-      <div className="sm:col-span-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+      <div>
+        <button type="submit" disabled={pending} className="button-pixel">
           {current ? "Mettre à jour mon inscription" : "M'inscrire"}
         </button>
         <ActionMessages state={state} />

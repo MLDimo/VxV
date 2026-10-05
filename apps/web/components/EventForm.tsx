@@ -6,7 +6,7 @@ import { createEvent } from "@/app/actions/events";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 
-const FIELD = "mt-1 block w-full rounded border border-zinc-700 bg-zinc-900 p-2";
+const FIELD = "field";
 
 export function EventForm({
   raids,
@@ -21,11 +21,11 @@ export function EventForm({
   return (
     <form action={action} className="mt-6 max-w-lg space-y-5">
       <label className="block">
-        <span className="text-sm text-zinc-300">Date et heure (heure de Paris)</span>
+        <span className="text-sm text-lavender">Date et heure (heure de Paris)</span>
         <input type="datetime-local" name="startsAt" required className={FIELD} />
       </label>
       <fieldset>
-        <legend className="text-sm text-zinc-300">Raids de la soirée</legend>
+        <legend className="text-sm text-lavender">Raids de la soirée</legend>
         <div className="mt-2 space-y-2">
           {raids.map((raid) => (
             <label key={raid.id} className="flex items-center gap-2">
@@ -36,7 +36,7 @@ export function EventForm({
         </div>
       </fieldset>
       <label className="block">
-        <span className="text-sm text-zinc-300">SR par joueur</span>
+        <span className="text-sm text-lavender">SR par joueur</span>
         <input
           type="number"
           name="softReservesPerPlayer"
@@ -48,14 +48,10 @@ export function EventForm({
         />
       </label>
       <label className="block">
-        <span className="text-sm text-zinc-300">Motif (visible dans le journal)</span>
+        <span className="text-sm text-lavender">Motif (visible dans le journal)</span>
         <input name="reason" required placeholder="Raid de la semaine" className={FIELD} />
       </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="button-pixel">
         {pending ? "Création…" : "Créer l'événement"}
       </button>
       <ActionMessages state={state} />

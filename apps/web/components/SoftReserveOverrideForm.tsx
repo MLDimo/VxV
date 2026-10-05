@@ -6,7 +6,7 @@ import { overrideSoftReserves } from "@/app/actions/softReserves";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 
-const FIELD = "mt-1 block w-full rounded border border-zinc-700 bg-zinc-900 p-2";
+const FIELD = "field";
 
 export interface SignedUpCharacter {
   characterId: string;
@@ -27,13 +27,13 @@ export function SoftReserveOverrideForm({
   const [characterId, setCharacterId] = useState(players[0]?.characterId ?? "");
   const playerFieldId = useId();
   if (players.length === 0) {
-    return <p className="mt-2 text-sm text-zinc-500">Personne n&apos;est encore inscrit.</p>;
+    return <p className="mt-2 text-sm text-muted">Personne n&apos;est encore inscrit.</p>;
   }
   return (
     <form action={action} className="mt-4 max-w-2xl space-y-4">
       <input type="hidden" name="eventId" value={eventId} />
       <div>
-        <label htmlFor={playerFieldId} className="text-sm text-zinc-300">
+        <label htmlFor={playerFieldId} className="text-sm text-lavender">
           Joueur
         </label>
         <select
@@ -52,7 +52,7 @@ export function SoftReserveOverrideForm({
       </div>
       {/* Remounted per player, so that the boxes start from that player's current reserves. */}
       <fieldset key={characterId}>
-        <legend className="text-sm text-zinc-300">Ses SR</legend>
+        <legend className="text-sm text-lavender">Ses SR</legend>
         <div className="mt-2 grid gap-1 sm:grid-cols-2">
           {items.map((item) => (
             <label key={item.itemId} className="flex items-center gap-2">
@@ -68,14 +68,10 @@ export function SoftReserveOverrideForm({
         </div>
       </fieldset>
       <label className="block">
-        <span className="text-sm text-zinc-300">Motif de la correction (visible dans le journal)</span>
+        <span className="text-sm text-lavender">Motif de la correction (visible dans le journal)</span>
         <input name="reason" required className={FIELD} />
       </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-amber-700 px-4 py-2 font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="button-wood text-gold">
         Corriger ses SR
       </button>
       <ActionMessages state={state} />
