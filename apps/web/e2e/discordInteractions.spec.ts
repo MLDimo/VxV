@@ -86,7 +86,7 @@ test.describe.serial("Discord bot", () => {
     });
 
     await signInAs(context, "officer");
-    await page.goto("/");
+    await page.goto("/raid");
     await page
       .getByRole("link", { name: /La salle des Thanes/ })
       .filter({ hasText: "20 mars 2031" })

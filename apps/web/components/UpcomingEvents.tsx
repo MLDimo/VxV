@@ -4,18 +4,20 @@ import { formatEventDate, raidTitle, softReserveCount } from "./format";
 
 export function UpcomingEvents({ events }: { events: RaidEvent[] }) {
   if (events.length === 0) {
-    return <p className="mt-4 text-zinc-500">Aucun raid prévu pour l&apos;instant.</p>;
+    return <p className="mt-8 text-muted">Aucun raid prévu pour l&apos;instant.</p>;
   }
   return (
-    <ul className="mt-4 space-y-3">
+    <ul className="mt-8 space-y-5">
       {events.map((event) => (
         <li key={event.id}>
           <Link
             href={`/evenements/${event.id}`}
-            className="block rounded border border-zinc-800 px-4 py-3 hover:border-zinc-600"
+            className="panel block hover:bg-plum focus-visible:bg-plum focus-visible:outline-none"
           >
-            <span className="font-semibold">{raidTitle(event.raids.map((raid) => raid.name))}</span>
-            <span className="block text-sm text-zinc-400">
+            <span className="font-pixel text-xl font-semibold text-ivory">
+              {raidTitle(event.raids.map((raid) => raid.name))}
+            </span>
+            <span className="mt-1 block text-sm text-muted">
               {formatEventDate(event.startsAt)} · {softReserveCount(event.softReservesPerPlayer)} par joueur
             </span>
           </Link>

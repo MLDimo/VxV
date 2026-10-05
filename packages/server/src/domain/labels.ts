@@ -30,6 +30,20 @@ export function formatDateTime(date: Date): string {
   return DATE_TIME.format(date);
 }
 
+const SHORT_DAY = new Intl.DateTimeFormat("fr-FR", {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  timeZone: GUILD_TIME_ZONE,
+});
+const SHORT_TIME = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: GUILD_TIME_ZONE });
+
+/** Short day and time of a raid night, for a card: "jeu. 10 déc. · 21h00". */
+export function formatShortEventDate(date: Date): string {
+  const day = SHORT_DAY.format(date).replace(/^\p{Ll}/u, (letter) => letter.toUpperCase());
+  return `${day} · ${SHORT_TIME.format(date).replace(":", "h")}`;
+}
+
 /** Full date and time of a raid night: "jeudi 10 décembre 2026 à 21:00". */
 export function formatEventDate(date: Date): string {
   return EVENT_DATE.format(date);

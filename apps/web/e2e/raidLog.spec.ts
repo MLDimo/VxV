@@ -49,6 +49,7 @@ test.describe.serial("raid log", () => {
     expect(recap?.body.content).toContain("💰 Brassards brindecieux → Ciel Gris (Loot council)");
     expect(recap?.body.content).toContain("💀 Morts : Dune Sable ×2");
 
+    await page.getByRole("link", { name: "Raid", exact: true }).click();
     await page.getByRole("link", { name: "Historique" }).click();
     await expect(page.getByRole("listitem").filter({ hasText: "Brassards brindecieux" }).first()).toContainText(
       "reçu par Ciel Gris",

@@ -6,7 +6,7 @@ test("the history lists every loot with how it was given, and can keep only the 
   context,
 }) => {
   await signInAs(context, "member");
-  await page.goto("/");
+  await page.goto("/raid");
   await page.getByRole("link", { name: "Historique" }).click();
   const softReserved = page.getByRole("listitem").filter({ hasText: "Bottines du golem protecteur" });
   await expect(softReserved).toContainText("reçu par Dune Sable");
