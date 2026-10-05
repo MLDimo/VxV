@@ -4,13 +4,13 @@ import { discordEventMessage } from "./fakeDiscord";
 import { signInAs } from "./sessions";
 
 test.describe.serial("raid events", () => {
-  test("an officer creates an event on a raid, shown on the home page, on Discord and in the journal", async ({
+  test("an officer creates an event on a raid, shown on the Raid page, on Discord and in the journal", async ({
     page,
     context,
     request,
   }) => {
     await signInAs(context, "officer");
-    await page.goto("/");
+    await page.goto("/raid");
     await page.getByRole("link", { name: "Créer un événement" }).click();
     await page.getByLabel("Date et heure (heure de Paris)").fill("2030-12-12T21:00");
     await page.getByLabel("La salle des Thanes").check();
@@ -25,7 +25,7 @@ test.describe.serial("raid events", () => {
     expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID);
     expect(message?.embed?.title).toBe("La salle des Thanes");
 
-    await page.getByRole("link", { name: "VXV" }).click();
+    await page.getByRole("link", { name: "Raid", exact: true }).click();
     await expect(
       page.getByRole("link", { name: /La salle des Thanes/ }).filter({ hasText: "12 décembre 2030" }),
     ).toBeVisible();
@@ -46,7 +46,7 @@ test.describe.serial("raid events", () => {
 
   test("a member sees the event but cannot create one", async ({ page, context }) => {
     await signInAs(context, "member");
-    await page.goto("/");
+    await page.goto("/raid");
     await expect(
       page.getByRole("link", { name: /La salle des Thanes/ }).filter({ hasText: "12 décembre 2030" }),
     ).toBeVisible();

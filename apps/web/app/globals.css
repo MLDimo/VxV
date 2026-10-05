@@ -1,2 +1,219 @@
 @import "tailwindcss";
 @import "@vxv/design/tokens.css";
+
+/*
+ * The pixel primitives of the charter (docs/design/VXV_Design_Spec.md §3): relief made of stacked solid shadows,
+ * never rounded corners nor blur. Hover and keyboard focus look the same: plum with a gold ring.
+ */
+
+@utility ring-pixel {
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-beam);
+}
+
+@utility panel {
+  background: var(--color-panel);
+  padding: 14px;
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-beam);
+}
+
+/* Officers' zone: gold border. */
+@utility panel-officer {
+  background: var(--color-panel-officer);
+  padding: 14px;
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-gold);
+}
+
+@utility button-pixel {
+  display: inline-block;
+  padding: 8px 18px;
+  background: var(--color-amethyst-button);
+  color: #fff;
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow:
+    inset -3px -3px 0 var(--color-amethyst-shade),
+    inset 3px 3px 0 var(--color-amethyst-light),
+    0 0 0 2px var(--color-ink);
+  &:hover,
+  &:focus-visible {
+    background: var(--color-plum);
+    outline: none;
+    box-shadow:
+      inset -3px -3px 0 var(--color-amethyst-shade),
+      inset 3px 3px 0 var(--color-amethyst-light),
+      0 0 0 2px var(--color-gold);
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+/* Wood button; text in gold for an officer's action. */
+@utility button-wood {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--color-wood);
+  color: var(--color-parchment);
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow:
+    inset -3px -3px 0 var(--color-wood-shade),
+    inset 3px 3px 0 var(--color-copper),
+    0 0 0 2px var(--color-ink);
+  &:hover,
+  &:focus-visible {
+    background: var(--color-plum);
+    outline: none;
+    box-shadow:
+      inset -3px -3px 0 var(--color-wood-shade),
+      inset 3px 3px 0 var(--color-copper),
+      0 0 0 2px var(--color-gold);
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+@utility button-gold {
+  display: inline-block;
+  padding: 8px 18px;
+  background: var(--color-gold);
+  color: #1a1206;
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow:
+    inset -4px -4px 0 var(--color-gold-shade),
+    inset 4px 4px 0 var(--color-gold-light),
+    0 0 0 3px var(--color-ink);
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      inset -4px -4px 0 var(--color-gold-shade),
+      inset 4px 4px 0 var(--color-gold-light),
+      0 0 0 3px var(--color-plum);
+  }
+}
+
+@utility tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  background: var(--color-wood-tab);
+  color: var(--color-old-paper);
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    inset 0 -3px 0 var(--color-wood-shade);
+  &[aria-current="page"] {
+    background: var(--color-plum);
+    color: #fff;
+    box-shadow:
+      0 0 0 2px var(--color-ink),
+      inset 0 -3px 0 var(--color-gold);
+  }
+  &:hover,
+  &:focus-visible {
+    color: #fff;
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--color-gold),
+      inset 0 -3px 0 var(--color-gold);
+  }
+}
+
+/* Wooden plaque: the name of a place of the tavern. */
+@utility plaque {
+  white-space: nowrap;
+  padding: 6px 12px;
+  background: var(--color-wood);
+  color: var(--color-parchment);
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  box-shadow:
+    0 0 0 3px var(--color-wood-shade),
+    0 0 0 6px var(--color-copper),
+    0 6px 0 6px rgba(0, 0, 0, 0.35);
+}
+
+@utility kicker {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@utility field {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  background: var(--color-night);
+  color: var(--color-ivory);
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 3px var(--color-line);
+  &:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--color-ink),
+      0 0 0 3px var(--color-amethyst);
+  }
+}
+
+@utility image-pixelated {
+  image-rendering: pixelated;
+}
+
+/* The tavern's lights: they jump in steps, like a pixel animation. */
+@keyframes flick {
+  0% {
+    opacity: 0.55;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

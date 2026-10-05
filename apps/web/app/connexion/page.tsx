@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getCurrentMember } from "@/server/session";
 
@@ -6,6 +7,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   requete: "La connexion a été interrompue. Merci de réessayer.",
 };
 
+/** The only page a visitor sees: the charter, without any of the guild's data. */
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ erreur?: string }> }) {
   if (await getCurrentMember()) {
     redirect("/");
@@ -13,15 +15,20 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const { erreur } = await searchParams;
   const error = erreur === undefined ? undefined : ERROR_MESSAGES[erreur];
   return (
-    <main className="mx-auto max-w-md px-4 py-24 text-center">
-      <h1 className="text-3xl font-bold">VXV</h1>
-      <p className="mt-2 text-zinc-400">Réservé aux membres de la guilde.</p>
-      {error && <p className="mt-6 rounded bg-red-950 px-4 py-3 text-red-200">{error}</p>}
-      <a
-        href="/connexion/discord"
-        className="mt-8 inline-block rounded bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-500"
-      >
-        Se connecter avec Discord
+    <main className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center">
+      <Image
+        src="/images/emblem.jpg"
+        alt=""
+        width={120}
+        height={120}
+        priority
+        className="image-pixelated size-30 object-cover shadow-[0_0_0_2px_var(--color-ink),0_0_0_4px_var(--color-amethyst)]"
+      />
+      <h1 className="plaque mt-10 text-3xl">VXV</h1>
+      <p className="mt-6 text-lavender">La taverne est réservée aux membres de la guilde.</p>
+      {error && <p className="mt-6 bg-loss/14 px-4 py-3 text-loss">{error}</p>}
+      <a href="/connexion/discord" className="button-pixel mt-8">
+        Connexion Discord
       </a>
     </main>
   );
