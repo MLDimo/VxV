@@ -1,0 +1,23 @@
+{
+  "name": "@vxv/companion",
+  "productName": "VXV Compagnon",
+  "private": true,
+  "version": "0.0.0",
+  "description": "VXV companion: desktop app linking the game to the website (Windows and Mac).",
+  "author": "VXV",
+  "type": "module",
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "tsx build.ts",
+    "start": "tsx build.ts && electron .",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/pixelify-sans": "^5.3.0",
+    "@vxv/design": "*",
+    "electron": "^44.5.1",
+    "esbuild": "^0.28.2"
+  }
+}

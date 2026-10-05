@@ -13,6 +13,7 @@ npx playwright install chromium   # navigateur des tests de bout en bout, une fo
 npm run check    # formatage, lint, typage, tests unitaires et de bout en bout ; aussi lancé avant chaque push
 npm run generate # packs de l'addon et SQL des raids, depuis data/raids
 npm run dev -w @vxv/web   # site en local sur http://localhost:3000
+VXV_SITE_URL=http://localhost:3000 npm start -w @vxv/companion   # compagnon relié au site local
 ```
 
 ## Structure
@@ -24,7 +25,7 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `apps/web` | Site et API, Next.js 16 sur Vercel ([vxv-web.vercel.app](https://vxv-web.vercel.app)), et adresse des interactions du bot (`/api/discord/interactions`) | P2, P3 |
 | `packages/server` | Cœur du serveur partagé par le site et le bot : domaine, cas d'usage, PostgreSQL (`@vxv/server`) | P2 |
 | `packages/bot` | Bot Discord en interactions HTTP : signature, commandes, boutons (`@vxv/bot`), hébergé par `apps/web` | P3 |
-| `apps/companion` | Application de bureau compagnon | P7 |
+| `apps/companion` | Compagnon de bureau (Electron, Windows et Mac) : relie le jeu au site (`@vxv/companion`) | P7 |
 | `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`…) | P1.5 puis P4 |
 | `packages/raid-data` | Schéma et validation des données de raid (`@vxv/raid-data`) | P1.4 |
 | `packages/design` | Jetons de la charte « La Taverne » (couleurs, polices) et thème du site généré (`@vxv/design`) | Habillage |

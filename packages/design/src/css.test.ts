@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { renderCss } from "./css.ts";
+import { fontFile, renderCss, renderPlainCss } from "./css.ts";
 import { renderLua } from "./lua.ts";
 import { FONTS } from "./tokens.ts";
 
@@ -18,13 +18,18 @@ describe("generated styles", () => {
 
   it("only use font files the website serves", () => {
     const served = new Set(readdirSync(FONT_FILES));
-    const needed = Object.values(FONTS).flatMap((font) =>
-      font.weights.map((weight) => `${font.file}-latin-${String(weight)}-normal.woff2`),
-    );
+    const needed = Object.values(FONTS).flatMap((font) => font.weights.map((weight) => fontFile(font.file, weight)));
     expect(needed.filter((file) => !served.has(file))).toEqual([]);
   });
 
   it("take rounded corners out of the theme", () => {
     expect(renderCss()).toContain("--radius-*: initial;");
+  });
+
+  it("exist as plain CSS for a page without Tailwind, with its own font files", () => {
+    const css = renderPlainCss("fonts");
+    expect(css).toContain('src: url("fonts/pixelify-sans-latin-600-normal.woff2")');
+    expect(css).toContain(":root {\n  --font-pixel:");
+    expect(css).toContain("  --color-amethyst: #a35cff;");
   });
 });

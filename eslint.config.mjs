@@ -23,7 +23,14 @@ const nextRules = nextVitals
 
 export default tseslint.config(
   {
-    ignores: ["**/node_modules/", "dist/", ".vercel/", "tools/VXV_Probe/", "apps/web/.next/", "apps/web/next-env.d.ts"],
+    ignores: [
+      "**/node_modules/",
+      "**/dist/",
+      ".vercel/",
+      "tools/VXV_Probe/",
+      "apps/web/.next/",
+      "apps/web/next-env.d.ts",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strict,
@@ -49,6 +56,34 @@ export default tseslint.config(
       "no-restricted-imports": [
         "error",
         { patterns: [{ group: ["**/infrastructure/**", "pg"], message: "Use cases only depend on ports." }] },
+      ],
+    },
+  },
+  // The companion follows the same layers; its Electron glue (main/) and window (renderer/) sit on top.
+  {
+    files: ["apps/companion/src/domain/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/application/**", "**/infrastructure/**", "electron", "node:*"],
+              message: "The domain depends on nothing.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["apps/companion/src/application/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        { patterns: [{ group: ["**/infrastructure/**", "electron"], message: "Use cases only depend on ports." }] },
       ],
     },
   },
