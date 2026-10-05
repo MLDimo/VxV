@@ -1,6 +1,6 @@
 import { rolesFromDiscordRoles, type DiscordRoleMapping, type Member } from "../domain/members.ts";
 import type { Clock, DiscordIdentity, MemberRepository, UnitOfWork } from "./ports.ts";
-import { generateSessionToken, sessionIdFromToken } from "./sessionTokens.ts";
+import { generateSecretToken, hashSecret } from "./secretTokens.ts";
 
 /** Guild roles are read from Discord at sign-in, so a session is kept short to pick up role changes. */
 export const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -25,11 +25,11 @@ export function createAuth({ unitOfWork, clock, discordRoles }: AuthDependencies
   return {
     /** Opens a session for a user on the guild's Discord server, recording their current name and roles. */
     async signIn(identity: DiscordIdentity, discordRoleIds: readonly string[]): Promise<SignedIn> {
-      const token = generateSessionToken();
+      const token = generateSecretToken();
       const expiresAt = new Date(clock().getTime() + SESSION_DURATION_MS);
       const member = await unitOfWork.run(async ({ members, sessions }) => {
         const saved = await save(members, identity, discordRoleIds);
-        await sessions.create({ id: sessionIdFromToken(token), memberId: saved.id, expiresAt });
+        await sessions.create({ id: hashSecret(token), memberId: saved.id, expiresAt });
         return saved;
       });
       return { token, expiresAt, member };
@@ -43,13 +43,13 @@ export function createAuth({ unitOfWork, clock, discordRoles }: AuthDependencies
     /** Member owning a valid session token, or undefined. */
     authenticate(token: string): Promise<Member | undefined> {
       return unitOfWork.run(async ({ members, sessions }) => {
-        const memberId = await sessions.findMemberId(sessionIdFromToken(token), clock());
+        const memberId = await sessions.findMemberId(hashSecret(token), clock());
         return memberId === undefined ? undefined : members.findById(memberId);
       });
     },
 
     signOut(token: string): Promise<void> {
-      return unitOfWork.run(({ sessions }) => sessions.delete(sessionIdFromToken(token)));
+      return unitOfWork.run(({ sessions }) => sessions.delete(hashSecret(token)));
     },
   };
 }

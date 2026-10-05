@@ -2,6 +2,7 @@ import type { Repositories, UnitOfWork } from "../../application/ports.ts";
 import type { SqlClient } from "../sql.ts";
 import { bossLootRepository } from "./bossLoot.ts";
 import { characterRepository } from "./characters.ts";
+import { companionRepository } from "./companion.ts";
 import { eventRepository } from "./events.ts";
 import { exclusionRepository } from "./exclusions.ts";
 import { journalRepository } from "./journal.ts";
@@ -17,6 +18,7 @@ function createRepositories(sql: SqlClient): Repositories {
   return {
     members: memberRepository(sql),
     sessions: sessionRepository(sql),
+    companion: companionRepository(sql),
     characters: characterRepository(sql),
     journal: journalRepository(sql),
     raids: raidRepository(sql),

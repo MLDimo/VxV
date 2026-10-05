@@ -1,6 +1,7 @@
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAuth } from "./application/auth.ts";
 import { createCharacters } from "./application/characters.ts";
+import { createCompanion } from "./application/companion.ts";
 import { createDiscordProfiles } from "./application/discordProfiles.ts";
 import { createEvents } from "./application/events.ts";
 import { createExclusions } from "./application/exclusions.ts";
@@ -38,6 +39,7 @@ export function createApplication({
   const unitOfWork = createUnitOfWork(sql);
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
+    companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
     roster: createRoster({ unitOfWork }),
     characters: createCharacters({ unitOfWork }),
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),

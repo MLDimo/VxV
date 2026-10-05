@@ -2,9 +2,15 @@ import { generateCodeVerifier, generateState } from "arctic";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { createDiscordClient, DISCORD_SCOPES } from "@/server/discord";
-import { OAUTH_COOKIE_SECONDS, OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE } from "@/server/oauthCookies";
+import { safeNextPath } from "@/server/nextPath";
+import {
+  OAUTH_COOKIE_SECONDS,
+  OAUTH_NEXT_COOKIE,
+  OAUTH_STATE_COOKIE,
+  OAUTH_VERIFIER_COOKIE,
+} from "@/server/oauthCookies";
 
-/** First half of the OAuth flow: remembers state and PKCE verifier, then sends the user to Discord. */
+/** First half of the OAuth flow: remembers state, PKCE verifier and the page asked for, then goes to Discord. */
 export async function GET(request: NextRequest) {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
@@ -19,5 +25,6 @@ export async function GET(request: NextRequest) {
   };
   store.set(OAUTH_STATE_COOKIE, state, options);
   store.set(OAUTH_VERIFIER_COOKIE, codeVerifier, options);
+  store.set(OAUTH_NEXT_COOKIE, safeNextPath(request.nextUrl.searchParams.get("suite")), options);
   return NextResponse.redirect(url);
 }
