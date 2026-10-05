@@ -114,7 +114,9 @@ end
 function CreateFrame(kind, name, parent, template)
     local frame = newRegion(kind or "Frame")
     frame.events, frame.scripts, frame.name, frame.parent, frame.template = {}, {}, name, parent, template
-    frame.enabled, frame.frameLevel, frame.children = true, 1, {}
+    -- Like the game, a frame lies one level above its parent: it draws over it.
+    local parentLevel = parent ~= nil and parent.frameLevel or 0
+    frame.enabled, frame.frameLevel, frame.children = true, parentLevel + 1, {}
     function frame:RegisterEvent(event)
         self.events[event] = true
         RegisteredEvents[event] = true
