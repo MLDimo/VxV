@@ -1,20 +1,45 @@
 local _, ns = ...
 
---- The main window: one tab per module that has one, built at the first opening.
+--- The main window in the charter (§6): a frame of four rings, a header with the emblem and one tab per place of
+--- the tavern (Taverne first), each tab built at its first opening. A place no module provides yet shows its
+--- screen with "Bientôt". The window shrinks on small screens.
 local Window = {}
 ns.Window = Window
 
-local Bus, Modules, Storage = ns.Bus, ns.Modules, ns.Storage
+local Bus, Modules, Storage, Theme, Tokens = ns.Bus, ns.Modules, ns.Storage, ns.Theme, ns.Tokens
 
 -- Named: the client closes the frames listed in UISpecialFrames when Escape is pressed.
 local FRAME_NAME = "VXV_Window"
-local WIDTH, HEIGHT = 640, 440
-local INSET = 12
-local TITLE_HEIGHT = 30
-local TAB_WIDTH, TAB_HEIGHT, TAB_GAP = 110, 24, 4
+local WIDTH, HEIGHT = 1000, 680
+local FRAME_RINGS = { { "ink", 3 }, { "copper", 4 }, { "ink", 3 }, { "beam", 2 } }
+local BORDER = 12
+local HEADER_HEIGHT = 56
+local EMBLEM_SIZE = 30
+local TAB_GAP = 2
+local CLOSE_SIZE = 28
+local SCREEN_MARGIN = 40
+local SCREEN_PADDING = 22
+local TAVERN = { id = "tavern", name = "Taverne" }
 
 local frame
 local tabs = {}
+
+--- The places in the order of the tabs: the Taverne, then the places of the tavern.
+local function placeList()
+    local list = { TAVERN }
+    for _, place in ipairs(Tokens.places) do
+        list[#list + 1] = place
+    end
+    return list
+end
+
+local function moduleFor(placeId)
+    for _, module in ipairs(Modules.All()) do
+        if module.tab ~= nil and module.tab.place == placeId then
+            return module
+        end
+    end
+end
 
 local function savePosition()
     local point, _, relativePoint, x, y = frame:GetPoint()
@@ -22,41 +47,98 @@ local function savePosition()
     settings.point, settings.relativePoint, settings.x, settings.y = point, relativePoint, x, y
 end
 
-local function selectTab(chosen)
-    for _, tab in ipairs(tabs) do
-        local isChosen = tab == chosen
-        if isChosen and tab.content == nil then
-            tab.content = CreateFrame("Frame", nil, frame)
-            tab.content:SetPoint("TOPLEFT", INSET, -(TITLE_HEIGHT + TAB_HEIGHT + INSET))
-            tab.content:SetSize(WIDTH - 2 * INSET, HEIGHT - TITLE_HEIGHT - TAB_HEIGHT - 3 * INSET)
-            tab.module.tab.Build(tab.content)
-        end
-        if tab.content ~= nil then
-            tab.content:SetShown(isChosen)
-        end
-        if isChosen then
-            tab.button:Disable()
-        else
-            tab.button:Enable()
-        end
+--- The screen of a place no module provides yet.
+local function buildComingSoon(content, place)
+    Theme.ScreenHeader(content, place.subtitle, place.kicker, place.name)
+        :SetPoint("TOPLEFT", SCREEN_PADDING, -SCREEN_PADDING)
+    local soon = Theme.Text(content, "text", 15, "muted")
+    soon:SetPoint("TOPLEFT", SCREEN_PADDING, -110)
+    soon:SetText("Bientôt : ce lieu ouvre avec sa phase.")
+end
+
+local function buildContent(tab)
+    tab.content = CreateFrame("Frame", nil, frame)
+    tab.content:SetPoint("TOPLEFT", BORDER, -(BORDER + HEADER_HEIGHT))
+    tab.content:SetSize(WIDTH - 2 * BORDER, HEIGHT - 2 * BORDER - HEADER_HEIGHT)
+    local module = moduleFor(tab.place.id)
+    if module ~= nil then
+        module.tab.Build(tab.content)
+    else
+        buildComingSoon(tab.content, tab.place)
     end
 end
 
-local function addTab(module)
-    local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    button:SetSize(TAB_WIDTH, TAB_HEIGHT)
-    button:SetPoint("TOPLEFT", INSET + #tabs * (TAB_WIDTH + TAB_GAP), -TITLE_HEIGHT)
-    button:SetText(module.tab.title)
-    local tab = { module = module, button = button }
-    button:SetScript("OnClick", function()
-        selectTab(tab)
+--- Shows the tab of this place ("tavern", "raid", …).
+function Window.Select(placeId)
+    for _, tab in ipairs(tabs) do
+        local chosen = tab.place.id == placeId
+        if chosen and tab.content == nil then
+            buildContent(tab)
+        end
+        if tab.content ~= nil then
+            tab.content:SetShown(chosen)
+        end
+        tab.button:SetSelected(chosen)
+    end
+end
+
+local function addHeader()
+    local header = CreateFrame("Frame", nil, frame)
+    frame.header = header
+    header:SetPoint("TOPLEFT", BORDER, -BORDER)
+    header:SetSize(WIDTH - 2 * BORDER, HEADER_HEIGHT)
+    Theme.Fill(header, "wood-night"):SetAllPoints()
+    local line = Theme.Fill(header, "amethyst", "ARTWORK")
+    line:SetPoint("BOTTOMLEFT")
+    line:SetPoint("BOTTOMRIGHT")
+    line:SetHeight(1)
+    header:EnableMouse(true)
+    header:RegisterForDrag("LeftButton")
+    header:SetScript("OnDragStart", function()
+        frame:StartMoving()
     end)
-    tabs[#tabs + 1] = tab
+    header:SetScript("OnDragStop", function()
+        frame:StopMovingOrSizing()
+        savePosition()
+    end)
+
+    local emblem = header:CreateTexture(nil, "ARTWORK")
+    emblem:SetSize(EMBLEM_SIZE, EMBLEM_SIZE)
+    emblem:SetPoint("LEFT", 12, 0)
+    emblem:SetTexture(Theme.MEDIA .. "emblem.png", nil, nil, "NEAREST")
+    local name = Theme.Text(header, "pixelBold", 16, "ivory")
+    name:SetPoint("LEFT", emblem, "RIGHT", 10, 0)
+    name:SetText("VXV")
+
+    local previous = name
+    for _, place in ipairs(placeList()) do
+        local button = Theme.Tab(header, place.name)
+        button:SetPoint("LEFT", previous, "RIGHT", previous == name and 24 or TAB_GAP, 0)
+        local tab = { place = place, button = button }
+        button:SetScript("OnClick", function()
+            Window.Select(place.id)
+        end)
+        tabs[#tabs + 1] = tab
+        previous = button
+    end
+
+    local close = Theme.Button(header, "wood", "X", CLOSE_SIZE, CLOSE_SIZE)
+    close:SetPoint("RIGHT", -12, 0)
+    close:SetScript("OnClick", function()
+        frame:Hide()
+    end)
+end
+
+--- Smaller than the screen, whatever its size (§6: resized proportionally).
+local function fitScreen()
+    local available = UIParent:GetHeight()
+    if available ~= nil and available > 0 and available < HEIGHT + SCREEN_MARGIN then
+        frame:SetScale((available - SCREEN_MARGIN) / HEIGHT)
+    end
 end
 
 local function create()
-    local ok, templated = pcall(CreateFrame, "Frame", FRAME_NAME, UIParent, "BasicFrameTemplateWithInset")
-    frame = ok and templated or CreateFrame("Frame", FRAME_NAME, UIParent)
+    frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetSize(WIDTH, HEIGHT)
     local saved = Storage.Interface("window")
     frame:SetPoint(saved.point or "CENTER", UIParent, saved.relativePoint or "CENTER", saved.x or 0, saved.y or 0)
@@ -64,24 +146,12 @@ local function create()
     frame:SetMovable(true)
     frame:SetClampedToScreen(true)
     frame:EnableMouse(true)
-    frame:RegisterForDrag("LeftButton")
-    frame:SetScript("OnDragStart", frame.StartMoving)
-    frame:SetScript("OnDragStop", function()
-        frame:StopMovingOrSizing()
-        savePosition()
-    end)
-    local title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    title:SetPoint("TOP", 0, -6)
-    title:SetText("VXV")
+    Theme.Fill(frame, "night-window"):SetAllPoints()
+    Theme.Rings(frame, FRAME_RINGS, true)
+    addHeader()
+    fitScreen()
     table.insert(UISpecialFrames, FRAME_NAME)
-    for _, module in ipairs(Modules.All()) do
-        if module.tab ~= nil then
-            addTab(module)
-        end
-    end
-    if tabs[1] ~= nil then
-        selectTab(tabs[1])
-    end
+    Window.Select(TAVERN.id)
 end
 
 function Window.Toggle()
@@ -93,9 +163,24 @@ function Window.Toggle()
     frame:SetShown(not frame:IsShown())
 end
 
--- A bundle loaded on demand after the window was built gets its tab at once.
+--- Opens the window on a place's tab.
+function Window.Open(placeId)
+    if frame == nil then
+        create()
+    end
+    frame:Show()
+    Window.Select(placeId)
+end
+
+-- A bundle loaded after the window was built: its place's tab shows its screen at the next opening.
 Bus.On("modules.registered", function(module)
-    if frame ~= nil and module.tab ~= nil then
-        addTab(module)
+    if frame == nil or module.tab == nil then
+        return
+    end
+    for _, tab in ipairs(tabs) do
+        if tab.place.id == module.tab.place and tab.content ~= nil then
+            tab.content:Hide()
+            tab.content = nil
+        end
     end
 end)

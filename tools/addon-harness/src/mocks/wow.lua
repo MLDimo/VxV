@@ -73,6 +73,10 @@ local function newFontString()
     function fontString:SetJustifyH(justify) self.justify = justify end
     function fontString:SetWordWrap(wrap) self.wordWrap = wrap end
     function fontString:SetFontObject(font) self.font = font end
+    function fontString:SetFont(file, size, flags) self.font = file return true end
+    function fontString:SetTextColor(r, g, b, a) self.color = { r, g, b, a } end
+    --- About 7 pixels a character: enough to lay out.
+    function fontString:GetStringWidth() return #tostring(self.text or "") * 7 end
     return fontString
 end
 
@@ -80,6 +84,9 @@ local function newTexture()
     local texture = newRegion("Texture")
     function texture:SetTexture(path) self.path = path end
     function texture:SetAllPoints() end
+    function texture:SetColorTexture(r, g, b, a) self.color = { r, g, b, a } end
+    function texture:SetTexCoord(...) self.coords = { ... } end
+    function texture:SetBlendMode(mode) self.blendMode = mode end
     return texture
 end
 
@@ -130,6 +137,7 @@ function CreateFrame(kind, name, parent, template)
     function frame:Disable() self.enabled = false end
     function frame:IsEnabled() return self.enabled end
     function frame:GetCenter() return self.centerX or 0, self.centerY or 0 end
+    function frame:SetScale(scale) self.scale = scale end
     function frame:GetEffectiveScale() return 1 end
     --- Test helper: runs a script as the client would (a click, a drag, a frame update).
     function frame:Run(script, ...)
@@ -376,3 +384,14 @@ function GetGuildRosterInfo(index)
     return member.name, "Membre", 3, 60, "Classe", "", "", "", member.online ~= false, 0, member.class
 end
 ChatFontNormal = {}
+--- The game's font object, whose fonts write each alphabet; and the font families made from fonts.
+GameFontNormal = {
+    GetFontObjectForAlphabet = function(_, alphabet)
+        return { GetFont = function() return "Fonts\\" .. alphabet .. ".ttf" end }
+    end,
+}
+FontFamilies = {}
+function CreateFontFamily(name, members)
+    FontFamilies[name] = members
+    return { name = name, members = members }
+end

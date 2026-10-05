@@ -24,12 +24,12 @@ const rowsOf = (raid: LoadedAddon) => raid.run(ROWS) as unknown as Row[];
 /** Opens /vxv on the Raid tab. */
 const OPEN_RAID_TAB = `
   SlashCmdList.VXV("")
-  FindWidget(VXV_Window, function(widget) return widget.text == "Raid" end):Run("OnClick")
+  FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Raid" end):Run("OnClick")
 `;
 /** The shown row of the Raid tab whose text contains this. */
 const ROW_FRAME = (text: string) =>
   `FindWidget(VXV_Window, function(widget)
-      return widget.label ~= nil and widget.shown and tostring(widget.label.text):find(${JSON.stringify(text)}, 1, true)
+      return widget.row ~= nil and widget.shown and tostring(widget.label.text):find(${JSON.stringify(text)}, 1, true)
   end)`;
 const LOAD_BUTTON = 'FindWidget(VXV_Window, function(widget) return widget.text == "Charger les données" end)';
 const savedEvent = (text: string) => `{ schemaVersion = 2, modules = { raid = { text = ${JSON.stringify(text)} } } }`;

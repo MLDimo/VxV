@@ -1,21 +1,20 @@
 local _, ns = ...
 
---- French wording and colors of the event's data, as the website shows them.
+--- French wording of the event's data, as the website shows it; class colors come from VXV_Core's theme.
 local Labels = {}
 ns.Labels = Labels
 
-local CLASSES = {
-    WARRIOR = { name = "Guerrier", color = "c69b6d" },
-    PALADIN = { name = "Paladin", color = "f48cba" },
-    HUNTER = { name = "Chasseur", color = "aad372" },
-    ROGUE = { name = "Voleur", color = "fff468" },
-    PRIEST = { name = "Prêtre", color = "ffffff" },
-    SHAMAN = { name = "Chaman", color = "0070dd" },
-    MAGE = { name = "Mage", color = "3fc7eb" },
-    WARLOCK = { name = "Démoniste", color = "8788ee" },
-    DRUID = { name = "Druide", color = "ff7c0a" },
+local CLASS_NAMES = {
+    WARRIOR = "Guerrier",
+    PALADIN = "Paladin",
+    HUNTER = "Chasseur",
+    ROGUE = "Voleur",
+    PRIEST = "Prêtre",
+    SHAMAN = "Chaman",
+    MAGE = "Mage",
+    WARLOCK = "Démoniste",
+    DRUID = "Druide",
 }
-local UNKNOWN_CLASS_COLOR = "a1a1aa"
 
 -- Role icons of the game's group finder, cut from one texture.
 local ROLE_ICON = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:%s|t"
@@ -41,14 +40,12 @@ local METHODS = {
 }
 
 function Labels.ClassName(token)
-    local class = CLASSES[token]
-    return class and class.name or tostring(token)
+    return CLASS_NAMES[token] or tostring(token)
 end
 
 --- The name in the color of the class.
 function Labels.Colored(name, token)
-    local class = CLASSES[token]
-    return "|cff" .. (class and class.color or UNKNOWN_CLASS_COLOR) .. name .. "|r"
+    return VXV.ClassColored(name, token)
 end
 
 --- { label, plural, icon } of a role, or a neutral one for a role this version does not know.

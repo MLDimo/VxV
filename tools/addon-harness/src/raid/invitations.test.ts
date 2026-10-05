@@ -8,7 +8,7 @@ const PREFIX = "|cff14b8a6VXV|r ";
 const OFFICER = "Ðéjà Vu";
 const OPEN_RAID_TAB = `
   SlashCmdList.VXV("")
-  FindWidget(VXV_Window, function(widget) return widget.text == "Raid" end):Run("OnClick")
+  FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Raid" end):Run("OnClick")
 `;
 const CLICK = (text: string) =>
   `FindWidget(VXV_Window, function(widget) return widget.text == ${JSON.stringify(text)} end):Run("OnClick")`;

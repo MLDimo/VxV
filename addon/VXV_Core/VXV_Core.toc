@@ -25,11 +25,13 @@ Core\Comm.lua
 Core\GroupChat.lua
 Core\Presence.lua
 
-# Interface: window, home tab, /vxv, minimap icon.
+# Interface: the charter's theme, window, Taverne tab, /vxv, minimap icon.
+UI\Tokens.lua
+UI\Theme.lua
 UI\Window.lua
 UI\Tooltip.lua
 UI\TextWindow.lua
-UI\HomeTab.lua
+UI\TavernTab.lua
 UI\Slash.lua
 UI\MinimapButton.lua
 UI\Ping.lua

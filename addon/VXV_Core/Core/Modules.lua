@@ -1,7 +1,8 @@
 local _, ns = ...
 
 --- Feature modules plug into the core: { id, name, Enable(data), tab }, data being the module's saved data
---- and tab an optional { title, Build(content) } shown in the window.
+--- and tab an optional { place, Build(content) }: the screen of a place of the tavern ("raid", "journal"…, see
+--- UI/Tokens.lua), shown in the window under the place's name.
 --- Modules registered after login (bundles loaded on demand) are enabled at once.
 local Modules = {}
 ns.Modules = Modules

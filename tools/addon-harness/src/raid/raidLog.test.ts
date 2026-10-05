@@ -18,12 +18,12 @@ const LOG = `
 `;
 const OPEN_LOOT_TAB = `
   SlashCmdList.VXV("")
-  FindWidget(VXV_Window, function(widget) return widget.text == "Butin" end):Run("OnClick")
+  FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Journal" end):Run("OnClick")
 `;
 const TAB_ROWS = `
   local texts = {}
   FindWidget(VXV_Window, function(widget)
-      if widget.label ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
   end)
   return texts
 `;

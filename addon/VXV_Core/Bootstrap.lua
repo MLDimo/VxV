@@ -6,6 +6,7 @@ local ADDON_NAME, ns = ...
 ns.Events.On("ADDON_LOADED", function(name)
     if name == ADDON_NAME then
         VXV_DB = ns.Storage.Load(VXV_DB)
+        ns.Theme.Preload()
     end
 end)
 

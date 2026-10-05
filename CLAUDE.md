@@ -36,7 +36,11 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - journal du raid en jeu (boss, présents, morts, objets, diffusé par le maître du butin), onglet Butin, export `VXV-LOG-1` ;
   - import du journal sur le site (présents et objets, qui nourrissent le SR+), corrections par un officier avec motif, récap de fin de raid publié par le bot.
   Validation en attente : un raid réel enregistré sans saisie manuelle (raids ouverts le 9 décembre ; répétition en donjon avec maître du butin possible avant la fin de la bêta).
-- **Habillage (charte « La Taverne »)** : en cours, avant la P7 (`docs/plan/decisions-2026-10-05.md`). Socle : référence `docs/design/`, jetons `packages/design`, polices et images du site.
+- **Habillage (charte « La Taverne »)** : en cours, avant la P7 (`docs/plan/decisions-2026-10-05.md`) :
+  - socle : référence `docs/design/`, jetons `packages/design` (thème du site et `VXV_Core/UI/Tokens.lua` générés) ;
+  - site entièrement rhabillé, en production ;
+  - mesure en jeu des polices et textures faite (`docs/design/mesure-en-jeu-2026-10-05.md`) ;
+  - addon : thème (polices en familles, anneaux, boutons, onglets), fenêtre 1000×680 à un onglet par lieu, Taverne cliquable ; écrans Raid et Journal, panneau de butin et mode réduit à rhabiller.
 - P7 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -166,3 +170,4 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.
 - Métiers : `GetProfessions` ; recettes connues via `C_TradeSkillUI`, quand la fenêtre du métier est ouverte.
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
+- Habillage (mesuré le 5 octobre, `docs/design/mesure-en-jeu-2026-10-05.md`) : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.
