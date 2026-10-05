@@ -15,8 +15,8 @@ Complète le plan de développement v1.0 et les décisions du 3 octobre.
   de l'addon (thème Lua généré).
 - Le site reste **entièrement réservé aux membres** : un visiteur ne voit que la page de connexion, dans la charte,
   sans données.
-- Survol d'un lieu de la taverne : halo améthyste seul, sans contour or (site et addon) ; la plaque passe toujours en
-  prune.
+- Survol d'un lieu de la taverne (site et addon) : seule la plaque change et passe en prune, pour les lieux actifs
+  comme pour ceux « Bientôt » ; ni voile, ni halo, ni contour sur la zone.
 - Les lieux des phases suivantes (Le Dé Pipé, Quêtes, Ranking, Artisans) peuvent être préparés dès l'habillage :
   l'addon n'est ouvert à la guilde qu'une fois toutes les phases terminées. Le mur des avis de recherche (JcJ)
   reste sans interaction.

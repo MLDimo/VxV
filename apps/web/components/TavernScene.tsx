@@ -25,6 +25,7 @@ function box([left, top, width, height]: readonly number[]): CSSProperties {
   return { left: percent(left ?? 0), top: percent(top ?? 0), width: percent(width ?? 0), height: percent(height ?? 0) };
 }
 
+/** A place of the tavern: hovering it, only its plaque changes, whether it opens a section or says "Bientôt". */
 function PlaceSpot({ place, href }: { place: Place; href: string | undefined }) {
   const plaque = (
     <span
@@ -36,9 +37,6 @@ function PlaceSpot({ place, href }: { place: Place; href: string | undefined }) 
       </small>
     </span>
   );
-  const glow = (
-    <span className="absolute inset-0 bg-amethyst/10 opacity-0 shadow-[0_0_30px_6px_rgba(163,92,255,0.65)] transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
-  );
   if (href === undefined) {
     return (
       <span className="group absolute" style={box(place.spot)} title={`${place.name} : bientôt`}>
@@ -48,7 +46,6 @@ function PlaceSpot({ place, href }: { place: Place; href: string | undefined }) 
   }
   return (
     <Link href={href} className="group absolute outline-none" style={box(place.spot)} aria-label={place.name}>
-      {glow}
       {plaque}
     </Link>
   );
