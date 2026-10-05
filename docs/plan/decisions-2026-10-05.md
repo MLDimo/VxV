@@ -22,7 +22,10 @@ Complète le plan de développement v1.0 et les décisions du 3 octobre.
   reste sans interaction.
 - Noms de joueurs dans d'autres alphabets (cyrillique, chinois, coréen, présents dans la guilde de la bêta) :
   nos polices n'ont pas les caractères chinois et coréens ; l'addon passe par les polices du jeu pour ces
-  alphabets (à mesurer en jeu).
+  alphabets (mesuré en jeu le 5 octobre). Pixelify Sans reste la police pixel du latin et du cyrillique, malgré
+  son « О » majuscule cyrillique manquant.
+- Noms de joueurs en Manrope, comme le reste du texte, dans leur couleur de classe ; Pixelify Sans reste aux
+  titres, onglets, plaques, boutons et gros chiffres.
 - Avatars : le jeu ne donne la race et le sexe d'un autre joueur que dans le groupe, et la liste de guilde ne les
   contient pas. Avatar par classe en attendant que l'addon de chaque joueur transmette la race et le sexe de ses
   personnages (P7).
