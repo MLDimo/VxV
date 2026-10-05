@@ -8,8 +8,7 @@ ns.Freshness = Freshness
 local Labels, RaidData = ns.Labels, ns.RaidData
 
 local CHECK_EVERY_SECONDS = 60
--- The website locks soft reserves 30 minutes before the raid, and lists an event 6 hours after its start.
-local LOCK_BEFORE_START_SECONDS = 30 * 60
+-- The website lists an event 6 hours after its start.
 local LISTED_AFTER_START_SECONDS = 6 * 60 * 60
 local STALE = "SR verrouillées depuis le %s, mais tes données sont du %s : recopie-les depuis la page de "
     .. "l'événement sur le site (/vxv importer) pour envoyer les SR définitives à la guilde."
@@ -19,7 +18,7 @@ local remindedFor
 local function check()
     local event = RaidData.Current()
     if event ~= nil and remindedFor ~= event.exportedAt and RaidData.IsOfficer(VXV.PlayerName()) then
-        local lockAt, now = event.startsAt - LOCK_BEFORE_START_SECONDS, time()
+        local lockAt, now = RaidData.LockAt(event), time()
         if event.exportedAt < lockAt and now >= lockAt and now < event.startsAt + LISTED_AFTER_START_SECONDS then
             remindedFor = event.exportedAt
             VXV.Print(STALE:format(Labels.DateTime(lockAt), Labels.DateTime(event.exportedAt)))

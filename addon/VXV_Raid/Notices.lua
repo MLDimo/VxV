@@ -5,7 +5,7 @@ local Labels = ns.Labels
 
 local NEW_RAID = "Raid chargé par %s : %s, le %s. Tape /vxv pour voir les inscrits et les SR."
 local CHANGE = "|cffff8000Modification par %s :|r %s (motif : %s)"
-local MORE_CHANGES = "… et %d autres modifications : voir l'onglet Raid."
+local MORE_CHANGES = "… et %d autres modifications : voir le Journal."
 local MAX_CHANGES_SHOWN = 3
 
 local function lastChangeAt(event)

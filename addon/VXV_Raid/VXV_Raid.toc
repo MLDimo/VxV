@@ -21,14 +21,15 @@ BossLoot.lua
 Distribution.lua
 RaidLog.lua
 
-# Interface: the Raid tab and the import of the data.
+# Interface: the Raid and Journal screens, the loot panel and the import and export of the data.
 UI\RowList.lua
 UI\RaidView.lua
 UI\LootView.lua
-UI\LogView.lua
+UI\JournalView.lua
 UI\Import.lua
+UI\LogExport.lua
 UI\RaidTab.lua
 UI\LootPanel.lua
-UI\LootTab.lua
+UI\JournalTab.lua
 
 Bootstrap.lua

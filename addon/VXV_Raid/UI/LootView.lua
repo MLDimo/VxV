@@ -8,7 +8,11 @@ ns.LootView = LootView
 
 local Attribution, Labels, Reserves = ns.Attribution, ns.Labels, ns.Reserves
 
-local GREY = "|cff808080%s|r"
+local Theme = VXV.Theme
+
+local function dimmed(text)
+    return Theme.Colored(text, "muted")
+end
 
 local function bonusText(bonus)
     return bonus > 0 and (" +" .. bonus) or ""
@@ -21,7 +25,7 @@ local function reservedBy(reservers, inGroup)
         if inGroup[signup.name] then
             names[#names + 1] = Labels.Colored(signup.name, signup.class) .. bonusText(reserver.bonus)
         else
-            names[#names + 1] = GREY:format(signup.name .. " (absent)")
+            names[#names + 1] = dimmed(signup.name .. " (absent)")
         end
     end
     return "SR de " .. table.concat(names, ", ")
@@ -50,8 +54,8 @@ local function addRolls(rows, round)
             local detail = bonus > 0 and string.format("%d + %d = %d", roll.roll, bonus, total) or tostring(total)
             rows[#rows + 1] = { kind = "line", text = roll.name .. " : " .. detail }
         else
-            rows[#rows + 1] = { kind = "line", text = GREY:format(roll.name .. " : " .. roll.roll .. " (" ..
-                roll.reason .. ")") }
+            local text = roll.name .. " : " .. roll.roll .. " (" .. roll.reason .. ")"
+            rows[#rows + 1] = { kind = "line", text = dimmed(text) }
         end
     end
 end

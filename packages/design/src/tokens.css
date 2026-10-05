@@ -92,6 +92,14 @@
   --color-ink-brown: #3a2614;
   --color-ember: #ffa03c;
   --color-neon: #ff5ac8;
+  --color-leather: #4a2414;
+  --color-leather-shade: #2e140a;
+  --color-ruling: rgba(120, 80, 30, 0.22);
+  --color-stamp-loot: #7a2fe0;
+  --color-stamp-cash: #8a5a0e;
+  --color-stamp-quest: #2e7a44;
+  --color-stamp-bet: #b0306e;
+  --color-stamp-raid: #3a5aa0;
   --color-class-warrior: #c69b6d;
   --color-class-paladin: #f48cba;
   --color-class-hunter: #aad372;

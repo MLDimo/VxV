@@ -26,7 +26,6 @@ local ROLES = {
 Labels.ROLE_ORDER = { "tank", "healer", "dps" }
 
 local STATUSES = { present = "Présent", late = "En retard", maybe = "Peut-être", bench = "Banc", absent = "Absent" }
-Labels.STATUS_ORDER = { "present", "late", "maybe", "bench", "absent" }
 -- Players expected in the raid, as the website counts them.
 local COMING = { present = true, late = true }
 

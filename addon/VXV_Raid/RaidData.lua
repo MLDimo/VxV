@@ -34,6 +34,14 @@ function RaidData.ExportedAt()
     return current and current.exportedAt or 0
 end
 
+-- The website locks soft reserves 30 minutes before the raid.
+local LOCK_BEFORE_START_SECONDS = 30 * 60
+
+--- When the event's soft reserves lock (Unix seconds).
+function RaidData.LockAt(event)
+    return event.startsAt - LOCK_BEFORE_START_SECONDS
+end
+
 --- The current event, or nil when no officer loaded any.
 function RaidData.Current()
     return current

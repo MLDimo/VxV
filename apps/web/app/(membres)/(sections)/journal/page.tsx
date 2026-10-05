@@ -7,13 +7,13 @@ import { getApplication } from "@/server/application";
 /** The stamp of each officer action (§7.7): its category, in its ink. */
 const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "roster.import": { label: "GUILDE", className: "border-ink-brown text-ink-brown" },
-  "event.create": { label: "RAID", className: "border-[#3a5aa0] text-[#3a5aa0]" },
-  "exclusion.add": { label: "RAID", className: "border-[#3a5aa0] text-[#3a5aa0]" },
-  "exclusion.remove": { label: "RAID", className: "border-[#3a5aa0] text-[#3a5aa0]" },
-  "softReserve.override": { label: "RAID", className: "border-[#3a5aa0] text-[#3a5aa0]" },
-  "raid.import": { label: "RAID", className: "border-[#3a5aa0] text-[#3a5aa0]" },
-  "loot.council": { label: "LOOT", className: "border-[#7a2fe0] text-[#7a2fe0]" },
-  "loot.correct": { label: "LOOT", className: "border-[#7a2fe0] text-[#7a2fe0]" },
+  "event.create": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
+  "exclusion.add": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
+  "exclusion.remove": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
+  "softReserve.override": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
+  "raid.import": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
+  "loot.council": { label: "LOOT", className: "border-stamp-loot text-stamp-loot" },
+  "loot.correct": { label: "LOOT", className: "border-stamp-loot text-stamp-loot" },
 };
 
 /** The accounts book (§7.7): the guild's cash on the left (to come), the officers' journal on the right. */

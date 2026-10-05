@@ -4,46 +4,42 @@ local _, ns = ...
 local TextWindow = {}
 ns.TextWindow = TextWindow
 
--- Named: the client closes the frames listed in UISpecialFrames when Escape is pressed.
+local Dialog, Theme = ns.Dialog, ns.Theme
+
 local FRAME_NAME = "VXV_TextWindow"
 local WIDTH, HEIGHT = 520, 380
-local INSET = 12
-local TITLE_HEIGHT = 30
-local SCROLLBAR_WIDTH = 30
-local BUTTON_WIDTH, BUTTON_HEIGHT = 140, 24
+local GAP = 12
+-- The game's scroll frame keeps the box's cursor in view while typing; its scroll bar needs this room.
+local SCROLLBAR_WIDTH = 26
+local BUTTON_WIDTH, BUTTON_HEIGHT = 150, 28
 local NO_LETTER_LIMIT = 0
 
 local frame
 
 local function create()
-    local ok, templated = pcall(CreateFrame, "Frame", FRAME_NAME, UIParent, "BasicFrameTemplateWithInset")
-    frame = ok and templated or CreateFrame("Frame", FRAME_NAME, UIParent)
-    frame:SetSize(WIDTH, HEIGHT)
-    frame:SetPoint("CENTER")
-    frame:SetFrameStrata("DIALOG")
-    frame:SetMovable(true)
-    frame:EnableMouse(true)
-    frame:RegisterForDrag("LeftButton")
-    frame:SetScript("OnDragStart", frame.StartMoving)
-    frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-    local scroll = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", INSET, -TITLE_HEIGHT)
-    scroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_WIDTH, INSET + BUTTON_HEIGHT + INSET)
+    local body
+    frame, body = Dialog.Create(FRAME_NAME, WIDTH, HEIGHT, "VXV", "DIALOG")
+    local field = CreateFrame("Frame", nil, body)
+    field:SetPoint("TOPLEFT")
+    field:SetSize(body:GetWidth(), body:GetHeight() - BUTTON_HEIGHT - GAP)
+    Theme.Fill(field, "night"):SetAllPoints()
+    Theme.Rings(field, { { "line", 1 } })
+    local scroll = CreateFrame("ScrollFrame", nil, field, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", GAP / 2, -GAP / 2)
+    scroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_WIDTH, GAP / 2)
     local editBox = CreateFrame("EditBox", nil, scroll)
     editBox:SetMultiLine(true)
     editBox:SetMaxLetters(NO_LETTER_LIMIT)
     editBox:SetAutoFocus(false)
     editBox:SetFontObject(ChatFontNormal)
-    editBox:SetWidth(WIDTH - INSET - SCROLLBAR_WIDTH * 2)
+    editBox:SetWidth(field:GetWidth() - SCROLLBAR_WIDTH - GAP)
     editBox:SetScript("OnEscapePressed", function()
         frame:Hide()
     end)
     scroll:SetScrollChild(editBox)
-    local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
-    button:SetPoint("BOTTOMRIGHT", -INSET, INSET)
+    local button = Theme.Button(body, "pixel", "", BUTTON_WIDTH, BUTTON_HEIGHT)
+    button:SetPoint("BOTTOMRIGHT")
     frame.editBox, frame.button = editBox, button
-    table.insert(UISpecialFrames, FRAME_NAME)
 end
 
 local function open(text)

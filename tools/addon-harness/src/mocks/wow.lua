@@ -63,6 +63,7 @@ local function newRegion(kind)
     function region:Hide() self.shown = false end
     function region:SetShown(shown) self.shown = shown end
     function region:IsShown() return self.shown end
+    function region:SetAlpha(alpha) self.alpha = alpha end
     return region
 end
 
@@ -115,12 +116,13 @@ function CreateFrame(kind, name, parent, template)
     function frame:StopMovingOrSizing() end
     function frame:CreateFontString(_, _, template)
         local fontString = newFontString()
-        fontString.font = template
+        fontString.font, fontString.parent = template, self
         self.children[#self.children + 1] = fontString
         return fontString
     end
     function frame:CreateTexture()
         local texture = newTexture()
+        texture.parent = self
         self.children[#self.children + 1] = texture
         return texture
     end
@@ -133,6 +135,9 @@ function CreateFrame(kind, name, parent, template)
     function frame:SetFocus() self.focused = true end
     function frame:HighlightText() self.highlighted = true end
     function frame:SetScrollChild(child) self.scrollChild = child end
+    function frame:EnableMouseWheel(enabled) self.mouseWheel = enabled end
+    function frame:SetVerticalScroll(offset) self.verticalScroll = offset end
+    function frame:GetVerticalScroll() return self.verticalScroll or 0 end
     function frame:Enable() self.enabled = true end
     function frame:Disable() self.enabled = false end
     function frame:IsEnabled() return self.enabled end
@@ -166,6 +171,22 @@ function FindWidget(frame, test)
             return found
         end
     end
+end
+
+--- Test helper: whether the widget and all its parents are shown.
+function IsVisible(widget)
+    while widget ~= nil do
+        if not widget.shown then
+            return false
+        end
+        widget = widget.parent
+    end
+    return true
+end
+
+--- Test helper: the charter's button (VXV.Theme.Button) showing this text under the frame.
+function FindButton(frame, text)
+    return FindWidget(frame, function(widget) return widget.label ~= nil and widget.label.text == text end)
 end
 
 function geterrorhandler()

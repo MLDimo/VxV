@@ -56,7 +56,7 @@ export function killAndOpen(guild: Guild, links: readonly string[]): void {
 export const PANEL_ROWS = `
   local texts = {}
   FindWidget(VXV_LootPanel, function(widget)
-      if widget.label ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
   end)
   return texts
 `;

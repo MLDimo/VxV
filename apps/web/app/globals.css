@@ -226,14 +226,14 @@
 
 @utility ruled-page {
   background:
-    repeating-linear-gradient(180deg, transparent 0 31px, rgba(120, 80, 30, 0.22) 31px 32px),
+    repeating-linear-gradient(180deg, transparent 0 31px, var(--color-ruling) 31px 32px),
     radial-gradient(circle at 30% 20%, #f3e7c9, #e2cfa3 70%, #cdb581);
   color: var(--color-ink-brown);
 }
 
 /* The leather cover of the accounts book. */
 @utility leather {
-  background: linear-gradient(180deg, #4a2414, #2e140a);
+  background: linear-gradient(180deg, var(--color-leather), var(--color-leather-shade));
   box-shadow:
     0 0 0 2px var(--color-ink),
     0 0 0 5px var(--color-copper);
