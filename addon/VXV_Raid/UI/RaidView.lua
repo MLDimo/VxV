@@ -74,13 +74,13 @@ end
 function RaidView.Header(event, sender, now)
     if event == nil then
         return { kicker = "Conseil de guerre", title = "Aucun raid chargé", badges = {},
-            subtitle = "Un officier charge les données depuis la page de l'événement sur le site (/vxv importer)." }
+            subtitle = "Un officier les envoie à la guilde, ou ton compagnon VXV les apporte au prochain /reload." }
     end
     local _, expected = RaidView.ExpectedByRole(event)
     local lockAt = RaidData.LockAt(event)
     local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. remaining(lockAt - now))
     local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
-        or ("données copiées le " .. Labels.DateTime(event.exportedAt))
+        or ("données du compagnon, du " .. Labels.DateTime(event.exportedAt))
     return {
         kicker = "Conseil de guerre · prochain raid",
         title = event.title,
@@ -219,7 +219,7 @@ end
 function RaidView.Card(event)
     if event == nil then
         return { title = "Aucun raid chargé", action = "Voir le raid",
-            lines = { "Un officier charge les données depuis la page de l'événement sur le site." } }
+            lines = { "Un officier les envoie à la guilde, ou ton compagnon VXV les apporte." } }
     end
     local byRole, expected = RaidView.ExpectedByRole(event)
     local roles = {}

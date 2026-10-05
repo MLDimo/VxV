@@ -66,6 +66,30 @@ describe("addon export", () => {
     ]);
   });
 
+  it("gives any member's companion the next event, the soonest first", async () => {
+    const next = await addonExport.exportNextEvent();
+    expect(next).toMatchObject({ title: "Onyxia", startsAt: new Date("2026-12-10T20:00:00Z") });
+    expect(next?.text).toBe(await addonExport.exportEvent(officer, eventId));
+  });
+
+  it("keeps the event being played a few hours after its start, then moves to the next one", async () => {
+    const during = createAddonExport({
+      unitOfWork: createUnitOfWork(sql),
+      clock: () => new Date("2026-12-11T01:00:00Z"),
+    });
+    expect((await during.exportNextEvent())?.text).toContain(`E;${eventId};`);
+    const after = createAddonExport({
+      unitOfWork: createUnitOfWork(sql),
+      clock: () => new Date("2026-12-11T03:00:00Z"),
+    });
+    expect((await after.exportNextEvent())?.startsAt).toEqual(new Date("2026-12-17T20:00:00Z"));
+    const later = createAddonExport({
+      unitOfWork: createUnitOfWork(sql),
+      clock: () => new Date("2027-01-01T00:00:00Z"),
+    });
+    expect(await later.exportNextEvent()).toBeUndefined();
+  });
+
   it("is refused to a member, and to an unknown event", async () => {
     await expect(addonExport.exportEvent(member, eventId)).rejects.toThrow(ForbiddenError);
     await expect(addonExport.exportEvent(officer, "00000000-0000-0000-0000-000000000000")).rejects.toThrow(

@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { COLORS } from "@vxv/design";
 import { app, BrowserWindow, dialog, ipcMain, Menu, safeStorage, shell, Tray, type IpcMainInvokeEvent } from "electron";
 import { createCompanion, type Companion } from "../application/companion.ts";
-import { diskReader, thisComputer } from "../infrastructure/folders.ts";
+import { diskGameFiles, diskReader, thisComputer } from "../infrastructure/disk.ts";
 import { listenForReturn } from "../infrastructure/loopback.ts";
 import { createSiteApi } from "../infrastructure/siteApi.ts";
 import { createSettingsFile, createTokenFile } from "../infrastructure/storage.ts";
@@ -12,7 +12,7 @@ import { CHANNELS, type Action } from "./bridge.ts";
 const SITE_URL = process.env.VXV_SITE_URL ?? "https://vxv-web.vercel.app";
 /** Given to the system for the launch at login: the companion then starts hidden in the notification area. */
 const HIDDEN_ARGUMENT = "--cache";
-const WINDOW_SIZE = { width: 440, height: 640 };
+const WINDOW_SIZE = { width: 440, height: 720 };
 const RENDERER = join(__dirname, "renderer", "index.html");
 
 let mainWindow: BrowserWindow | undefined;
@@ -94,6 +94,7 @@ function actions(companion: Companion): Record<Action, (...args: unknown[]) => P
       }
     },
     setLaunchAtLogin: (on) => companion.setLaunchAtLogin(on === true),
+    syncNow: () => companion.syncNow(),
     openSite: () => shell.openExternal(SITE_URL),
   };
 }
@@ -122,6 +123,7 @@ async function start(): Promise<void> {
     tokens: createTokenFile(join(userData, "jeton"), safeStorage),
     settings: createSettingsFile(join(userData, "reglages.json")),
     folders: diskReader,
+    gameFiles: diskGameFiles,
     computer: thisComputer,
     listen: listenForReturn,
     openBrowser: (url) => shell.openExternal(url),
@@ -134,6 +136,7 @@ async function start(): Promise<void> {
     version: app.getVersion(),
   });
   connect(companion);
+  app.on("will-quit", companion.stop);
   tray ??= createTray();
   const startedHidden = process.argv.includes(HIDDEN_ARGUMENT) || app.getLoginItemSettings().wasOpenedAtLogin;
   if (!startedHidden) {

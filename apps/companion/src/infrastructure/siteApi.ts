@@ -1,5 +1,5 @@
 import { SiteError, UnlinkedError } from "../application/errors.ts";
-import type { Account, LinkRequest, SitePort } from "../application/ports.ts";
+import type { Account, LinkRequest, NextRaid, SitePort } from "../application/ports.ts";
 
 const HTTP_UNAUTHORIZED = 401;
 const UNREACHABLE = "Le site VXV ne répond pas : vérifie ta connexion à Internet.";
@@ -46,6 +46,10 @@ export function createSiteApi(siteUrl: string): SitePort {
 
     me(token: string): Promise<Account> {
       return call("/api/compagnon/moi", {}, token);
+    },
+
+    download(token: string): Promise<{ raid: NextRaid | null }> {
+      return call("/api/compagnon/donnees", {}, token);
     },
 
     // The companion forgets the token anyway: a token the website still knows expires unused.

@@ -14,6 +14,7 @@ Reserves.lua
 Attribution.lua
 Rolls.lua
 Sharing.lua
+Companion.lua
 Notices.lua
 Freshness.lua
 Invitations.lua

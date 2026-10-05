@@ -24,7 +24,7 @@ function RaidData.Restore(data)
     current = EventData.Parse(data.text)
 end
 
---- The text of the current event, as the website wrote it, and who sent it.
+--- The text of the current event, as the website wrote it, and who sent it (nil: the player's companion).
 function RaidData.Text()
     return saved.text, saved.sender
 end
@@ -83,6 +83,17 @@ function RaidData.Import(text)
     end
     keep(text, event, VXV.PlayerName())
     return true, LOADED:format(event.title, Labels.DateTime(event.startsAt))
+end
+
+--- Data brought by the player's own companion (VXV_Sync): kept when newer, whoever the officers are, since the
+--- player's computer wrote them. True when kept.
+function RaidData.FromCompanion(text)
+    local event = EventData.Parse(text)
+    if event == nil or staleness(event) ~= nil then
+        return false
+    end
+    keep(text, event, nil)
+    return true
 end
 
 --- Data an addon of the guild sent, kept when they are newer and their sender is an officer for both the new

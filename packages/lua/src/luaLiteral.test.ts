@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { toLuaLiteral, type LuaValue } from "./luaLiteral.ts";
-import { evaluateLua } from "./test/evaluateLua.ts";
+import { evaluateLua } from "./testing.ts";
 
 function roundTrip(value: LuaValue): unknown {
   return evaluateLua(`value = ${toLuaLiteral(value)}`, "value");

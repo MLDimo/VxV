@@ -1,3 +1,6 @@
+// fengari has no typings: the packages that use this helper need ours along with it.
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- an import cannot carry ambient typings
+/// <reference path="./fengari.d.ts" />
 import { lauxlib, lua, lualib, to_luastring, type LuaState } from "fengari";
 import luaparse from "luaparse";
 

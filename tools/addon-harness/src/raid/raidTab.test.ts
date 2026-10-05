@@ -73,7 +73,7 @@ describe("Raid screen", () => {
     expect(view.header).toEqual({
       kicker: "Conseil de guerre",
       title: "Aucun raid chargé",
-      subtitle: "Un officier charge les données depuis la page de l'événement sur le site (/vxv importer).",
+      subtitle: "Un officier les envoie à la guilde, ou ton compagnon VXV les apporte au prochain /reload.",
       badges: {},
     });
     expect(texts(view.me)).toEqual([
@@ -195,7 +195,7 @@ describe("Raid screen", () => {
     client('SlashCmdList.VXV("")');
     expect(client(RAID_CARD)).toEqual([
       "Aucun raid chargé",
-      "Un officier charge les données depuis la page de l'événement sur le site.",
+      "Un officier les envoie à la guilde, ou ton compagnon VXV les apporte.",
       "Voir le raid",
     ]);
     importText(websiteText());

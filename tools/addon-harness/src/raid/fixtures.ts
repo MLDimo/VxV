@@ -104,9 +104,10 @@ export function importText(client: (code: string) => unknown, text: string): voi
   client(`VXV_TextWindow.editBox:SetText(${JSON.stringify(text)}) VXV_TextWindow.button:Run("OnClick")`);
 }
 
-/** VXV_Core and VXV_Raid on a mocked client, as the game loads them. */
+/** VXV_Core and VXV_Raid on a mocked client, as the game loads them; VXV_Sync too when the companion wrote files. */
 export function startRaid(options: CoreStart = {}) {
-  const started = startCore({ ...options, bundles: ["VXV_Raid"] });
+  const bundles = options.written === undefined ? ["VXV_Raid"] : ["VXV_Raid", "VXV_Sync"];
+  const started = startCore({ ...options, bundles });
   const raid = started.bundles.VXV_Raid;
   if (raid === undefined) {
     throw new Error("VXV_Raid was not loaded");

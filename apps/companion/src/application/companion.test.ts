@@ -1,11 +1,18 @@
 import { posix } from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FolderReader } from "../domain/installations.ts";
-import { createCompanion, type CompanionDependencies } from "./companion.ts";
+import { createCompanion, SYNC_EVERY_MS, type Companion, type CompanionDependencies } from "./companion.ts";
 import { SiteError, UnlinkedError } from "./errors.ts";
 import type { Settings, SitePort } from "./ports.ts";
 
 const member = { name: "Martin", roles: ["member", "officer"] };
+const NEXT_RAID = {
+  text: "VXV-RAID-1\nE;e1;1796932800;1796931900;2;Onyxia",
+  title: "Onyxia",
+  startsAt: "2026-12-10T20:00:00.000Z",
+};
+const NOW = new Date("2026-12-10T19:45:00Z");
+const started: Companion[] = [];
 const TOC = "Interface/AddOns/VXV_Core/VXV_Core.toc";
 
 /** A Mac whose disk holds these files. */
@@ -26,11 +33,13 @@ function disk(...files: string[]): FolderReader {
 function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: string) {
   let saved: Settings = { gameFolder: undefined, launchAtLogin: true };
   let token = savedToken;
+  const inboxes = new Map<string, string>();
   const site: SitePort = {
     linkPage: ({ state }) => `https://vxv.example/compagnon/relier?etat=${state}`,
     exchange: vi.fn(async () => ({ token: "new-token", member })),
     me: vi.fn(async () => member),
     unlink: vi.fn(async () => undefined),
+    download: vi.fn(async () => ({ raid: NEXT_RAID })),
   };
   const dependencies: CompanionDependencies = {
     site,
@@ -50,6 +59,13 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
       },
     },
     folders: disk(`/Applications/World of Warcraft/_classic_/${TOC}`),
+    gameFiles: {
+      writeInbox: async (installation, content) => {
+        inboxes.set(installation, content);
+        return true;
+      },
+    },
+    clock: () => NOW,
     computer: async () => ({ platform: "darwin", home: "/Users/martin", roots: [] }),
     // The member never comes back from the browser.
     listen: async () => ({ port: 1, returned: new Promise(() => undefined), close: () => undefined }),
@@ -58,8 +74,17 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
     version: "1.0.0",
     ...overrides,
   };
-  return { companion: createCompanion(dependencies), dependencies, site, token: () => token, saved: () => saved };
+  const companion = createCompanion(dependencies);
+  started.push(companion);
+  return { companion, dependencies, site, inboxes, token: () => token, saved: () => saved };
 }
+
+afterEach(() => {
+  for (const companion of started.splice(0)) {
+    companion.stop();
+  }
+  vi.useRealTimers();
+});
 
 describe("companion", () => {
   it("starts with the game found and the member of the saved token", async () => {
@@ -84,6 +109,7 @@ describe("companion", () => {
   it("keeps the token when the website is out of reach", async () => {
     const { companion, site, token } = setUp({}, "saved-token");
     vi.mocked(site.me).mockRejectedValue(new SiteError("Le site VXV ne répond pas."));
+    vi.mocked(site.download).mockRejectedValue(new SiteError("Le site VXV ne répond pas."));
     await companion.start();
     expect(companion.state().notice).toBe("Le site VXV ne répond pas.");
     expect(token()).toBe("saved-token");
@@ -147,5 +173,44 @@ describe("companion", () => {
     await companion.setLaunchAtLogin(false);
     expect(dependencies.applyLaunchAtLogin).toHaveBeenLastCalledWith(false);
     expect(saved().launchAtLogin).toBe(false);
+  });
+
+  describe("synchronisation", () => {
+    it("brings the next event to the game at launch", async () => {
+      const { companion, inboxes } = setUp({}, "saved-token");
+      await companion.start();
+      expect(inboxes.get("/Applications/World of Warcraft/_classic_")).toContain('raid = "VXV-RAID-1\\010E;e1;');
+      expect(companion.state().lastSync).toEqual({
+        at: NOW,
+        raid: { title: "Onyxia", startsAt: "2026-12-10T20:00:00.000Z" },
+        outdated: [],
+      });
+    });
+
+    it("waits for the link, then synchronises at once", async () => {
+      const { companion, site, inboxes } = setUp();
+      await companion.start();
+      expect(site.download).not.toHaveBeenCalled();
+      expect(inboxes.size).toBe(0);
+      await companion.syncNow();
+      expect(site.download).not.toHaveBeenCalled();
+    });
+
+    it("names the versions of the game whose addon is too old for the companion", async () => {
+      const { companion } = setUp({ gameFiles: { writeInbox: async () => false } }, "saved-token");
+      await companion.start();
+      expect(companion.state().lastSync?.outdated).toEqual(["/Applications/World of Warcraft/_classic_"]);
+    });
+
+    it("synchronises again every few minutes, and clears a past problem", async () => {
+      vi.useFakeTimers();
+      const { companion, site } = setUp({}, "saved-token");
+      vi.mocked(site.download).mockRejectedValueOnce(new SiteError("Le site VXV ne répond pas."));
+      await companion.start();
+      expect(companion.state().notice).toBe("Le site VXV ne répond pas.");
+      await vi.advanceTimersByTimeAsync(SYNC_EVERY_MS);
+      expect(site.download).toHaveBeenCalledTimes(2);
+      expect(companion.state()).toMatchObject({ notice: undefined, syncing: false });
+    });
   });
 });

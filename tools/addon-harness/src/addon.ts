@@ -18,12 +18,17 @@ export function loadMock(vm: LuaVm, name: string): void {
   vm.run(readFileSync(new URL(`${name}.lua`, MOCKS), "utf8"), `mocks/${name}`);
 }
 
-/** Loads an addon like the client does: each file gets the addon's name and private namespace as "...". */
-export function loadAddon(vm: LuaVm, addonDir: string) {
+/**
+ * Loads an addon like the client does: each file gets the addon's name and private namespace as "...". Files
+ * written on the player's computer by another program (the companion) replace those of the repository, by path
+ * such as "VXV_Sync/External/Inbox.lua".
+ */
+export function loadAddon(vm: LuaVm, addonDir: string, written: Readonly<Record<string, string>> = {}) {
   const name = basename(addonDir);
   const namespace = vm.newTable();
   for (const file of readTocFiles(addonDir)) {
-    vm.run(readFileSync(join(addonDir, file), "utf8"), `${name}/${file}`, [name, namespace]);
+    const code = written[`${name}/${file}`] ?? readFileSync(join(addonDir, file), "utf8");
+    vm.run(code, `${name}/${file}`, [name, namespace]);
   }
   return {
     name,

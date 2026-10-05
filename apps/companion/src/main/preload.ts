@@ -15,6 +15,7 @@ const bridge: CompanionBridge = {
   unlink: () => act("unlink"),
   chooseGameFolder: () => act("chooseGameFolder"),
   setLaunchAtLogin: (on) => act("setLaunchAtLogin", on),
+  syncNow: () => act("syncNow"),
   openSite: () => act("openSite"),
 };
 

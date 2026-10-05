@@ -33,9 +33,9 @@ export function startGuild(names: readonly string[], options: Omit<CoreStart, "p
       }
       return found;
     },
-    /** A player who logs in later, on their own client. */
-    join(name: string) {
-      const player = start(name);
+    /** A player who logs in later, on their own client, with their own options (their companion's files). */
+    join(name: string, own: Omit<CoreStart, "playerName"> = {}) {
+      const player = { name, ...startCore({ ...options, ...own, playerName: name }) };
       players.push(player);
       return player;
     },
