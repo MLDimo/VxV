@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
-import { expect, test } from "@playwright/test";
-import { signInAs } from "./sessions";
+import { expect, test, type APIRequestContext, type BrowserContext, type Page } from "@playwright/test";
+import { readSeed, signInAs } from "./sessions";
 
 const PORT = 53682;
 const STATE = randomBytes(16).toString("base64url");
@@ -12,6 +12,22 @@ function pkce() {
 }
 
 const linkPage = (challenge: string) => `/compagnon/relier?port=${PORT}&etat=${STATE}&defi=${challenge}`;
+
+/** The member links a companion, as the app does it: returns its token. */
+async function linkCompanion(page: Page, context: BrowserContext, request: APIRequestContext): Promise<string> {
+  await signInAs(context, "member");
+  const { verifier, challenge } = pkce();
+  let code = "";
+  await page.route(`http://127.0.0.1:${PORT}/**`, async (route) => {
+    code = new URL(route.request().url()).searchParams.get("code") ?? "";
+    await route.fulfill({ body: "" });
+  });
+  await page.goto(linkPage(challenge));
+  await page.getByRole("button", { name: "Relier le compagnon" }).click();
+  await expect.poll(() => code).not.toBe("");
+  const exchange = await request.post("/api/compagnon/jeton", { data: { code, verifier } });
+  return ((await exchange.json()) as { token: string }).token;
+}
 
 test("a member links the companion, which then acts for them until unlinked", async ({ page, context, request }) => {
   await signInAs(context, "member");
@@ -42,6 +58,23 @@ test("a member links the companion, which then acts for them until unlinked", as
   expect((await request.delete("/api/compagnon/jeton", { headers: authorization })).status()).toBe(204);
   const afterwards = await request.get("/api/compagnon/moi", { headers: authorization });
   expect(afterwards.status()).toBe(401);
+});
+
+test("the companion brings the next event to the addon, as an officer would paste it", async ({
+  page,
+  context,
+  request,
+}) => {
+  const token = await linkCompanion(page, context, request);
+  const response = await request.get("/api/compagnon/donnees", { headers: { Authorization: `Bearer ${token}` } });
+  const { raid } = (await response.json()) as { raid: { text: string; title: string; startsAt: string } };
+  // The soonest event is the one starting 10 minutes after the seed.
+  expect(raid.title).toBe("La salle des Thanes");
+  expect(raid.text.split("\n").slice(0, 2)).toEqual([
+    "VXV-RAID-1",
+    expect.stringMatching(`^E;${readSeed().lockedEventId};`),
+  ]);
+  expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
 });
 
 test("a visitor signs in first, then comes back to the link", async ({ page }) => {

@@ -10,7 +10,7 @@
 
 body {
   min-height: 100vh;
-  padding: 20px;
+  padding: 16px 18px;
   background: var(--color-night);
   color: var(--color-ivory);
   font: 14px/1.5 var(--font-sans);
@@ -21,7 +21,7 @@ body {
   display: flex;
   gap: 14px;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .emblem {
@@ -47,7 +47,20 @@ body {
 
 #app {
   display: grid;
-  gap: 20px;
+  gap: 16px;
+}
+
+/* A dark scroll bar, should the content outgrow the window. */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-night);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-beam);
 }
 
 .panel {
@@ -59,14 +72,17 @@ body {
 }
 
 .panel h2 {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font: 600 16px var(--font-pixel);
 }
 
-.panel p + p,
+.panel p + p {
+  margin-top: 6px;
+}
+
 .panel p + .actions,
 .panel ul + .actions {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .muted {
@@ -75,6 +91,10 @@ body {
 
 .lavender {
   color: var(--color-lavender);
+}
+
+.loss {
+  color: var(--color-loss);
 }
 
 .notice {

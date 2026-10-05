@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ADDON_INTERFACE, packFolderName, RAID_DATA_GLOBAL, renderLuaPack } from "./luaPack.ts";
-import { evaluateLua } from "./test/evaluateLua.ts";
+import { evaluateLua } from "@vxv/lua/testing";
 import { onyxia, salleDesThanes } from "./test/raids.ts";
 
 describe("packFolderName", () => {

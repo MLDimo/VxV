@@ -1,5 +1,5 @@
 import type { Raid } from "@vxv/raid-data";
-import { toLuaLiteral } from "./luaLiteral.ts";
+import { toLuaLiteral } from "@vxv/lua";
 import type { OutputFile } from "./outputFile.ts";
 
 /** Interface version of WoW Forever, confirmed in Phase 0. */

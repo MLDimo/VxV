@@ -1,15 +1,8 @@
-import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { readFile, rm } from "node:fs/promises";
 import type { Settings, SettingsStore, TokenStore } from "../application/ports.ts";
+import { writeAtomically } from "./files.ts";
 
 export const DEFAULT_SETTINGS: Settings = { gameFolder: undefined, launchAtLogin: true };
-
-/** Written beside, then put in place: a crash never leaves half a file. */
-export async function writeAtomically(path: string, data: string | Uint8Array): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
-  await writeFile(`${path}.tmp`, data);
-  await rename(`${path}.tmp`, path);
-}
 
 /** Settings in a JSON file; a missing or damaged file gives the defaults. */
 export function createSettingsFile(path: string): SettingsStore {

@@ -18,6 +18,8 @@ export interface CoreStart {
   inGuild?: boolean;
   /** Bundles loaded after VXV_Core, in this order, as the client does with their dependency on it. */
   bundles?: readonly string[];
+  /** Files another program wrote in the addons' folders, by path ("VXV_Sync/External/Inbox.lua"). */
+  written?: Readonly<Record<string, string>>;
 }
 
 /** VXV_Core loaded on the mocked client like the game does: files, ADDON_LOADED, then PLAYER_LOGIN. */
@@ -27,6 +29,7 @@ export function startCore({
   playerName,
   inGuild = true,
   bundles = [],
+  written = {},
 }: CoreStart = {}) {
   const vm = createLuaVm();
   loadMock(vm, "wow");
@@ -43,7 +46,7 @@ export function startCore({
   client('Fire("ADDON_LOADED", "VXV_Core")');
   const loadedBundles = Object.fromEntries(
     bundles.map((name) => {
-      const bundle = loadAddon(vm, bundleDir(name));
+      const bundle = loadAddon(vm, bundleDir(name), written);
       client(`Fire("ADDON_LOADED", ${JSON.stringify(name)})`);
       return [name, bundle];
     }),

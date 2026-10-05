@@ -17,6 +17,7 @@
     "@fontsource/manrope": "^5.3.0",
     "@fontsource/pixelify-sans": "^5.3.0",
     "@vxv/design": "*",
+    "@vxv/lua": "*",
     "electron": "^44.5.1",
     "esbuild": "^0.28.2"
   }

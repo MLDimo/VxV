@@ -91,6 +91,65 @@ function gamePanel(state: CompanionState): HTMLElement {
   );
 }
 
+const SECONDS_PER_MINUTE = 60;
+const MINUTES_PER_HOUR = 60;
+const REFRESH_MS = 30 * 1000;
+
+/** "à l'instant", "il y a 4 min", "il y a 2 h". */
+function ago(at: Date, now: Date): string {
+  const minutes = Math.floor((now.getTime() - at.getTime()) / 1000 / SECONDS_PER_MINUTE);
+  if (minutes < 1) {
+    return "à l'instant";
+  }
+  return minutes < MINUTES_PER_HOUR
+    ? `il y a ${String(minutes)} min`
+    : `il y a ${String(Math.floor(minutes / MINUTES_PER_HOUR))} h`;
+}
+
+const raidDate = new Intl.DateTimeFormat("fr-FR", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+/** Only once linked and the game found: when the data last went to the game, and which raid. */
+function syncPanel(state: CompanionState): HTMLElement[] {
+  if (state.account === undefined || state.installations.length === 0) {
+    return [];
+  }
+  const { lastSync } = state;
+  const lines: Child[] = [];
+  if (lastSync === undefined) {
+    lines.push(
+      element("p", { class: "lavender" }, state.syncing ? "Synchronisation en cours…" : "Pas encore synchronisé."),
+    );
+  } else {
+    lines.push(element("p", {}, `Dernière synchronisation ${ago(lastSync.at, new Date())}.`));
+    lines.push(
+      lastSync.raid === undefined
+        ? element("p", { class: "lavender" }, "Aucun raid prévu pour le moment.")
+        : element(
+            "p",
+            { class: "lavender" },
+            "Prochain raid : ",
+            element("strong", {}, lastSync.raid.title),
+            `, ${raidDate.format(new Date(lastSync.raid.startsAt))}.`,
+          ),
+    );
+    if (lastSync.outdated.length > 0) {
+      lines.push(
+        element("p", { class: "loss" }, "Mets l'addon VXV à jour : cette version ne sait pas lire le compagnon."),
+      );
+    }
+    lines.push(element("p", { class: "muted" }, "En jeu, tape /reload pour charger les nouvelles données."));
+  }
+  const sync = button("wood", state.syncing ? "Synchronisation…" : "Synchroniser maintenant", vxv.syncNow);
+  sync.toggleAttribute("disabled", state.syncing);
+  return [panel("Synchronisation", ...lines, element("div", { class: "actions" }, sync))];
+}
+
 function footer(state: CompanionState): HTMLElement {
   const checkbox = element("input", { type: "checkbox" }) as HTMLInputElement;
   checkbox.checked = state.settings.launchAtLogin;
@@ -103,10 +162,19 @@ function footer(state: CompanionState): HTMLElement {
   );
 }
 
+let shown: CompanionState | undefined;
+
 function render(state: CompanionState): void {
+  shown = state;
   const notice = state.notice === undefined ? [] : [element("p", { class: "notice", role: "alert" }, state.notice)];
-  app.replaceChildren(...notice, accountPanel(state), gamePanel(state), footer(state));
+  app.replaceChildren(...notice, accountPanel(state), gamePanel(state), ...syncPanel(state), footer(state));
 }
 
 vxv.onState(render);
 void vxv.state().then(render);
+// "il y a 4 min" moves on by itself.
+setInterval(() => {
+  if (shown !== undefined) {
+    render(shown);
+  }
+}, REFRESH_MS);

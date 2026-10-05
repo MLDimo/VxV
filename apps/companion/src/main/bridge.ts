@@ -9,6 +9,7 @@ export interface CompanionBridge {
   unlink(): Promise<void>;
   chooseGameFolder(): Promise<void>;
   setLaunchAtLogin(on: boolean): Promise<void>;
+  syncNow(): Promise<void>;
   openSite(): Promise<void>;
 }
 

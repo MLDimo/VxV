@@ -12,12 +12,10 @@
     "test": "vitest run --maxWorkers=2 --hookTimeout=30000 --testTimeout=30000"
   },
   "dependencies": {
+    "@vxv/lua": "*",
     "@vxv/raid-data": "*"
   },
   "devDependencies": {
-    "@types/luaparse": "^0.2.13",
-    "@vxv/database": "*",
-    "fengari": "^0.1.5",
-    "luaparse": "^0.3.1"
+    "@vxv/database": "*"
   }
 }

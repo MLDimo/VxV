@@ -45,10 +45,12 @@ function Modules.ForPlace(placeId)
     end
 end
 
---- Enables every registered module, in registration order, once the player is in the world.
+--- Enables every registered module, in registration order, once the player is in the world; then tells the
+--- bundles ("modules.started"), whatever their loading order.
 function Modules.Start()
     started = true
     for _, module in ipairs(ordered) do
         enable(module)
     end
+    ns.Bus.Emit("modules.started")
 end

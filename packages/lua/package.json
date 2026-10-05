@@ -1,0 +1,19 @@
+{
+  "name": "@vxv/lua",
+  "private": true,
+  "description": "Lua 5.1 data shared by the tools and the companion: values written as Lua for the addon, and their checks.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/luaparse": "^0.2.13",
+    "fengari": "^0.1.5",
+    "luaparse": "^0.3.1"
+  }
+}
