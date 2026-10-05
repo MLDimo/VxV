@@ -15,6 +15,7 @@ VXV.RegisterModule({
         Card = function()
             return ns.RaidView.Card(ns.RaidData.Current())
         end,
+        Compact = ns.RaidCompact.Build,
     },
 })
 

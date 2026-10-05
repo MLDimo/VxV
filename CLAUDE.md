@@ -36,14 +36,15 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - journal du raid en jeu (boss, présents, morts, objets, diffusé par le maître du butin), montré dans le Journal, export `VXV-LOG-1` (zone officier de l'écran Raid ou `/vxv journal`) ;
   - import du journal sur le site (présents et objets, qui nourrissent le SR+), corrections par un officier avec motif, récap de fin de raid publié par le bot.
   Validation en attente : un raid réel enregistré sans saisie manuelle (raids ouverts le 9 décembre ; répétition en donjon avec maître du butin possible avant la fin de la bêta).
-- **Habillage (charte « La Taverne »)** : en cours, avant la P7 (`docs/plan/decisions-2026-10-05.md`) :
+- **Habillage (charte « La Taverne »)** : terminé avant la P7 (`docs/plan/decisions-2026-10-05.md`), validé en jeu le 5 octobre sauf le mode réduit :
   - socle : référence `docs/design/`, jetons `packages/design` (thème du site et `VXV_Core/UI/Tokens.lua` générés) ;
   - site entièrement rhabillé, en production ;
   - mesure en jeu des polices et textures faite (`docs/design/mesure-en-jeu-2026-10-05.md`) ;
-  - addon : thème (polices en familles, anneaux, boutons, onglets), fenêtre 1000×680 à un onglet par lieu, Taverne cliquable ;
-  - addon : écran Raid en trois colonnes, Journal en livre de comptes (raids enregistrés, modifications des officiers avec motif, tampons), panneau de butin et fenêtre de copier-coller en boîtes de dialogue de la charte, listes à la molette ;
-  - addon : Taverne vivante (lueurs animées, parallaxe, vignette, plaques qui montent au survol), cartes du moment sous la scène (un module donne la carte de son lieu), fond de chaque écran cadré sur son lieu ;
-  - reste : mode réduit.
+  - addon : thème (polices en familles, anneaux, boutons, onglets), fenêtre 1000×680 à un onglet par lieu, Taverne vivante (lueurs, parallaxe, plaques qui montent au survol) et cartes du moment, fond de chaque écran cadré sur son lieu ;
+  - addon : écran Raid en trois colonnes, Journal en livre de comptes, panneau de butin et copier-coller en boîtes de dialogue de la charte, listes à la molette ;
+  - addon : mode réduit 420×600 (bouton de l'en-tête, `/vxv` rouvre le dernier mode) ; son onglet Raid montre le prochain boss de l'instance (packs de données), son butin avec les SR et une alerte quand le joueur y a une SR ;
+  - laissés pour plus tard : badges sur les plaques (« ! », nombre d'éléments en attente), avatars (P7 : race et sexe transmis par l'addon), filtres du Journal.
+  Validation en attente : le mode réduit en jeu, dans « La salle des Thanes » (seul pack de la bêta).
 - P7 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -55,6 +56,8 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 - Un lieu = un onglet, même nom partout : Taverne, Raid, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit.
+- Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 
 ## Structure du dépôt
 
@@ -94,7 +97,7 @@ La table complète est dans le README. Règles :
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
 - Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-1`, puis une ligne par enregistrement (événement, officiers, objets, inscrits, journal), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-1`, puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
-- Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent à la demande.
+- Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
 - Confiance entre addons : les données d'un événement ne sont gardées que si leur expéditeur figure parmi les officiers nommés par le site, dans les nouvelles données comme dans celles déjà gardées.
 - Données sauvegardées (`VXV_DB`) : numéro de schéma, et migrations appliquées au chargement ; une migration publiée ne change plus.

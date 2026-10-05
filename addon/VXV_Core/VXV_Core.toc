@@ -33,6 +33,8 @@ UI\Dialog.lua
 UI\Tooltip.lua
 UI\TextWindow.lua
 UI\TavernTab.lua
+UI\CompactWindow.lua
+UI\Windows.lua
 UI\Slash.lua
 UI\MinimapButton.lua
 UI\Ping.lua

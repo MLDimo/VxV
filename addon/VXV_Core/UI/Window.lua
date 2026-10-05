@@ -17,6 +17,7 @@ local HEADER_HEIGHT = 56
 local EMBLEM_SIZE = 30
 local TAB_GAP = 2
 local CLOSE_SIZE = 28
+local REDUCE_ICON_WIDTH, REDUCE_ICON_HEIGHT, REDUCE_ICON_BOTTOM = 12, 3, 8
 local SCREEN_MARGIN = 40
 local SCREEN_PADDING = 22
 local TAVERN = { id = "tavern", name = "Taverne" }
@@ -24,7 +25,7 @@ local PERCENT = 100
 -- Under everything the screen draws in its background layer.
 local BACKDROP_LEVEL = -8
 
-local frame
+local frame, selected
 local tabs = {}
 
 --- The places in the order of the tabs: the Taverne, then the places of the tavern.
@@ -86,6 +87,7 @@ end
 
 --- Shows the tab of this place ("tavern", "raid", …).
 function Window.Select(placeId)
+    selected = placeId
     for _, tab in ipairs(tabs) do
         local chosen = tab.place.id == placeId
         if chosen and tab.content == nil then
@@ -143,6 +145,17 @@ local function addHeader()
     close:SetScript("OnClick", function()
         frame:Hide()
     end)
+    -- The reduced mode (§7.8), on the same place when it has a compact screen.
+    local reduce = Theme.Button(header, "wood", "", CLOSE_SIZE, CLOSE_SIZE)
+    reduce:SetPoint("RIGHT", close, "LEFT", -TAB_GAP * 3, 0)
+    local bar = Theme.Fill(reduce, "parchment", "ARTWORK")
+    bar:SetSize(REDUCE_ICON_WIDTH, REDUCE_ICON_HEIGHT)
+    bar:SetPoint("BOTTOM", 0, REDUCE_ICON_BOTTOM)
+    reduce.icon = bar
+    reduce:SetScript("OnClick", function()
+        Bus.Emit("window.reduce", selected)
+    end)
+    frame.reduce = reduce
 end
 
 --- Smaller than the screen, whatever its size (§6: resized proportionally).
@@ -177,6 +190,12 @@ function Window.Toggle()
         return
     end
     frame:SetShown(not frame:IsShown())
+end
+
+function Window.Hide()
+    if frame ~= nil then
+        frame:Hide()
+    end
 end
 
 --- Opens the window on a place's tab.

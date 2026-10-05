@@ -230,6 +230,65 @@ describe("VXV_Core interface", () => {
     expect(veil?.path).toBe("Interface\\AddOns\\VXV_Core\\Media\\veil.png");
   });
 
+  describe("reduced mode", () => {
+    const COMPACT_TABS = `
+      local tabs = {}
+      FindWidget(VXV_CompactWindow, function(widget)
+          if widget.SetSelected ~= nil then tabs[#tabs + 1] = widget.label:GetText() end
+      end)
+      return tabs
+    `;
+    const COMPACT_TEXTS = `
+      local texts = {}
+      for _, child in ipairs(VXV_CompactWindow.children) do
+          if child ~= VXV_CompactWindow.header and child.kind == "Frame" and child:IsShown() then
+              FindWidget(child, function(widget)
+                  if widget.kind == "FontString" and widget.text ~= nil then texts[#texts + 1] = widget.text end
+              end)
+          end
+      end
+      return texts
+    `;
+
+    it("switches to the reduced mode and back, on the same place, and reopens the mode used last", () => {
+      const { client, errors } = startCore();
+      client('SlashCmdList.VXV("")');
+      client(`${TAB("Quêtes")}:Run("OnClick")`);
+      client('VXV_Window.reduce:Run("OnClick")');
+      expect(client("return { VXV_Window:IsShown(), VXV_CompactWindow:IsShown() }")).toEqual([false, true]);
+      expect(client(COMPACT_TABS)).toEqual(["Raid", "Paris", "Quêtes", "Ranking", "…"]);
+      expect(client(COMPACT_TEXTS)).toEqual(["Bientôt : ce lieu ouvre avec sa phase."]);
+      expect(client("return VXV_DB.ui.window.reduced")).toBe(true);
+
+      client('SlashCmdList.VXV("")');
+      expect(client("return VXV_CompactWindow:IsShown()")).toBe(false);
+      client('SlashCmdList.VXV("")');
+      expect(client("return { VXV_Window:IsShown(), VXV_CompactWindow:IsShown() }")).toEqual([false, true]);
+
+      client('VXV_CompactWindow.expand:Run("OnClick")');
+      expect(client("return { VXV_Window:IsShown(), VXV_CompactWindow:IsShown() }")).toEqual([true, false]);
+      expect((client(WINDOW) as { texts: string[] }).texts).toContain("Quêtes");
+      expect(client("return VXV_DB.ui.window.reduced")).toBe(false);
+      expect(client("return UISpecialFrames")).toEqual(["VXV_Window", "VXV_CompactWindow"]);
+      expect(errors()).toEqual([]);
+    });
+
+    it("opens the reduced mode on its first tab from a place without a compact screen, and the others with …", () => {
+      const { client } = startCore();
+      client('SlashCmdList.VXV("")');
+      client('VXV_Window.reduce:Run("OnClick")');
+      const selected = `return FindWidget(VXV_CompactWindow, function(widget)
+          return widget.SetSelected ~= nil and widget.label.text == "Raid"
+      end).label.color`;
+      expect(client(selected)).toEqual(client('local _, ns = ... return { VXV.Theme.Color("ivory") }'));
+      client('VXV_CompactWindow.more:Run("OnClick")');
+      expect(client("return { VXV_Window:IsShown(), VXV_CompactWindow:IsShown() }")).toEqual([true, false]);
+      expect((client(WINDOW) as { texts: string[] }).texts).toContain(
+        "Survole un lieu pour l'éclairer · clique pour entrer",
+      );
+    });
+  });
+
   it("opens in combat without any error: nothing in VXV's window is protected", () => {
     const { client, errors } = startCore();
     client("InCombat = true");

@@ -5,7 +5,7 @@ local _, ns = ...
 local MinimapButton = {}
 ns.MinimapButton = MinimapButton
 
-local Compat, Storage, Tooltip, Window = ns.Compat, ns.Storage, ns.Tooltip, ns.Window
+local Compat, Storage, Tooltip, Windows = ns.Compat, ns.Storage, ns.Tooltip, ns.Windows
 
 local DEFAULT_ANGLE = 225
 local SIZE = 31
@@ -98,7 +98,7 @@ function MinimapButton.Create()
     addTexture(button, "Interface\\Minimap\\MiniMap-TrackingBorder", BORDER_SIZE, "OVERLAY"):SetPoint("TOPLEFT")
     button:RegisterForClicks("AnyUp")
     button:RegisterForDrag("LeftButton")
-    button:SetScript("OnClick", Window.Toggle)
+    button:SetScript("OnClick", Windows.Toggle)
     button:SetScript("OnEnter", showTooltip)
     button:SetScript("OnLeave", Tooltip.Hide)
     button:SetScript("OnDragStart", function()
@@ -118,6 +118,6 @@ function MinimapButton.Create()
 
     local compartment = Compat.Resolve("AddonCompartmentFrame")
     if compartment ~= nil and type(compartment.RegisterAddon) == "function" then
-        compartment:RegisterAddon({ text = "VXV", icon = ICON, notCheckable = true, func = Window.Toggle })
+        compartment:RegisterAddon({ text = "VXV", icon = ICON, notCheckable = true, func = Windows.Toggle })
     end
 end

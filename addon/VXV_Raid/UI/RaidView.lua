@@ -52,7 +52,7 @@ local function remaining(seconds)
 end
 
 --- The expected players (present or late) of each role, in the website's order, and how many are expected.
-local function expectedByRole(event)
+function RaidView.ExpectedByRole(event)
     local byRole, expected = {}, 0
     for _, role in ipairs(Labels.ROLE_ORDER) do
         byRole[role] = {}
@@ -76,7 +76,7 @@ function RaidView.Header(event, sender, now)
         return { kicker = "Conseil de guerre", title = "Aucun raid chargé", badges = {},
             subtitle = "Un officier charge les données depuis la page de l'événement sur le site (/vxv importer)." }
     end
-    local _, expected = expectedByRole(event)
+    local _, expected = RaidView.ExpectedByRole(event)
     local lockAt = RaidData.LockAt(event)
     local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. remaining(lockAt - now))
     local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
@@ -168,7 +168,7 @@ function RaidView.Composition(event)
     end
     local rows = { row("line", string.format("%s · %d en retard · %d au banc", VXV.Count(count("present"), "présent"),
         count("late"), count("bench"))) }
-    local byRole, expected = expectedByRole(event)
+    local byRole, expected = RaidView.ExpectedByRole(event)
     for _, role in ipairs(Labels.ROLE_ORDER) do
         local players, label = byRole[role], Labels.Role(role)
         rows[#rows + 1] = row("header", string.format("%s %s · %d", label.icon, label.plural, #players))
@@ -221,7 +221,7 @@ function RaidView.Card(event)
         return { title = "Aucun raid chargé", action = "Voir le raid",
             lines = { "Un officier charge les données depuis la page de l'événement sur le site." } }
     end
-    local byRole, expected = expectedByRole(event)
+    local byRole, expected = RaidView.ExpectedByRole(event)
     local roles = {}
     for _, role in ipairs(Labels.ROLE_ORDER) do
         roles[#roles + 1] = Theme.Colored(#byRole[role] .. " " .. ROLE_COUNTS[role], ROLE_COLORS[role])

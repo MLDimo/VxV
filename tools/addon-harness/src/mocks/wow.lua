@@ -237,6 +237,11 @@ function GameTooltip:SetHyperlink(link) self.link = link end
 --- Where the cursor is, in screen pixels; tests move it.
 Cursor = { x = 0, y = 0 }
 function GetCursorPosition() return Cursor.x, Cursor.y end
+--- Where the player is: GetInstanceInfo's name, type and instance id (outside any instance: the open world).
+Instance = { name = "Kalimdor", type = "none", id = 1 }
+function GetInstanceInfo()
+    return Instance.name, Instance.type, 0, "", 0, 0, false, Instance.id
+end
 --- Whether the player is in combat; tests set it.
 InCombat = false
 function InCombatLockdown() return InCombat end

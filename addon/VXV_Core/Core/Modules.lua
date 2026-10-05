@@ -1,10 +1,10 @@
 local _, ns = ...
 
 --- Feature modules plug into the core: { id, name, Enable(data), tab }, data being the module's saved data
---- and tab an optional { place, Build(content), Card() }: the screen of a place of the tavern ("raid",
---- "journal"…, see UI/Tokens.lua), shown in the window under the place's name, and the place's card under the
---- tavern when it has one, Card() giving { title, lines, action } (the module emits "tavern.changed" when it
---- changes).
+--- and tab an optional { place, Build(content), Card(), Compact(content) }: the screen of a place of the tavern
+--- ("raid", "journal"…, see UI/Tokens.lua), shown in the window under the place's name; the place's card under
+--- the tavern when it has one, Card() giving { title, lines, action } (the module emits "tavern.changed" when it
+--- changes); and its compact screen in the reduced mode.
 --- Modules registered after login (bundles loaded on demand) are enabled at once.
 local Modules = {}
 ns.Modules = Modules

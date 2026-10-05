@@ -1,4 +1,4 @@
-import { PLACES, TAVERN, TAVERN_CARDS } from "./places.ts";
+import { COMPACT_PLACES, PLACES, TAVERN, TAVERN_CARDS } from "./places.ts";
 import { CLASS_COLORS, COLORS, UNKNOWN_CLASS_COLOR } from "./tokens.ts";
 
 const CHANNEL = 255;
@@ -60,11 +60,13 @@ export function renderLua(): string {
     "    },",
     "    places = {",
     ...PLACES.flatMap((place) => [
-      `        { id = ${luaString(place.id)}, name = ${luaString(place.name)}, subtitle = ${luaString(place.subtitle)},`,
+      `        { id = ${luaString(place.id)}, name = ${luaString(place.name)}, short = ${luaString(place.short ?? place.name)},`,
+      `          subtitle = ${luaString(place.subtitle)},`,
       `          spot = ${list(place.spot)}, plaque = ${luaString(place.plaque)}${place.kicker ? `, kicker = ${luaString(place.kicker)}` : ""},`,
       `          backdrop = { position = ${list(place.backdrop.position)}, zoom = ${number(place.backdrop.zoom)}, opacity = ${number(place.backdrop.opacity)} } },`,
     ]),
     "    },",
+    `    compactPlaces = ${list(COMPACT_PLACES)},`,
     "    cards = {",
     ...TAVERN_CARDS.flatMap((card) => [
       `        { place = ${luaString(card.place)}, kicker = ${luaString(card.kicker)}${card.soon ? "," : " },"}`,
