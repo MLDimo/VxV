@@ -1,4 +1,4 @@
-import { PLACES, TAVERN } from "./places.ts";
+import { PLACES, TAVERN, TAVERN_CARDS } from "./places.ts";
 import { CLASS_COLORS, COLORS, UNKNOWN_CLASS_COLOR } from "./tokens.ts";
 
 const CHANNEL = 255;
@@ -34,7 +34,7 @@ const key = (name: string) => (/^[a-z_][a-z0-9_]*$/i.test(name) ? name : `[${lua
 
 /**
  * The tokens for the addon (VXV_Core/UI/Tokens.lua): colors as { r, g, b, a }, class colors as RRGGBB for the
- * |cff…|r codes, the tavern and its places.
+ * |cff…|r codes, the tavern, its places and its cards.
  */
 export function renderLua(): string {
   const lines = [
@@ -61,7 +61,14 @@ export function renderLua(): string {
     "    places = {",
     ...PLACES.flatMap((place) => [
       `        { id = ${luaString(place.id)}, name = ${luaString(place.name)}, subtitle = ${luaString(place.subtitle)},`,
-      `          spot = ${list(place.spot)}, plaque = ${luaString(place.plaque)}${place.kicker ? `, kicker = ${luaString(place.kicker)}` : ""} },`,
+      `          spot = ${list(place.spot)}, plaque = ${luaString(place.plaque)}${place.kicker ? `, kicker = ${luaString(place.kicker)}` : ""},`,
+      `          backdrop = { position = ${list(place.backdrop.position)}, zoom = ${number(place.backdrop.zoom)}, opacity = ${number(place.backdrop.opacity)} } },`,
+    ]),
+    "    },",
+    "    cards = {",
+    ...TAVERN_CARDS.flatMap((card) => [
+      `        { place = ${luaString(card.place)}, kicker = ${luaString(card.kicker)}${card.soon ? "," : " },"}`,
+      ...(card.soon ? [`          soon = ${luaString(card.soon)} },`] : []),
     ]),
     "    },",
     "}",

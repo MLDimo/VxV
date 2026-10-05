@@ -42,7 +42,8 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - mesure en jeu des polices et textures faite (`docs/design/mesure-en-jeu-2026-10-05.md`) ;
   - addon : thème (polices en familles, anneaux, boutons, onglets), fenêtre 1000×680 à un onglet par lieu, Taverne cliquable ;
   - addon : écran Raid en trois colonnes, Journal en livre de comptes (raids enregistrés, modifications des officiers avec motif, tampons), panneau de butin et fenêtre de copier-coller en boîtes de dialogue de la charte, listes à la molette ;
-  - reste : cartes et lumières de la Taverne, mode réduit.
+  - addon : Taverne vivante (lueurs animées, parallaxe, vignette, plaques qui montent au survol), cartes du moment sous la scène (un module donne la carte de son lieu), fond de chaque écran cadré sur son lieu ;
+  - reste : mode réduit.
 - P7 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)

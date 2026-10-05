@@ -38,7 +38,7 @@ describe("VXV_Core interface", () => {
       expect.arrayContaining([
         "Raid",
         "Journal",
-        "VXV @project-version@ · Connectés avec VXV (1) : Ðéjà Vu",
+        "VXV @project-version@ · Connectés avec VXV (1)",
         "Survole un lieu pour l'éclairer · clique pour entrer",
       ]),
     );
@@ -89,27 +89,145 @@ describe("VXV_Core interface", () => {
     expect((client(WINDOW) as { texts: string[] }).texts).toEqual(["Le tableau des quêtes"]);
   });
 
-  it("opens a place's tab from its plaque in the tavern, the plaque turning plum when hovered", () => {
-    const { core, client, errors } = startCore();
-    const color = (token: string) => core.run(`local _, ns = ... return { ns.Theme.Color("${token}") }`);
-    client('SlashCmdList.VXV("")');
-    const spot = `FindWidget(VXV_Window, function(widget)
-        return widget.plaque ~= nil and widget.plaque.children[#widget.plaque.children].text == "Raid"
+  describe("tavern", () => {
+    const SPOT = (name: string) => `FindWidget(VXV_Window, function(widget)
+        return widget.plaque ~= nil and widget.plaque.children[#widget.plaque.children].text == "${name}"
     end)`;
-    client(`${spot}:Run("OnEnter")`);
-    expect(client(`return ${spot}.plaque.children[1].color`)).toEqual(color("plum"));
-    client(`${spot}:Run("OnLeave")`);
-    expect(client(`return ${spot}.plaque.children[1].color`)).toEqual(color("wood"));
+    const SCENE = "FindWidget(VXV_Window, function(widget) return widget.scripts and widget.scripts.OnUpdate end)";
+    const CARDS = `
+      local cards = {}
+      FindWidget(VXV_Window, function(widget)
+          if widget.card ~= nil then
+              cards[#cards + 1] = { widget.kicker.text, widget.title.text, widget.text.text, widget.action.shown }
+          end
+      end)
+      return cards
+    `;
 
-    client(`${spot}:Run("OnClick")`);
-    expect(client(`return ${TAB("Raid")}.label.color`)).toEqual(color("ivory"));
-    expect(client(`return ${TAB("Taverne")}.label.color`)).toEqual(color("old-paper"));
-    expect((client(WINDOW) as { texts: string[] }).texts).toEqual([
-      "RAIDS & SR",
-      "Raid",
-      "Bientôt : ce lieu ouvre avec sa phase.",
-    ]);
-    expect(errors()).toEqual([]);
+    it("opens a place's tab from its plaque, the plaque rising and turning plum when hovered", () => {
+      const { core, client, errors } = startCore();
+      const color = (token: string) => core.run(`local _, ns = ... return { ns.Theme.Color("${token}") }`);
+      client('SlashCmdList.VXV("")');
+      const plaqueY = () => client(`return select(5, ${SPOT("Raid")}.plaque:GetPoint())`) as number;
+      const resting = plaqueY();
+      client(`${SPOT("Raid")}:Run("OnEnter")`);
+      expect(client(`return ${SPOT("Raid")}.plaque.children[1].color`)).toEqual(color("plum"));
+      expect(plaqueY()).toBe(resting + 4);
+      client(`${SPOT("Raid")}:Run("OnLeave")`);
+      expect(client(`return ${SPOT("Raid")}.plaque.children[1].color`)).toEqual(color("wood"));
+      expect(plaqueY()).toBe(resting);
+
+      client(`${SPOT("Raid")}:Run("OnClick")`);
+      expect(client(`return ${TAB("Raid")}.label.color`)).toEqual(color("ivory"));
+      expect(client(`return ${TAB("Taverne")}.label.color`)).toEqual(color("old-paper"));
+      expect((client(WINDOW) as { texts: string[] }).texts).toEqual([
+        "RAIDS & SR",
+        "Raid",
+        "Bientôt : ce lieu ouvre avec sa phase.",
+      ]);
+      expect(errors()).toEqual([]);
+    });
+
+    it("lights the hearth, the door and the forge, flickering in steps or breathing", () => {
+      const { client } = startCore();
+      client('SlashCmdList.VXV("")');
+      const lights = client(`
+        local lights = {}
+        for _, child in ipairs(${SCENE}.children) do
+            if child.blendMode == "ADD" then
+                local steps = {}
+                for _, step in ipairs(child.animation.steps) do steps[#steps + 1] = { step.from, step.to } end
+                lights[#lights + 1] = { playing = child.animation.playing, looping = child.animation.looping, steps = steps }
+            end
+        end
+        return lights
+      `);
+      const flick = {
+        playing: true,
+        looping: "REPEAT",
+        steps: [
+          [0.55, 0.55],
+          [0.8, 0.8],
+          [0.6, 0.6],
+          [0.9, 0.9],
+        ],
+      };
+      const pulse = {
+        playing: true,
+        looping: "REPEAT",
+        steps: [
+          [0.45, 0.8],
+          [0.8, 0.45],
+        ],
+      };
+      expect(lights).toEqual([flick, pulse, flick]);
+    });
+
+    it("moves the picture a little with the cursor, and back when the cursor leaves the scene", () => {
+      const { client } = startCore();
+      client('SlashCmdList.VXV("")');
+      // The picture is 3 % larger than the scene: at rest, the middle of it shows.
+      const margin = (1 - 1 / 1.03) / 2;
+      const coords = (cursorX: number) =>
+        client(`
+          local scene = ${SCENE}
+          scene.centerX, scene.centerY = 500, 400
+          Cursor.x, Cursor.y = ${String(cursorX)}, 400
+          scene:Run("OnUpdate", 1)
+          return scene.children[1].coords
+        `) as number[];
+      // Cursor on the right edge: the picture moves 6 pixels left, showing more of its right side.
+      const right = coords(500 + 976 / 2);
+      expect(right[0]).toBeCloseTo(margin + 6 / (976 * 1.03), 6);
+      expect(right[2]).toBeCloseTo(margin, 6);
+      const outside = coords(5000);
+      expect(outside[0]).toBeCloseTo(margin, 6);
+    });
+
+    it("shows under the scene the cards of the places to come", () => {
+      const { client } = startCore();
+      client('SlashCmdList.VXV("")');
+      expect(client(CARDS)).toEqual([
+        ["Prochain raid", "Bientôt", "Ce lieu ouvre avec sa phase.", false],
+        ["Quête de la semaine", "Bientôt", "Le tableau des quêtes ouvre avec les missions de la guilde.", false],
+        ["Le Dé Pipé", "Bientôt", "Paris et deathroll arrivent avec la salle de jeu.", false],
+      ]);
+    });
+
+    it("names who is connected with VXV on hovering the footer", () => {
+      const { client } = startCore();
+      client('SlashCmdList.VXV("")');
+      client(`FindWidget(VXV_Window, function(widget)
+          return widget.label ~= nil and tostring(widget.label.text):find("Connectés", 1, true)
+      end):Run("OnEnter")`);
+      expect(client("return { GameTooltip.text, GameTooltip.lines }")).toEqual(["Connectés avec VXV", ["Ðéjà Vu"]]);
+    });
+  });
+
+  it("frames the tavern on the place behind each screen, very dark under a veil", () => {
+    const { client } = startCore();
+    client('SlashCmdList.VXV("")');
+    client(`${TAB("Quêtes")}:Run("OnClick")`);
+    const [picture, veil] = client(`
+      local content
+      for _, child in ipairs(VXV_Window.children) do
+          if child ~= VXV_Window.header and child.kind == "Frame" and child:IsShown() then content = child end
+      end
+      local picture, veil = content.children[1], content.children[2]
+      return { { path = picture.path, alpha = picture.alpha, coords = picture.coords }, { path = veil.path } }
+    `) as { path: string; alpha: number; coords: number[] }[];
+    expect(picture?.path).toBe("Interface\\AddOns\\VXV_Core\\Media\\taverne.png");
+    expect(picture?.alpha).toBe(0.3);
+    // Quêtes: background-position 22 % 45 %, the picture 2.5 times as wide as the 976 x 600 screen.
+    const width = 976 * 2.5;
+    const height = (width * 672) / 1589;
+    const left = ((width - 976) * 0.22) / width;
+    const top = ((height - 600) * 0.45) / height;
+    const expected = [left, left + 976 / width, top, top + 600 / height];
+    picture?.coords.forEach((coord, index) => {
+      expect(coord).toBeCloseTo(expected[index] ?? 0, 6);
+    });
+    expect(veil?.path).toBe("Interface\\AddOns\\VXV_Core\\Media\\veil.png");
   });
 
   it("opens in combat without any error: nothing in VXV's window is protected", () => {

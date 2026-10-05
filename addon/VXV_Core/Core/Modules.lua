@@ -1,8 +1,10 @@
 local _, ns = ...
 
 --- Feature modules plug into the core: { id, name, Enable(data), tab }, data being the module's saved data
---- and tab an optional { place, Build(content) }: the screen of a place of the tavern ("raid", "journal"…, see
---- UI/Tokens.lua), shown in the window under the place's name.
+--- and tab an optional { place, Build(content), Card() }: the screen of a place of the tavern ("raid",
+--- "journal"…, see UI/Tokens.lua), shown in the window under the place's name, and the place's card under the
+--- tavern when it has one, Card() giving { title, lines, action } (the module emits "tavern.changed" when it
+--- changes).
 --- Modules registered after login (bundles loaded on demand) are enabled at once.
 local Modules = {}
 ns.Modules = Modules
@@ -32,6 +34,15 @@ end
 --- Registered modules, in registration order.
 function Modules.All()
     return ordered
+end
+
+--- The module showing this place's screen, if any.
+function Modules.ForPlace(placeId)
+    for _, module in ipairs(ordered) do
+        if module.tab ~= nil and module.tab.place == placeId then
+            return module
+        end
+    end
 end
 
 --- Enables every registered module, in registration order, once the player is in the world.
