@@ -1,8 +1,9 @@
-import { readdir } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { GameFiles } from "../application/ports.ts";
 import { INBOX_FILE, SYNC_BUNDLE } from "../domain/inbox.ts";
+import { ACCOUNTS_FOLDER, OUTBOX_FILE } from "../domain/outbox.ts";
 import type { Computer, FolderReader } from "../domain/installations.ts";
 import { exists, writeAtomically } from "./files.ts";
 
@@ -43,5 +44,21 @@ export const diskGameFiles: GameFiles = {
     }
     await writeAtomically(join(bundle, ...INBOX_FILE), content);
     return true;
+  },
+
+  async savedFiles(installation) {
+    const accounts = join(installation, ...ACCOUNTS_FOLDER);
+    const files = await Promise.all(
+      (await diskReader.subfolders(accounts)).map(async (account) => {
+        const path = join(accounts, account, ...OUTBOX_FILE);
+        const saved = await stat(path).catch(() => undefined);
+        return saved?.isFile() ? [{ path, modifiedAt: saved.mtimeMs }] : [];
+      }),
+    );
+    return files.flat();
+  },
+
+  async read(path) {
+    return new Uint8Array(await readFile(path));
   },
 };

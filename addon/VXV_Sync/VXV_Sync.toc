@@ -1,11 +1,18 @@
 ## Interface: 16001
 ## Title: VXV Sync
-## Notes: Données apportées par le compagnon VXV (application de bureau facultative).
+## Notes: Échanges avec le compagnon VXV (application de bureau facultative).
 ## Author: VXV
 ## Version: @project-version@
 ## Dependencies: VXV_Core
+## SavedVariables: VXV_SyncDB
 
 # Written by the companion app on the player's computer, read by the game at each /reload or launch.
 External\Inbox.lua
 
-Inbox.lua
+# What the companion brings to the game, and what it takes to the website.
+Companion.lua
+Outbox.lua
+Roster.lua
+Character.lua
+
+Bootstrap.lua

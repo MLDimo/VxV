@@ -162,3 +162,9 @@ export function planRaidLogImport(
   plan.unknownCharacters = [...unknown].sort();
   return plan;
 }
+
+/** Of two records of the same raid sent by different players, the one with more lines knows more of it. */
+export function isMoreComplete(candidate: string, kept: string | undefined): boolean {
+  const lines = (text: string) => text.split(/\r?\n/).filter((line) => line.trim() !== "").length;
+  return kept === undefined || lines(candidate) >= lines(kept);
+}

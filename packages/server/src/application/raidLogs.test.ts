@@ -11,7 +11,7 @@ import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createHistory } from "./history.ts";
 import { createJournal } from "./journal.ts";
 import type { RaidAnnouncer } from "./ports.ts";
-import { createRaidLogs } from "./raidLogs.ts";
+import { COMPANION_LOG_REASON, createRaidLogs } from "./raidLogs.ts";
 
 const NOW = new Date("2026-12-11T09:00:00Z");
 
@@ -127,5 +127,46 @@ describe("raid logs", () => {
     await expect(raidLogs.importLog(member, eventId, logOf(eventId), "Essai")).rejects.toThrow(ForbiddenError);
     await expect(raidLogs.importLog(officer, eventId, logOf("autre"), "Essai")).rejects.toThrow(ValidationError);
     await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-1\nK;x;y", "Essai")).rejects.toThrow(RaidLogFormatError);
+  });
+
+  describe("from the officers' companions", () => {
+    it("adds the raid's records, journals only what is new, and keeps the recap for the end", async () => {
+      const first = await raidLogs.receiveFromCompanion(officer, logOf(eventId));
+      expect(first).toEqual({ summary: expect.objectContaining({ present: 2, loots: 2 }), news: 4 });
+      const other = await createMember(sql, "gm", "Maître");
+      expect((await raidLogs.receiveFromCompanion(other, logOf(eventId))).news).toBe(0);
+      const entries = await journal.listRecent();
+      expect(entries.map((entry) => [entry.action, entry.reason])).toEqual([
+        ["loot.council", COMPANION_LOG_REASON],
+        ["raid.import", COMPANION_LOG_REASON],
+      ]);
+      expect(recaps).toHaveLength(0);
+    });
+
+    it("publishes the recap once the raid is over, from the most complete log, once", async () => {
+      await raidLogs.receiveFromCompanion(officer, logOf(eventId, "D;Ðéjà Vu;1"));
+      await raidLogs.receiveFromCompanion(officer, logOf(eventId));
+      const tonight = await createEvent(sql, officer, new Date(NOW.getTime() - 60 * 60 * 1000), ["onyxia"]);
+      await raidLogs.receiveFromCompanion(officer, logOf(tonight));
+      expect(await raidLogs.publishDueRecaps()).toBe(1);
+      expect(recaps).toEqual([
+        expect.objectContaining({
+          event: expect.objectContaining({ id: eventId }),
+          deaths: [
+            { name: "Thom Leboss", count: 2 },
+            { name: "Ðéjà Vu", count: 1 },
+          ],
+        }),
+      ]);
+      expect(await raidLogs.publishDueRecaps()).toBe(0);
+    });
+
+    it("is reserved to the officers, for an event the website knows", async () => {
+      const member = await createMember(sql, "member", "Membre");
+      await expect(raidLogs.receiveFromCompanion(member, logOf(eventId))).rejects.toThrow(ForbiddenError);
+      await expect(
+        raidLogs.receiveFromCompanion(officer, logOf("00000000-0000-0000-0000-000000000000")),
+      ).rejects.toThrow(ValidationError);
+    });
   });
 });

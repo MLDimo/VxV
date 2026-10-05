@@ -81,7 +81,8 @@ body {
 }
 
 .panel p + .actions,
-.panel ul + .actions {
+.panel ul + .actions,
+.panel ul + p {
   margin-top: 12px;
 }
 
@@ -112,6 +113,13 @@ body {
 
 .installations strong {
   color: var(--color-gain);
+}
+
+.sent {
+  margin-top: 4px;
+  padding-left: 18px;
+  color: var(--color-lavender);
+  font-size: 13px;
 }
 
 .path {

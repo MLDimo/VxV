@@ -1,7 +1,7 @@
 {
   "name": "@vxv/lua",
   "private": true,
-  "description": "Lua 5.1 data shared by the tools and the companion: values written as Lua for the addon, and their checks.",
+  "description": "Lua 5.1 data shared by the tools and the companion: values written for the addon, files the game saves read back.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -11,9 +11,11 @@
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
   },
+  "dependencies": {
+    "luaparse": "^0.3.1"
+  },
   "devDependencies": {
     "@types/luaparse": "^0.2.13",
-    "fengari": "^0.1.5",
-    "luaparse": "^0.3.1"
+    "fengari": "^0.1.5"
   }
 }

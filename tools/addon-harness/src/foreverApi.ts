@@ -49,6 +49,8 @@ const USED_IN_GAME = [
   // Design measurement, 5 October (docs/design/mesure-en-jeu-2026-10-05.md).
   "CreateFontFamily",
   "GameFontNormal",
+  "UnitRace",
+  "UnitSex",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

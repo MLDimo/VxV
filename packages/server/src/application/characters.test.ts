@@ -83,4 +83,26 @@ describe("character linking", () => {
     await expect(characters.setMain(me, deja.id)).rejects.toThrow(/ne vous appartient pas/);
     await expect(characters.unlink(me, deja.id)).rejects.toThrow(/ne vous appartient pas/);
   });
+
+  it("keeps how the member's own characters look in game, for the avatars", async () => {
+    const [deja, eole, thom] = await createGuildCharacters(sql, "Ðéjà Vu", "Eole Hermes", "Thom Leboss");
+    await characters.link(me, deja.id, true);
+    await characters.link(me, eole.id, false);
+    await characters.link(other, thom.id, true);
+    const kept = await characters.recordAppearances(me, [
+      { name: "Ðéjà Vu", race: "Scourge", sex: 3 },
+      { name: "Eole Hermes", race: "Orc", sex: 1 },
+      { name: "Thom Leboss", race: "Tauren", sex: 2 },
+      { name: "Inconnu Total", race: "Troll", sex: 2 },
+    ]);
+    expect(kept).toBe(1);
+    const rows = await sql.query<{ first_name: string; race: string | null; sex: string | null }>(
+      "select first_name, race, sex from characters order by first_name",
+    );
+    expect(rows).toEqual([
+      { first_name: "Eole", race: null, sex: null },
+      { first_name: "Thom", race: null, sex: null },
+      { first_name: "Ðéjà", race: "Scourge", sex: "female" },
+    ]);
+  });
 });

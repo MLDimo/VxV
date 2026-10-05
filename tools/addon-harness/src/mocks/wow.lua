@@ -324,8 +324,16 @@ function FromHex(hex)
     return (hex:gsub("%x%x", function(pair) return string.char(tonumber(pair, 16)) end))
 end
 
--- The player of this client.
-Player = { name = "Ðéjà Vu", inGuild = true }
+-- The player of this client: an undead woman ("Scourge", sex 3) unless a test says otherwise.
+Player = { name = "Ðéjà Vu", inGuild = true, race = "Scourge", sex = 3 }
+function UnitRace(unit)
+    if unit == "player" then
+        return "Mort-vivant", Player.race, 5
+    end
+end
+function UnitSex(unit)
+    return unit == "player" and Player.sex or nil
+end
 --- The player's group, set by the tests: the other members' names, whether it is a raid, and who leads.
 --- Raid units start with the player (raid1), party units are the others (party1 to party4).
 Group = { members = {}, raid = false, leader = true }

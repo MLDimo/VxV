@@ -154,6 +154,7 @@ await importRaidLog(
 const bonusEventId = await createThanesEvent("2031-03-12T20:00:00Z", "Événement des tests de SR+");
 await reserveJambieres(bonusEventId);
 const raidLogEventId = await createThanesEvent("2031-04-02T20:00:00Z", "Événement des tests du journal de raid");
+const companionEventId = await createThanesEvent("2031-04-09T20:00:00Z", "Événement des tests du compagnon");
 
 const seed: E2ESeed = {
   sessions: {
@@ -170,6 +171,7 @@ const seed: E2ESeed = {
   historyEventId,
   bonusEventId,
   raidLogEventId,
+  companionEventId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 

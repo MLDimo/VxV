@@ -6,6 +6,10 @@ import { synchronize, type SyncReport } from "./sync.ts";
 
 /** The companion synchronises this often while it runs, and at once after a link or a new folder. */
 export const SYNC_EVERY_MS = 5 * 60 * 1000;
+/** And this often, it looks whether the game saved its data again (a /reload, a logout): they go at once. */
+export const WATCH_EVERY_MS = 15 * 1000;
+
+const OFFICER_ROLES = new Set(["officer", "gm"]);
 
 /** What the window shows. */
 export interface CompanionState {
@@ -18,6 +22,8 @@ export interface CompanionState {
   syncing: boolean;
   /** The last synchronisation that worked. */
   lastSync: SyncReport | undefined;
+  /** The last time the website received something new from the game, and what it made of it. */
+  lastUpload: { at: Date; messages: string[] } | undefined;
   /** The last problem met, in French, until the next action. */
   notice: string | undefined;
   version: string;
@@ -47,6 +53,13 @@ export function createCompanion(dependencies: CompanionDependencies) {
   let token: string | undefined;
   let linkAbort: AbortController | undefined;
   let timer: ReturnType<typeof setInterval> | undefined;
+  let watcher: ReturnType<typeof setInterval> | undefined;
+  /** What the website already received during this launch. */
+  const sent = new Set<string>();
+  /** When the game last saved each file of saved data, as last seen. */
+  let savedSeen = new Map<string, number>();
+  /** Asked again while a synchronisation was running. */
+  let again = false;
   let state: CompanionState = {
     account: undefined,
     linking: false,
@@ -54,6 +67,7 @@ export function createCompanion(dependencies: CompanionDependencies) {
     settings: { gameFolder: undefined, launchAtLogin: true },
     syncing: false,
     lastSync: undefined,
+    lastUpload: undefined,
     notice: undefined,
     version: dependencies.version,
   };
@@ -93,19 +107,47 @@ export function createCompanion(dependencies: CompanionDependencies) {
     update({ settings });
   }
 
-  /** Brings the website's data to the game, once linked and the game found; one synchronisation at a time. */
+  /** True when the game saved its data again since last seen. */
+  async function savedDataChanged(): Promise<boolean> {
+    const files = (
+      await Promise.all(state.installations.map((installation) => gameFiles.savedFiles(installation)))
+    ).flat();
+    const changed = files.some((file) => savedSeen.get(file.path) !== file.modifiedAt);
+    savedSeen = new Map(files.map((file) => [file.path, file.modifiedAt]));
+    return changed;
+  }
+
+  /**
+   * Takes the game's saved data to the website and brings the website's data to the game, once linked and the
+   * game found. One synchronisation at a time: asked meanwhile, the next one follows.
+   */
   async function syncNow(): Promise<void> {
-    if (token === undefined || state.installations.length === 0 || state.syncing) {
+    if (token === undefined || state.installations.length === 0) {
+      return;
+    }
+    if (state.syncing) {
+      again = true;
       return;
     }
     update({ syncing: true });
     try {
-      const lastSync = await synchronize({ site, gameFiles }, token, state.installations, clock());
-      update({ lastSync, notice: undefined });
+      await savedDataChanged();
+      const account = state.account ?? (await site.me(token));
+      const officer = account.roles.some((role) => OFFICER_ROLES.has(role));
+      const lastSync = await synchronize(
+        { site, gameFiles },
+        { token, installations: state.installations, officer, now: clock(), sent },
+      );
+      const lastUpload = lastSync.sent.length > 0 ? { at: lastSync.at, messages: lastSync.sent } : state.lastUpload;
+      update({ account, lastSync, lastUpload, notice: undefined });
     } catch (error) {
       await report(error);
     } finally {
       update({ syncing: false });
+    }
+    if (again) {
+      again = false;
+      await syncNow();
     }
   }
 
@@ -129,6 +171,9 @@ export function createCompanion(dependencies: CompanionDependencies) {
       }
       await syncNow();
       timer ??= setInterval(() => void syncNow(), SYNC_EVERY_MS);
+      watcher ??= setInterval(() => {
+        void savedDataChanged().then((changed) => (changed ? syncNow() : undefined));
+      }, WATCH_EVERY_MS);
     },
 
     syncNow,
@@ -136,7 +181,9 @@ export function createCompanion(dependencies: CompanionDependencies) {
     /** Stops the synchronisations, when the companion quits. */
     stop(): void {
       clearInterval(timer);
+      clearInterval(watcher);
       timer = undefined;
+      watcher = undefined;
     },
 
     /** Links the companion through the browser; a second call while waiting does nothing. */
@@ -172,7 +219,8 @@ export function createCompanion(dependencies: CompanionDependencies) {
         await site.unlink(token);
       }
       await forgetToken();
-      update({ account: undefined, lastSync: undefined, notice: undefined });
+      sent.clear();
+      update({ account: undefined, lastSync: undefined, lastUpload: undefined, notice: undefined });
     },
 
     /** The player shows where the game is, when it is not in its usual places. */

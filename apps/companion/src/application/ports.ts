@@ -32,6 +32,21 @@ export interface SitePort {
   unlink(token: string): Promise<void>;
   /** What the addon needs from the website. */
   download(token: string): Promise<{ raid: NextRaid | null }>;
+  /** What the addon saved for the website; the website says what it made of it, in French. */
+  upload(token: string, upload: Upload): Promise<UploadReport>;
+}
+
+/** What the companion sends (apps/web/app/api/compagnon/envoi): the officers' data only for an officer. */
+export interface Upload {
+  roster?: { text: string; capturedAt: number };
+  raidLogs: string[];
+  characters: { name: string; race: string; sex: number }[];
+}
+
+export interface UploadReport {
+  roster?: string;
+  raidLogs: string[];
+  characters: number;
 }
 
 /** Listens on this computer only, for the browser coming back from the website's link page. */
@@ -62,8 +77,17 @@ export interface TokenStore {
   clear(): Promise<void>;
 }
 
-/** The game's files the companion writes, in one version of the game. */
+/** A file the game saves, and when it last did. */
+export interface SavedFile {
+  path: string;
+  modifiedAt: number;
+}
+
+/** The game's files the companion reads and writes, in one version of the game. */
 export interface GameFiles {
   /** Writes the inbox of VXV_Sync; false when the addon has no VXV_Sync yet (an older version). */
   writeInbox(installation: string, content: string): Promise<boolean>;
+  /** VXV_Sync's saved data of every account of this version of the game. */
+  savedFiles(installation: string): Promise<SavedFile[]>;
+  read(path: string): Promise<Uint8Array>;
 }

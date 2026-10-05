@@ -27,4 +27,15 @@ describe("game files on the disk", () => {
     expect(await diskGameFiles.writeInbox(game, "ns.Inbox = {}")).toBe(false);
     await expect(readFile(join(game, "Interface", "AddOns", "VXV_Sync", "External", "Inbox.lua"))).rejects.toThrow();
   });
+
+  it("finds VXV_Sync's saved data of every account, and reads them", async () => {
+    const saved = join(game, "WTF", "Account", "124804161#1", "SavedVariables");
+    await mkdir(saved, { recursive: true });
+    await mkdir(join(game, "WTF", "Account", "SANS_VXV", "SavedVariables"), { recursive: true });
+    await writeFile(join(saved, "VXV_Sync.lua"), "VXV_SyncDB = {}");
+    const files = await diskGameFiles.savedFiles(game);
+    expect(files).toEqual([{ path: join(saved, "VXV_Sync.lua"), modifiedAt: expect.any(Number) }]);
+    expect(new TextDecoder().decode(await diskGameFiles.read(join(saved, "VXV_Sync.lua")))).toBe("VXV_SyncDB = {}");
+    expect(await diskGameFiles.savedFiles(join(game, "ailleurs"))).toEqual([]);
+  });
 });

@@ -2,6 +2,7 @@ import { createAddonExport } from "./application/addonExport.ts";
 import { createAuth } from "./application/auth.ts";
 import { createCharacters } from "./application/characters.ts";
 import { createCompanion } from "./application/companion.ts";
+import { createCompanionUploads } from "./application/companionUploads.ts";
 import { createDiscordProfiles } from "./application/discordProfiles.ts";
 import { createEvents } from "./application/events.ts";
 import { createExclusions } from "./application/exclusions.ts";
@@ -37,11 +38,15 @@ export function createApplication({
   clock = () => new Date(),
 }: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
+  const roster = createRoster({ unitOfWork });
+  const characters = createCharacters({ unitOfWork });
+  const raidLogs = createRaidLogs({ unitOfWork, announcer, clock });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
-    roster: createRoster({ unitOfWork }),
-    characters: createCharacters({ unitOfWork }),
+    companionUploads: createCompanionUploads({ roster, raidLogs, characters }),
+    roster,
+    characters,
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
     raidAnnouncements: createRaidAnnouncements({ unitOfWork, announcer }),
     raidReminders: createRaidReminders({ unitOfWork, announcer }),
@@ -52,7 +57,7 @@ export function createApplication({
     history: createHistory({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
     addonExport: createAddonExport({ unitOfWork, clock }),
-    raidLogs: createRaidLogs({ unitOfWork, announcer, clock }),
+    raidLogs,
   };
 }
 

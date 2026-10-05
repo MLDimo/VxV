@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { expect, test, type APIRequestContext, type BrowserContext, type Page } from "@playwright/test";
+import { SEED_ROSTER, WEB_ENVIRONMENT, type E2ESessions } from "./environment";
 import { readSeed, signInAs } from "./sessions";
 
 const PORT = 53682;
@@ -14,8 +15,13 @@ function pkce() {
 const linkPage = (challenge: string) => `/compagnon/relier?port=${PORT}&etat=${STATE}&defi=${challenge}`;
 
 /** The member links a companion, as the app does it: returns its token. */
-async function linkCompanion(page: Page, context: BrowserContext, request: APIRequestContext): Promise<string> {
-  await signInAs(context, "member");
+async function linkCompanion(
+  page: Page,
+  context: BrowserContext,
+  request: APIRequestContext,
+  who: keyof E2ESessions = "member",
+): Promise<string> {
+  await signInAs(context, who);
   const { verifier, challenge } = pkce();
   let code = "";
   await page.route(`http://127.0.0.1:${PORT}/**`, async (route) => {
@@ -75,6 +81,46 @@ test("the companion brings the next event to the addon, as an officer would past
     expect.stringMatching(`^E;${readSeed().lockedEventId};`),
   ]);
   expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
+});
+
+test("an officer's companion sends the roster, the raid's record and the characters' look", async ({
+  page,
+  context,
+  request,
+}) => {
+  const token = await linkCompanion(page, context, request, "officer");
+  const night = Date.UTC(2031, 3, 9, 21) / 1000;
+  const upload = {
+    roster: { text: ["VXV-ROSTER-1", ...SEED_ROSTER].join("\n"), capturedAt: Math.floor(Date.now() / 1000) },
+    raidLogs: [
+      [
+        "VXV-LOG-1",
+        `R;${readSeed().companionEventId};${String(night)};${String(night + 3600)}`,
+        `K;3493;${String(night + 1800)}`,
+        "P;Ciel Gris",
+        "P;Aubé Clairval",
+      ].join("\n"),
+    ],
+    characters: [{ name: "Ciel Gris", race: "Orc", sex: 2 }],
+  };
+  const headers = { Authorization: `Bearer ${token}` };
+  const response = await request.post("/api/compagnon/envoi", { headers, data: upload });
+  expect(await response.json()).toEqual({
+    roster: "Liste de guilde à jour.",
+    raidLogs: ["Journal du raid importé : 1 boss tué, 2 présents, 0 objets ajoutés."],
+    characters: 1,
+  });
+  // Sent again by another officer's companion: nothing new.
+  const again = await request.post("/api/compagnon/envoi", { headers, data: upload });
+  expect(((await again.json()) as { raidLogs: string[] }).raidLogs).toEqual(["Journal du raid à jour."]);
+  expect((await request.post("/api/compagnon/envoi", { headers, data: { raidLogs: "x" } })).status()).toBe(400);
+});
+
+test("the recap of the raids over is published every day", async ({ request }) => {
+  expect((await request.get("/api/cron/recaps")).status()).toBe(401);
+  const authorization = { authorization: `Bearer ${WEB_ENVIRONMENT.CRON_SECRET}` };
+  const response = await request.get("/api/cron/recaps", { headers: authorization });
+  expect(await response.json()).toEqual({ published: 0 });
 });
 
 test("a visitor signs in first, then comes back to the link", async ({ page }) => {

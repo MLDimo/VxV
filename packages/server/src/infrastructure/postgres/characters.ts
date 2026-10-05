@@ -56,6 +56,10 @@ export function characterRepository(sql: SqlClient): CharacterRepository {
       await sql.query("update characters set member_id = $2 where id = $1", [characterId, memberId]);
     },
 
+    async setAppearance(characterId, { race, sex }) {
+      await sql.query("update characters set race = $2, sex = $3 where id = $1", [characterId, race, sex]);
+    },
+
     async unlink(characterId) {
       await sql.query("update characters set member_id = null, is_main = false where id = $1", [characterId]);
     },

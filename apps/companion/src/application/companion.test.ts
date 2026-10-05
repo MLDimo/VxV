@@ -1,7 +1,13 @@
 import { posix } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FolderReader } from "../domain/installations.ts";
-import { createCompanion, SYNC_EVERY_MS, type Companion, type CompanionDependencies } from "./companion.ts";
+import {
+  createCompanion,
+  SYNC_EVERY_MS,
+  WATCH_EVERY_MS,
+  type Companion,
+  type CompanionDependencies,
+} from "./companion.ts";
 import { SiteError, UnlinkedError } from "./errors.ts";
 import type { Settings, SitePort } from "./ports.ts";
 
@@ -12,6 +18,17 @@ const NEXT_RAID = {
   startsAt: "2026-12-10T20:00:00.000Z",
 };
 const NOW = new Date("2026-12-10T19:45:00Z");
+/** VXV_Sync's saved data, as the game writes them. */
+const SAVED_DATA = [
+  "VXV_SyncDB = {",
+  '\t["version"] = 1,',
+  '\t["roster"] = { ["text"] = "VXV-ROSTER-1\\nÐéjà;Vu;ROGUE", ["capturedAt"] = 1796904000 },',
+  '\t["raidLogs"] = {',
+  '\t\t["e1"] = "VXV-LOG-1\\nR;e1;1796904000;1796904120",',
+  "\t},",
+  '\t["characters"] = { ["Ðéjà Vu"] = { ["race"] = "Scourge", ["sex"] = 3 } },',
+  "}",
+].join("\n");
 const started: Companion[] = [];
 const TOC = "Interface/AddOns/VXV_Core/VXV_Core.toc";
 
@@ -34,12 +51,19 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
   let saved: Settings = { gameFolder: undefined, launchAtLogin: true };
   let token = savedToken;
   const inboxes = new Map<string, string>();
+  /** VXV_Sync's saved data, by file: its Lua text, and when the game wrote it. */
+  const savedData = new Map<string, { text: string; modifiedAt: number }>();
   const site: SitePort = {
     linkPage: ({ state }) => `https://vxv.example/compagnon/relier?etat=${state}`,
     exchange: vi.fn(async () => ({ token: "new-token", member })),
     me: vi.fn(async () => member),
     unlink: vi.fn(async () => undefined),
     download: vi.fn(async () => ({ raid: NEXT_RAID })),
+    upload: vi.fn(async (_token, upload) => ({
+      ...(upload.roster === undefined ? {} : { roster: "Liste de guilde à jour." }),
+      raidLogs: upload.raidLogs.map(() => "Journal du raid importé."),
+      characters: upload.characters.length,
+    })),
   };
   const dependencies: CompanionDependencies = {
     site,
@@ -64,6 +88,8 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
         inboxes.set(installation, content);
         return true;
       },
+      savedFiles: async () => [...savedData].map(([path, { modifiedAt }]) => ({ path, modifiedAt })),
+      read: async (path) => new TextEncoder().encode(savedData.get(path)?.text ?? ""),
     },
     clock: () => NOW,
     computer: async () => ({ platform: "darwin", home: "/Users/martin", roots: [] }),
@@ -76,7 +102,7 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
   };
   const companion = createCompanion(dependencies);
   started.push(companion);
-  return { companion, dependencies, site, inboxes, token: () => token, saved: () => saved };
+  return { companion, dependencies, site, inboxes, savedData, token: () => token, saved: () => saved };
 }
 
 afterEach(() => {
@@ -184,6 +210,7 @@ describe("companion", () => {
         at: NOW,
         raid: { title: "Onyxia", startsAt: "2026-12-10T20:00:00.000Z" },
         outdated: [],
+        sent: [],
       });
     });
 
@@ -197,7 +224,8 @@ describe("companion", () => {
     });
 
     it("names the versions of the game whose addon is too old for the companion", async () => {
-      const { companion } = setUp({ gameFiles: { writeInbox: async () => false } }, "saved-token");
+      const { companion, dependencies } = setUp({}, "saved-token");
+      dependencies.gameFiles.writeInbox = async () => false;
       await companion.start();
       expect(companion.state().lastSync?.outdated).toEqual(["/Applications/World of Warcraft/_classic_"]);
     });
@@ -211,6 +239,44 @@ describe("companion", () => {
       await vi.advanceTimersByTimeAsync(SYNC_EVERY_MS);
       expect(site.download).toHaveBeenCalledTimes(2);
       expect(companion.state()).toMatchObject({ notice: undefined, syncing: false });
+    });
+
+    it("takes an officer's saved data to the website once, then what the game saves again", async () => {
+      vi.useFakeTimers();
+      const { companion, site, savedData } = setUp({}, "saved-token");
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: SAVED_DATA, modifiedAt: 1 });
+      await companion.start();
+      expect(site.upload).toHaveBeenCalledWith("saved-token", {
+        roster: { text: "VXV-ROSTER-1\nÐéjà;Vu;ROGUE", capturedAt: 1796904000 },
+        raidLogs: ["VXV-LOG-1\nR;e1;1796904000;1796904120"],
+        characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
+      });
+      expect(companion.state().lastUpload).toEqual({
+        at: NOW,
+        messages: ["Liste de guilde à jour.", "Journal du raid importé."],
+      });
+      // A /reload: the game writes the same data again, plus the record of a second raid.
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", {
+        text: SAVED_DATA.replace('["e1"]', '["e2"] = "VXV-LOG-1\\nR;e2;1;2",\n\t\t["e1"]'),
+        modifiedAt: 2,
+      });
+      await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
+      expect(site.upload).toHaveBeenCalledTimes(2);
+      expect(site.upload).toHaveBeenLastCalledWith("saved-token", {
+        raidLogs: ["VXV-LOG-1\nR;e2;1;2"],
+        characters: [],
+      });
+    });
+
+    it("sends only the characters for a member", async () => {
+      const { companion, site, savedData } = setUp({}, "saved-token");
+      vi.mocked(site.me).mockResolvedValue({ name: "Thom", roles: ["member"] });
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: SAVED_DATA, modifiedAt: 1 });
+      await companion.start();
+      expect(site.upload).toHaveBeenCalledWith("saved-token", {
+        raidLogs: [],
+        characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
+      });
     });
   });
 });
