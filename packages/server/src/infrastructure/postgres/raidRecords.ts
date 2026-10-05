@@ -14,13 +14,14 @@ export function raidRecordRepository(sql: SqlClient): RaidRecordRepository {
   return {
     async recordAttendance(eventId, characterIds) {
       if (characterIds.length === 0) {
-        return;
+        return 0;
       }
-      await sql.query(
+      const added = await sql.query(
         `insert into event_attendance (event_id, character_id) select $1, unnest($2::uuid[])
-         on conflict do nothing`,
+         on conflict do nothing returning character_id`,
         [eventId, characterIds],
       );
+      return added.length;
     },
 
     async addLoots(eventId, loots) {

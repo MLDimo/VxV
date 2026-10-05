@@ -18,10 +18,24 @@ local saved
 local inEncounter = false
 local deadNow = {}
 
---- Takes the module's saved data at start-up.
+local function hasRecords(log)
+    return #log.kills > 0 or #log.loots > 0
+end
+
+--- The log goes to the website through the companion (VXV_Sync), once it holds a kill or a loot.
+local function upload(log)
+    if hasRecords(log) then
+        VXV.Emit("sync.put", "raidLogs", log.eventId, RaidLog.Export(log))
+    end
+end
+
+--- Takes the module's saved data at start-up, and hands every log over to the companion.
 function RaidLog.Restore(data)
     saved = data
     saved.logs = type(saved.logs) == "table" and saved.logs or {}
+    for _, log in pairs(saved.logs) do
+        upload(log)
+    end
 end
 
 --- The logs, newest raid first.
@@ -40,6 +54,7 @@ local function forgetOldest()
     local list = RaidLog.All()
     for index = MAX_LOGS + 1, #list do
         saved.logs[list[index].eventId] = nil
+        VXV.Emit("sync.put", "raidLogs", list[index].eventId, nil)
     end
 end
 
@@ -59,7 +74,8 @@ function RaidLog.Current()
     return log
 end
 
-local function changed()
+local function changed(log)
+    upload(log)
     VXV.Emit("raid.log")
 end
 
@@ -72,7 +88,7 @@ local function checkDeaths()
         local dead = UnitIsDeadOrGhost(member.unit) == true
         if dead and not deadNow[member.name] and log ~= nil then
             log.deaths[member.name] = (log.deaths[member.name] or 0) + 1
-            changed()
+            changed(log)
         end
         deadNow[member.name] = dead
     end
@@ -103,14 +119,14 @@ VXV.OnEvent("ENCOUNTER_END", function(encounterId, boss, _, _, success)
     for name in pairs(Group.Names()) do
         log.present[name] = true
     end
-    changed()
+    changed(log)
 end)
 
 local function addLoot(eventId, loot)
     local log = saved and saved.logs[eventId]
     if log ~= nil then
         log.loots[#log.loots + 1] = loot
-        changed()
+        changed(log)
     end
 end
 

@@ -8,11 +8,13 @@ import { exclusionRepository } from "./exclusions.ts";
 import { journalRepository } from "./journal.ts";
 import { lootHistoryRepository } from "./lootHistory.ts";
 import { memberRepository } from "./members.ts";
+import { raidLogRepository } from "./raidLogs.ts";
 import { raidRecordRepository } from "./raidRecords.ts";
 import { raidRepository } from "./raids.ts";
 import { sessionRepository } from "./sessions.ts";
 import { signupRepository } from "./signups.ts";
 import { softReserveRepository } from "./softReserves.ts";
+import { syncMarkRepository } from "./syncMarks.ts";
 
 function createRepositories(sql: SqlClient): Repositories {
   return {
@@ -29,6 +31,8 @@ function createRepositories(sql: SqlClient): Repositories {
     softReserves: softReserveRepository(sql),
     exclusions: exclusionRepository(sql),
     raidRecords: raidRecordRepository(sql),
+    raidLogs: raidLogRepository(sql),
+    syncMarks: syncMarkRepository(sql),
   };
 }
 

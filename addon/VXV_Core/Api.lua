@@ -34,6 +34,12 @@ VXV = {
     OnEvent = ns.Events.On,
     --- The guild members the client knows: { name, class, online }.
     GuildMembers = ns.Roster.Read,
+    --- The roster as the website imports it (VXV-ROSTER-1 text), and how many characters it holds.
+    GuildRosterText = function()
+        local text = ns.Roster.Format(ns.Roster.Read())
+        local _, count = text:gsub("\n", "")
+        return text, count
+    end,
     --- (value): true when the client hides the value (secret): it may be neither compared nor stored.
     IsSecret = ns.Util.IsSecret,
     --- "Prénom Nom" of a unit ("raid3", "party1"…), or nil when the client has none or hides it.

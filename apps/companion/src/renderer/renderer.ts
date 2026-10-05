@@ -138,6 +138,12 @@ function syncPanel(state: CompanionState): HTMLElement[] {
             `, ${raidDate.format(new Date(lastSync.raid.startsAt))}.`,
           ),
     );
+    if (state.lastUpload !== undefined) {
+      lines.push(
+        element("p", {}, `Envoyé au site ${ago(state.lastUpload.at, new Date())} :`),
+        element("ul", { class: "sent" }, ...state.lastUpload.messages.map((message) => element("li", {}, message))),
+      );
+    }
     if (lastSync.outdated.length > 0) {
       lines.push(
         element("p", { class: "loss" }, "Mets l'addon VXV à jour : cette version ne sait pas lire le compagnon."),

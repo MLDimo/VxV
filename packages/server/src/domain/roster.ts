@@ -107,3 +107,23 @@ export function summarizeRosterImport(plan: RosterImportPlan, rosterSize: number
     inGuild: rosterSize,
   };
 }
+
+/** True when the import changes nothing: nothing to write, nothing to journal. */
+export function isEmptyRosterPlan(plan: RosterImportPlan): boolean {
+  return (
+    plan.added.length === 0 && plan.classChanged.length === 0 && plan.left.length === 0 && plan.rejoined.length === 0
+  );
+}
+
+/** Departures an automatic import accepts at once, whatever the guild's size… */
+const AUTOMATIC_DEPARTURES = 5;
+/** …or this share of the guild. */
+const AUTOMATIC_DEPARTURE_SHARE = 0.1;
+
+/**
+ * A roster read in game that would mark many characters as gone looks incomplete (the client knew only part of
+ * the guild): an automatic import refuses it, an officer may still import it on the website.
+ */
+export function looksIncomplete(plan: RosterImportPlan, inGuildBefore: number): boolean {
+  return plan.left.length > Math.max(AUTOMATIC_DEPARTURES, Math.floor(inGuildBefore * AUTOMATIC_DEPARTURE_SHARE));
+}

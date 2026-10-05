@@ -91,4 +91,51 @@ describe("roster import", () => {
     expect(await characters()).toEqual([]);
     expect(await listJournal()).toEqual([]);
   });
+
+  describe("from an officer's companion", () => {
+    let fromCompanion: ReturnType<typeof createRoster>["importFromCompanion"];
+    const at = (minute: number) => new Date(Date.UTC(2026, 9, 6, 20, minute));
+    const guild = (count: number) => Array.from({ length: count }, (_, index) => `Membre;N${String(index)};ROGUE`);
+
+    beforeEach(() => {
+      fromCompanion = createRoster({ unitOfWork: createUnitOfWork(sql) }).importFromCompanion;
+    });
+
+    it("imports a roster that changes something, and journals it as the companion's", async () => {
+      const officer = await createMember(sql, "officer", "Officier");
+      const outcome = await fromCompanion(officer, roster("Ðéjà;Vu;ROGUE"), at(0));
+      expect(outcome).toEqual({ kind: "imported", summary: expect.objectContaining({ added: ["Ðéjà Vu"] }) });
+      expect((await listJournal())[0]).toMatchObject({
+        action: "roster.import",
+        reason: "Liste de guilde envoyée par le compagnon",
+      });
+    });
+
+    it("journals nothing for the same roster sent again, by another officer", async () => {
+      const officer = await createMember(sql, "officer", "Officier");
+      const other = await createMember(sql, "gm", "Maître");
+      await fromCompanion(officer, roster("Ðéjà;Vu;ROGUE"), at(0));
+      expect(await fromCompanion(other, roster("Ðéjà;Vu;ROGUE"), at(5))).toEqual({ kind: "unchanged" });
+      expect(await listJournal()).toHaveLength(1);
+    });
+
+    it("ignores a copy older than the last one imported", async () => {
+      const officer = await createMember(sql, "officer", "Officier");
+      await fromCompanion(officer, roster("Ðéjà;Vu;ROGUE", "Eole;Hermes;WARRIOR"), at(10));
+      expect(await fromCompanion(officer, roster("Ðéjà;Vu;ROGUE"), at(5))).toEqual({ kind: "older" });
+      expect((await characters()).every((character) => character.in_guild)).toBe(true);
+    });
+
+    it("refuses a roster that would empty the guild, read before the client knew it all", async () => {
+      const officer = await createMember(sql, "officer", "Officier");
+      await fromCompanion(officer, roster(...guild(100)), at(0));
+      expect(await fromCompanion(officer, roster(...guild(89)), at(5))).toEqual({ kind: "incomplete", departures: 11 });
+      expect(await fromCompanion(officer, roster(...guild(90)), at(6))).toMatchObject({ kind: "imported" });
+    });
+
+    it("is reserved to the officers", async () => {
+      const member = await createMember(sql, "member", "Membre");
+      await expect(fromCompanion(member, roster("Ðéjà;Vu;ROGUE"), at(0))).rejects.toThrow(ForbiddenError);
+    });
+  });
 });

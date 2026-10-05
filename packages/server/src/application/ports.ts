@@ -1,4 +1,4 @@
-import type { Character } from "../domain/characters.ts";
+import type { Appearance, Character } from "../domain/characters.ts";
 import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
@@ -82,6 +82,8 @@ export interface CharacterRepository {
   add(entries: readonly RosterEntry[]): Promise<void>;
   changeClass(characterId: string, characterClass: string): Promise<void>;
   setInGuild(characterIds: readonly string[], inGuild: boolean): Promise<void>;
+  /** The character as the game draws it (for the avatars). */
+  setAppearance(characterId: string, appearance: Appearance): Promise<void>;
 }
 
 export interface JournalRepository {
@@ -167,10 +169,24 @@ export interface NewLoot {
 
 /** What the addon recorded during a raid: who was present, and the items given. */
 export interface RaidRecordRepository {
-  /** Characters present at the event; those already recorded stay. */
-  recordAttendance(eventId: string, characterIds: readonly string[]): Promise<void>;
+  /** Characters present at the event; those already recorded stay. Returns how many were not recorded yet. */
+  recordAttendance(eventId: string, characterIds: readonly string[]): Promise<number>;
   /** Adds the gives the event does not have yet (same item, boss and instant), and returns those added. */
   addLoots(eventId: string, loots: readonly NewLoot[]): Promise<NewLoot[]>;
+}
+
+/** The record of each raid, as the addon exports it (VXV-LOG text), kept to publish its recap. */
+export interface RaidLogRepository {
+  find(eventId: string): Promise<string | undefined>;
+  save(eventId: string, content: string, receivedAt: Date): Promise<void>;
+  /** Events started before the instant, whose record is kept and whose recap is not published yet. */
+  listUnannounced(startedBefore: Date): Promise<{ event: RaidEvent; content: string }[]>;
+}
+
+/** When the latest copy of some data, read in game, was imported ("roster"). */
+export interface SyncMarkRepository {
+  find(kind: string): Promise<Date | undefined>;
+  save(kind: string, capturedAt: Date): Promise<void>;
 }
 
 export interface Repositories {
@@ -187,6 +203,8 @@ export interface Repositories {
   softReserves: SoftReserveRepository;
   exclusions: ExclusionRepository;
   raidRecords: RaidRecordRepository;
+  raidLogs: RaidLogRepository;
+  syncMarks: SyncMarkRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

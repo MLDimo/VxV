@@ -9,6 +9,7 @@ globals = {
     "VXV_ProbeInbox",
     "VXV_RaidData",
     "VXV_DB",
+    "VXV_SyncDB",
     "VXV",
     "VXV_Window",
     "VXV_TextWindow",
@@ -27,6 +28,6 @@ read_globals = {
     "GetInstanceInfo", "GetLootSlotLink", "GetNumGroupMembers", "GetNumGuildMembers", "GetNumLootItems", "GetTime",
     "GiveMasterLoot", "InCombatLockdown", "IsInGroup", "IsInGuild", "IsInInstance", "IsInRaid",
     "LE_PARTY_CATEGORY_INSTANCE", "RANDOM_ROLL_RESULT", "ScrollUtil", "UIParent", "UnitFullName",
-    "UnitIsDeadOrGhost", "UnitIsGroupAssistant", "UnitIsGroupLeader", "UnitIsPlayer", "UnitName",
-    "date", "geterrorhandler", "hooksecurefunc", "issecretvalue", "strsplit", "time",
+    "UnitIsDeadOrGhost", "UnitIsGroupAssistant", "UnitIsGroupLeader", "UnitIsPlayer", "UnitName", "UnitRace",
+    "UnitSex", "date", "geterrorhandler", "hooksecurefunc", "issecretvalue", "strsplit", "time",
 }

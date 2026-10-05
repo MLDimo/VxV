@@ -71,4 +71,6 @@ export interface E2ESeed {
   bonusEventId: string;
   /** Event without sign-ups, whose raid log the tests import. */
   raidLogEventId: string;
+  /** Event without sign-ups, whose raid log an officer's companion sends. */
+  companionEventId: string;
 }
