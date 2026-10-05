@@ -10,8 +10,7 @@ const OPEN_RAID_TAB = `
   SlashCmdList.VXV("")
   FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Raid" end):Run("OnClick")
 `;
-const CLICK = (text: string) =>
-  `FindWidget(VXV_Window, function(widget) return widget.text == ${JSON.stringify(text)} end):Run("OnClick")`;
+const CLICK = (text: string) => `FindButton(VXV_Window, ${JSON.stringify(text)}):Run("OnClick")`;
 
 type Guild = ReturnType<typeof startGuild>;
 

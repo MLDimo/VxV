@@ -1,13 +1,34 @@
 local _, ns = ...
 
---- A scrolling list of text rows, shared by the Raid tab and the loot panel. A row is { kind = "title" | "header"
---- | "line", text, tooltip = { title, lines } or link = item link for the game's item tooltip, onClick or nil }.
+--- A list of text rows in the charter's fonts, scrolled with the mouse wheel; shared by the Raid and Journal
+--- screens and the loot panel. A row is { kind = "title" | "header" | "line" | "bar", text, tooltip = { title,
+--- lines } or link = item link for the game's item tooltip, onClick, stamp = { text, color } }; a bar is
+--- { kind = "bar", share between 0 and 1, color = a token }.
 local RowList = {}
 ns.RowList = RowList
 
-local ROW_HEIGHT = 18
-local SCROLLBAR_WIDTH = 26
-local FONTS = { title = "GameFontNormalLarge", header = "GameFontNormal", line = "GameFontHighlight" }
+local Theme = VXV.Theme
+
+-- Palettes: the dark panels of the screens, and the parchment of the accounts book (§7.7), whose rows all sit on
+-- the page's lines.
+local RULE = 24
+RowList.RULE = RULE
+local PALETTES = {
+    panel = {
+        heights = { title = 24, header = 22, line = 18, bar = 8 },
+        fonts = { title = { "pixelBold", 18, "ivory" }, header = { "pixel", 15, "ivory" },
+            line = { "text", 13, "lavender" } },
+        step = 40,
+    },
+    parchment = {
+        heights = { title = RULE, header = RULE, line = RULE, bar = RULE },
+        fonts = { title = { "pixelBold", 18, "ink-brown" }, header = { "textBold", 13, "ink-brown" },
+            line = { "text", 13, "ink-brown" } },
+        step = 2 * RULE,
+    },
+}
+local BAR_HEIGHT = 4
+local STAMP_HEIGHT, STAMP_PADDING, STAMP_GAP, STAMP_BORDER = 14, 8, 6, 1
 
 local function showTooltip(frame)
     local row = frame.row
@@ -24,48 +45,99 @@ local function click(frame)
     end
 end
 
---- Fills the parent frame (whose size is set) with a scrolling list; returns the list, to give it rows.
-function RowList.Create(parent, topOffset)
-    local scroll = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate")
+--- The stamp in front of a row (§7.7): its category in its ink, framed.
+local function addStamp(frame)
+    local stamp = CreateFrame("Frame", nil, frame)
+    stamp:SetPoint("LEFT")
+    stamp:SetHeight(STAMP_HEIGHT)
+    stamp.ring = Theme.Rings(stamp, { { "ink-brown", STAMP_BORDER } }, true)[1]
+    stamp.label = Theme.Text(stamp, "textHeavy", 10, "ink-brown")
+    stamp.label:SetPoint("CENTER")
+    return stamp
+end
+
+local function showStamp(frame, stamp)
+    frame.stamp:SetShown(stamp ~= nil)
+    frame.label:ClearAllPoints()
+    frame.label:SetPoint("RIGHT")
+    if stamp == nil then
+        frame.label:SetPoint("LEFT")
+        return
+    end
+    Theme.Recolor(frame.stamp.ring, stamp.color)
+    frame.stamp.label:SetTextColor(Theme.Color(stamp.color))
+    frame.stamp.label:SetText(stamp.text)
+    frame.stamp:SetWidth(frame.stamp.label:GetStringWidth() + STAMP_PADDING)
+    frame.label:SetPoint("LEFT", frame.stamp, "RIGHT", STAMP_GAP, 0)
+end
+
+--- Fills the parent frame (whose size is set) below topOffset with a list in a palette ("panel" by default, or
+--- "parchment"); returns the list, to give it rows.
+function RowList.Create(parent, topOffset, paletteName)
+    local palette = PALETTES[paletteName or "panel"]
+    local scroll = CreateFrame("ScrollFrame", nil, parent)
     scroll:SetPoint("TOPLEFT", 0, -(topOffset or 0))
-    scroll:SetPoint("BOTTOMRIGHT", -SCROLLBAR_WIDTH, 0)
+    scroll:SetPoint("BOTTOMRIGHT")
+    local width = parent:GetWidth()
     local content = CreateFrame("Frame", nil, scroll)
-    local width = parent:GetWidth() - SCROLLBAR_WIDTH
     content:SetWidth(width)
     scroll:SetScrollChild(content)
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(_, delta)
+        local range = math.max(0, content:GetHeight() - scroll:GetHeight())
+        scroll:SetVerticalScroll(math.min(range, math.max(0, scroll:GetVerticalScroll() - delta * palette.step)))
+    end)
     local frames = {}
 
-    local function newRow(index)
+    local function newRow()
         local frame = CreateFrame("Frame", nil, content)
-        frame:SetSize(width, ROW_HEIGHT)
-        frame:SetPoint("TOPLEFT", 0, -(index - 1) * ROW_HEIGHT)
+        frame:SetWidth(width)
         frame:EnableMouse(true)
         frame:SetScript("OnEnter", showTooltip)
         frame:SetScript("OnLeave", VXV.HideTooltip)
         frame:SetScript("OnMouseUp", click)
-        frame.label = frame:CreateFontString(nil, "OVERLAY", FONTS.line)
-        frame.label:SetPoint("LEFT")
-        frame.label:SetWidth(width)
-        frame.label:SetJustifyH("LEFT")
+        frame.label = Theme.Text(frame, "text", 13, "lavender")
         frame.label:SetWordWrap(false)
-        frames[index] = frame
+        frame.stamp = addStamp(frame)
+        frame.bar = Theme.Fill(frame, "line", "ARTWORK")
+        frame.bar:SetPoint("LEFT")
+        frame.bar:SetHeight(BAR_HEIGHT)
+        frames[#frames + 1] = frame
         return frame
     end
 
     local list = {}
     --- Shows these rows, reusing the row frames.
     function list.SetRows(rows)
+        local top = 0
         for index, row in ipairs(rows) do
-            local frame = frames[index] or newRow(index)
-            frame.label:SetFontObject(FONTS[row.kind])
-            frame.label:SetText(row.text)
+            local frame = frames[index] or newRow()
+            local height = palette.heights[row.kind]
+            frame:SetHeight(height)
+            frame:ClearAllPoints()
+            frame:SetPoint("TOPLEFT", 0, -top)
+            top = top + height
+            showStamp(frame, row.stamp)
+            if row.kind == "bar" then
+                frame.label:SetText("")
+                frame.bar:SetColorTexture(Theme.Color(row.color or "line"))
+                frame.bar:SetWidth(math.max(1, width * row.share))
+                frame.bar:Show()
+            else
+                local font = palette.fonts[row.kind]
+                frame.label:SetFontObject(Theme.Font(font[1], font[2]))
+                frame.label:SetTextColor(Theme.Color(font[3]))
+                frame.label:SetText(row.text)
+                frame.bar:Hide()
+            end
             frame.row = row
             frame:Show()
         end
         for index = #rows + 1, #frames do
             frames[index]:Hide()
         end
-        content:SetHeight(#rows * ROW_HEIGHT)
+        content:SetHeight(top)
+        scroll:SetVerticalScroll(0)
     end
     return list
 end

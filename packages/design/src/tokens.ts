@@ -40,6 +40,15 @@ export const COLORS = {
   "ink-brown": "#3A2614",
   ember: "#FFA03C",
   neon: "#FF5AC8",
+  // Accounts book (§7.7): leather cover, ruled pages and the inks of the stamps
+  leather: "#4A2414",
+  "leather-shade": "#2E140A",
+  ruling: "rgba(120, 80, 30, 0.22)",
+  "stamp-loot": "#7A2FE0",
+  "stamp-cash": "#8A5A0E",
+  "stamp-quest": "#2E7A44",
+  "stamp-bet": "#B0306E",
+  "stamp-raid": "#3A5AA0",
 } as const;
 
 export type ColorToken = keyof typeof COLORS;

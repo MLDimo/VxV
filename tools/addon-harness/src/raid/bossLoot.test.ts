@@ -12,7 +12,7 @@ describe("loot of the boss", () => {
     expect(thom.client("return VXV_LootPanel:IsShown()")).toBe(true);
     expect(thom.client(PANEL_ROWS)).toEqual([
       "Butin de Onyxia",
-      `${link(20, "Tête d'Onyxia")} : SR de |cffffffffThom Leboss|r +20, |cff808080Ciel Gris (absent)|r`,
+      `${link(20, "Tête d'Onyxia")} : SR de |cffffffffThom Leboss|r +20, |cffa49bbdCiel Gris (absent)|r`,
       `${link(21, "Sac en peau")} : SR de |cfffff468Ðéjà Vu|r +10`,
       `${link(30, "Écaille d'Onyxia")} : exclu des SR (loot council)`,
       `${link(99, "Cape inconnue")} : aucune SR, roll libre`,

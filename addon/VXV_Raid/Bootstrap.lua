@@ -13,7 +13,7 @@ VXV.RegisterModule({
 })
 
 VXV.RegisterModule({
-    id = "loot",
+    id = "journal",
     name = "Journal",
-    tab = { place = "journal", Build = ns.LootTab.Build },
+    tab = { place = "journal", Build = ns.JournalTab.Build },
 })

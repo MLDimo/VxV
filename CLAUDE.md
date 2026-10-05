@@ -33,14 +33,16 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 - **P6 Assistant d'attribution + historique** : code terminé (bundle `addon/VXV_Raid`, 100 tests du banc ; import du journal et corrections sur le site) :
   - butin du boss montré à tout le raid avec ses SR, quand le maître du butin ouvre le corps ;
   - attribution selon les règles du plan (une SR : sans roll ; plusieurs : roll entre elles avec SR+ ; aucune : roll libre ; objet exclu : loot council), message pour chacun, rolls suivis en direct, annonces dans le canal du groupe, don d'un clic ;
-  - journal du raid en jeu (boss, présents, morts, objets, diffusé par le maître du butin), onglet Butin, export `VXV-LOG-1` ;
+  - journal du raid en jeu (boss, présents, morts, objets, diffusé par le maître du butin), montré dans le Journal, export `VXV-LOG-1` (zone officier de l'écran Raid ou `/vxv journal`) ;
   - import du journal sur le site (présents et objets, qui nourrissent le SR+), corrections par un officier avec motif, récap de fin de raid publié par le bot.
   Validation en attente : un raid réel enregistré sans saisie manuelle (raids ouverts le 9 décembre ; répétition en donjon avec maître du butin possible avant la fin de la bêta).
 - **Habillage (charte « La Taverne »)** : en cours, avant la P7 (`docs/plan/decisions-2026-10-05.md`) :
   - socle : référence `docs/design/`, jetons `packages/design` (thème du site et `VXV_Core/UI/Tokens.lua` générés) ;
   - site entièrement rhabillé, en production ;
   - mesure en jeu des polices et textures faite (`docs/design/mesure-en-jeu-2026-10-05.md`) ;
-  - addon : thème (polices en familles, anneaux, boutons, onglets), fenêtre 1000×680 à un onglet par lieu, Taverne cliquable ; écrans Raid et Journal, panneau de butin et mode réduit à rhabiller.
+  - addon : thème (polices en familles, anneaux, boutons, onglets), fenêtre 1000×680 à un onglet par lieu, Taverne cliquable ;
+  - addon : écran Raid en trois colonnes, Journal en livre de comptes (raids enregistrés, modifications des officiers avec motif, tampons), panneau de butin et fenêtre de copier-coller en boîtes de dialogue de la charte, listes à la molette ;
+  - reste : cartes et lumières de la Taverne, mode réduit.
 - P7 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -51,6 +53,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 - Pixelify Sans pour les titres, onglets, plaques, boutons et gros chiffres ; Manrope pour le texte. Polices et images servies par le site (`apps/web/public`), licences OFL à côté des polices.
 - Un lieu = un onglet, même nom partout : Taverne, Raid, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
+- Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
 
 ## Structure du dépôt
 

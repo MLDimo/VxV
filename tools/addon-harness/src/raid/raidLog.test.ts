@@ -16,10 +16,11 @@ const LOG = `
   table.sort(present)
   return { kills = kills, loots = loots, present = present, deaths = log.deaths }
 `;
-const OPEN_LOOT_TAB = `
+const OPEN_TAB = (name: string) => `
   SlashCmdList.VXV("")
-  FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Journal" end):Run("OnClick")
+  FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "${name}" end):Run("OnClick")
 `;
+const EXPORT = 'FindButton(VXV_Window, "Exporter le journal du raid")';
 const TAB_ROWS = `
   local texts = {}
   FindWidget(VXV_Window, function(widget)
@@ -46,9 +47,7 @@ function playOnyxia(): Guild {
       return widget.row and widget.row.start and widget.row.start.itemId == 20
   end):Run("OnMouseUp")`);
   settle(guild, 1);
-  officer.client(
-    `FindWidget(VXV_LootPanel, function(widget) return widget.text == "Donner à Thom Leboss" end):Run("OnClick")`,
-  );
+  officer.client(`FindButton(VXV_LootPanel, "Donner à Thom Leboss"):Run("OnClick")`);
   officer.client("GiveMasterLoot(2, 3)");
   settle(guild);
   return guild;
@@ -71,25 +70,24 @@ describe("record of the raid", () => {
     }
   });
 
-  it("shows the raid in the Butin tab, and lets an officer export it for the website", () => {
+  it("shows the raid in the Journal, and lets an officer export it for the website from the Raid screen", () => {
     const guild = playOnyxia();
     const officer = guild.player(OFFICER);
-    officer.client(OPEN_LOOT_TAB);
+    officer.client(OPEN_TAB("Journal"));
     const rows = officer.client(TAB_ROWS) as unknown as string[];
     expect(rows.slice(0, 2)).toEqual([
       "Onyxia · 10/12 20:00",
       expect.stringMatching(/^Boss tués : Onyxia \(\d\d:\d\d\)$/),
     ]);
-    expect(rows.slice(2)).toEqual([
+    expect(rows.slice(2, 6)).toEqual([
       "Objets donnés (2)",
       `${link(20, "Tête d'Onyxia")} → Thom Leboss (SR+)`,
       `${link(99, "Cape inconnue")} → Aube Claire (loot council)`,
       "Morts : Thom Leboss ×1",
     ]);
 
-    officer.client(
-      'FindWidget(VXV_Window, function(widget) return widget.text == "Exporter pour le site" end):Run("OnClick")',
-    );
+    officer.client(OPEN_TAB("Raid"));
+    officer.client(`${EXPORT}:Run("OnClick")`);
     const exported = (officer.client("return VXV_TextWindow.editBox:GetText()") as string).split("\n");
     expect(exported).toEqual([
       "VXV-LOG-1",
@@ -107,20 +105,13 @@ describe("record of the raid", () => {
     );
 
     const thom = guild.player("Thom Leboss");
-    thom.client(OPEN_LOOT_TAB);
-    expect(
-      thom.client(
-        'return FindWidget(VXV_Window, function(widget) return widget.text == "Exporter pour le site" end).shown',
-      ),
-    ).toBe(false);
+    thom.client(OPEN_TAB("Raid"));
+    expect(thom.client(`return IsVisible(${EXPORT})`)).toBe(false);
   });
 
   it("exports a log the website reads (contract VXV-LOG-1)", () => {
     const officer = playOnyxia().player(OFFICER);
-    officer.client(OPEN_LOOT_TAB);
-    officer.client(
-      'FindWidget(VXV_Window, function(widget) return widget.text == "Exporter pour le site" end):Run("OnClick")',
-    );
+    officer.client(`SlashCmdList.VXV("journal")`);
     const log = parseRaidLog(officer.client("return VXV_TextWindow.editBox:GetText()") as string);
     expect(log).toMatchObject({
       eventId: "e1",
@@ -158,7 +149,7 @@ describe("record of the raid", () => {
     });
     raid.run("local _, ns = ... ns.RaidLog.Current()");
     expect(raid.run("local _, ns = ... return #ns.RaidLog.All()")).toBe(20);
-    client(OPEN_LOOT_TAB);
+    client(OPEN_TAB("Journal"));
     const rows = client(TAB_ROWS) as unknown as string[];
     expect(rows).toContain("Raids précédents");
     expect(rows).toContain("Raid 20 · 11/10 14:13 : 0 boss, 0 objets");

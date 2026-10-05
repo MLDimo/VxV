@@ -40,6 +40,10 @@ VXV = {
     NameOfUnit = ns.Names.OfUnit,
     --- (name, class token): the name in the game's class color, else the charter's.
     ClassColored = ns.Theme.ClassColored,
+    --- The charter's fonts, colors and pixel frames (panels, buttons, rings): see UI/Theme.lua.
+    Theme = ns.Theme,
+    --- (name, width, height, title): a small window in the charter, closed by Escape; returns it and its body.
+    CreateDialog = ns.Dialog.Create,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

@@ -42,9 +42,38 @@ function Theme.ClassHex(token)
     return Tokens.classColors[token] or Tokens.unknownClassColor
 end
 
---- The name in the color of its class, for a font string.
-function Theme.ClassColored(name, token)
-    return "|cff" .. Theme.ClassHex(token) .. name .. "|r"
+local CHANNEL = 255
+
+--- RRGGBB of a token, for the |cff…|r codes of a font string.
+function Theme.Hex(name)
+    local r, g, b = Theme.Color(name)
+    return string.format("%02x%02x%02x", math.floor(r * CHANNEL + 0.5), math.floor(g * CHANNEL + 0.5),
+        math.floor(b * CHANNEL + 0.5))
+end
+
+--- The text in a token's color, for a font string.
+function Theme.Colored(text, name)
+    return "|cff" .. Theme.Hex(name) .. text .. "|r"
+end
+
+-- Dimmed names (late players, §7.1) keep 55 % of their color over the window's background.
+local DIMMED = 0.55
+
+local function dim(hex)
+    local background = { Theme.Color("night-window") }
+    local parts = {}
+    for index = 1, 3 do
+        local channel = tonumber(hex:sub(index * 2 - 1, index * 2), 16) / CHANNEL
+        local mixed = channel * DIMMED + background[index] * (1 - DIMMED)
+        parts[index] = string.format("%02x", math.floor(mixed * CHANNEL + 0.5))
+    end
+    return table.concat(parts)
+end
+
+--- The name in the color of its class, for a font string; dimmed for a late player.
+function Theme.ClassColored(name, token, dimmed)
+    local hex = Theme.ClassHex(token)
+    return "|cff" .. (dimmed and dim(hex) or hex) .. name .. "|r"
 end
 
 --- Starts loading the font files when the addon loads: the client loads them in the background, and a font set

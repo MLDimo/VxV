@@ -12,4 +12,4 @@ d'interface (échelle 0,667). Capture d'écran du propriétaire et journal de la
 | `CreateFontFamily` (nos polices pour le latin et le cyrillique, celles du jeu pour le reste) | Fonctionne : `Fonts\2002.TTF` (coréen), `Fonts\ARKai_T.ttf` (chinois simplifié), `Fonts\blei00d.TTF` (chinois traditionnel), lues par `GetFontObjectForAlphabet` | Famille Pixelify : Pixelify (latin et cyrillique, choix du propriétaire), polices du jeu (chinois, coréen). Famille Manrope : Manrope (latin, cyrillique), polices du jeu |
 | `RAID_CLASS_COLORS`, `C_ClassColor.GetClassColor` | Présentes ; guerrier `ffc69b6d`, comme nos jetons | Couleurs lues dans le jeu, nos jetons en secours |
 | `UnitRace`, `UnitSex`, `UnitClass` | Présentes (« Elfe de la nuit » `NightElf`, 2, « Voleur » `ROGUE`) | Avatars du joueur (race × classe × sexe) |
-| `SetBlendMode("ADD")`, `AnimationGroup` d'animations `Alpha` | Créées sans erreur | Lueurs de la taverne |
+| `SetBlendMode("ADD")`, `AnimationGroup` d'animations `Alpha` | Créées sans erreur ; la lueur clignote bien par paliers (vu par le propriétaire) | Lueurs de la taverne |

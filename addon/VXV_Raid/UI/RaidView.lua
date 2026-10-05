@@ -1,16 +1,20 @@
 local _, ns = ...
 
---- What the Raid tab shows, as rows of text with an optional tooltip: built from the event's data alone, so
---- that it can be checked without the interface.
+--- What the Raid screen shows (§7.1), panel by panel, as rows of text with an optional tooltip: built from the
+--- event's data alone, so that it can be checked without the interface.
 local RaidView = {}
 ns.RaidView = RaidView
 
-local Labels, Reserves = ns.Labels, ns.Reserves
+local Labels, RaidData, Reserves = ns.Labels, ns.RaidData, ns.Reserves
 
-local NO_EVENT = {
-    "Aucun raid chargé pour l'instant.",
-    "Un officier charge les données depuis la page de l'événement sur le site (/vxv importer).",
-}
+local Theme = VXV.Theme
+
+local SECONDS_PER_MINUTE, SECONDS_PER_HOUR, SECONDS_PER_DAY = 60, 3600, 86400
+-- Bars of the roles (§7.1): tanks green, healers gold, DPS amethyst.
+local ROLE_BARS = { tank = "gain", healer = "gold", dps = "amethyst" }
+-- Tags of the loot methods (§7.1): SR violet, SR+ gold, free roll green, loot council sakura.
+local METHOD_TAGS = { soft_reserve = "epic", soft_reserve_plus = "gold", free_roll = "gain", loot_council = "sakura" }
+local LAST_LOOTS = 10
 
 local function row(kind, text, tooltip)
     return { kind = kind, text = text, tooltip = tooltip }
@@ -21,179 +25,215 @@ local function itemName(event, itemId)
     return item and item.name or ("Objet n°" .. itemId)
 end
 
-local function bonusText(bonus)
-    return bonus > 0 and (" +" .. bonus) or ""
+local function bonusTag(bonus)
+    return bonus > 0 and (" " .. Theme.Colored("SR+ " .. bonus, "gold")) or ""
 end
 
---- Coming players first (present, then late), then maybe, bench and absent; in each, the website's order.
-local function sortedSignups(event)
-    local rank, position, list = {}, {}, {}
-    for index, status in ipairs(Labels.STATUS_ORDER) do
-        rank[status] = index
-    end
-    for index, signup in ipairs(event.signups) do
-        position[signup], list[index] = index, signup
-    end
-    local last = #Labels.STATUS_ORDER + 1
-    table.sort(list, function(left, right)
-        local leftRank, rightRank = rank[left.status] or last, rank[right.status] or last
-        if leftRank ~= rightRank then
-            return leftRank < rightRank
+local function findSignup(event, name)
+    for _, signup in ipairs(event and event.signups or {}) do
+        if signup.name == name then
+            return signup
         end
-        return position[left] < position[right]
-    end)
-    return list
+    end
 end
 
-local function composition(event)
-    local counts, coming = {}, 0
+--- "2 j 04 h", "4 h 05", "12 min".
+local function remaining(seconds)
+    local days = math.floor(seconds / SECONDS_PER_DAY)
+    local hours = math.floor(seconds % SECONDS_PER_DAY / SECONDS_PER_HOUR)
+    local minutes = math.floor(seconds % SECONDS_PER_HOUR / SECONDS_PER_MINUTE)
+    if days > 0 then
+        return string.format("%d j %02d h", days, hours)
+    elseif hours > 0 then
+        return string.format("%d h %02d", hours, minutes)
+    end
+    return minutes .. " min"
+end
+
+local function countComing(event)
+    local coming = 0
     for _, signup in ipairs(event.signups) do
         if Labels.IsComing(signup.status) then
-            counts[signup.role] = (counts[signup.role] or 0) + 1
             coming = coming + 1
         end
     end
-    local parts = {}
-    for _, role in ipairs(Labels.ROLE_ORDER) do
-        parts[#parts + 1] = Labels.Role(role).plural .. " " .. (counts[role] or 0)
-    end
-    return coming, table.concat(parts, " · ")
+    return coming
 end
 
-local function signupRow(signup)
-    local status = signup.status == "present" and "" or (" (" .. Labels.Status(signup.status) .. ")")
-    local role = Labels.Role(signup.role)
+--- The head of the screen: kicker, title, the date and where the data come from, and the badges
+--- { text, color }. Without event, how the data arrive.
+function RaidView.Header(event, sender, now)
+    if event == nil then
+        return { kicker = "Conseil de guerre", title = "Aucun raid chargé", badges = {},
+            subtitle = "Un officier charge les données depuis la page de l'événement sur le site (/vxv importer)." }
+    end
+    local lockAt = RaidData.LockAt(event)
+    local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. remaining(lockAt - now))
+    local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
+        or ("données copiées le " .. Labels.DateTime(event.exportedAt))
+    return {
+        kicker = "Conseil de guerre · prochain raid",
+        title = event.title,
+        subtitle = string.format("%s · %d SR par joueur · %s", Labels.DateTime(event.startsAt),
+            event.softReservesPerPlayer, origin),
+        badges = { { text = countComing(event) .. " attendus", color = "gain" }, { text = lock, color = "gold" } },
+    }
+end
+
+--- "Mon inscription": the player's character, class, role and status.
+function RaidView.Me(event, player)
+    local signup = findSignup(event, player)
+    if signup == nil then
+        return { row("line", "Tu n'es pas inscrit avec ce personnage."),
+            row("line", "Inscris-toi sur le site ou avec le bouton du message Discord.") }
+    end
+    return {
+        row("header", Labels.Colored(signup.name, signup.class)),
+        row("line", string.format("%s · %s · %s", Labels.ClassName(signup.class), Labels.Role(signup.role).label,
+            signup.reroll and "reroll" or "main")),
+        row("line", "Spécialisation : " .. signup.spec),
+        row("line", "Statut : " .. Labels.Status(signup.status)),
+    }
+end
+
+--- "Mes SR": each item with its boss and the SR+ bonus.
+function RaidView.MyReserves(event, player)
+    local signup = findSignup(event, player)
+    if signup == nil then
+        return { row("line", "Pas d'inscription, pas de SR.") }
+    end
+    local rows = {}
+    for _, reserve in ipairs(signup.reserves) do
+        local item = event.items[reserve.itemId]
+        rows[#rows + 1] = row("line", Theme.Colored(itemName(event, reserve.itemId), "epic") .. bonusTag(reserve.bonus),
+            { title = itemName(event, reserve.itemId), lines = { "Boss : " .. (item and item.boss or "?") } })
+    end
+    if #signup.reserves == 0 then
+        rows[1] = row("line", "Aucune SR.")
+    end
+    rows[#rows + 1] = row("line", Theme.Colored("SR+ : +10 par raid sans l'objet si tu le re-SR (max +50).", "muted"))
+    return rows
+end
+
+--- Coming players first (present, then late), then maybe, bench and absent; in each, the website's order.
+local function byStatus(event, coming)
+    local list = {}
+    for _, signup in ipairs(event.signups) do
+        if Labels.IsComing(signup.status) == coming then
+            list[#list + 1] = signup
+        end
+    end
+    return list
+end
+
+--- A player of the composition: name in the class color (dimmed when late), then the specialization of an
+--- expected player or the status of another; the tooltip gives the class, role, status and whether an officer
+--- invites them by hand.
+local function playerRow(signup)
+    local late = signup.status == "late"
     local lines = {
         Labels.ClassName(signup.class) .. " · " .. signup.spec,
-        role.label .. " · " .. Labels.Status(signup.status),
+        Labels.Role(signup.role).label .. " · " .. Labels.Status(signup.status),
     }
     if signup.reroll then
         lines[#lines + 1] = "Reroll : invité à la main par un officier."
     end
-    local text = role.icon .. " " .. Labels.Colored(signup.name, signup.class) .. " · " .. signup.spec .. status
-    return row("line", text, { title = signup.name, lines = lines })
+    local name = Theme.ClassColored(signup.name, signup.class, late)
+    local detail = not Labels.IsComing(signup.status) and Labels.Status(signup.status)
+        or signup.spec .. (late and (" (" .. Labels.Status(signup.status) .. ")") or "")
+    return row("line", name .. " · " .. detail, { title = signup.name, lines = lines })
 end
 
-local function addSignups(rows, event)
-    local coming, counts = composition(event)
-    rows[#rows + 1] = row("header", string.format("Inscrits (%d attendus sur %d)", coming, #event.signups))
-    rows[#rows + 1] = row("line", counts)
-    for _, signup in ipairs(sortedSignups(event)) do
-        rows[#rows + 1] = signupRow(signup)
+--- "Composition": per role, its expected players with a bar of its share, the late ones dimmed; then the others.
+function RaidView.Composition(event)
+    if event == nil then
+        return {}
     end
-end
-
-local function addMyReserves(rows, event, playerName)
-    rows[#rows + 1] = row("header", "Mes SR")
-    for _, signup in ipairs(event.signups) do
-        if signup.name == playerName then
-            for _, reserve in ipairs(signup.reserves) do
-                local item = event.items[reserve.itemId]
-                local boss = item and (" (" .. item.boss .. ")") or ""
-                rows[#rows + 1] = row("line", itemName(event, reserve.itemId) .. boss .. bonusText(reserve.bonus))
+    local count = function(status)
+        local total = 0
+        for _, signup in ipairs(event.signups) do
+            total = total + (signup.status == status and 1 or 0)
+        end
+        return total
+    end
+    local rows = { row("line", string.format("%s · %d en retard · %d au banc", VXV.Count(count("present"), "présent"),
+        count("late"), count("bench"))) }
+    local coming = byStatus(event, true)
+    for _, role in ipairs(Labels.ROLE_ORDER) do
+        local players = {}
+        for _, signup in ipairs(coming) do
+            if signup.role == role then
+                players[#players + 1] = signup
             end
-            if #signup.reserves == 0 then
-                rows[#rows + 1] = row("line", "Aucune SR.")
-            end
-            return
+        end
+        local label = Labels.Role(role)
+        rows[#rows + 1] = row("header", string.format("%s %s · %d", label.icon, label.plural, #players))
+        rows[#rows + 1] = { kind = "bar", share = #coming > 0 and #players / #coming or 0, color = ROLE_BARS[role] }
+        for _, signup in ipairs(players) do
+            rows[#rows + 1] = playerRow(signup)
         end
     end
-    rows[#rows + 1] = row("line", "Tu n'es pas inscrit avec ce personnage.")
+    local others = byStatus(event, false)
+    if #others > 0 then
+        rows[#rows + 1] = row("header", "Peut-être, banc, absents")
+        for _, signup in ipairs(others) do
+            rows[#rows + 1] = playerRow(signup)
+        end
+    end
+    return rows
 end
 
-local function addRaidReserves(rows, event)
-    rows[#rows + 1] = row("header", "SR du raid")
-    local byItem, any = Reserves.ByItem(event), false
+--- "SR du raid": each reserved item with its reservers and their SR+ bonus, then the items excluded.
+function RaidView.RaidReserves(event)
+    if event == nil then
+        return {}
+    end
+    local rows, byItem = {}, Reserves.ByItem(event)
     for _, itemId in ipairs(event.itemOrder) do
-        local reservers = byItem[itemId]
-        if reservers ~= nil then
-            any = true
-            local names, lines = {}, { "Boss : " .. event.items[itemId].boss }
+        local item, reservers = event.items[itemId], byItem[itemId]
+        if item.excluded then
+            rows[#rows + 1] = row("line", Theme.Colored(item.name, "epic") .. " · exclu des SR (loot council)",
+                { title = item.name, lines = { "Boss : " .. item.boss, "Attribué par les officiers (loot council)." } })
+        elseif reservers ~= nil then
+            local names, lines = {}, { "Boss : " .. item.boss }
             for _, reserver in ipairs(reservers) do
                 local signup = reserver.signup
-                names[#names + 1] = Labels.Colored(signup.name, signup.class) .. bonusText(reserver.bonus)
+                names[#names + 1] = Labels.Colored(signup.name, signup.class) .. bonusTag(reserver.bonus)
                 lines[#lines + 1] = signup.name .. (reserver.bonus > 0 and (" (SR+ +" .. reserver.bonus .. ")") or "")
             end
-            local text = itemName(event, itemId) .. " : " .. table.concat(names, ", ")
-            rows[#rows + 1] = row("line", text, { title = itemName(event, itemId), lines = lines })
+            rows[#rows + 1] = row("line", Theme.Colored(item.name, "epic") .. " : " .. table.concat(names, ", "),
+                { title = item.name, lines = lines })
         end
     end
-    if not any then
-        rows[#rows + 1] = row("line", "Aucune SR pour l'instant.")
+    if #rows == 0 then
+        rows[1] = row("line", "Aucune SR pour l'instant.")
     end
+    return rows
 end
 
-local function addExclusions(rows, event)
-    local excluded = {}
-    for _, itemId in ipairs(event.itemOrder) do
-        local item = event.items[itemId]
-        if item.excluded then
-            excluded[#excluded + 1] = row("line", item.name .. " (" .. item.boss .. ")", {
-                title = item.name,
-                lines = { "Exclu des SR : attribué par les officiers (loot council)." },
-            })
-        end
-    end
-    if #excluded > 0 then
-        rows[#rows + 1] = row("header", "Objets exclus des SR")
-        for _, excludedRow in ipairs(excluded) do
-            rows[#rows + 1] = excludedRow
-        end
-    end
-end
-
-local function addJournal(rows, event)
-    rows[#rows + 1] = row("header", string.format("Modifications (%d)", #event.journal))
-    for index = #event.journal, 1, -1 do
-        local entry = event.journal[index]
-        local when = Labels.DateTime(entry.at)
-        rows[#rows + 1] = row("line", when .. " · " .. entry.actor .. " · " .. entry.summary, {
-            title = entry.actor .. " · " .. when,
-            lines = { entry.summary, "Motif : " .. entry.reason },
-        })
-    end
-    if #event.journal == 0 then
-        rows[#rows + 1] = row("line", "Aucune modification par les officiers.")
-    end
-end
-
---- When and from whom the data came.
-local function origin(event, sender)
-    local when = Labels.DateTime(event.exportedAt)
-    return sender and string.format("données de %s, copiées le %s", sender, when) or ("données copiées le " .. when)
-end
-
-local function addRequests(rows, requests)
-    if #requests == 0 then
-        return
-    end
-    rows[#rows + 1] = row("header", string.format("Demandes pour rejoindre (%d)", #requests))
+--- The requests to join, for the leader of the invitations: a click invites.
+function RaidView.Requests(requests)
+    local rows = {}
     for _, request in ipairs(requests) do
-        local requestRow = row("line", request.name .. " · " .. request.reason, {
-            title = request.name,
-            lines = { request.reason, "Clic : inviter" },
-        })
+        local requestRow = row("line", request.name .. " · " .. request.reason,
+            { title = request.name, lines = { request.reason, "Clic : inviter" } })
         requestRow.invite = request.name
         rows[#rows + 1] = requestRow
     end
+    return rows
 end
 
---- Rows of the tab: { kind = "title" | "header" | "line", text, tooltip = { title, lines } or nil, invite = name
---- or nil }. The view holds the event, the player's name, who sent the data and the requests to join.
-function RaidView.Rows(view)
-    local event, playerName = view.event, view.player
-    if event == nil then
-        return { row("line", NO_EVENT[1]), row("line", NO_EVENT[2]) }
+--- "Derniers loots": the items given at this raid, the latest first, with their method's tag.
+function RaidView.LastLoots(log)
+    local rows = {}
+    local loots = log and log.loots or {}
+    for index = #loots, math.max(1, #loots - LAST_LOOTS + 1), -1 do
+        local loot = loots[index]
+        rows[#rows + 1] = { kind = "line", link = loot.link, text = string.format("%s → %s %s", loot.link,
+            loot.winner, Theme.Colored(Labels.Method(loot.method), METHOD_TAGS[loot.method] or "muted")) }
     end
-    local rows = {
-        row("title", event.title .. " · " .. Labels.DateTime(event.startsAt)),
-        row("line", string.format("%d SR par joueur · %s", event.softReservesPerPlayer, origin(event, view.sender))),
-    }
-    addRequests(rows, view.requests or {})
-    addSignups(rows, event)
-    addMyReserves(rows, event, playerName)
-    addRaidReserves(rows, event)
-    addExclusions(rows, event)
-    addJournal(rows, event)
+    if #rows == 0 then
+        rows[1] = row("line", "Aucun objet donné pour l'instant.")
+    end
     return rows
 end

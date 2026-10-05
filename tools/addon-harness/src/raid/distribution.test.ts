@@ -5,7 +5,8 @@ import { killAndOpen, link, LINKS, OFFICER, PANEL_ROWS, raidWithData, settle, ty
 const TETE = link(20, "Tête d'Onyxia");
 const CAPE = link(99, "Cape inconnue");
 const ECAILLE = link(30, "Écaille d'Onyxia");
-const GREY = (text: string) => `|cff808080${text}|r`;
+/** A muted text (§2.1: secondary text color). */
+const GREY = (text: string) => `|cffa49bbd${text}|r`;
 
 const rows = (guild: Guild, name: string) => guild.player(name).client(PANEL_ROWS) as unknown as string[];
 const chat = (guild: Guild) =>
@@ -28,17 +29,12 @@ function rolls(guild: Guild, ...results: [string, number, number?][]): void {
 }
 
 function clickButton(guild: Guild, name: string, text: string): void {
-  guild
-    .player(name)
-    .client(
-      `FindWidget(VXV_LootPanel, function(widget) return widget.text == ${JSON.stringify(text)} end):Run("OnClick")`,
-    );
+  guild.player(name).client(`FindButton(VXV_LootPanel, ${JSON.stringify(text)}):Run("OnClick")`);
   settle(guild, 1);
 }
 
 const buttonShown = (guild: Guild, name: string, text: string) =>
-  guild.player(name)
-    .client(`local button = FindWidget(VXV_LootPanel, function(widget) return widget.text == ${JSON.stringify(text)} end)
+  guild.player(name).client(`local button = FindButton(VXV_LootPanel, ${JSON.stringify(text)})
       return button ~= nil and button.shown`);
 
 const given = (guild: Guild) => guild.player(OFFICER).client("return Given") as unknown as { name: string }[];
