@@ -24,10 +24,12 @@ local function render()
     list.SetRows(JournalView.Rows(RaidLog.All(), RaidData.Current()))
 end
 
---- A parchment page, its title and its lines every RULE pixels below topOffset; the spine on one side.
-local function addPage(x, width, height, title, spineSide)
-    local page = CreateFrame("Frame", nil, content)
-    page:SetPoint("TOPLEFT", x, -(BOOK_TOP + COVER))
+--- A parchment page on the cover, its title and its lines every RULE pixels; the spine on one side. A child of
+--- the cover, it lies a level above it: the game draws the textures of frames on the same level layer by layer,
+--- and the leather would hide the parchment.
+local function addPage(cover, x, width, height, title, spineSide)
+    local page = CreateFrame("Frame", nil, cover)
+    page:SetPoint("TOPLEFT", x, -COVER)
     page:SetSize(width, height)
     Theme.Fill(page, "parchment"):SetAllPoints()
     for y = PAGE_HEAD + RowList.RULE, height - PAGE_PADDING, RowList.RULE do
@@ -64,13 +66,13 @@ function JournalTab.Build(frame)
     local pages = width - 2 * COVER - SPINE
     local leftWidth = math.floor(pages * LEFT_SHARE)
     local pageHeight = height - 2 * COVER
-    local left = addPage(PADDING + COVER, leftWidth, pageHeight, "La caisse", "RIGHT")
+    local left = addPage(cover, COVER, leftWidth, pageHeight, "La caisse", "RIGHT")
     local soon = Theme.Text(left, "text", 13, "ink-brown")
     soon:SetPoint("TOPLEFT", PAGE_PADDING, -PAGE_HEAD)
     soon:SetText("Bientôt : dons, dettes et caisse de la guilde, avec les paris.")
 
     local rightWidth = pages - leftWidth
-    local right = addPage(PADDING + COVER + leftWidth + SPINE, rightWidth, pageHeight, "Journal", "LEFT")
+    local right = addPage(cover, COVER + leftWidth + SPINE, rightWidth, pageHeight, "Journal", "LEFT")
     local intro = Theme.Text(right, "text", 12, "ink-brown")
     intro:SetPoint("TOPLEFT", PAGE_PADDING, -(PAGE_PADDING + 26))
     intro:SetText("Les raids enregistrés en jeu et les modifications des officiers, avec leur motif.")

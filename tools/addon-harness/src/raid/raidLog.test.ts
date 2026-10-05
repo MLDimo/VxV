@@ -163,4 +163,34 @@ describe("record of the raid", () => {
     expect(raid.run(LOG)).toBeUndefined();
     expect(errors()).toEqual([]);
   });
+
+  it("draws the Journal's parchment pages above the book's leather cover", () => {
+    const { client } = startRaid();
+    client(OPEN_TAB("Journal"));
+    // The cover is the frame filled with leather; its pages, filled with parchment, must lie above it.
+    const levels = client(`
+      local function filledWith(token, under)
+        local r, g, b = VXV.Theme.Color(token)
+        local found = {}
+        local function walk(frame)
+          for _, child in ipairs(frame.children or {}) do
+            local color = child.kind == "Texture" and child.color
+            if color and math.abs(color[1] - r) < 0.001 and math.abs(color[2] - g) < 0.001
+              and math.abs(color[3] - b) < 0.001 then
+              found[#found + 1] = child.parent
+            end
+            walk(child)
+          end
+        end
+        walk(under)
+        return found
+      end
+      local cover = filledWith("leather", VXV_Window)[1]
+      local pages = {}
+      for _, page in ipairs(filledWith("parchment", cover)) do pages[#pages + 1] = page.frameLevel end
+      return { cover = cover.frameLevel, pages = pages }
+    `) as unknown as { cover: number; pages: number[] };
+    expect(levels.pages).toHaveLength(2);
+    expect(Math.min(...levels.pages)).toBeGreaterThan(levels.cover);
+  });
 });

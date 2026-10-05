@@ -58,6 +58,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
 - Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
+- Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus (vu sur le Journal le 5 octobre).
 
 ## Structure du dépôt
 
