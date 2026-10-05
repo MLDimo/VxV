@@ -166,6 +166,42 @@ describe("changes made in game", () => {
   });
 });
 
+describe("events created in game (P9.2)", () => {
+  it("lets an officer create an event: date and time as on Discord, raids, soft reserves and reason", () => {
+    const { client, errors } = startRaid({ written: companionFiles({ raid: websiteText() }) });
+    client(ONYXIA_PACK);
+    client(OPEN_RAID);
+    client(click("VXV_Window", "Créer un événement"));
+    client(click("VXV_EventDialog", "Créer"));
+    expect(client(PENDING)).toEqual({});
+    client(`
+      local boxes = {}
+      local function walk(frame)
+        for _, child in ipairs(frame.children or {}) do
+          if child.kind == "EditBox" then boxes[#boxes + 1] = child end
+          walk(child)
+        end
+      end
+      walk(VXV_EventDialog)
+      boxes[1]:SetText("15/12") boxes[2]:SetText("21:00") boxes[3]:SetText("Raid du lundi")
+    `);
+    client(click("VXV_EventDialog", "Repaire d'Onyxia"));
+    client(click("VXV_EventDialog", "+"));
+    client(click("VXV_EventDialog", "Créer"));
+    expect(client(PENDING)).toEqual([
+      expect.objectContaining({
+        kind: "event",
+        date: "15/12",
+        time: "21:00",
+        raidIds: ["onyxia"],
+        softReserves: 2,
+        reason: "Raid du lundi",
+      }),
+    ]);
+    expect(errors()).toEqual([]);
+  });
+});
+
 describe("relaying the changes of the members without the companion", () => {
   it("an officer with the companion keeps them for the website; nobody else does", () => {
     const guild = startGuild(["Thom Leboss", "Ciel Gris"], { bundles: BUNDLES });

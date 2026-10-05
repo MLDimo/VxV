@@ -58,7 +58,12 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - 8.3 alerte : message au milieu de l'écran et son de l'avertissement de raid, une fois par boss où le joueur a une SR ; désactivable (`/vxv alerte` ou le bouton « Alerte » de l'écran Raid).
   L'entrée dans une instance n'a pas d'événement mesuré sur Forever : la position est relue toutes les 5 s. `PlaySound` passe par Compat tant qu'il n'est pas mesuré (ajouté à l'inventaire de la sonde, avec `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA`).
   Validation en attente : l'alerte sur un raid enchaînant deux instances (raids ouverts le 9 décembre ; en bêta, « La salle des Thanes » seule).
-- P9 à P15 : pas commencées.
+- **P9 Inscriptions bidirectionnelles** : code terminé :
+  - 9.1 inscription en jeu et 9.3 message Discord à jour : faits en P7.5 (changement en attente puis confirmé, le site met à jour le message de l'événement) ;
+  - 9.2 création d'événement en jeu (officiers) : bouton « Créer un événement » de l'écran Raid (date et heure comme `/vxv_raid`, raids des packs, SR par joueur, motif), créé par le site avec la même lecture des dates (`domain/raidStart.ts`, partagée avec le bot), journalisé et annoncé sur Discord ; la réponse revient avec les données de tout événement pendant 14 jours ;
+  - 9.4 conflits : le site fait foi et la modification la plus récente gagne avant le verrouillage (heure de l'inscription et de ses SR en base ; un changement fait en jeu porte l'heure du jeu, ramenée à l'heure du site si elle la dépasse).
+  Validation en attente : une inscription faite en jeu apparaît sur Discord après la synchro (compagnon relié).
+- P10 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
 

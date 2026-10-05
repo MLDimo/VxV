@@ -46,11 +46,14 @@ export function createApplication({
   const softReserves = createSoftReserves({ unitOfWork, clock });
   const exclusions = createExclusions({ unitOfWork });
   const raidAnnouncements = createRaidAnnouncements({ unitOfWork, announcer });
+  const events = createEvents({ unitOfWork, clock });
   const gameChanges = createGameChanges({
     unitOfWork,
+    clock,
     signups,
     softReserves,
     exclusions,
+    events,
     announcements: raidAnnouncements,
   });
   return {
@@ -62,7 +65,7 @@ export function createApplication({
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
     raidAnnouncements,
     raidReminders: createRaidReminders({ unitOfWork, announcer }),
-    events: createEvents({ unitOfWork, clock }),
+    events,
     signups,
     softReserves,
     exclusions,

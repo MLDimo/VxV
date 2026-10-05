@@ -135,6 +135,35 @@ test("an officer's companion sends the roster, the raid's record and the charact
   expect((await request.post("/api/compagnon/envoi", { headers, data: { raidLogs: "x" } })).status()).toBe(400);
 });
 
+test("an officer creates an event in game: the website creates it and announces it", async ({
+  page,
+  context,
+  request,
+}) => {
+  const token = await linkCompanion(page, context, request, "officer");
+  const creation = {
+    id: "Ciel Gris#1796900500#3",
+    eventId: "",
+    author: "Ciel Gris",
+    at: Math.floor(Date.now() / 1000),
+    kind: "event",
+    date: "20/06/2031",
+    time: "21:00",
+    raidIds: ["salle-des-thanes"],
+    softReserves: 1,
+    reason: "Raid créé en jeu",
+  };
+  const response = await request.post("/api/compagnon/envoi", {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { changes: [creation] },
+  });
+  expect(((await response.json()) as { changes: string }).changes).toBe(
+    "1 changement fait en jeu : 1 accepté, 0 refusés.",
+  );
+  await page.goto("/journal");
+  await expect(page.getByText("Raid créé en jeu")).toBeVisible();
+});
+
 test("the recap of the raids over is published every day", async ({ request }) => {
   expect((await request.get("/api/cron/recaps")).status()).toBe(401);
   const authorization = { authorization: `Bearer ${WEB_ENVIRONMENT.CRON_SECRET}` };

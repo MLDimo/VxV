@@ -29,8 +29,13 @@ export function softReserveRepository(sql: SqlClient): SoftReserveRepository {
       }));
     },
 
-    async replaceForCharacter(eventId, characterId, itemIds) {
+    async replaceForCharacter(eventId, characterId, itemIds, changedAt) {
       await sql.query("delete from soft_reserves where event_id = $1 and character_id = $2", [eventId, characterId]);
+      await sql.query("update signups set reserves_updated_at = $3 where event_id = $1 and character_id = $2", [
+        eventId,
+        characterId,
+        changedAt,
+      ]);
       await sql.query(
         `insert into soft_reserves (event_id, character_id, item_id)
          select $1, $2, unnest($3::int[])`,

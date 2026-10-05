@@ -1,54 +1,79 @@
 import { fullName, type Character } from "../domain/characters.ts";
-import { acceptedMessage, type GameChange, type GameChangeOutcome } from "../domain/gameChanges.ts";
+import type { NewRaidEvent } from "../domain/events.ts";
+import type { GameChange, GameChangeOutcome } from "../domain/gameChanges.ts";
+import { formatDateTime } from "../domain/labels.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
-import { ApplicationError } from "./errors.ts";
-import type { UnitOfWork } from "./ports.ts";
+import { parseRaidStart } from "../domain/raidStart.ts";
+import { ApplicationError, ValidationError } from "./errors.ts";
+import type { Clock, UnitOfWork } from "./ports.ts";
 import type { SignupInput } from "./signups.ts";
 
 const UNKNOWN_AUTHOR = "Ce personnage n'est lié à aucun membre sur le site : lie-le avec /vxv_main ou /vxv_reroll.";
+const UNREADABLE_START = "Date ou heure illisible : écris par exemple 15/10 et 21:00, comme sur Discord.";
 
 /** The use cases a change goes through: each checks the author's rights as on the website. */
 export interface GameChangeDependencies {
   unitOfWork: UnitOfWork;
-  signups: { signUp(member: Member, eventId: string, input: SignupInput): Promise<void> };
-  softReserves: { setMine(member: Member, eventId: string, itemIds: readonly string[]): Promise<void> };
+  clock: Clock;
+  signups: { signUp(member: Member, eventId: string, input: SignupInput, madeAt?: Date): Promise<void> };
+  softReserves: {
+    setMine(member: Member, eventId: string, itemIds: readonly string[], madeAt?: Date): Promise<void>;
+  };
   exclusions: {
     exclude(officer: Member, eventId: string, itemId: string, reason: string): Promise<void>;
     include(officer: Member, eventId: string, itemId: string, reason: string): Promise<void>;
   };
-  /** The event's message on Discord follows its sign-ups. */
+  events: { createEvent(officer: Member, event: NewRaidEvent, reason: string): Promise<string> };
+  /** The event's message on Discord follows its sign-ups, and a new event gets one. */
   announcements: { announceQuietly(eventId: string): Promise<boolean> };
 }
 
 export function createGameChanges({
   unitOfWork,
+  clock,
   signups,
   softReserves,
   exclusions,
+  events,
   announcements,
 }: GameChangeDependencies) {
-  /** Does the change as its author's member would on the website. */
-  async function perform(author: { character: Character; member: Member }, change: GameChange): Promise<void> {
+  /** Does the change as its author's member would on the website; returns what the game tells the author. */
+  async function perform(author: { character: Character; member: Member }, change: GameChange): Promise<string> {
     switch (change.kind) {
       case "signup":
-        await signups.signUp(author.member, change.eventId, {
-          characterId: author.character.id,
-          role: change.role,
-          spec: change.spec,
-          status: change.status,
-        });
+        await signups.signUp(
+          author.member,
+          change.eventId,
+          { characterId: author.character.id, role: change.role, spec: change.spec, status: change.status },
+          change.madeAt,
+        );
         await announcements.announceQuietly(change.eventId);
-        return;
+        return "Inscription enregistrée sur le site.";
       case "reserves":
-        return softReserves.setMine(author.member, change.eventId, change.itemIds.map(String));
+        await softReserves.setMine(author.member, change.eventId, change.itemIds.map(String), change.madeAt);
+        return "SR enregistrées sur le site.";
       case "exclusion":
-        return (change.excluded ? exclusions.exclude : exclusions.include)(
+        await (change.excluded ? exclusions.exclude : exclusions.include)(
           author.member,
           change.eventId,
           String(change.itemId),
           change.reason,
         );
+        return change.excluded ? "Objet exclu des SR." : "Objet de nouveau ouvert aux SR.";
+      case "event": {
+        const startsAt = parseRaidStart(change.date, change.time, clock());
+        if (startsAt === undefined) {
+          throw new ValidationError(UNREADABLE_START);
+        }
+        const eventId = await events.createEvent(
+          author.member,
+          { startsAt, raidIds: change.raidIds, softReservesPerPlayer: change.softReserves },
+          change.reason,
+        );
+        await announcements.announceQuietly(eventId);
+        return `Événement du ${formatDateTime(startsAt)} créé et annoncé sur Discord.`;
+      }
     }
   }
 
@@ -63,11 +88,12 @@ export function createGameChanges({
 
   /** What becomes of one change; undefined when it cannot be kept (unknown event, or relayed by a member). */
   async function receiveOne(sender: Member, change: GameChange): Promise<GameChangeOutcome | undefined> {
-    const known = await unitOfWork.run(async ({ gameChanges, events }) => ({
+    const creation = change.kind === "event";
+    const known = await unitOfWork.run(async ({ gameChanges, events: stored }) => ({
       outcome: await gameChanges.find(change.id),
-      event: await events.findById(change.eventId),
+      event: creation ? undefined : await stored.findById(change.eventId),
     }));
-    if (known.outcome !== undefined || known.event === undefined) {
+    if (known.outcome !== undefined || (!creation && known.event === undefined)) {
       return known.outcome;
     }
     const author = await findAuthor(change.author);
@@ -75,14 +101,13 @@ export function createGameChanges({
     if (author !== undefined && author.member.id !== sender.id && !canManageRaids(sender.roles)) {
       return undefined;
     }
-    const base = { id: change.id, eventId: change.eventId, author: change.author };
+    const base = { id: change.id, eventId: creation ? undefined : change.eventId, author: change.author };
     let outcome: GameChangeOutcome;
     if (author === undefined) {
       outcome = { ...base, accepted: false, message: UNKNOWN_AUTHOR };
     } else {
       try {
-        await perform(author, change);
-        outcome = { ...base, accepted: true, message: acceptedMessage(change) };
+        outcome = { ...base, accepted: true, message: await perform(author, change) };
       } catch (error) {
         if (!(error instanceof ApplicationError)) {
           throw error;
@@ -90,15 +115,15 @@ export function createGameChanges({
         outcome = { ...base, accepted: false, message: error.message };
       }
     }
-    await unitOfWork.run(({ gameChanges }) => gameChanges.save(outcome, sender.id));
+    await unitOfWork.run(({ gameChanges }) => gameChanges.save(outcome, sender.id, clock()));
     return outcome;
   }
 
   return {
     /**
-     * The changes made in game that a companion sends (P7.5): its member's own, and for an officer those relayed
-     * from other players. Each is done once, as its author would on the website, rights checked; what became of it
-     * goes back to the game with the event's data.
+     * The changes made in game that a companion sends (P7.5, P9): its member's own, and for an officer those relayed
+     * from other players. Each is done once, as its author would on the website, rights checked, the latest change
+     * winning; what became of it goes back to the game with the event's data.
      */
     async receive(sender: Member, changes: readonly GameChange[]): Promise<GameChangeOutcome[]> {
       const outcomes: GameChangeOutcome[] = [];

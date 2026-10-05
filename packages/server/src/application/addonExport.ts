@@ -7,6 +7,9 @@ import { ForbiddenError, ValidationError } from "./errors.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
 import { loadBoardItems } from "./softReserves.ts";
 
+/** The answers to the events created in game go with every event's data this long: their author learns them. */
+export const EVENT_CREATION_ANSWERS_MS = 14 * 24 * 60 * 60 * 1000;
+
 /** The next event as the companion hands it to the addon, with what its window shows. */
 export interface NextEventExport {
   /** VXV-RAID text, as an officer would paste it. */
@@ -24,7 +27,7 @@ export function createAddonExport({ unitOfWork, clock }: { unitOfWork: UnitOfWor
       repositories.members.listAll(),
       repositories.characters.listAll(),
       repositories.journal.listForEvent(event.id),
-      repositories.gameChanges.listByEvent(event.id),
+      repositories.gameChanges.listForEvent(event.id, new Date(clock().getTime() - EVENT_CREATION_ANSWERS_MS)),
     ]);
     const managers = new Set(members.filter((member) => canManageRaids(member.roles)).map((member) => member.id));
     return formatAddonEvent({

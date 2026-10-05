@@ -71,12 +71,26 @@ export function signupRepository(sql: SqlClient): SignupRepository {
       return row && toSignup(row);
     },
 
-    async save(signup) {
+    async changedAt(eventId, memberId) {
+      const [row] = await sql.query<{ updated_at: Date; reserves_updated_at: Date | null }>(
+        "select updated_at, reserves_updated_at from signups where event_id = $1 and member_id = $2",
+        [eventId, memberId],
+      );
+      return (
+        row && {
+          signup: new Date(row.updated_at),
+          reserves: row.reserves_updated_at === null ? undefined : new Date(row.reserves_updated_at),
+        }
+      );
+    },
+
+    async save(signup, changedAt) {
       await sql.query(
-        `insert into signups (event_id, character_id, member_id, role, spec, status) values ($1, $2, $3, $4, $5, $6)
+        `insert into signups (event_id, character_id, member_id, role, spec, status, updated_at)
+         values ($1, $2, $3, $4, $5, $6, $7)
          on conflict (event_id, character_id) do update
-           set role = excluded.role, spec = excluded.spec, status = excluded.status, updated_at = now()`,
-        [signup.eventId, signup.characterId, signup.memberId, signup.role, signup.spec, signup.status],
+           set role = excluded.role, spec = excluded.spec, status = excluded.status, updated_at = excluded.updated_at`,
+        [signup.eventId, signup.characterId, signup.memberId, signup.role, signup.spec, signup.status, changedAt],
       );
     },
 

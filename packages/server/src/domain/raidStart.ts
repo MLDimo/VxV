@@ -1,4 +1,4 @@
-import { wallClockToInstant } from "@vxv/server/domain/dateTime";
+import { wallClockToInstant } from "./dateTime.ts";
 
 const DATE = /^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/;
 const TIME = /^(\d{1,2})(?:[:h](\d{2})?)?$/i;

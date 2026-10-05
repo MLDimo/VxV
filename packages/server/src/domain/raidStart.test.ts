@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseRaidStart } from "./dateInput.ts";
+import { parseRaidStart } from "./raidStart.ts";
 
 const now = new Date("2026-10-03T12:00:00Z");
 

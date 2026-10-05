@@ -4,8 +4,9 @@ local _, ns = ...
 --- website ("en attente") until the event's data bring back what became of it (confirmed or refused, with why).
 --- It reaches the website through the player's companion (VXV_Sync), or through an officer's: every change goes to
 --- the guild, and an officer with the companion relays those of the others. The website checks every right.
---- A change: { id, eventId, author = "Prénom Nom", at, kind = "signup" | "reserves" | "exclusion", ... }, with
---- role, spec, status (signup), itemIds (reserves), itemId, excluded, reason (exclusion).
+--- A change: { id, eventId, author = "Prénom Nom", at, kind = "signup" | "reserves" | "exclusion" | "event", ... },
+--- with role, spec, status (signup), itemIds (reserves), itemId, excluded, reason (exclusion), date, time, raidIds,
+--- softReserves, reason (an event an officer creates, P9.2: it belongs to no event yet).
 local Changes = {}
 ns.Changes = Changes
 
@@ -27,6 +28,7 @@ local FIELDS = {
     signup = { role = "string", spec = "string", status = "string" },
     reserves = { itemIds = "table" },
     exclusion = { itemId = "number", excluded = "boolean", reason = "string" },
+    event = { date = "string", time = "string", raidIds = "table", softReserves = "number", reason = "string" },
 }
 
 local saved = { pending = {}, answers = {} }
@@ -70,13 +72,13 @@ local function broadcastPending()
 end
 
 --- Records a change of the player for the current event ({ kind, ... }): kept until the website answers, handed
---- over to the companion and sent to the guild. False without event.
+--- over to the companion and sent to the guild. False without event, unless it creates one.
 function Changes.Submit(fields)
     local event, author = RaidData.Current(), VXV.PlayerName()
-    if event == nil or author == nil then
+    if (event == nil and fields.kind ~= "event") or author == nil then
         return false
     end
-    local change = { eventId = event.id, author = author, at = time() }
+    local change = { eventId = event and event.id or "", author = author, at = time() }
     change.id = string.format("%s#%d#%d", author, change.at, math.random(ID_RANDOM))
     for key, value in pairs(fields) do
         change[key] = value
@@ -111,6 +113,13 @@ local function relayed(payload, sender)
             itemIds[#itemIds + 1] = tonumber(itemId)
         end
         change.itemIds = itemIds
+    end
+    if change.raidIds ~= nil then
+        local raidIds = {}
+        for _, raidId in ipairs(change.raidIds) do
+            raidIds[#raidIds + 1] = tostring(raidId)
+        end
+        change.raidIds = raidIds
     end
     return change
 end

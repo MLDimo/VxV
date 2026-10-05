@@ -1,4 +1,5 @@
 import type { RaidEvent } from "../domain/events.ts";
+import { OLDER_THAN_WEBSITE } from "../domain/gameChanges.ts";
 import type { SoftReserveOverrideRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import type { Signup } from "../domain/signups.ts";
@@ -12,6 +13,7 @@ import {
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
+import { changeInstant } from "./signups.ts";
 
 export interface SoftReserveBoard {
   allowance: number;
@@ -83,8 +85,12 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
       });
     },
 
-    /** The member's soft reserves for the event become the chosen items, until the lock. */
-    setMine(member: Member, eventId: string, itemIds: readonly string[]): Promise<void> {
+    /**
+     * The member's soft reserves for the event become the chosen items, until the lock. A change made in game
+     * earlier (madeAt) than the reserves' latest change is refused: the latest wins (P9.4).
+     */
+    setMine(member: Member, eventId: string, itemIds: readonly string[], madeAt?: Date): Promise<void> {
+      const changedAt = changeInstant(madeAt, clock());
       return unitOfWork.run(async (repositories) => {
         const event = await requireEvent(repositories, eventId);
         if (areSoftReservesLocked(event.startsAt, clock())) {
@@ -96,8 +102,12 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
         if (signup === undefined) {
           throw new ValidationError("Inscrivez-vous à l'événement avant de choisir vos SR.");
         }
+        const changed = madeAt && (await repositories.signups.changedAt(event.id, member.id));
+        if (changed?.reserves !== undefined && changed.reserves.getTime() > changedAt.getTime()) {
+          throw new ValidationError(OLDER_THAN_WEBSITE);
+        }
         const { itemIds: checked } = await checkChoice(repositories, event, itemIds);
-        await repositories.softReserves.replaceForCharacter(event.id, signup.characterId, checked);
+        await repositories.softReserves.replaceForCharacter(event.id, signup.characterId, checked, changedAt);
       });
     },
 
@@ -123,7 +133,7 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
         const before = (await repositories.softReserves.listByEvent(event.id))
           .filter((reserve) => reserve.characterId === characterId)
           .map((reserve) => nameOf(reserve.itemId));
-        await repositories.softReserves.replaceForCharacter(event.id, characterId, checked);
+        await repositories.softReserves.replaceForCharacter(event.id, characterId, checked, clock());
         const record: SoftReserveOverrideRecord = {
           characterName: signup.characterName,
           raids: event.raids.map((raid) => raid.name),
