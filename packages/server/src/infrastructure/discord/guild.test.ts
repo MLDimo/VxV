@@ -40,6 +40,13 @@ describe("Discord guild through the REST API", () => {
     expect(await guild.setNickname("owner", "GM - [Eole Hermes]")).toBe(false);
   });
 
+  it("reads the roles of a member, and knows when they left the server", async () => {
+    await guild.setOnlyRoleAmong("200", "Voleur", CLASSES);
+    expect(await guild.fetchRoleIds("200")).toHaveLength(1);
+    discord.leave("200");
+    expect(await guild.fetchRoleIds("200")).toBeUndefined();
+  });
+
   it("lets any other refusal surface", async () => {
     const broken = createDiscordGuild({ token: "token", guildId: "guild", apiUrl: "https://discord.test/unknown" });
     await expect(broken.setOnlyRoleAmong("200", "Voleur", CLASSES)).rejects.toBeInstanceOf(DiscordApiError);

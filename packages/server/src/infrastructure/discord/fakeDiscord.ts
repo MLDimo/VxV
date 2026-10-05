@@ -1,6 +1,6 @@
 /**
  * In-memory stand-in for the part of Discord's REST API the bot uses, for the tests.
- * Like Discord, it refuses to rename the server owner.
+ * Like Discord, it refuses to rename the server owner, and knows no member who left the server.
  */
 export interface FakeDiscordReply {
   status: number;
@@ -25,6 +25,7 @@ const HTTP_FORBIDDEN = 403;
 const HTTP_NOT_FOUND = 404;
 const MISSING_PERMISSIONS = { message: "Missing Permissions", code: 50013 };
 const UNKNOWN_MESSAGE = { message: "Unknown Message", code: 10008 };
+const UNKNOWN_MEMBER = { message: "Unknown Member", code: 10007 };
 
 type Handler = (params: string[], body: unknown) => FakeDiscordReply;
 
@@ -33,6 +34,7 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
   const memberRoles = new Map<string, Set<string>>();
   const nicknames = new Map<string, string>();
   const messages = new Map<string, FakeMessage>();
+  const departed = new Set<string>();
   const requests: { method: string; path: string; body: unknown }[] = [];
   let lastId = 0;
   const newId = () => String((lastId += 1));
@@ -53,7 +55,10 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
     [
       "GET",
       /^\/guilds\/[^/]+\/members\/([^/]+)$/,
-      ([userId = ""]) => ok({ user: { id: userId }, roles: [...rolesOf(userId)] }),
+      ([userId = ""]) =>
+        departed.has(userId)
+          ? { status: HTTP_NOT_FOUND, body: UNKNOWN_MEMBER }
+          : ok({ user: { id: userId }, roles: [...rolesOf(userId)] }),
     ],
     [
       "PATCH",
@@ -127,6 +132,8 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
       return new Response(reply.body === undefined ? null : JSON.stringify(reply.body), { status: reply.status });
     },
     nicknameOf: (userId: string) => nicknames.get(userId),
+    /** The user leaves the guild's server. */
+    leave: (userId: string) => departed.add(userId),
     roleNamesOf: (userId: string) => roles.filter((role) => rolesOf(userId).has(role.id)).map((role) => role.name),
     /** Messages published by the bot, in publication order. */
     messages: () => [...messages.values()],

@@ -26,6 +26,8 @@ export interface MemberRepository {
   saveFromDiscord(identity: DiscordIdentity, roles: readonly MemberRole[]): Promise<Member>;
   findById(id: string): Promise<Member | undefined>;
   listAll(): Promise<Member[]>;
+  /** The member's guild roles, as Discord gives them now. */
+  setRoles(memberId: string, roles: readonly MemberRole[]): Promise<void>;
 }
 
 export interface SessionRepository {
@@ -33,6 +35,36 @@ export interface SessionRepository {
   /** Member of a session that has not expired at the given instant. */
   findMemberId(sessionId: string, now: Date): Promise<string | undefined>;
   delete(sessionId: string): Promise<void>;
+}
+
+/** A link code handed by the website to the companion, by the hash of the code. */
+export interface CompanionCode {
+  id: string;
+  memberId: string;
+  /** PKCE challenge sent by the companion when the link started. */
+  challenge: string;
+  expiresAt: Date;
+}
+
+/** A companion's token, by the hash of the token. */
+export interface CompanionToken {
+  id: string;
+  memberId: string;
+  expiresAt: Date;
+  /** When the member's roles were last read from Discord. */
+  rolesCheckedAt: Date;
+}
+
+export interface CompanionRepository {
+  createCode(code: CompanionCode): Promise<void>;
+  /** Removes the code and returns it, unless it expired; expired codes are removed along the way. */
+  takeCode(codeId: string, now: Date): Promise<CompanionCode | undefined>;
+  createToken(token: CompanionToken): Promise<void>;
+  /** A token that has not expired at the given instant. */
+  findToken(tokenId: string, now: Date): Promise<CompanionToken | undefined>;
+  /** After the roles were read again from Discord: the token lives on. */
+  renewToken(tokenId: string, expiresAt: Date, rolesCheckedAt: Date): Promise<void>;
+  deleteToken(tokenId: string): Promise<void>;
 }
 
 export interface CharacterRepository {
@@ -144,6 +176,7 @@ export interface RaidRecordRepository {
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
+  companion: CompanionRepository;
   characters: CharacterRepository;
   journal: JournalRepository;
   raids: RaidRepository;
@@ -169,6 +202,8 @@ export interface GuildGateway {
   setNickname(discordId: string, nickname: string): Promise<boolean>;
   /** Gives the member this role, creating it if needed, and takes away the other roles of the group. */
   setOnlyRoleAmong(discordId: string, roleName: string, group: readonly string[]): Promise<void>;
+  /** The Discord roles the member holds on the server, or undefined when they are no longer on it. */
+  fetchRoleIds(discordId: string): Promise<string[] | undefined>;
 }
 
 /** An event and its sign-ups, as shown in its Discord message. */

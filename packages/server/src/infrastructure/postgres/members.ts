@@ -35,5 +35,9 @@ export function memberRepository(sql: SqlClient): MemberRepository {
     async listAll() {
       return (await sql.query<MemberRow>(`select ${COLUMNS} from members order by discord_name`)).map(toMember);
     },
+
+    async setRoles(memberId, roles) {
+      await sql.query("update members set roles = $2::text[]::member_role[] where id = $1", [memberId, roles]);
+    },
   };
 }

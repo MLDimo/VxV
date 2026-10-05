@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getApplication } from "@/server/application";
 import { createDiscordClient, fetchGuildMember } from "@/server/discord";
 import { completeDiscordSignIn } from "@/server/discordSignIn";
-import { OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE } from "@/server/oauthCookies";
+import { safeNextPath } from "@/server/nextPath";
+import { OAUTH_NEXT_COOKIE, OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE } from "@/server/oauthCookies";
 import { saveSessionCookie } from "@/server/session";
 
 const SIGN_IN_ERRORS = { notGuildMember: "non-membre", invalidRequest: "requete" } as const;
@@ -13,8 +14,10 @@ export async function GET(request: NextRequest) {
   const store = await cookies();
   const expectedState = store.get(OAUTH_STATE_COOKIE)?.value;
   const codeVerifier = store.get(OAUTH_VERIFIER_COOKIE)?.value;
+  const next = safeNextPath(store.get(OAUTH_NEXT_COOKIE)?.value);
   store.delete(OAUTH_STATE_COOKIE);
   store.delete(OAUTH_VERIFIER_COOKIE);
+  store.delete(OAUTH_NEXT_COOKIE);
 
   const discord = createDiscordClient(request.nextUrl.origin);
   const outcome = await completeDiscordSignIn(
@@ -35,5 +38,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL(`/connexion?erreur=${SIGN_IN_ERRORS[outcome.kind]}`, request.nextUrl.origin));
   }
   await saveSessionCookie(outcome.session);
-  return NextResponse.redirect(new URL("/", request.nextUrl.origin));
+  return NextResponse.redirect(new URL(next, request.nextUrl.origin));
 }

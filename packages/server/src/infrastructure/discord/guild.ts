@@ -2,6 +2,7 @@ import type { GuildGateway } from "../../application/ports.ts";
 import { createDiscordRest, DiscordApiError, type DiscordRestOptions } from "./rest.ts";
 
 const HTTP_FORBIDDEN = 403;
+const HTTP_NOT_FOUND = 404;
 const AUDIT_REASON = "VXV : personnage principal";
 
 interface DiscordRole {
@@ -42,6 +43,17 @@ export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions &
       }
       if (!member.roles.includes(target.id)) {
         await request("PUT", `${memberPath(discordId)}/roles/${target.id}`, { reason: AUDIT_REASON });
+      }
+    },
+
+    async fetchRoleIds(discordId) {
+      try {
+        return (await request<{ roles: string[] }>("GET", memberPath(discordId))).roles;
+      } catch (error) {
+        if (error instanceof DiscordApiError && error.status === HTTP_NOT_FOUND) {
+          return undefined;
+        }
+        throw error;
       }
     },
   };
