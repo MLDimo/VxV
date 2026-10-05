@@ -1,3 +1,4 @@
+import { TAVERN_CARDS } from "@vxv/design";
 import { composition, type Composition, type RaidEvent } from "@vxv/server";
 import { formatShortEventDate, raidTitle } from "@vxv/server/domain/labels";
 import Link from "next/link";
@@ -7,10 +8,18 @@ import { sectionHrefs } from "@/components/sections";
 import { TavernScene } from "@/components/TavernScene";
 import { getApplication } from "@/server/application";
 
-function NextRaid({ event, counts }: { event: RaidEvent | undefined; counts: Composition | undefined }) {
+function NextRaid({
+  kicker,
+  event,
+  counts,
+}: {
+  kicker: string;
+  event: RaidEvent | undefined;
+  counts: Composition | undefined;
+}) {
   if (event === undefined || counts === undefined) {
     return (
-      <HomeCard kicker="Prochain raid" title="Aucun raid prévu">
+      <HomeCard kicker={kicker} title="Aucun raid prévu">
         <p>Les officiers annoncent les raids sur le site et sur Discord.</p>
         <Link href="/raid" className="button-pixel">
           Voir les raids
@@ -20,7 +29,7 @@ function NextRaid({ event, counts }: { event: RaidEvent | undefined; counts: Com
   }
   const expected = counts.byStatus.present + counts.byStatus.late;
   return (
-    <HomeCard kicker="Prochain raid" title={formatShortEventDate(event.startsAt)}>
+    <HomeCard kicker={kicker} title={formatShortEventDate(event.startsAt)}>
       <p>
         {raidTitle(event.raids.map((raid) => raid.name))} · {expected} attendus
       </p>
@@ -59,13 +68,15 @@ export default async function TavernPage() {
         <PlaceTiles hrefs={hrefs} />
       </div>
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-3 md:px-16">
-        <NextRaid event={next} counts={counts} />
-        <HomeCard kicker="Quête de la semaine" title="Bientôt">
-          <p>Le tableau des quêtes ouvre avec les missions de la guilde.</p>
-        </HomeCard>
-        <HomeCard kicker="Le Dé Pipé" title="Bientôt">
-          <p>Paris et deathroll arrivent avec la salle de jeu.</p>
-        </HomeCard>
+        {TAVERN_CARDS.map((card) =>
+          card.place === "raid" ? (
+            <NextRaid key={card.place} kicker={card.kicker} event={next} counts={counts} />
+          ) : (
+            <HomeCard key={card.place} kicker={card.kicker} title="Bientôt">
+              <p>{card.soon}</p>
+            </HomeCard>
+          ),
+        )}
       </div>
     </>
   );

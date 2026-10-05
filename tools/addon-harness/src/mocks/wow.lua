@@ -72,6 +72,7 @@ local function newFontString()
     function fontString:SetText(text) self.text = text end
     function fontString:GetText() return self.text end
     function fontString:SetJustifyH(justify) self.justify = justify end
+    function fontString:SetJustifyV(justify) self.justifyV = justify end
     function fontString:SetWordWrap(wrap) self.wordWrap = wrap end
     function fontString:SetFontObject(font) self.font = font end
     function fontString:SetFont(file, size, flags) self.font = file return true end
@@ -88,6 +89,25 @@ local function newTexture()
     function texture:SetColorTexture(r, g, b, a) self.color = { r, g, b, a } end
     function texture:SetTexCoord(...) self.coords = { ... } end
     function texture:SetBlendMode(mode) self.blendMode = mode end
+    function texture:SetVertexColor(r, g, b, a) self.vertexColor = { r, g, b, a } end
+    --- Animations: the steps a group plays, in order, and whether it plays.
+    function texture:CreateAnimationGroup()
+        local group = { steps = {} }
+        function group:CreateAnimation(kind)
+            local step = { kind = kind }
+            function step:SetOrder(order) self.order = order end
+            function step:SetFromAlpha(alpha) self.from = alpha end
+            function step:SetToAlpha(alpha) self.to = alpha end
+            function step:SetDuration(seconds) self.duration = seconds end
+            function step:SetSmoothing(smoothing) self.smoothing = smoothing end
+            self.steps[#self.steps + 1] = step
+            return step
+        end
+        function group:SetLooping(looping) self.looping = looping end
+        function group:Play() self.playing = true end
+        self.animation = group
+        return group
+    end
     return texture
 end
 

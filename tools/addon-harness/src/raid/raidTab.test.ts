@@ -186,6 +186,35 @@ describe("Raid screen", () => {
     expect(errors()).toEqual([]);
   });
 
+  it("gives the Taverne the next raid's card, updated when the data arrive", () => {
+    const { client, importText, errors } = startRaid();
+    const RAID_CARD = `
+      local card = FindWidget(VXV_Window, function(widget) return widget.card ~= nil and widget.card.place == "raid" end)
+      return { card.title.text, card.text.text, card.action.label.text }
+    `;
+    client('SlashCmdList.VXV("")');
+    expect(client(RAID_CARD)).toEqual([
+      "Aucun raid chargé",
+      "Un officier charge les données depuis la page de l'événement sur le site.",
+      "Voir le raid",
+    ]);
+    importText(websiteText());
+    expect(client(RAID_CARD)).toEqual([
+      "10/12 20:00",
+      "Onyxia · 2 attendus\n|cff7ee2a00 tanks|r  |cfff2c94c1 heals|r  |cffa35cff1 DPS|r",
+      "Voir le raid",
+    ]);
+    client(
+      'FindWidget(VXV_Window, function(widget) return widget.card ~= nil and widget.card.place == "raid" end).action:Run("OnClick")',
+    );
+    expect(
+      client(
+        'return FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Raid" end).label.color',
+      ),
+    ).toEqual(client('local _, ns = ... return { VXV.Theme.Color("ivory") }'));
+    expect(errors()).toEqual([]);
+  });
+
   it("keeps the event in the saved data, shown again after /reload", () => {
     const text = websiteText();
     const first = startRaid();

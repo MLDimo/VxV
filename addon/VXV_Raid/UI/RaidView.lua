@@ -10,8 +10,9 @@ local Labels, RaidData, Reserves = ns.Labels, ns.RaidData, ns.Reserves
 local Theme = VXV.Theme
 
 local SECONDS_PER_MINUTE, SECONDS_PER_HOUR, SECONDS_PER_DAY = 60, 3600, 86400
--- Bars of the roles (§7.1): tanks green, healers gold, DPS amethyst.
-local ROLE_BARS = { tank = "gain", healer = "gold", dps = "amethyst" }
+-- Colors of the roles (§7.1): tanks green, healers gold, DPS amethyst.
+local ROLE_COLORS = { tank = "gain", healer = "gold", dps = "amethyst" }
+local ROLE_COUNTS = { tank = "tanks", healer = "heals", dps = "DPS" }
 -- Tags of the loot methods (§7.1): SR violet, SR+ gold, free roll green, loot council sakura.
 local METHOD_TAGS = { soft_reserve = "epic", soft_reserve_plus = "gold", free_roll = "gain", loot_council = "sakura" }
 local LAST_LOOTS = 10
@@ -50,14 +51,22 @@ local function remaining(seconds)
     return minutes .. " min"
 end
 
-local function countComing(event)
-    local coming = 0
+--- The expected players (present or late) of each role, in the website's order, and how many are expected.
+local function expectedByRole(event)
+    local byRole, expected = {}, 0
+    for _, role in ipairs(Labels.ROLE_ORDER) do
+        byRole[role] = {}
+    end
     for _, signup in ipairs(event.signups) do
         if Labels.IsComing(signup.status) then
-            coming = coming + 1
+            expected = expected + 1
+            local players = byRole[signup.role]
+            if players ~= nil then
+                players[#players + 1] = signup
+            end
         end
     end
-    return coming
+    return byRole, expected
 end
 
 --- The head of the screen: kicker, title, the date and where the data come from, and the badges
@@ -67,6 +76,7 @@ function RaidView.Header(event, sender, now)
         return { kicker = "Conseil de guerre", title = "Aucun raid chargé", badges = {},
             subtitle = "Un officier charge les données depuis la page de l'événement sur le site (/vxv importer)." }
     end
+    local _, expected = expectedByRole(event)
     local lockAt = RaidData.LockAt(event)
     local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. remaining(lockAt - now))
     local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
@@ -76,7 +86,7 @@ function RaidView.Header(event, sender, now)
         title = event.title,
         subtitle = string.format("%s · %d SR par joueur · %s", Labels.DateTime(event.startsAt),
             event.softReservesPerPlayer, origin),
-        badges = { { text = countComing(event) .. " attendus", color = "gain" }, { text = lock, color = "gold" } },
+        badges = { { text = VXV.Count(expected, "attendu"), color = "gain" }, { text = lock, color = "gold" } },
     }
 end
 
@@ -115,11 +125,11 @@ function RaidView.MyReserves(event, player)
     return rows
 end
 
---- Coming players first (present, then late), then maybe, bench and absent; in each, the website's order.
-local function byStatus(event, coming)
+--- The players who are not expected: maybe, bench, absent, in the website's order.
+local function notExpected(event)
     local list = {}
     for _, signup in ipairs(event.signups) do
-        if Labels.IsComing(signup.status) == coming then
+        if not Labels.IsComing(signup.status) then
             list[#list + 1] = signup
         end
     end
@@ -158,22 +168,16 @@ function RaidView.Composition(event)
     end
     local rows = { row("line", string.format("%s · %d en retard · %d au banc", VXV.Count(count("present"), "présent"),
         count("late"), count("bench"))) }
-    local coming = byStatus(event, true)
+    local byRole, expected = expectedByRole(event)
     for _, role in ipairs(Labels.ROLE_ORDER) do
-        local players = {}
-        for _, signup in ipairs(coming) do
-            if signup.role == role then
-                players[#players + 1] = signup
-            end
-        end
-        local label = Labels.Role(role)
+        local players, label = byRole[role], Labels.Role(role)
         rows[#rows + 1] = row("header", string.format("%s %s · %d", label.icon, label.plural, #players))
-        rows[#rows + 1] = { kind = "bar", share = #coming > 0 and #players / #coming or 0, color = ROLE_BARS[role] }
+        rows[#rows + 1] = { kind = "bar", share = expected > 0 and #players / expected or 0, color = ROLE_COLORS[role] }
         for _, signup in ipairs(players) do
             rows[#rows + 1] = playerRow(signup)
         end
     end
-    local others = byStatus(event, false)
+    local others = notExpected(event)
     if #others > 0 then
         rows[#rows + 1] = row("header", "Peut-être, banc, absents")
         for _, signup in ipairs(others) do
@@ -209,6 +213,24 @@ function RaidView.RaidReserves(event)
         rows[1] = row("line", "Aucune SR pour l'instant.")
     end
     return rows
+end
+
+--- The Taverne's card (§7.0): the next raid and its expected players by role.
+function RaidView.Card(event)
+    if event == nil then
+        return { title = "Aucun raid chargé", action = "Voir le raid",
+            lines = { "Un officier charge les données depuis la page de l'événement sur le site." } }
+    end
+    local byRole, expected = expectedByRole(event)
+    local roles = {}
+    for _, role in ipairs(Labels.ROLE_ORDER) do
+        roles[#roles + 1] = Theme.Colored(#byRole[role] .. " " .. ROLE_COUNTS[role], ROLE_COLORS[role])
+    end
+    return {
+        title = Labels.DateTime(event.startsAt),
+        lines = { event.title .. " · " .. VXV.Count(expected, "attendu"), table.concat(roles, "  ") },
+        action = "Voir le raid",
+    }
 end
 
 --- The requests to join, for the leader of the invitations: a click invites.

@@ -1,8 +1,8 @@
 local _, ns = ...
 
 --- The main window in the charter (§6): a frame of four rings, a header with the emblem and one tab per place of
---- the tavern (Taverne first), each tab built at its first opening. A place no module provides yet shows its
---- screen with "Bientôt". The window shrinks on small screens.
+--- the tavern (Taverne first), each tab built at its first opening over the tavern framed on its place. A place
+--- no module provides yet shows its screen with "Bientôt". The window shrinks on small screens.
 local Window = {}
 ns.Window = Window
 
@@ -20,6 +20,9 @@ local CLOSE_SIZE = 28
 local SCREEN_MARGIN = 40
 local SCREEN_PADDING = 22
 local TAVERN = { id = "tavern", name = "Taverne" }
+local PERCENT = 100
+-- Under everything the screen draws in its background layer.
+local BACKDROP_LEVEL = -8
 
 local frame
 local tabs = {}
@@ -33,18 +36,28 @@ local function placeList()
     return list
 end
 
-local function moduleFor(placeId)
-    for _, module in ipairs(Modules.All()) do
-        if module.tab ~= nil and module.tab.place == placeId then
-            return module
-        end
-    end
-end
-
 local function savePosition()
     local point, _, relativePoint, x, y = frame:GetPoint()
     local settings = Storage.Interface("window")
     settings.point, settings.relativePoint, settings.x, settings.y = point, relativePoint, x, y
+end
+
+--- The screen's background (§6): the tavern framed on its place, very dark under a veil.
+local function addBackdrop(content, backdrop)
+    local width, height = content:GetWidth(), content:GetHeight()
+    local pictureWidth = width * backdrop.zoom
+    local pictureHeight = pictureWidth * Tokens.tavern.height / Tokens.tavern.width
+    -- As CSS's background-position: x % of the picture on x % of the screen.
+    local left = (pictureWidth - width) * backdrop.position[1] / PERCENT / pictureWidth
+    local top = (pictureHeight - height) * backdrop.position[2] / PERCENT / pictureHeight
+    local picture = content:CreateTexture(nil, "BACKGROUND", nil, BACKDROP_LEVEL)
+    picture:SetAllPoints()
+    picture:SetTexture(Theme.MEDIA .. "taverne.png", nil, nil, "NEAREST")
+    picture:SetTexCoord(left, left + width / pictureWidth, top, top + height / pictureHeight)
+    picture:SetAlpha(backdrop.opacity)
+    local veil = content:CreateTexture(nil, "BACKGROUND", nil, BACKDROP_LEVEL + 1)
+    veil:SetAllPoints()
+    veil:SetTexture(Theme.MEDIA .. "veil.png")
 end
 
 --- The screen of a place no module provides yet.
@@ -60,7 +73,10 @@ local function buildContent(tab)
     tab.content = CreateFrame("Frame", nil, frame)
     tab.content:SetPoint("TOPLEFT", BORDER, -(BORDER + HEADER_HEIGHT))
     tab.content:SetSize(WIDTH - 2 * BORDER, HEIGHT - 2 * BORDER - HEADER_HEIGHT)
-    local module = moduleFor(tab.place.id)
+    if tab.place.backdrop ~= nil then
+        addBackdrop(tab.content, tab.place.backdrop)
+    end
+    local module = Modules.ForPlace(tab.place.id)
     if module ~= nil then
         module.tab.Build(tab.content)
     else

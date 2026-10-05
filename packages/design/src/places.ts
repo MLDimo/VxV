@@ -19,6 +19,11 @@ export interface Place {
   plaque: PlaqueAnchor;
   /** Background position of the place's tile in the mobile grid, the scene being 1100 px wide. */
   tile: readonly [number, number];
+  /**
+   * Background of the place's screen in the addon (§6): the tavern framed on the place (position in percent, as
+   * CSS's background-position, the picture being zoom times as wide as the screen), very dark (opacity).
+   */
+  backdrop: { position: readonly [number, number]; zoom: number; opacity: number };
 }
 
 /** In the order of the addon's tabs, after the Taverne. */
@@ -31,6 +36,7 @@ export const PLACES: readonly Place[] = [
     spot: [49.5, 57, 24, 36],
     plaque: "table",
     tile: [-560, -300],
+    backdrop: { position: [60, 85], zoom: 2.6, opacity: 0.3 },
   },
   {
     id: "dice",
@@ -40,6 +46,7 @@ export const PLACES: readonly Place[] = [
     spot: [73.5, 21, 11, 68],
     plaque: "door",
     tile: [-790, -230],
+    backdrop: { position: [80, 75], zoom: 2.5, opacity: 0.32 },
   },
   {
     id: "quests",
@@ -49,6 +56,7 @@ export const PLACES: readonly Place[] = [
     spot: [17.3, 27, 13, 27],
     plaque: "board",
     tile: [-175, -125],
+    backdrop: { position: [22, 45], zoom: 2.5, opacity: 0.3 },
   },
   {
     id: "ranking",
@@ -58,6 +66,7 @@ export const PLACES: readonly Place[] = [
     spot: [34.6, 26, 14.5, 58],
     plaque: "above",
     tile: [-370, -130],
+    backdrop: { position: [41, 60], zoom: 2.5, opacity: 0.3 },
   },
   {
     id: "artisans",
@@ -67,6 +76,7 @@ export const PLACES: readonly Place[] = [
     spot: [85.5, 22, 14, 72],
     plaque: "middle",
     tile: [-935, -300],
+    backdrop: { position: [100, 80], zoom: 2.5, opacity: 0.34 },
   },
   {
     id: "journal",
@@ -76,7 +86,19 @@ export const PLACES: readonly Place[] = [
     spot: [0.5, 22, 18, 72],
     plaque: "middle",
     tile: [-10, -220],
+    backdrop: { position: [0, 70], zoom: 2.5, opacity: 0.3 },
   },
+];
+
+/** The cards under the tavern (§5.1, §7.0), in order: a place's news, or what it will bring ("Bientôt"). */
+export const TAVERN_CARDS: readonly { place: Place["id"]; kicker: string; soon?: string }[] = [
+  { place: "raid", kicker: "Prochain raid" },
+  {
+    place: "quests",
+    kicker: "Quête de la semaine",
+    soon: "Le tableau des quêtes ouvre avec les missions de la guilde.",
+  },
+  { place: "dice", kicker: "Le Dé Pipé", soon: "Paris et deathroll arrivent avec la salle de jeu." },
 ];
 
 /** The scene: the tavern picture's size, and its lights (left, top, width, height in percent). */
