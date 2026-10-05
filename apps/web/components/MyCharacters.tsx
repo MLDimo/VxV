@@ -15,18 +15,16 @@ export interface OwnCharacter extends SearchableCharacter {
 export function MyCharacters({ characters }: { characters: OwnCharacter[] }) {
   const [state, action, pending] = useActionState(changeCharacter, IDLE);
   if (characters.length === 0) {
-    return <p className="mt-4 text-zinc-500">Aucun personnage lié pour l&apos;instant.</p>;
+    return <p className="mt-4 text-muted">Aucun personnage lié pour l&apos;instant.</p>;
   }
   return (
     <>
-      <ul className="mt-4 divide-y divide-zinc-800 rounded border border-zinc-800">
+      <ul className="mt-4 divide-y divide-line bg-panel ring-pixel">
         {characters.map((character) => (
           <li key={character.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
             <CharacterName name={character.name} characterClass={character.characterClass} />
-            <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300">
-              {character.isMain ? "Main" : "Reroll"}
-            </span>
-            {!character.inGuild && <span className="text-xs text-amber-400">a quitté la guilde</span>}
+            <span className="bg-line px-2 py-0.5 text-xs text-lavender">{character.isMain ? "Main" : "Reroll"}</span>
+            {!character.inGuild && <span className="text-xs text-gold">a quitté la guilde</span>}
             <form action={action} className="ml-auto flex gap-3">
               <input type="hidden" name="characterId" value={character.id} />
               {!character.isMain && (
@@ -35,7 +33,7 @@ export function MyCharacters({ characters }: { characters: OwnCharacter[] }) {
                   name="intent"
                   value="main"
                   disabled={pending}
-                  className="text-sm text-indigo-300 hover:text-indigo-200"
+                  className="text-sm text-amethyst hover:text-ivory"
                   aria-label={`Définir ${character.name} comme main`}
                 >
                   Définir comme main
@@ -46,7 +44,7 @@ export function MyCharacters({ characters }: { characters: OwnCharacter[] }) {
                 name="intent"
                 value="unlink"
                 disabled={pending}
-                className="text-sm text-zinc-400 hover:text-red-300"
+                className="text-sm text-muted hover:text-loss"
                 aria-label={`Retirer ${character.name}`}
               >
                 Retirer

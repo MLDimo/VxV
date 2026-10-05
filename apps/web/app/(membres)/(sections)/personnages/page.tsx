@@ -1,6 +1,7 @@
 import { fullName, type Character } from "@vxv/server";
 import { CharacterPicker } from "@/components/CharacterPicker";
 import { MyCharacters } from "@/components/MyCharacters";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
@@ -14,8 +15,8 @@ export default async function CharactersPage() {
   const [mine, available] = await Promise.all([characters.listMine(member), characters.listAvailable()]);
   return (
     <>
-      <h1 className="text-2xl font-bold">Mes personnages</h1>
-      <p className="mt-2 text-zinc-400">Votre main et vos rerolls, choisis parmi les personnages de la guilde.</p>
+      <ScreenHeader kicker="Mon compte" kickerClassName="text-lavender" title="Mes personnages" />
+      <p className="mt-2 text-muted">Votre main et vos rerolls, choisis parmi les personnages de la guilde.</p>
       <MyCharacters
         characters={mine.map((character) => ({
           ...toSearchable(character),
@@ -23,7 +24,7 @@ export default async function CharactersPage() {
           inGuild: character.inGuild,
         }))}
       />
-      <h2 className="mt-10 text-lg font-semibold">Ajouter un personnage</h2>
+      <h2 className="mt-10 font-pixel text-lg text-ivory">Ajouter un personnage</h2>
       <CharacterPicker characters={available.map(toSearchable)} />
     </>
   );

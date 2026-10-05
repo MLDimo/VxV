@@ -45,28 +45,28 @@ export function SoftReserveBoardForm({
   return (
     <form action={action} aria-label="Mes SR" className="mt-4">
       <input type="hidden" name="eventId" value={eventId} />
-      <p className={`text-sm ${locked ? "text-amber-300" : "text-zinc-400"}`}>
+      <p className={`text-sm ${locked ? "text-gold" : "text-muted"}`}>
         {locked
           ? `SR verrouillées depuis le ${lockLabel} : seul un officier peut encore les modifier.`
           : `Verrouillage des SR le ${lockLabel}.`}
       </p>
       {!locked && (
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-muted">
           {signedUp
             ? `Vous avez droit à ${softReserveCount(allowance)} : ${chosen.size} choisie(s).`
             : "Inscrivez-vous à l'événement pour choisir vos SR."}
         </p>
       )}
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-muted">
         SR+ : +{SOFT_RESERVE_BONUS_STEP} au roll pour chaque raid précédent où le joueur était présent et avait réservé
         l&apos;objet sans l&apos;obtenir, jusqu&apos;à +{SOFT_RESERVE_BONUS_CAP}.
       </p>
       {groupByBoss(items).map((group) => (
         <fieldset key={`${group.raidName}/${group.bossName}`} className="mt-4">
-          <legend className="text-sm font-semibold text-zinc-300">
+          <legend className="font-pixel text-sm text-ivory">
             {group.raidName} · {group.bossName}
           </legend>
-          <ul className="mt-2 divide-y divide-zinc-800 rounded border border-zinc-800">
+          <ul className="mt-4 divide-y divide-line bg-panel ring-pixel">
             {group.items.map((item) => (
               <li key={item.itemId} className="px-4 py-2">
                 <div className="flex flex-wrap items-center gap-3">
@@ -79,10 +79,10 @@ export function SoftReserveBoardForm({
                       disabled={!canReserve || item.excluded || (full && !chosen.has(item.itemId))}
                       onChange={(event) => toggle(item.itemId, event.target.checked)}
                     />
-                    <span className={item.excluded ? "text-zinc-500 line-through" : ""}>{item.name}</span>
+                    <span className={item.excluded ? "text-muted line-through" : "text-epic"}>{item.name}</span>
                   </label>
-                  {item.excluded && <span className="text-xs text-amber-400">exclu par les officiers</span>}
-                  <span className="ml-auto text-xs text-zinc-400">
+                  {item.excluded && <span className="text-xs text-gold">exclu par les officiers</span>}
+                  <span className="ml-auto text-xs text-muted">
                     {softReserveCount(item.reservedBy.length)} · {item.alreadyOwnedBy} l&apos;ont déjà
                   </span>
                 </div>
@@ -92,7 +92,10 @@ export function SoftReserveBoardForm({
                       <span key={reserver.characterName}>
                         <CharacterName name={reserver.characterName} characterClass={reserver.characterClass} />
                         {reserver.bonus > 0 && (
-                          <span className="ml-1 text-xs text-emerald-400" title="Bonus SR+ ajouté au roll">
+                          <span
+                            className="ml-1 bg-gold px-1 text-xs font-extrabold text-ink"
+                            title="Bonus SR+ ajouté au roll"
+                          >
                             SR+ +{reserver.bonus}
                           </span>
                         )}
@@ -106,11 +109,7 @@ export function SoftReserveBoardForm({
         </fieldset>
       ))}
       {canReserve && (
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-4 rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <button type="submit" disabled={pending} className="button-pixel mt-4">
           Enregistrer mes SR
         </button>
       )}

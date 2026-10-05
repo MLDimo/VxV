@@ -21,7 +21,7 @@ test.describe.serial("sign-ups", () => {
     await page.getByRole("button", { name: "M'inscrire" }).click();
 
     await expect(page.getByRole("status")).toContainText("Inscription enregistrée.");
-    await expect(page.getByText("Tank : 1")).toBeVisible();
+    await expect(page.getByRole("group", { name: "Tank" })).toContainText("1Ciel Gris");
     const row = page.getByRole("listitem").filter({ hasText: "Ciel Gris" });
     await expect(row).toContainText("Protection");
     await expect(row).toContainText("Présent");
@@ -33,6 +33,6 @@ test.describe.serial("sign-ups", () => {
     await page.getByLabel("Statut").selectOption({ label: "En retard" });
     await page.getByRole("button", { name: "Mettre à jour mon inscription" }).click();
     await expect(page.getByRole("listitem").filter({ hasText: "Ciel Gris" })).toContainText("En retard");
-    await expect(page.getByText("Tank : 1")).toBeVisible();
+    await expect(page.getByRole("group", { name: "Tank" })).toContainText("1Ciel Gris");
   });
 });

@@ -6,7 +6,7 @@ import { changeExclusion } from "@/app/actions/exclusions";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 
-const FIELD = "mt-1 block w-full rounded border border-zinc-700 bg-zinc-900 p-2";
+const FIELD = "field";
 
 /** Officers exclude an item from the soft reserves of this event, or allow it again, with a reason. */
 export function ExclusionForm({ eventId, items }: { eventId: string; items: BoardItem[] }) {
@@ -17,7 +17,7 @@ export function ExclusionForm({ eventId, items }: { eventId: string; items: Boar
     <form action={action} className="mt-4 grid max-w-2xl gap-4 sm:grid-cols-2">
       <input type="hidden" name="eventId" value={eventId} />
       <div>
-        <label htmlFor={itemFieldId} className="text-sm text-zinc-300">
+        <label htmlFor={itemFieldId} className="text-sm text-lavender">
           Objet
         </label>
         <select id={itemFieldId} name="itemId" className={FIELD}>
@@ -29,26 +29,14 @@ export function ExclusionForm({ eventId, items }: { eventId: string; items: Boar
         </select>
       </div>
       <label className="block">
-        <span className="text-sm text-zinc-300">Motif de l&apos;exclusion (visible dans le journal)</span>
+        <span className="text-sm text-lavender">Motif de l&apos;exclusion (visible dans le journal)</span>
         <input name="reason" required className={FIELD} />
       </label>
       <div className="flex gap-3 sm:col-span-2">
-        <button
-          type="submit"
-          name="intent"
-          value="exclude"
-          disabled={pending}
-          className="rounded bg-amber-700 px-4 py-2 font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
-        >
+        <button type="submit" name="intent" value="exclude" disabled={pending} className="button-wood text-gold">
           Exclure
         </button>
-        <button
-          type="submit"
-          name="intent"
-          value="include"
-          disabled={pending}
-          className="rounded border border-zinc-600 px-4 py-2 font-semibold hover:bg-zinc-800 disabled:opacity-50"
-        >
+        <button type="submit" name="intent" value="include" disabled={pending} className="button-wood">
           Réintégrer
         </button>
       </div>

@@ -22,7 +22,7 @@ export function CharacterPicker({ characters }: { characters: SearchableCharacte
   return (
     <form action={action} className="mt-4 space-y-3">
       <label className="block">
-        <span className="text-sm text-zinc-300">Nom du personnage</span>
+        <span className="text-sm text-lavender">Nom du personnage</span>
         <input
           role="combobox"
           aria-controls={listId}
@@ -35,17 +35,17 @@ export function CharacterPicker({ characters }: { characters: SearchableCharacte
             setQuery(event.target.value);
           }}
           placeholder="Tapez quelques lettres"
-          className="mt-1 block w-full rounded border border-zinc-700 bg-zinc-900 p-2"
+          className="field"
         />
       </label>
       {suggestions.length > 0 && (
-        <ul id={listId} role="listbox" className="divide-y divide-zinc-800 rounded border border-zinc-700">
+        <ul id={listId} role="listbox" className="divide-y divide-line bg-night ring-pixel">
           {suggestions.map((character) => (
             <li key={character.id} role="option" aria-selected={false}>
               <button
                 type="button"
                 onClick={() => setSelectedId(character.id)}
-                className="block w-full px-3 py-2 text-left hover:bg-zinc-800"
+                className="block w-full px-3 py-2 text-left hover:bg-plum"
               >
                 <CharacterName name={character.name} characterClass={character.characterClass} />
               </button>
@@ -55,22 +55,10 @@ export function CharacterPicker({ characters }: { characters: SearchableCharacte
       )}
       <input type="hidden" name="characterId" value={selected?.id ?? ""} />
       <div className="flex gap-3">
-        <button
-          type="submit"
-          name="as"
-          value="main"
-          disabled={!selected || pending}
-          className="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <button type="submit" name="as" value="main" disabled={!selected || pending} className="button-pixel">
           Ajouter comme main
         </button>
-        <button
-          type="submit"
-          name="as"
-          value="reroll"
-          disabled={!selected || pending}
-          className="rounded border border-zinc-600 px-4 py-2 font-semibold hover:bg-zinc-800 disabled:opacity-50"
-        >
+        <button type="submit" name="as" value="reroll" disabled={!selected || pending} className="button-wood">
           Ajouter comme reroll
         </button>
       </div>
