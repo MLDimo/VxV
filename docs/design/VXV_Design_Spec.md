@@ -166,7 +166,7 @@ Survol / focus (partout) : la cible passe en prune `#4A2A6A` avec liseré or `#F
 
 ### 4.2 Zones cliquables (hotspots)
 
-`<a class="spot">` (site) / `Button` invisible (addon), positionnés en absolu. Au survol : overlay `rgba(163,92,255,.10)` + `box-shadow: 0 0 0 3px #F2C94C, 0 0 30px 6px rgba(163,92,255,.65)` (transition opacité .2s). La plaque monte de 4px et passe en prune/or.
+`<a class="spot">` (site) / `Button` invisible (addon), positionnés en absolu. Au survol : overlay `rgba(163,92,255,.10)` + `box-shadow: 0 0 30px 6px rgba(163,92,255,.65)` (transition opacité .2s), **sans contour or** (retiré le 5 octobre à la demande du propriétaire). La plaque monte de 4px et passe en prune/or.
 
 | Lieu | left | top | width | height | Position de la plaque |
 |---|---|---|---|---|---|

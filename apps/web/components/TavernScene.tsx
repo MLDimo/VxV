@@ -37,7 +37,7 @@ function PlaceSpot({ place, href }: { place: Place; href: string | undefined }) 
     </span>
   );
   const glow = (
-    <span className="absolute inset-0 bg-amethyst/10 opacity-0 shadow-[0_0_0_3px_var(--color-gold),0_0_30px_6px_rgba(163,92,255,0.65)] transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
+    <span className="absolute inset-0 bg-amethyst/10 opacity-0 shadow-[0_0_30px_6px_rgba(163,92,255,0.65)] transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
   );
   if (href === undefined) {
     return (
