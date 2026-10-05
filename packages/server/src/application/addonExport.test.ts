@@ -54,8 +54,8 @@ describe("addon export", () => {
   it("gives an officer the event with its officers, sign-ups, soft reserves and journal", async () => {
     const lines = (await addonExport.exportEvent(officer, eventId)).split("\n");
     expect(lines).toEqual([
-      "VXV-RAID-1",
-      `E;${eventId};1796932800;1796126400;1;Onyxia`,
+      "VXV-RAID-2",
+      `E;${eventId};1796932800;1796126400;1;Onyxia;onyxia`,
       "O;Ðéjà Vu",
       "I;21;Sac en peau;Onyxia;1",
       "I;20;Tête d'Onyxia;Onyxia;0",

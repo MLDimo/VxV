@@ -8,8 +8,12 @@ import { createEvent, createMember, createRaidWithLoot } from "../test/fixtures.
 import { createTestDatabase } from "../testing.ts";
 import { createCharacters } from "./characters.ts";
 import { createCompanionUploads, type CompanionUpload } from "./companionUploads.ts";
+import { createExclusions } from "./exclusions.ts";
+import { createGameChanges } from "./gameChanges.ts";
 import { createRaidLogs } from "./raidLogs.ts";
 import { createRoster } from "./roster.ts";
+import { createSignups } from "./signups.ts";
+import { createSoftReserves } from "./softReserves.ts";
 
 const ROSTER = "VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nThom;Leboss;PRIEST";
 const CAPTURED_AT = new Date("2026-12-10T23:30:00Z");
@@ -38,6 +42,13 @@ describe("companion uploads", () => {
       roster: createRoster({ unitOfWork }),
       raidLogs: createRaidLogs({ unitOfWork, announcer, clock }),
       characters: createCharacters({ unitOfWork }),
+      gameChanges: createGameChanges({
+        unitOfWork,
+        signups: createSignups({ unitOfWork, clock }),
+        softReserves: createSoftReserves({ unitOfWork, clock }),
+        exclusions: createExclusions({ unitOfWork }),
+        announcements: { announceQuietly: async () => true },
+      }),
     });
     officer = await createMember(sql, "officer", "Officier");
     await createRaidWithLoot(sql);
@@ -52,6 +63,7 @@ describe("companion uploads", () => {
     roster: { text: ROSTER, capturedAt: CAPTURED_AT },
     raidLogs: [logOf(eventId)],
     characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
+    changes: [],
     ...changes,
   });
 
@@ -68,6 +80,7 @@ describe("companion uploads", () => {
       roster: "Liste de guilde plus ancienne que la dernière importée : ignorée.",
       raidLogs: ["Journal du raid à jour."],
       characters: 1,
+      changes: undefined,
     });
   });
 
@@ -77,6 +90,7 @@ describe("companion uploads", () => {
       roster: "Réservé aux officiers.",
       raidLogs: ["Réservé aux officiers."],
       characters: 0,
+      changes: undefined,
     });
   });
 
@@ -89,6 +103,7 @@ describe("companion uploads", () => {
       roster: undefined,
       raidLogs: ["Ligne 2 illisible : recopiez le journal depuis l'addon.", "Cet événement n'existe pas."],
       characters: 0,
+      changes: undefined,
     });
   });
 });

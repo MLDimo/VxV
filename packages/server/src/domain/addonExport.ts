@@ -1,5 +1,6 @@
 import { fullName, type Character } from "./characters.ts";
 import type { RaidEvent } from "./events.ts";
+import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { JournalEntry } from "./journal.ts";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "./journalDescriptions.ts";
 import { raidTitle } from "./labels.ts";
@@ -7,7 +8,7 @@ import type { Signup } from "./signups.ts";
 import type { BoardItem } from "./softReserves.ts";
 
 /** First line of an event exported for the addon (contract with VXV_Raid); the number is the format version. */
-export const ADDON_EVENT_HEADER = "VXV-RAID-1";
+export const ADDON_EVENT_HEADER = "VXV-RAID-2";
 
 const MS_PER_SECOND = 1000;
 
@@ -21,6 +22,8 @@ export interface AddonEventFacts {
   mainCharacterIds: ReadonlySet<string>;
   /** Officer actions on the event, oldest first. */
   journal: readonly JournalEntry[];
+  /** What became of the changes made in game, in the order received. */
+  changes: readonly GameChangeOutcome[];
   exportedAt: Date;
 }
 
@@ -47,12 +50,14 @@ function flag(value: boolean): number {
 
 /**
  * The event as the officers paste it into the addon, one record per line:
- * E;event id;start (Unix seconds);export (Unix seconds);SR per player;title
+ * E;event id;start (Unix seconds);export (Unix seconds);SR per player;title;raid ids separated by commas
  * O;officer character
  * I;item id;item name;boss;1 when excluded from SR
  * S;character;class token;role;status;1 for a reroll;spec;item id:SR+ bonus,…
  * J;time (Unix seconds);officer;what changed;reason
- * Items are those reserved or excluded. The addon needs nothing else, and parses the lines in this order.
+ * C;change id;1 when done, 0 when refused;message
+ * Items are those reserved or excluded: the raids' loot comes with the addon's data packs. The addon parses the
+ * lines in this order.
  */
 export function formatAddonEvent(facts: AddonEventFacts): string {
   const { event, board } = facts;
@@ -71,6 +76,7 @@ export function formatAddonEvent(facts: AddonEventFacts): string {
       seconds(facts.exportedAt),
       event.softReservesPerPlayer,
       text(raidTitle(event.raids.map((raid) => raid.name))),
+      event.raids.map((raid) => raid.id).join(","),
     ),
     ...facts.officers.map((officer) => line("O", fullName(officer))),
     ...board
@@ -97,5 +103,6 @@ export function formatAddonEvent(facts: AddonEventFacts): string {
         text(entry.reason),
       ),
     ),
+    ...facts.changes.map((change) => line("C", change.id, flag(change.accepted), text(change.message))),
   ].join("\n");
 }

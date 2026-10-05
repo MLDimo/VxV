@@ -5,6 +5,7 @@ import { characterRepository } from "./characters.ts";
 import { companionRepository } from "./companion.ts";
 import { eventRepository } from "./events.ts";
 import { exclusionRepository } from "./exclusions.ts";
+import { gameChangeRepository } from "./gameChanges.ts";
 import { journalRepository } from "./journal.ts";
 import { lootHistoryRepository } from "./lootHistory.ts";
 import { memberRepository } from "./members.ts";
@@ -33,6 +34,7 @@ function createRepositories(sql: SqlClient): Repositories {
     raidRecords: raidRecordRepository(sql),
     raidLogs: raidLogRepository(sql),
     syncMarks: syncMarkRepository(sql),
+    gameChanges: gameChangeRepository(sql),
   };
 }
 

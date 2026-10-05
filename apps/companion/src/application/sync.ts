@@ -74,6 +74,7 @@ function unsent(outbox: Outbox, officer: boolean, sent: ReadonlySet<string>): { 
       ...(roster && outbox.roster !== undefined ? { roster: outbox.roster } : {}),
       raidLogs: officer ? outbox.raidLogs.filter((log) => isNew(`log:${log}`)) : [],
       characters: outbox.characters.filter((look) => isNew(`look:${look.name}:${look.race}:${String(look.sex)}`)),
+      changes: outbox.changes.filter((change) => isNew(`change:${change.id}`)),
     },
     keys,
   };
@@ -94,7 +95,11 @@ export async function synchronize(
     for (const key of keys) {
       sent.add(key);
     }
-    messages.push(...(report.roster === undefined ? [] : [report.roster]), ...report.raidLogs);
+    messages.push(
+      ...(report.roster === undefined ? [] : [report.roster]),
+      ...report.raidLogs,
+      ...(report.changes === undefined ? [] : [report.changes]),
+    );
   }
   const { raid } = await site.download(token);
   const inbox = renderInbox({ raid: raid?.text, writtenAt: now });

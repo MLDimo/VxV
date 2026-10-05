@@ -1,11 +1,11 @@
 local _, ns = ...
 
---- The event's data as the website exports it for the addon: contract VXV-RAID-1, described line by line in
+--- The event's data as the website exports it for the addon: contract VXV-RAID-2, described line by line in
 --- packages/server/src/domain/addonExport.ts. Reading never raises a Lua error.
 local EventData = {}
 ns.EventData = EventData
 
-local HEADER = "VXV-RAID-1"
+local HEADER = "VXV-RAID-2"
 local FLAG_ON = "1"
 local NOT_EVENT = "Ce texte n'est pas une donnée d'événement : copie-la depuis la page de l'événement sur le site."
 local UNREADABLE_LINE = "Ligne %d illisible : recopie les données depuis le site."
@@ -16,6 +16,14 @@ local function fields(line)
         result[#result + 1] = field
     end
     return result
+end
+
+local function split(text)
+    local list = {}
+    for value in text:gmatch("[^,]+") do
+        list[#list + 1] = value
+    end
+    return list
 end
 
 local function reserves(text)
@@ -29,9 +37,9 @@ end
 --- Each kind of line: its number of fields, and how it adds to the event (false when a value is wrong).
 local RECORDS = {
     E = {
-        size = 6,
+        size = 7,
         read = function(event, line)
-            event.id, event.title = line[2], line[6]
+            event.id, event.title, event.raidIds = line[2], line[6], split(line[7])
             event.startsAt, event.exportedAt = tonumber(line[3]), tonumber(line[4])
             event.softReservesPerPlayer = tonumber(line[5])
             return event.startsAt ~= nil and event.exportedAt ~= nil and event.softReservesPerPlayer ~= nil
@@ -82,15 +90,22 @@ local RECORDS = {
             return true
         end,
     },
+    C = {
+        size = 4,
+        read = function(event, line)
+            event.results[line[2]] = { accepted = line[3] == FLAG_ON, message = line[4] }
+            return true
+        end,
+    },
 }
 
---- The event written in the text, or nil and why (in French) when the text is not readable VXV-RAID-1 data.
+--- The event written in the text, or nil and why (in French) when the text is not readable VXV-RAID-2 data.
 --- Lines of an unknown kind are skipped.
 function EventData.Parse(text)
     if type(text) ~= "string" then
         return nil, NOT_EVENT
     end
-    local event = { officers = {}, items = {}, itemOrder = {}, signups = {}, journal = {} }
+    local event = { officers = {}, items = {}, itemOrder = {}, signups = {}, journal = {}, results = {} }
     local number, headerSeen = 0, false
     for raw in (text .. "\n"):gmatch("([^\n]*)\n") do
         number = number + 1
@@ -112,4 +127,13 @@ function EventData.Parse(text)
         return nil, NOT_EVENT
     end
     return event
+end
+
+--- The sign-up of the character named "Prénom Nom", or nil.
+function EventData.SignupOf(event, name)
+    for _, signup in ipairs(event and event.signups or {}) do
+        if signup.name == name then
+            return signup
+        end
+    end
 end

@@ -5,7 +5,8 @@ local _, ns = ...
 local RaidView = {}
 ns.RaidView = RaidView
 
-local Labels, RaidData, Reserves = ns.Labels, ns.RaidData, ns.Reserves
+local Changes, EventData, Labels, RaidData, Raids = ns.Changes, ns.EventData, ns.Labels, ns.RaidData, ns.Raids
+local Reserves = ns.Reserves
 
 local Theme = VXV.Theme
 
@@ -30,12 +31,44 @@ local function bonusTag(bonus)
     return bonus > 0 and (" " .. Theme.Colored("SR+ " .. bonus, "gold")) or ""
 end
 
-local function findSignup(event, name)
-    for _, signup in ipairs(event and event.signups or {}) do
-        if signup.name == name then
-            return signup
+local findSignup = EventData.SignupOf
+
+--- The name of an item of the event's raids, reserved or not.
+local function lootName(event, itemId)
+    if event.items[itemId] ~= nil then
+        return event.items[itemId].name
+    end
+    for _, item in ipairs(Raids.Loot(event.raidIds)) do
+        if item.itemId == itemId then
+            return item.name
         end
     end
+    return "Objet n°" .. itemId
+end
+
+--- The player's change of a kind waiting for the website, or the website's refusal of the last one, as rows.
+local function changeRows(kind, describe)
+    local pending = Changes.Pending(kind)
+    if pending ~= nil then
+        return { row("line", Theme.Colored("En attente du site : " .. describe(pending), "gold")) }
+    end
+    local answer = Changes.Answer(kind)
+    if answer ~= nil and not answer.accepted then
+        return { row("line", Theme.Colored("Refusé : " .. answer.message, "loss"),
+            { title = "Refusé par le site", lines = { answer.message } }) }
+    end
+    return {}
+end
+
+local function append(rows, more)
+    for _, extra in ipairs(more) do
+        rows[#rows + 1] = extra
+    end
+    return rows
+end
+
+local function describeSignup(change)
+    return string.format("%s · %s · %s", Labels.Role(change.role).label, change.spec, Labels.Status(change.status))
 end
 
 --- "2 j 04 h", "4 h 05", "12 min".
@@ -90,27 +123,34 @@ function RaidView.Header(event, sender, now)
     }
 end
 
---- "Mon inscription": the player's character, class, role and status.
+--- "Mon inscription": the player's character, class, role and status, and the change waiting for the website.
 function RaidView.Me(event, player)
     local signup = findSignup(event, player)
     if signup == nil then
-        return { row("line", "Tu n'es pas inscrit avec ce personnage."),
-            row("line", "Inscris-toi sur le site ou avec le bouton du message Discord.") }
+        return append({ row("line", "Tu n'es pas inscrit avec ce personnage."),
+            row("line", "Inscris-toi ci-dessous, sur le site ou sur Discord.") }, changeRows("signup", describeSignup))
     end
-    return {
+    return append({
         row("header", Labels.Colored(signup.name, signup.class)),
         row("line", string.format("%s · %s · %s", Labels.ClassName(signup.class), Labels.Role(signup.role).label,
             signup.reroll and "reroll" or "main")),
         row("line", "Spécialisation : " .. signup.spec),
         row("line", "Statut : " .. Labels.Status(signup.status)),
-    }
+    }, changeRows("signup", describeSignup))
 end
 
---- "Mes SR": each item with its boss and the SR+ bonus.
+--- "Mes SR": each item with its boss and the SR+ bonus; the reserves waiting for the website, or why it refused.
 function RaidView.MyReserves(event, player)
     local signup = findSignup(event, player)
+    local changes = changeRows("reserves", function(change)
+        local names = {}
+        for _, itemId in ipairs(change.itemIds) do
+            names[#names + 1] = lootName(event, itemId)
+        end
+        return #names > 0 and table.concat(names, ", ") or "aucune SR"
+    end)
     if signup == nil then
-        return { row("line", "Pas d'inscription, pas de SR.") }
+        return append({ row("line", "Pas d'inscription, pas de SR.") }, changes)
     end
     local rows = {}
     for _, reserve in ipairs(signup.reserves) do
@@ -121,6 +161,7 @@ function RaidView.MyReserves(event, player)
     if #signup.reserves == 0 then
         rows[1] = row("line", "Aucune SR.")
     end
+    append(rows, changes)
     rows[#rows + 1] = row("line", Theme.Colored("SR+ : +10 par raid sans l'objet si tu le re-SR (max +50).", "muted"))
     return rows
 end

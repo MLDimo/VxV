@@ -1,16 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { startRaid, websiteText } from "./fixtures.ts";
+import { ONYXIA_PACK, startRaid, websiteText } from "./fixtures.ts";
 import { killAndOpen, LINKS, OFFICER, raidWithData } from "./raidGroup.ts";
 
-/** The raid of the tests' event as its data pack registers it: Onyxia, then the guardian. */
-const ONYXIA_PACK = `
-  VXV_RaidData = { onyxia = { name = "Repaire d'Onyxia", instanceId = 249, bosses = {
-      { encounterId = 1084, name = "Onyxia", loot = {
-          { itemId = 20, name = "Tête d'Onyxia" }, { itemId = 21, name = "Sac en peau" },
-          { itemId = 30, name = "Écaille d'Onyxia" }, { itemId = 40, name = "Bâton du dragon" } } },
-      { encounterId = 1085, name = "Gardienne", loot = { { itemId = 10, name = "Cape de la gardienne" } } },
-  } } }
-`;
 const IN_ONYXIA = "Instance.id = 249";
 const EPIC = (text: string) => `|cffc58bff${text}|r`;
 /** The reduced mode's Raid tab, as the player sees it. */

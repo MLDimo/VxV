@@ -9,7 +9,7 @@ function readInGame(source: string): unknown {
 
 describe("inbox for the addon", () => {
   it("carries the next event as the addon reads it, accents and line breaks included", () => {
-    const raid = "VXV-RAID-1\nE;e1;1796932800;1796931900;2;Onyxia\nO;Ðéjà Vu";
+    const raid = "VXV-RAID-2\nE;e1;1796932800;1796931900;2;Onyxia\nO;Ðéjà Vu";
     expect(readInGame(renderInbox({ raid, writtenAt: new Date("2026-12-10T19:45:00Z") }))).toEqual({
       version: 1,
       writtenAt: 1796931900,

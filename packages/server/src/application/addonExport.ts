@@ -18,12 +18,13 @@ export interface NextEventExport {
 export function createAddonExport({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
   /** The event as text for the addon: sign-ups, soft reserves, the officers it trusts and the journal. */
   async function format(repositories: Repositories, event: RaidEvent): Promise<string> {
-    const [signups, board, members, characters, journal] = await Promise.all([
+    const [signups, board, members, characters, journal, changes] = await Promise.all([
       repositories.signups.listByEvent(event.id),
       loadBoardItems(repositories, event, undefined),
       repositories.members.listAll(),
       repositories.characters.listAll(),
       repositories.journal.listForEvent(event.id),
+      repositories.gameChanges.listByEvent(event.id),
     ]);
     const managers = new Set(members.filter((member) => canManageRaids(member.roles)).map((member) => member.id));
     return formatAddonEvent({
@@ -35,6 +36,7 @@ export function createAddonExport({ unitOfWork, clock }: { unitOfWork: UnitOfWor
       ),
       mainCharacterIds: new Set(characters.filter((character) => character.isMain).map((character) => character.id)),
       journal,
+      changes,
       exportedAt: clock(),
     });
   }

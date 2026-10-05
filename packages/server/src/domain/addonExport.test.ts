@@ -90,14 +90,24 @@ const facts: AddonEventFacts = {
       reason: "Pour le tank;\nprincipal",
     },
   ],
+  changes: [
+    {
+      id: "Thom Leboss#1796900000#42",
+      eventId: "e1",
+      author: "Thom Leboss",
+      accepted: true,
+      message: "SR enregistrées.",
+    },
+    { id: "Ciel Gris#1796900100#7", eventId: "e1", author: "Ciel Gris", accepted: false, message: "Refusé; trop tard" },
+  ],
   exportedAt: new Date("2026-12-10T19:45:00Z"),
 };
 
 describe("formatAddonEvent", () => {
-  it("writes the event, its officers, the reserved or excluded items, the sign-ups and the journal", () => {
+  it("writes the event, its officers, the reserved or excluded items, the sign-ups, the journal and the changes", () => {
     expect(formatAddonEvent(facts).split("\n")).toEqual([
       ADDON_EVENT_HEADER,
-      "E;e1;1796932800;1796931900;2;Onyxia + Mont Hyjal",
+      "E;e1;1796932800;1796931900;2;Onyxia + Mont Hyjal;onyxia,mont-hyjal",
       "O;Ðéjà Vu",
       "I;20;Tête d'Onyxia;Onyxia;0",
       "I;21;Sac en peau;Onyxia;0",
@@ -105,6 +115,8 @@ describe("formatAddonEvent", () => {
       "S;Thom Leboss;PRIEST;healer;present;0;Sacré;20:20,21:0",
       "S;Ciel Gris;WARRIOR;tank;bench;1;Protection;20:0",
       "J;1796839200;Officier;Objet exclu des SR : « Écaille » (Onyxia + Mont Hyjal, 10/12/2026 21:00);Pour le tank, principal",
+      "C;Thom Leboss#1796900000#42;1;SR enregistrées.",
+      "C;Ciel Gris#1796900100#7;0;Refusé, trop tard",
     ]);
   });
 

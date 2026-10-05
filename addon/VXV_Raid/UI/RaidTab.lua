@@ -5,8 +5,9 @@ local _, ns = ...
 local RaidTab = {}
 ns.RaidTab = RaidTab
 
-local Import, Invitations, LogExport, RaidData = ns.Import, ns.Invitations, ns.LogExport, ns.RaidData
-local RaidLog, RaidView, RowList = ns.RaidLog, ns.RaidView, ns.RowList
+local Choices, EventData, Import, Invitations = ns.Choices, ns.EventData, ns.Import, ns.Invitations
+local LogExport, RaidData, RaidLog, RaidView = ns.LogExport, ns.RaidData, ns.RaidLog, ns.RaidView
+local RowList, SignupDialog = ns.RowList, ns.SignupDialog
 
 local Theme = VXV.Theme
 
@@ -18,12 +19,14 @@ local SMALL_SHARE, COMPOSITION_SHARE = 0.4, 0.6
 local PANEL_PADDING, PANEL_TITLE = 14, 40
 local BUTTON_HEIGHT, BUTTON_GAP, JOIN_HEIGHT = 24, 6, 30
 local BADGE_HEIGHT, BADGE_PADDING, BADGE_ALPHA = 24, 16, 0.14
+-- The small button on the right of a panel's title (§7.1: « Changer »).
+local TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT, TITLE_BUTTON_TOP = 104, 22, 9
 
 local content, header
 local lists, buttons, badges = {}, {}, {}
 local officerPanel
 -- The officers' buttons, top to bottom.
-local OFFICER_ACTIONS = { "import", "open", "inviteAll", "export" }
+local OFFICER_ACTIONS = { "import", "open", "inviteAll", "exclusions", "export" }
 
 --- A panel of the grid with its title; returns the panel and the frame under the title.
 local function addPanel(x, y, width, height, title, officer)
@@ -76,8 +79,13 @@ end
 
 --- Which buttons the player sees, and their texts; the officers' shown buttons stacked.
 local function updateButtons()
-    local player, leader = VXV.PlayerName(), Invitations.Leader()
+    local player, leader, event = VXV.PlayerName(), Invitations.Leader(), RaidData.Current()
     local isOfficer = RaidData.IsOfficer(player)
+    -- Signing up closes when the raid starts, as on the website.
+    buttons.signup:SetShown(event ~= nil and time() < event.startsAt)
+    buttons.signup:SetText(EventData.SignupOf(event, player) and "Changer" or "M'inscrire")
+    buttons.reserves:SetShown(Choices.CanReserve(event, player))
+    buttons.exclusions:SetShown(isOfficer)
     -- Anybody may load the first data: refused unless the website names them officer.
     officerPanel:SetShown(RaidData.Current() == nil or isOfficer)
     buttons.open:SetShown(isOfficer and (leader == nil or leader == player))
@@ -127,6 +135,7 @@ local function addOfficerPanel(x, y, height)
         import = { "Charger les données", Import.Open },
         open = { "Ouvrir les invitations", Invitations.Toggle },
         inviteAll = { "Inviter tout le roster", Invitations.InviteAll },
+        exclusions = { "Exclure des objets", Choices.Exclusions },
         export = { "Exporter le journal du raid", LogExport.Open },
     }
     for _, key in ipairs(OFFICER_ACTIONS) do
@@ -135,6 +144,22 @@ local function addOfficerPanel(x, y, height)
         buttons[key]:SetScript("OnClick", run)
     end
     lists.requests = RowList.Create(body, #OFFICER_ACTIONS * (BUTTON_HEIGHT + BUTTON_GAP))
+end
+
+--- A list in the panel's body, above room left at its bottom.
+local function listAbove(body, room)
+    local area = CreateFrame("Frame", nil, body)
+    area:SetPoint("TOPLEFT")
+    area:SetSize(body:GetWidth(), body:GetHeight() - room)
+    return RowList.Create(area)
+end
+
+--- A small wood button on the right of the panel's title.
+local function titleButton(panel, text, run)
+    local button = Theme.Button(panel, "wood", text, TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT)
+    button:SetPoint("TOPRIGHT", -PANEL_PADDING, -TITLE_BUTTON_TOP)
+    button:SetScript("OnClick", run)
+    return button
 end
 
 function RaidTab.Build(frame)
@@ -151,10 +176,11 @@ function RaidTab.Build(frame)
 
     local meHeight, officerHeight = split(SMALL_SHARE)
     local mePanel, meBody = addPanel(PADDING, GRID_TOP, LEFT, meHeight, "Mon inscription")
-    lists.me = RowList.Create(meBody)
+    lists.me = listAbove(meBody, JOIN_HEIGHT + BUTTON_GAP)
     buttons.join = Theme.Button(mePanel, "pixel", "Rejoindre le raid", LEFT - 2 * PANEL_PADDING, JOIN_HEIGHT)
     buttons.join:SetPoint("BOTTOM", 0, PANEL_PADDING)
     buttons.join:SetScript("OnClick", Invitations.Join)
+    buttons.signup = titleButton(mePanel, "M'inscrire", SignupDialog.Open)
     addOfficerPanel(PADDING, GRID_TOP + meHeight + GAP, officerHeight)
 
     local compositionHeight, reservesHeight = split(COMPOSITION_SHARE)
@@ -164,10 +190,13 @@ function RaidTab.Build(frame)
     lists.raidReserves = RowList.Create(reservesBody)
 
     local myHeight, lootsHeight = split(SMALL_SHARE)
-    local _, myBody = addPanel(x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
+    local myPanel, myBody = addPanel(x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
     lists.myReserves = RowList.Create(myBody)
+    buttons.reserves = titleButton(myPanel, "Choisir", Choices.Reserves)
     local _, lootsBody = addPanel(x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight, "Derniers loots")
     lists.loots = RowList.Create(lootsBody)
+    -- What depends on the time (the lock, the start) is up to date each time the screen shows.
+    content:SetScript("OnShow", render)
     render()
 end
 
@@ -180,3 +209,4 @@ end
 VXV.On("raid.updated", refresh)
 VXV.On("raid.invitations", refresh)
 VXV.On("raid.log", refresh)
+VXV.On("raid.changes", refresh)
