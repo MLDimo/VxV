@@ -20,6 +20,7 @@ export const COLORS = {
   ink: "#0D0912",
   panel: "rgba(18, 13, 26, 0.88)",
   card: "#1A1222",
+  alert: "#2A1030",
   "panel-officer": "rgba(42, 26, 10, 0.9)",
   ivory: "#F4EFFC",
   lavender: "#C9C2EA",

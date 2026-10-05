@@ -1,9 +1,10 @@
 local _, ns = ...
 
 --- A list of text rows in the charter's fonts, scrolled with the mouse wheel; shared by the Raid and Journal
---- screens and the loot panel. A row is { kind = "title" | "header" | "line" | "bar", text, tooltip = { title,
---- lines } or link = item link for the game's item tooltip, onClick, stamp = { text, color } }; a bar is
---- { kind = "bar", share between 0 and 1, color = a token }.
+--- screens, the reduced mode and the loot panel. A row is { kind = "title" | "header" | "line" | "bar" | "card",
+--- text, tooltip = { title, lines } or link = item link for the game's item tooltip, onClick, stamp = { text,
+--- color } }; a bar is { kind = "bar", share between 0 and 1, color = a token }; a card is a block with its text
+--- and a detail line under it.
 local RowList = {}
 ns.RowList = RowList
 
@@ -15,9 +16,9 @@ local RULE = 24
 RowList.RULE = RULE
 local PALETTES = {
     panel = {
-        heights = { title = 24, header = 22, line = 18, bar = 8 },
+        heights = { title = 24, header = 22, line = 18, bar = 8, card = 58 },
         fonts = { title = { "pixelBold", 18, "ivory" }, header = { "pixel", 15, "ivory" },
-            line = { "text", 13, "lavender" } },
+            line = { "text", 13, "lavender" }, card = { "textBold", 15, "ivory" } },
         step = 40,
     },
     parchment = {
@@ -29,6 +30,8 @@ local PALETTES = {
 }
 local BAR_HEIGHT = 4
 local STAMP_HEIGHT, STAMP_PADDING, STAMP_GAP, STAMP_BORDER = 14, 8, 6, 1
+-- A card: its block, the space under it, and its text's margins.
+local CARD_GAP, CARD_PADDING, CARD_TEXT_TOP, CARD_DETAIL_TOP = 6, 12, -9, -31
 
 local function showTooltip(frame)
     local row = frame.row
@@ -54,6 +57,20 @@ local function addStamp(frame)
     stamp.label = Theme.Text(stamp, "textHeavy", 10, "ink-brown")
     stamp.label:SetPoint("CENTER")
     return stamp
+end
+
+--- A card's block behind its text, and its detail line.
+local function showCard(frame, row)
+    local isCard = row.kind == "card"
+    frame.block:SetShown(isCard)
+    frame.detail:SetShown(isCard)
+    frame.detail:SetText(isCard and row.detail or "")
+    if isCard then
+        frame.label:ClearAllPoints()
+        frame.label:SetPoint("TOPLEFT", CARD_PADDING, CARD_TEXT_TOP)
+        frame.label:SetPoint("RIGHT", -CARD_PADDING, 0)
+    end
+    return isCard
 end
 
 local function showStamp(frame, stamp)
@@ -99,6 +116,13 @@ function RowList.Create(parent, topOffset, paletteName)
         frame.label = Theme.Text(frame, "text", 13, "lavender")
         frame.label:SetWordWrap(false)
         frame.stamp = addStamp(frame)
+        frame.block = Theme.Fill(frame, "card")
+        frame.block:SetPoint("TOPLEFT")
+        frame.block:SetPoint("BOTTOMRIGHT", 0, CARD_GAP)
+        frame.detail = Theme.Text(frame, "text", 13, "lavender")
+        frame.detail:SetPoint("TOPLEFT", CARD_PADDING, CARD_DETAIL_TOP)
+        frame.detail:SetPoint("RIGHT", -CARD_PADDING, 0)
+        frame.detail:SetWordWrap(false)
         frame.bar = Theme.Fill(frame, "line", "ARTWORK")
         frame.bar:SetPoint("LEFT")
         frame.bar:SetHeight(BAR_HEIGHT)
@@ -117,7 +141,9 @@ function RowList.Create(parent, topOffset, paletteName)
             frame:ClearAllPoints()
             frame:SetPoint("TOPLEFT", 0, -top)
             top = top + height
-            showStamp(frame, row.stamp)
+            if not showCard(frame, row) then
+                showStamp(frame, row.stamp)
+            end
             if row.kind == "bar" then
                 frame.label:SetText("")
                 frame.bar:SetColorTexture(Theme.Color(row.color or "line"))

@@ -23,13 +23,13 @@ describe("renderLuaPack", () => {
     ]);
   });
 
-  it("declares the Forever interface, a version filled by the packager and the data file", () => {
+  it("declares the Forever interface, a version filled by the packager and the data file, loaded with the game", () => {
     const lines = toc?.content.split("\n") ?? [];
     expect(lines).toContain(`## Interface: ${ADDON_INTERFACE}`);
     expect(lines).toContain("## Title: VXV Data - La salle des Thanes");
     expect(lines).toContain("## Version: @project-version@");
     expect(lines).toContain("## Dependencies: VXV_Core");
-    expect(lines).toContain("## LoadOnDemand: 1");
+    expect(lines.filter((line) => line.startsWith("## LoadOnDemand"))).toEqual([]);
     expect(lines).toContain("Data.lua");
   });
 

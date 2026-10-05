@@ -11,6 +11,8 @@ export type PlaqueAnchor = "above" | "board" | "middle" | "table" | "door";
 export interface Place {
   id: "raid" | "dice" | "quests" | "ranking" | "artisans" | "journal";
   name: string;
+  /** Name of the tab in the addon's reduced mode (§7.8), when the place's name is too long. */
+  short?: string;
   subtitle: string;
   /** Color token of the kicker above the screen's title (§2.5); the journal has none. */
   kicker: ColorToken | undefined;
@@ -41,6 +43,7 @@ export const PLACES: readonly Place[] = [
   {
     id: "dice",
     name: "Le Dé Pipé",
+    short: "Paris",
     subtitle: "Paris & deathroll",
     kicker: "neon",
     spot: [73.5, 21, 11, 68],
@@ -89,6 +92,9 @@ export const PLACES: readonly Place[] = [
     backdrop: { position: [0, 70], zoom: 2.5, opacity: 0.3 },
   },
 ];
+
+/** The tabs of the addon's reduced mode (§7.8), in order; the other places are behind "…". */
+export const COMPACT_PLACES: readonly Place["id"][] = ["raid", "dice", "quests", "ranking"];
 
 /** The cards under the tavern (§5.1, §7.0), in order: a place's news, or what it will bring ("Bientôt"). */
 export const TAVERN_CARDS: readonly { place: Place["id"]; kicker: string; soon?: string }[] = [

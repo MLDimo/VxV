@@ -26,9 +26,8 @@ function renderToc(raid: Raid): string {
     `## Notes: Données du raid ${raid.name} pour VXV (fichier généré)`,
     "## Author: VXV",
     "## Version: @project-version@",
-    // Loaded by VXV_Core when a raid needs it, never at login.
+    // Loaded with the game: a few kilobytes, and loading on demand (C_AddOns.LoadAddOn) is not measured on Forever.
     "## Dependencies: VXV_Core",
-    "## LoadOnDemand: 1",
     "",
     DATA_FILE,
     "",

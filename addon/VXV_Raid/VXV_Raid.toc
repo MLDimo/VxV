@@ -20,15 +20,18 @@ Invitations.lua
 BossLoot.lua
 Distribution.lua
 RaidLog.lua
+Raids.lua
 
-# Interface: the Raid and Journal screens, the loot panel and the import and export of the data.
+# Interface: the Raid and Journal screens, the reduced mode, the loot panel and the import and export of the data.
 UI\RowList.lua
 UI\RaidView.lua
+UI\CompactView.lua
 UI\LootView.lua
 UI\JournalView.lua
 UI\Import.lua
 UI\LogExport.lua
 UI\RaidTab.lua
+UI\RaidCompact.lua
 UI\LootPanel.lua
 UI\JournalTab.lua
 
