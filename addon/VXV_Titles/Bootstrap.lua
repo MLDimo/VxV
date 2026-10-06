@@ -9,6 +9,8 @@ VXV.RegisterModule({
     end,
     tab = {
         place = "ranking",
+        name = "Titres",
+        order = 3,
         Build = ns.RankingTab.Build,
         Compact = ns.RankingTab.Compact,
     },

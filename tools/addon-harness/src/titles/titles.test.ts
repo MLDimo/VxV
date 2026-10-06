@@ -4,6 +4,7 @@ import { TITLES } from "@vxv/server/domain/titles";
 import { describe, expect, it } from "vitest";
 import { startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
+import { parisText } from "../paris/fixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
 const BUNDLES = ["VXV_Titles", "VXV_Sync"];
@@ -37,6 +38,14 @@ const ROWS = `
   end)
   return texts
 `;
+/** The rows shown on screen: those of the selected tab of a place. */
+const VISIBLE_ROWS = `
+  local texts = {}
+  FindWidget(VXV_Window, function(widget)
+      if widget.row ~= nil and IsVisible(widget) then texts[#texts + 1] = widget.label.text end
+  end)
+  return texts
+`;
 /** The texts without their colors. */
 const plain = (texts: unknown) => (texts as string[]).map((text) => text.replace(/\|c\w{8}(.*?)\|r/gu, "$1"));
 const TAG = "[◆ Roi du gambling · ◆ Sugar Daddy]";
@@ -53,6 +62,29 @@ describe("the titles in game (P13.3, P13.4)", () => {
     expect(rows).toHaveLength(TITLES.length);
     expect(rows[0]).toBe("◆ Roi du gambling  Thom Leboss");
     expect(rows).toContain("◆ Bien gras  Personne cette semaine");
+    expect(errors()).toEqual([]);
+  });
+
+  it("shows the Ranking's three tabs, the bettors first, then the deathroll and the titles", () => {
+    const { client, errors } = startCore({
+      written: companionFiles({ titres: formatAddonTitles(WEEK), paris: parisText() }),
+      bundles: ["VXV_Titles", "VXV_Paris", "VXV_Deathroll", "VXV_Sync"],
+    });
+    client(OPEN_TAB("Ranking"));
+    const tabs = client(`
+      local names = {}
+      FindWidget(VXV_Window, function(widget)
+        if widget.SetSelected and widget.label and widget.label.text ~= nil and widget.parent ~= VXV_Window.header then
+          names[#names + 1] = widget.label.text
+        end
+      end)
+      return names`);
+    expect(tabs).toEqual(["Paris", "Deathroll", "Titres"]);
+    expect(plain(client(VISIBLE_ROWS))).toEqual(["1. Thom Leboss · +30 po · 2 paris"]);
+    client(`FindWidget(VXV_Window, function(widget)
+      return widget.SetSelected and widget.label and widget.label.text == "Titres"
+    end):Run("OnClick")`);
+    expect(plain(client(VISIBLE_ROWS))).toContain("◆ Roi du gambling  Thom Leboss");
     expect(errors()).toEqual([]);
   });
 

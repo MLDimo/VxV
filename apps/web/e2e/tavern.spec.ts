@@ -13,6 +13,8 @@ test("the tavern opens every place", async ({ page, context }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Le Dé Pipé", exact: true }).last().click();
   await expect(page).toHaveURL(/\/paris$/);
+  // Its screen stands over the tavern framed on its door, as in the addon.
+  await expect(page.locator('[data-place="dice"]')).toHaveCount(1);
 
   await page.goto("/");
   await page.getByRole("link", { name: "Artisans", exact: true }).last().click();
