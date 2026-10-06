@@ -1,6 +1,21 @@
 import type { APIRequestContext } from "@playwright/test";
 import type { FakeMessage } from "@vxv/server/testing";
-import { FAKE_DISCORD_URL } from "./environment";
+import { DISCORD, FAKE_DISCORD_URL } from "./environment";
+
+export const INTERACTIONS_ENDPOINT = "/api/discord/interactions";
+
+/** Posts to the website an interaction signed as Discord would sign it. */
+export function postSigned(request: APIRequestContext, interaction: unknown) {
+  const signed = DISCORD.sign(interaction);
+  return request.post(INTERACTIONS_ENDPOINT, {
+    data: signed.body,
+    headers: {
+      "content-type": "application/json",
+      "x-signature-ed25519": signed.signature,
+      "x-signature-timestamp": signed.timestamp,
+    },
+  });
+}
 
 /** What the bot did on a member, as the fake Discord saw it. */
 export async function discordMemberState(

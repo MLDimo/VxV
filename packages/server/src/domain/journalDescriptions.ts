@@ -1,4 +1,5 @@
 import type {
+  BetCreationRecord,
   EventCreationRecord,
   ExclusionRecord,
   JournalAction,
@@ -20,6 +21,7 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "raid.import": "Import du journal d'un raid",
   "loot.council": "Objet attribué au loot council",
   "loot.correct": "Loot corrigé par un officier",
+  "bet.create": "Ouverture d'un pari",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -82,6 +84,10 @@ function describeLootCorrection(record: LootCorrectionRecord): string {
   return `« ${record.itemName} » (${where}) : ${side(record.before)} → ${side(record.after)}`;
 }
 
+function describeBetCreation(record: BetCreationRecord): string {
+  return `« ${record.title} » : ${record.choices.join(", ")} ; fermeture le ${formatDateTime(new Date(record.closesAt))}`;
+}
+
 /** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -102,5 +108,7 @@ export function describeJournalEntry(entry: JournalEntry): string {
       return describeLootCouncil(entry.after as LootCouncilRecord);
     case "loot.correct":
       return describeLootCorrection(entry.after as LootCorrectionRecord);
+    case "bet.create":
+      return describeBetCreation(entry.after as BetCreationRecord);
   }
 }

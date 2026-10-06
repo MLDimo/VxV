@@ -4,9 +4,13 @@ import {
   InteractionType,
   type APIInteraction,
   type APIInteractionResponse,
+  type APIMessageComponentGuildInteraction,
+  type APIModalSubmitGuildInteraction,
 } from "discord-api-types/v10";
 import { isChatInputApplicationCommandInteraction, isGuildInteraction } from "discord-api-types/utils/v10";
 import type { KeyObject } from "node:crypto";
+import { BET_FORM_PREFIX, openBetForm, submitBetForm, withdrawStake } from "./betForm.ts";
+import { BET_BUTTON_PREFIX, BET_WITHDRAW_PREFIX } from "./betMessage.ts";
 import { SLASH_COMMANDS } from "./commandList.ts";
 import type { BotContext } from "./commands.ts";
 import { afterPrefix } from "./customIds.ts";
@@ -35,6 +39,34 @@ const FAILURE = "Une erreur est survenue. Réessaie dans un instant ; si elle pe
 
 const commandsByName = new Map(SLASH_COMMANDS.map((command) => [command.definition.name, command]));
 
+type Handler<Interaction> = (
+  interaction: Interaction,
+  context: BotContext,
+  id: string,
+) => Promise<APIInteractionResponse>;
+
+/** The buttons of the bot's messages and the forms they open, by the prefix of their id (an event or a bet). */
+const BUTTONS: readonly [string, Handler<APIMessageComponentGuildInteraction>][] = [
+  [SIGNUP_BUTTON_PREFIX, openSignupForm],
+  [BET_BUTTON_PREFIX, openBetForm],
+  [BET_WITHDRAW_PREFIX, withdrawStake],
+];
+const FORMS: readonly [string, Handler<APIModalSubmitGuildInteraction>][] = [
+  [SIGNUP_FORM_PREFIX, submitSignupForm],
+  [BET_FORM_PREFIX, submitBetForm],
+];
+
+/** The handler whose prefix starts the id, with what follows the prefix. */
+function route<Interaction>(handlers: readonly [string, Handler<Interaction>][], customId: string) {
+  for (const [prefix, handler] of handlers) {
+    const id = afterPrefix(customId, prefix);
+    if (id !== undefined) {
+      return { handler, id };
+    }
+  }
+  return undefined;
+}
+
 async function respond(interaction: APIInteraction, context: BotContext): Promise<APIInteractionResponse> {
   if (interaction.type === InteractionType.Ping) {
     return { type: InteractionResponseType.Pong };
@@ -56,15 +88,15 @@ async function respond(interaction: APIInteraction, context: BotContext): Promis
     }
   }
   if (interaction.type === InteractionType.MessageComponent) {
-    const eventId = afterPrefix(interaction.data.custom_id, SIGNUP_BUTTON_PREFIX);
-    if (eventId !== undefined) {
-      return openSignupForm(interaction, context, eventId);
+    const button = route(BUTTONS, interaction.data.custom_id);
+    if (button !== undefined) {
+      return button.handler(interaction, context, button.id);
     }
   }
   if (interaction.type === InteractionType.ModalSubmit) {
-    const eventId = afterPrefix(interaction.data.custom_id, SIGNUP_FORM_PREFIX);
-    if (eventId !== undefined) {
-      return submitSignupForm(interaction, context, eventId);
+    const form = route(FORMS, interaction.data.custom_id);
+    if (form !== undefined) {
+      return form.handler(interaction, context, form.id);
     }
   }
   return ephemeral(UNAVAILABLE);

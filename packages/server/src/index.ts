@@ -50,7 +50,21 @@ export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastru
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
-export type { AnnouncedRaid, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+export type { AnnouncedBet, AnnouncedRaid, BetAnnouncer, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+export type { BetView } from "./application/bets.ts";
+export {
+  MAX_BET_TITLE_LENGTH,
+  MAX_CHOICE_LENGTH,
+  MAX_CHOICES,
+  MIN_CHOICES,
+  MIN_STAKE,
+  ORGANISATION_PERCENT,
+  type Bet,
+  type BetBook,
+  type BetChoice,
+  type DiscordMessage,
+  type Stake,
+} from "./domain/bets.ts";
 export { RaidLogFormatError } from "./domain/raidLog.ts";
 export type { RaidRecap } from "./domain/raidRecap.ts";
 export type { RaidReminder } from "./domain/reminders.ts";

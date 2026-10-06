@@ -1,28 +1,20 @@
 import { autocomplete, buttonClick, formSubmission, slashCommand, type TestActor } from "@vxv/bot/testing";
-import { expect, test, type APIRequestContext } from "@playwright/test";
-import { DISCORD, DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
-import { discordEventMessage, discordMemberState, discordMessages } from "./fakeDiscord";
+import { expect, test } from "@playwright/test";
+import { DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
+import {
+  discordEventMessage,
+  discordMemberState,
+  discordMessages,
+  INTERACTIONS_ENDPOINT,
+  postSigned,
+} from "./fakeDiscord";
 import { signInAs } from "./sessions";
 
-const ENDPOINT = "/api/discord/interactions";
 const DISCORD_MEMBER: TestActor = {
   userId: "600",
   name: "Membre Discord",
   channelId: WEB_ENVIRONMENT.DISCORD_LINK_CHANNEL_ID,
 };
-
-/** Posts an interaction signed as Discord would sign it. */
-function postSigned(request: APIRequestContext, interaction: unknown) {
-  const signed = DISCORD.sign(interaction);
-  return request.post(ENDPOINT, {
-    data: signed.body,
-    headers: {
-      "content-type": "application/json",
-      "x-signature-ed25519": signed.signature,
-      "x-signature-timestamp": signed.timestamp,
-    },
-  });
-}
 
 // The tests build on each other: the member's main, linked with /vxv_main, then the raid created with /vxv_raid.
 let discordRaidId = "";
@@ -33,7 +25,7 @@ test.describe.serial("Discord bot", () => {
     expect(pong.status()).toBe(200);
     expect(await pong.json()).toEqual({ type: 1 });
 
-    const unsigned = await request.post(ENDPOINT, {
+    const unsigned = await request.post(INTERACTIONS_ENDPOINT, {
       data: { type: 1 },
       headers: { "content-type": "application/json" },
     });

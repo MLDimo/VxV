@@ -32,9 +32,14 @@ describe("parseConfig", () => {
         guildId: "222",
         linkChannelId: "333",
         raidChannelId: "444",
+        betsChannelId: "444",
         roles: { treasurer: "2", officer: "3", gm: "4" },
       },
     });
+  });
+
+  it("publishes the bets in their own channel when one is given", () => {
+    expect(parseConfig({ ...environment, DISCORD_BETS_CHANNEL_ID: "555" }).discord.betsChannelId).toBe("555");
   });
 
   it("names every missing or invalid variable", () => {

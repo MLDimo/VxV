@@ -3,7 +3,8 @@
 Outil de guilde pour WoW Forever : addon en jeu, site web, bot Discord et app compagnon, autour d'une base Supabase.
 Gestion des raids, soft reserves (SR), attribution et suivi du loot, puis paris, missions, titres, artisans et deathroll.
 Le plan de référence est le PDF « VXV - Plan de développement » v1.0 du 3 octobre 2026 : 16 phases (P0 à P15),
-avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` (SR+, historique, droits, modèle de données).
+avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` (SR+, historique, droits, modèle de données)
+et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
 
 ## État d'avancement
 
@@ -63,7 +64,12 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - 9.2 création d'événement en jeu (officiers) : bouton « Créer un événement » de l'écran Raid (date et heure comme `/vxv_raid`, raids des packs, SR par joueur, motif), créé par le site avec la même lecture des dates (`domain/raidStart.ts`, partagée avec le bot), journalisé et annoncé sur Discord ; la réponse revient avec les données de tout événement pendant 14 jours ;
   - 9.4 conflits : le site fait foi et la modification la plus récente gagne avant le verrouillage (heure de l'inscription et de ses SR en base ; un changement fait en jeu porte l'heure du jeu, ramenée à l'heure du site si elle la dépasse).
   Validation en attente : une inscription faite en jeu apparaît sur Discord après la synchro (compagnon relié).
-- P10 à P15 : pas commencées.
+- P10 Mise en production : pas commencée (le propriétaire a lancé la P11 et la P12 avant).
+- **P11 Paris** : en cours.
+  - 11.1 à 11.4 : paris, choix et mises en base ; ouverture par un officier (site, `/vxv_pari`), mises depuis le
+    site et Discord (boutons « Miser » et « Retirer ma mise »), cotes en direct dans le message du pari
+    (`packages/server/src/domain/bets.ts`, section « Le Dé Pipé » du site, `/paris`).
+- P12 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
 

@@ -60,6 +60,26 @@ export function formatDuration(durationMs: number): string {
   return hours > 0 ? `${String(hours)} h ${String(rest).padStart(2, "0")}` : `${String(minutes)} min`;
 }
 
+/** Keeps a number with its unit on one line. */
+const NO_BREAK = "\u00a0";
+const WHOLE = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+const ODDS = new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** Gold pieces, with the French thousands separator: "1 000 po". */
+export function formatGold(amount: number): string {
+  return `${WHOLE.format(amount)}${NO_BREAK}po`;
+}
+
+/** What one po brings back on a choice: "× 4,50"; a dash while nobody staked on it. */
+export function formatOdds(odds: number | undefined): string {
+  return odds === undefined ? "—" : `×${NO_BREAK}${ODDS.format(odds)}`;
+}
+
+/** A share from 0 to 1, as a whole percentage: "42 %". */
+export function formatShare(share: number): string {
+  return `${WHOLE.format(share * 100)}${NO_BREAK}%`;
+}
+
 /** Raids of an evening joined in one title: "Onyxia + Mont Hyjal". */
 export function raidTitle(raidNames: readonly string[]): string {
   return raidNames.join(" + ");

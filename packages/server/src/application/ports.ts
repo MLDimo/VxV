@@ -1,3 +1,4 @@
+import type { Bet, DiscordMessage, NewBet, Stake } from "../domain/bets.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
 import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { GameChangeOutcome } from "../domain/gameChanges.ts";
@@ -200,6 +201,25 @@ export interface SyncMarkRepository {
   save(kind: string, capturedAt: Date): Promise<void>;
 }
 
+export interface BetRepository {
+  create(bet: NewBet, createdBy: string, createdAt: Date): Promise<string>;
+  /** Undefined when the id is unknown or malformed. */
+  findById(betId: string): Promise<Bet | undefined>;
+  /** The latest closing first. */
+  listRecent(limit: number): Promise<Bet[]>;
+  setDiscordMessage(betId: string, message: DiscordMessage): Promise<void>;
+}
+
+export interface StakeRepository {
+  /** The bet's stakes, in the order they were placed. */
+  listByBet(betId: string): Promise<Stake[]>;
+  /** The stakes of these bets, in the order they were placed. */
+  listByBets(betIds: readonly string[]): Promise<Stake[]>;
+  /** Creates the member's stake on the bet, or moves it to this choice and amount, as placed at the instant. */
+  save(stake: Pick<Stake, "betId" | "memberId" | "choiceId" | "amount">, placedAt: Date): Promise<void>;
+  delete(betId: string, memberId: string): Promise<void>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
@@ -217,6 +237,8 @@ export interface Repositories {
   raidLogs: RaidLogRepository;
   syncMarks: SyncMarkRepository;
   gameChanges: GameChangeRepository;
+  bets: BetRepository;
+  stakes: StakeRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */
@@ -252,4 +274,19 @@ export interface RaidAnnouncer {
   remind(reminder: RaidReminder): Promise<void>;
   /** Publishes the end-of-raid recap, in the raid channel. */
   recap(recap: RaidRecap): Promise<void>;
+}
+
+/** A bet and its stakes, as shown in its Discord message. */
+export interface AnnouncedBet {
+  bet: Bet;
+  stakes: Stake[];
+  /** Whether stakes are still taken. */
+  open: boolean;
+}
+
+/** The bets' channel on Discord, where each bet has its message, with the pool and the odds. */
+export interface BetAnnouncer {
+  publish(bet: AnnouncedBet): Promise<DiscordMessage>;
+  /** Refreshes the message; false when it no longer exists (deleted on Discord). */
+  update(message: DiscordMessage, bet: AnnouncedBet): Promise<boolean>;
 }

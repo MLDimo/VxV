@@ -9,7 +9,8 @@ export type JournalAction =
   | "softReserve.override"
   | "raid.import"
   | "loot.council"
-  | "loot.correct";
+  | "loot.correct"
+  | "bet.create";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -70,6 +71,13 @@ export interface LootCorrectionRecord {
   eventStartsAt: string;
   before: { winnerName: string; method: LootMethod };
   after: { winnerName: string; method: LootMethod };
+}
+
+/** What the journal keeps about a bet an officer opened. */
+export interface BetCreationRecord {
+  title: string;
+  choices: string[];
+  closesAt: string;
 }
 
 /** What the journal keeps about an officer's correction of a player's soft reserves. */

@@ -42,6 +42,10 @@ export const COLORS = {
   "ink-brown": "#3A2614",
   ember: "#FFA03C",
   neon: "#FF5AC8",
+  // Le Dé Pipé (§7.2): the felt of the gaming table, from its lit centre to its edge
+  felt: "#3B1C5E",
+  "felt-mid": "#24123B",
+  "felt-edge": "#170C27",
   // Accounts book (§7.7): leather cover, ruled pages and the inks of the stamps
   leather: "#4A2414",
   "leather-shade": "#2E140A",

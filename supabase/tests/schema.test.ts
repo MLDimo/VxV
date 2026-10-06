@@ -180,6 +180,45 @@ describe("initial schema", () => {
     });
   });
 
+  describe("bets", () => {
+    async function insertBet(memberId: string, labels: string[]): Promise<{ betId: string; choiceIds: string[] }> {
+      const { rows } = await database.query<{ id: string }>(
+        "insert into bets (title, closes_at, created_by) values ('Qui meurt ?', now() + interval '1 day', $1) returning id",
+        [memberId],
+      );
+      const betId = rows[0]?.id ?? "";
+      const choiceIds: string[] = [];
+      for (const [index, label] of labels.entries()) {
+        const choice = await database.query<{ id: string }>(
+          "insert into bet_choices (bet_id, position, label) values ($1, $2, $3) returning id",
+          [betId, index + 1, label],
+        );
+        choiceIds.push(choice.rows[0]?.id ?? "");
+      }
+      return { betId, choiceIds };
+    }
+
+    const insertStake = (betId: string, memberId: string, choiceId: string | undefined) =>
+      database.query(
+        "insert into stakes (bet_id, member_id, choice_id, amount, placed_at) values ($1, $2, $3, 10, now())",
+        [betId, memberId, choiceId],
+      );
+
+    it("takes one stake per member and bet", async () => {
+      const memberId = await insertMember(database, "1");
+      const { betId, choiceIds } = await insertBet(memberId, ["Un tank", "Un heal"]);
+      await insertStake(betId, memberId, choiceIds[0]);
+      await expect(insertStake(betId, memberId, choiceIds[1])).rejects.toThrow(/duplicate key/);
+    });
+
+    it("refuses a stake on another bet's choice", async () => {
+      const memberId = await insertMember(database, "1");
+      const first = await insertBet(memberId, ["Un tank", "Un heal"]);
+      const second = await insertBet(memberId, ["Oui", "Non"]);
+      await expect(insertStake(first.betId, memberId, second.choiceIds[0])).rejects.toThrow(/foreign key/);
+    });
+  });
+
   describe("journal", () => {
     async function insertEntry(reason: string): Promise<void> {
       const actorId = await insertMember(database, "officer");
