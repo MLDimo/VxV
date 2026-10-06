@@ -1,3 +1,4 @@
+import { createAddonBets } from "./application/addonBets.ts";
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAuth } from "./application/auth.ts";
 import { createBetAnnouncements } from "./application/betAnnouncements.ts";
@@ -55,6 +56,8 @@ export function createApplication({
   const exclusions = createExclusions({ unitOfWork });
   const raidAnnouncements = createRaidAnnouncements({ unitOfWork, announcer });
   const events = createEvents({ unitOfWork, clock });
+  const bets = createBets({ unitOfWork, clock });
+  const betAnnouncements = createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock });
   const gameChanges = createGameChanges({
     unitOfWork,
     clock,
@@ -63,6 +66,8 @@ export function createApplication({
     exclusions,
     events,
     announcements: raidAnnouncements,
+    bets,
+    betAnnouncements,
   });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
@@ -81,8 +86,9 @@ export function createApplication({
     journal: createJournal({ unitOfWork }),
     addonExport: createAddonExport({ unitOfWork, clock }),
     raidLogs,
-    bets: createBets({ unitOfWork, clock }),
-    betAnnouncements: createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock }),
+    bets,
+    betAnnouncements,
+    addonBets: createAddonBets({ unitOfWork, clock }),
     treasury: createTreasury({ unitOfWork, clock }),
     cash: createCash({ unitOfWork, clock }),
     ranking: createRanking({ unitOfWork, clock }),

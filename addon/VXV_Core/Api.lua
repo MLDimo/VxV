@@ -57,6 +57,8 @@ VXV = {
     Theme = ns.Theme,
     --- (name, width, height, title): a small window in the charter, closed by Escape; returns it and its body.
     CreateDialog = ns.Dialog.Create,
+    --- Lists of text rows scrolled with the wheel: RowList.Create(parent, topOffset, palette), RowList.RULE.
+    RowList = ns.RowList,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

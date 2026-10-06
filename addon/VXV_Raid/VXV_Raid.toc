@@ -31,7 +31,6 @@ UI\AlertFrame.lua
 BossAlert.lua
 
 # Interface: the Raid and Journal screens, the reduced mode, the loot panel and the import and export of the data.
-UI\RowList.lua
 UI\RaidView.lua
 UI\CompactView.lua
 UI\LootView.lua

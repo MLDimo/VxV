@@ -15,6 +15,7 @@ import { createRaidLogs } from "./raidLogs.ts";
 import { createRoster } from "./roster.ts";
 import { createSignups } from "./signups.ts";
 import { createSoftReserves } from "./softReserves.ts";
+import { createBets } from "./bets.ts";
 
 const ROSTER = "VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nThom;Leboss;PRIEST";
 const CAPTURED_AT = new Date("2026-12-10T23:30:00Z");
@@ -50,6 +51,8 @@ describe("companion uploads", () => {
         signups: createSignups({ unitOfWork, clock }),
         softReserves: createSoftReserves({ unitOfWork, clock }),
         exclusions: createExclusions({ unitOfWork }),
+        bets: createBets({ unitOfWork, clock }),
+        betAnnouncements: { announceQuietly: async () => true },
         announcements: { announceQuietly: async () => true },
       }),
     });

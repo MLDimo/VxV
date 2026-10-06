@@ -5,12 +5,11 @@ import type { JournalEntry } from "./journal.ts";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "./journalDescriptions.ts";
 import { raidTitle } from "./labels.ts";
 import type { Signup } from "./signups.ts";
+import { flag, line, seconds, text } from "./addonText.ts";
 import type { BoardItem } from "./softReserves.ts";
 
 /** First line of an event exported for the addon (contract with VXV_Raid); the number is the format version. */
 export const ADDON_EVENT_HEADER = "VXV-RAID-2";
-
-const MS_PER_SECOND = 1000;
 
 export interface AddonEventFacts {
   event: RaidEvent;
@@ -25,27 +24,6 @@ export interface AddonEventFacts {
   /** What became of the changes made in game, in the order received. */
   changes: readonly GameChangeOutcome[];
   exportedAt: Date;
-}
-
-function seconds(date: Date): number {
-  return Math.floor(date.getTime() / MS_PER_SECOND);
-}
-
-/** Free text in one field: the separators of the format become commas. */
-function text(value: string): string {
-  return value
-    .split(/[;\r\n]+/)
-    .map((part) => part.trim())
-    .filter((part) => part !== "")
-    .join(", ");
-}
-
-function line(...fields: readonly (string | number)[]): string {
-  return fields.join(";");
-}
-
-function flag(value: boolean): number {
-  return value ? 1 : 0;
 }
 
 /**

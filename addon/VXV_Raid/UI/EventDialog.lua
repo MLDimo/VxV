@@ -12,7 +12,7 @@ local Theme = VXV.Theme
 
 local WIDTH, HEIGHT = 480, 420
 local HEADING_TOP, FIELD_TOP, SECTION = 0, 20, 64
-local FIELD_HEIGHT, FIELD_PADDING, SHORT_FIELD = 26, 6, 120
+local FIELD_PADDING, SHORT_FIELD = 6, 120
 local TOGGLE_GAP, BUTTON_WIDTH, BUTTON_HEIGHT, STEP_SIZE = 6, 160, 30, 26
 -- The website's bounds of the soft reserves per player.
 local MIN_SOFT_RESERVES, MAX_SOFT_RESERVES, DEFAULT_SOFT_RESERVES = 1, 10, 1
@@ -34,19 +34,8 @@ local function addField(key, x, top, width, title)
     local label = Theme.Text(body, "textBold", 13, "lavender")
     label:SetPoint("TOPLEFT", x, -top)
     label:SetText(title)
-    local holder = CreateFrame("Frame", nil, body)
+    local holder, box = Theme.Field(body, width, MAX_LETTERS[key])
     holder:SetPoint("TOPLEFT", x, -(top + FIELD_TOP))
-    holder:SetSize(width, FIELD_HEIGHT)
-    Theme.Fill(holder, "night"):SetAllPoints()
-    Theme.Rings(holder, { { "line", 1 } }, true)
-    local box = CreateFrame("EditBox", nil, holder)
-    box:SetPoint("TOPLEFT", FIELD_PADDING, 0)
-    box:SetPoint("BOTTOMRIGHT", -FIELD_PADDING, 0)
-    box:SetFontObject(Theme.Font("text", 13))
-    box:SetAutoFocus(false)
-    box:SetMaxLetters(MAX_LETTERS[key])
-    box:SetScript("OnEscapePressed", box.ClearFocus)
-    box:SetScript("OnEnterPressed", box.ClearFocus)
     boxes[key] = box
 end
 

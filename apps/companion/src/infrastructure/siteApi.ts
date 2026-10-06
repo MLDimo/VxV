@@ -48,7 +48,7 @@ export function createSiteApi(siteUrl: string): SitePort {
       return call("/api/compagnon/moi", {}, token);
     },
 
-    download(token: string): Promise<{ raid: NextRaid | null }> {
+    download(token: string): Promise<{ raid: NextRaid | null; paris?: { text: string } }> {
       return call("/api/compagnon/donnees", {}, token);
     },
 

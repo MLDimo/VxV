@@ -8,7 +8,7 @@ ns.RaidTab = RaidTab
 local BossAlert, Choices, EventData, Import = ns.BossAlert, ns.Choices, ns.EventData, ns.Import
 local EventDialog, Invitations = ns.EventDialog, ns.Invitations
 local LogExport, RaidData, RaidLog, RaidView = ns.LogExport, ns.RaidData, ns.RaidLog, ns.RaidView
-local RowList, SignupDialog = ns.RowList, ns.SignupDialog
+local RowList, SignupDialog = VXV.RowList, ns.SignupDialog
 
 local Theme = VXV.Theme
 

@@ -5,7 +5,7 @@ local _, ns = ...
 local JournalTab = {}
 ns.JournalTab = JournalTab
 
-local JournalView, RaidData, RaidLog, RowList = ns.JournalView, ns.RaidData, ns.RaidLog, ns.RowList
+local JournalView, RaidData, RaidLog, RowList = ns.JournalView, ns.RaidData, ns.RaidLog, VXV.RowList
 
 local Theme = VXV.Theme
 

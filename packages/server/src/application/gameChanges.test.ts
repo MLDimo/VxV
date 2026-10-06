@@ -13,6 +13,8 @@ import { createExclusions } from "./exclusions.ts";
 import { createGameChanges } from "./gameChanges.ts";
 import { createSignups } from "./signups.ts";
 import { createSoftReserves } from "./softReserves.ts";
+import { createAddonBets } from "./addonBets.ts";
+import { createBets } from "./bets.ts";
 
 const NOW = new Date("2026-12-01T12:00:00Z");
 
@@ -40,6 +42,13 @@ describe("changes made in game", () => {
       softReserves: createSoftReserves({ unitOfWork, clock }),
       exclusions: createExclusions({ unitOfWork }),
       announcements: {
+        announceQuietly: async (id) => {
+          announced.push(id);
+          return true;
+        },
+      },
+      bets: createBets({ unitOfWork, clock }),
+      betAnnouncements: {
         announceQuietly: async (id) => {
           announced.push(id);
           return true;
@@ -147,6 +156,74 @@ describe("changes made in game", () => {
       eventId,
     );
     expect(text.split("\n")).toContain("C;Thom Leboss#1#1;1;Inscription enregistrée sur le site.");
+  });
+
+  describe("stakes made in game (P11.8)", () => {
+    let betId: string;
+    let tank: string;
+
+    beforeEach(async () => {
+      const bets = createBets({ unitOfWork: createUnitOfWork(sql), clock: () => NOW });
+      betId = await bets.create(
+        officer,
+        {
+          title: "Qui meurt en premier ?",
+          choices: ["Un tank", "Un heal"],
+          closesAt: new Date("2026-12-10T20:00:00Z"),
+        },
+        "Pari",
+      );
+      tank = (await bets.find(betId))?.bet.choices[0]?.id ?? "";
+    });
+
+    const stake = (id: string, amount = 50): GameChange => ({
+      id,
+      eventId: "",
+      author: "Thom Leboss",
+      kind: "stake",
+      betId,
+      choiceId: tank,
+      amount,
+    });
+
+    it("stakes for the author, then takes the stake back, and refreshes the bet's message", async () => {
+      expect(await changes.receive(officer, [stake("Thom Leboss#1#1")])).toEqual([
+        {
+          id: "Thom Leboss#1#1",
+          eventId: undefined,
+          betId,
+          author: "Thom Leboss",
+          accepted: true,
+          message: "Mise de 50 po sur « Un tank » enregistrée : à payer au trésorier.".replace(/ po/u, "\u00a0po"),
+        },
+      ]);
+      const [refused] = await changes.receive(member, [stake("Thom Leboss#2#1", 0)]);
+      expect(refused).toMatchObject({ accepted: false, message: expect.stringMatching(/1 po au moins/u) });
+      const withdraw: GameChange = {
+        id: "Thom Leboss#3#1",
+        eventId: "",
+        author: "Thom Leboss",
+        kind: "withdraw",
+        betId,
+      };
+      expect(await changes.receive(member, [withdraw])).toEqual([
+        expect.objectContaining({ accepted: true, message: "Mise retirée." }),
+      ]);
+      expect(announced).toEqual([betId, betId]);
+    });
+
+    it("answers with the bets' data, not the event's, and leaves aside a stake on an unknown bet", async () => {
+      await changes.receive(member, [stake("Thom Leboss#1#1")]);
+      const unitOfWork = createUnitOfWork(sql);
+      const bets = await createAddonBets({ unitOfWork, clock: () => NOW }).exportBets();
+      expect(bets.split("\n").filter((line) => line.startsWith("C;"))).toEqual([
+        expect.stringMatching(/^C;Thom Leboss#1#1;1;Mise de 50/u),
+      ]);
+      const event = await createAddonExport({ unitOfWork, clock: () => NOW }).exportEvent(officer, eventId);
+      expect(event).not.toContain("Thom Leboss#1#1");
+      const lost = { ...stake("Thom Leboss#9#9"), betId: "00000000-0000-0000-0000-000000000000" };
+      expect(await changes.receive(member, [lost])).toEqual([]);
+    });
   });
 
   describe("events created in game (P9.2)", () => {

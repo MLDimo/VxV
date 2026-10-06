@@ -94,11 +94,19 @@ const facts: AddonEventFacts = {
     {
       id: "Thom Leboss#1796900000#42",
       eventId: "e1",
+      betId: undefined,
       author: "Thom Leboss",
       accepted: true,
       message: "SR enregistrées.",
     },
-    { id: "Ciel Gris#1796900100#7", eventId: "e1", author: "Ciel Gris", accepted: false, message: "Refusé; trop tard" },
+    {
+      id: "Ciel Gris#1796900100#7",
+      eventId: "e1",
+      betId: undefined,
+      author: "Ciel Gris",
+      accepted: false,
+      message: "Refusé; trop tard",
+    },
   ],
   exportedAt: new Date("2026-12-10T19:45:00Z"),
 };

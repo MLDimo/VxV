@@ -33,6 +33,7 @@ UI\Theme.lua
 UI\Window.lua
 UI\Dialog.lua
 UI\Tooltip.lua
+UI\RowList.lua
 UI\TextWindow.lua
 UI\TavernTab.lua
 UI\CompactWindow.lua
