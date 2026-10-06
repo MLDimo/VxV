@@ -1,6 +1,7 @@
 import type {
   BetCreationRecord,
   BetEndRecord,
+  SeasonStartRecord,
   EventCreationRecord,
   ExclusionRecord,
   JournalAction,
@@ -25,6 +26,7 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "bet.create": "Ouverture d'un pari",
   "bet.result": "Résultat d'un pari",
   "bet.cancel": "Pari annulé",
+  "season.start": "Nouvelle saison",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -126,5 +128,7 @@ export function describeJournalEntry(entry: JournalEntry): string {
     case "bet.result":
     case "bet.cancel":
       return describeBetEnd(entry.after as BetEndRecord);
+    case "season.start":
+      return `Saison ${String((entry.after as SeasonStartRecord).number)} : les classements par saison repartent de zéro`;
   }
 }

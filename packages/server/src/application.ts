@@ -14,6 +14,7 @@ import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
 import { createRaidLogs } from "./application/raidLogs.ts";
+import { createRanking } from "./application/ranking.ts";
 import { createRaidReminders } from "./application/raidReminders.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
@@ -84,6 +85,7 @@ export function createApplication({
     betAnnouncements: createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock }),
     treasury: createTreasury({ unitOfWork, clock }),
     cash: createCash({ unitOfWork, clock }),
+    ranking: createRanking({ unitOfWork, clock }),
   };
 }
 

@@ -11,6 +11,7 @@ import type { RaidReminder, ReminderTarget } from "../domain/reminders.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
 import type { LootItem, PastEventForItem, SoftReserve } from "../domain/softReserves.ts";
+import type { RankedStake } from "../domain/ranking.ts";
 import type { LedgerStake } from "../domain/treasury.ts";
 
 export interface DiscordIdentity {
@@ -237,6 +238,20 @@ export interface StakeRepository {
   listPending(): Promise<LedgerStake[]>;
   /** Stakes the treasurer validated, the latest validation first. */
   listValidated(limit: number): Promise<LedgerStake[]>;
+  /** The stakes of every ended bet, with when it ended, for the rankings. */
+  listRanked(): Promise<RankedStake[]>;
+}
+
+export interface Season {
+  number: number;
+  startedAt: Date;
+}
+
+export interface SeasonRepository {
+  /** The latest season started, if any. */
+  current(): Promise<Season | undefined>;
+  /** Starts the next season and returns it. */
+  start(startedBy: string, at: Date): Promise<Season>;
 }
 
 /** A movement of the guild's cash, as recorded: its amount signed. */
@@ -276,6 +291,7 @@ export interface Repositories {
   bets: BetRepository;
   stakes: StakeRepository;
   cash: CashRepository;
+  seasons: SeasonRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

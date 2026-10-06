@@ -53,6 +53,9 @@ export type { DiscordProfileSync } from "./application/discordProfiles.ts";
 export type { AnnouncedBet, AnnouncedRaid, BetAnnouncer, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
 export type { BetView } from "./application/bets.ts";
 export type { CashOverview } from "./application/cash.ts";
+export type { Season } from "./application/ports.ts";
+export type { Ranking } from "./application/ranking.ts";
+export { RANKING_PERIODS, type BettorRank, type RankingPeriod } from "./domain/ranking.ts";
 export {
   CASH_KIND_LABELS,
   MANUAL_CASH_KINDS,

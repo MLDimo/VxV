@@ -198,4 +198,28 @@ test.describe.serial("bets", () => {
     await expect(page.getByText("520 po", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Inscrire dans la caisse" })).toHaveCount(0);
   });
+
+  test("the Ranking shows the bettors by net gain, and an officer starts a season", async ({ page, context }) => {
+    await signInAs(context, "member");
+    await page.goto("/");
+    await page.getByRole("link", { name: "Ranking", exact: true }).last().click();
+    await expect(page).toHaveURL(/\/ranking$/);
+    // Parieur Discord won 180 po for 150 staked; the member lost 50.
+    // The member's row comes again at the bottom, as "Ta position": the ranking itself is the table's body.
+    const table = page.getByRole("region", { name: "Classement des parieurs" }).locator("tbody");
+    await expect(table.getByRole("row", { name: /^1 .*Parieur Discord/ })).toContainText("+30 po");
+    await expect(table.getByRole("row", { name: /^2 / })).toContainText("−50 po");
+    await expect(page.getByRole("list", { name: "Podium" })).toContainText("Parieur Discord");
+    await expect(page.getByText("Ta position")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Lancer une nouvelle saison" })).toHaveCount(0);
+
+    await signInAs(context, "officer");
+    await page.goto("/ranking?periode=saison");
+    await expect(page.getByText("Aucune saison lancée : un officier la lance ici.")).toBeVisible();
+    await page.getByLabel("Motif (visible dans le journal)").fill("Lancement des classements");
+    await page.getByRole("button", { name: "Lancer une nouvelle saison" }).click();
+    await expect(page.getByRole("status")).toContainText("Saison 1 lancée.");
+    await expect(page.getByText(/^Saison 1 · lancée le/)).toBeVisible();
+    await expect(page.getByText("Aucun pari terminé sur cette période.")).toBeVisible();
+  });
 });

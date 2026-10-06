@@ -12,7 +12,8 @@ export type JournalAction =
   | "loot.correct"
   | "bet.create"
   | "bet.result"
-  | "bet.cancel";
+  | "bet.cancel"
+  | "season.start";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -90,6 +91,11 @@ export interface BetEndRecord {
   winners: number;
   /** What went to the guild's cash. */
   organisation: number;
+}
+
+/** What the journal keeps about a new season of the rankings. */
+export interface SeasonStartRecord {
+  number: number;
 }
 
 /** What the journal keeps about an officer's correction of a player's soft reserves. */

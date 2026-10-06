@@ -209,6 +209,23 @@
   }
 }
 
+/* The Ranking's banners (§7.5): cloth cut in a point, swaying from their rod. */
+@utility fanion {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 90%, 0 100%);
+  transform-origin: top center;
+  animation: sway 5s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

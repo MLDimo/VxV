@@ -33,3 +33,11 @@ restent ouverts à sa relecture.
 - Caisse de la guilde : solde, entrées et sorties du mois, et chaque mouvement avec son motif, sur la page gauche du
   Journal. Le trésorier inscrit les dons (avec leur donateur, pour le titre « Sugar Daddy » de la P13), les dépenses
   et les récompenses ; aucun mouvement ne se modifie ni ne s'efface : une erreur se corrige par un autre mouvement.
+- Classement des parieurs (Ranking, `/ranking`) : gain net (gains moins mises), total gagné, nombre de paris et
+  taux de réussite, sur les paris terminés dans la période (depuis toujours, ce mois, la saison) ; les paris annulés
+  ne comptent pas. À gain net égal, le plus gros total gagné passe devant. La dette d'un parieur s'affiche à côté de
+  son nom, quelle que soit la période.
+- Saisons : un officier lance la suivante avec un motif au journal ; seule la période « Saison » repart de zéro. Avant
+  la première saison, ce classement est vide.
+- Avatars : portraits de la charte (§8) choisis par race, classe et sexe du personnage principal, avec le repli prévu
+  (même race et classe, puis même classe, puis même race) ; les neuf portraits livrés couvrent les neuf classes.

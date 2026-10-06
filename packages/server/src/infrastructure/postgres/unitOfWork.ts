@@ -14,6 +14,7 @@ import { memberRepository } from "./members.ts";
 import { raidLogRepository } from "./raidLogs.ts";
 import { raidRecordRepository } from "./raidRecords.ts";
 import { raidRepository } from "./raids.ts";
+import { seasonRepository } from "./seasons.ts";
 import { sessionRepository } from "./sessions.ts";
 import { signupRepository } from "./signups.ts";
 import { softReserveRepository } from "./softReserves.ts";
@@ -40,6 +41,7 @@ function createRepositories(sql: SqlClient): Repositories {
     bets: betRepository(sql),
     stakes: stakeRepository(sql),
     cash: cashRepository(sql),
+    seasons: seasonRepository(sql),
   };
 }
 

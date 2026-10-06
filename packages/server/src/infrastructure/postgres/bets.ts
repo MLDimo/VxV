@@ -1,5 +1,6 @@
 import type { BetRepository, StakeRepository } from "../../application/ports.ts";
 import type { Bet, BetChoice, Stake, StakeOutcome } from "../../domain/bets.ts";
+import type { RankedStake } from "../../domain/ranking.ts";
 import type { LedgerStake } from "../../domain/treasury.ts";
 import type { SqlClient } from "../sql.ts";
 import { expectRow } from "./rows.ts";
@@ -245,6 +246,35 @@ export function stakeRepository(sql: SqlClient): StakeRepository {
         [limit],
       );
       return rows.map(toLedgerStake);
+    },
+
+    async listRanked() {
+      const rows = await sql.query<
+        StakeRow & {
+          outcome: RankedStake["outcome"];
+          gain: number;
+          ended_at: Date;
+          race: string | null;
+          sex: string | null;
+        }
+      >(
+        `select ${STAKE_COLUMNS}, bets.ended_at, main.race, main.sex
+         from stakes ${STAKE_JOINS}
+         join bets on bets.id = stakes.bet_id
+         where stakes.outcome is not null`,
+      );
+      return rows.map((row) => ({
+        memberId: row.member_id,
+        memberName: row.member_name,
+        memberClass: row.member_class ?? undefined,
+        memberRace: row.race ?? undefined,
+        memberSex: row.sex === "male" || row.sex === "female" ? row.sex : undefined,
+        amount: row.amount,
+        paidAt: row.paid_at ?? undefined,
+        outcome: row.outcome,
+        gain: row.gain,
+        endedAt: row.ended_at,
+      }));
     },
   };
 }
