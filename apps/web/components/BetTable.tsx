@@ -1,6 +1,13 @@
 import { ORGANISATION_PERCENT, type BetView, type Member } from "@vxv/server";
-import { potentialGain } from "@vxv/server/domain/bets";
-import { formatDateTime, formatEventDate, formatGold, formatOdds, formatShare } from "@vxv/server/domain/labels";
+import { payout, potentialGain, standing, type Bet, type Stake } from "@vxv/server/domain/bets";
+import {
+  formatDateTime,
+  formatEventDate,
+  formatGold,
+  formatOdds,
+  formatShare,
+  STAKE_STANDING_LABELS,
+} from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { StakeForm } from "./StakeForm";
 
@@ -14,6 +21,33 @@ function Figure({ label, value }: { label: string; value: string }) {
       <p className="font-pixel text-xl text-gold">{value}</p>
     </div>
   );
+}
+
+/** When the bet closes, or how it ended. */
+function closingText(bet: Bet, open: boolean): string {
+  if (open) {
+    return `Ferme le ${formatEventDate(bet.closesAt)}`;
+  }
+  if (bet.endedAt === undefined) {
+    return `Fermé depuis le ${formatDateTime(bet.closesAt)} : résultat à venir`;
+  }
+  const winner = bet.choices.find((choice) => choice.id === bet.winningChoiceId);
+  return winner === undefined ? "Pari annulé : mises rendues" : `Résultat : « ${winner.label} »`;
+}
+
+/** What the member receives (or owes) for their stake, once the bet ended or while it runs. */
+function settlementText(mine: Stake, gain: number): string {
+  if (mine.outcome !== undefined && mine.gain !== undefined) {
+    const current = standing(mine);
+    if (current === "debt") {
+      return `Je dois ${formatGold(mine.amount)}`;
+    }
+    const owed = payout(mine, { outcome: mine.outcome, gain: mine.gain });
+    return owed === 0 ? "Rien" : `${formatGold(owed)} (${STAKE_STANDING_LABELS[current].toLowerCase()})`;
+  }
+  return mine.paidAt === undefined
+    ? `${formatGold(gain - mine.amount)} (${formatGold(gain)} − ${formatGold(mine.amount)} non payés)`
+    : formatGold(gain);
 }
 
 /** A bet on the gaming table (§7.2): when it closes, the pool, each choice's share and odds, and the member's stake. */
@@ -35,8 +69,10 @@ export function BetTable({ view, member, linked = false }: { view: BetView; memb
             bet.title
           )}
         </h2>
-        <p className={`text-sm ${open ? "text-neon" : "text-muted"}`}>
-          {open ? `Ferme le ${formatEventDate(bet.closesAt)}` : `Fermé depuis le ${formatDateTime(bet.closesAt)}`}
+        <p
+          className={`text-sm ${open ? "text-neon" : bet.endedAt === undefined ? "text-muted" : "font-bold text-gold"}`}
+        >
+          {closingText(bet, open)}
         </p>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -80,12 +116,8 @@ export function BetTable({ view, member, linked = false }: { view: BetView; memb
           <Figure label="Ma mise" value={`${formatGold(mine.amount)} sur « ${mineLabel ?? ""} »`} />
           <Figure label="Statut" value={mine.paidAt === undefined ? "Déposée · à payer" : "Payée"} />
           <Figure
-            label="Si je gagne, je reçois"
-            value={
-              mine.paidAt === undefined
-                ? `${formatGold(gain - mine.amount)} (${formatGold(gain)} − ${formatGold(mine.amount)} non payés)`
-                : formatGold(gain)
-            }
+            label={mine.outcome === undefined ? "Si je gagne, je reçois" : "Je reçois"}
+            value={settlementText(mine, gain)}
           />
         </div>
       )}
@@ -93,7 +125,9 @@ export function BetTable({ view, member, linked = false }: { view: BetView; memb
       <p className="mt-3 text-xs text-muted">
         {open
           ? "Cotes recalculées à chaque mise, définitives à la fermeture. Mise en po, 1 po au moins, à payer au trésorier ; modifiable tant qu'elle n'est pas payée."
-          : "Les cotes sont définitives : le résultat sera déclaré par un officier."}
+          : bet.endedAt === undefined
+            ? "Les cotes sont définitives : le résultat sera déclaré par un officier."
+            : "Les gains se récupèrent auprès du trésorier ; une mise perdue non payée devient une dette."}
       </p>
     </section>
   );

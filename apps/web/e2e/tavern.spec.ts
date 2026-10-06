@@ -4,7 +4,7 @@ import { readSeed, signInAs } from "./sessions";
 test("the tavern opens the places already built and announces the others", async ({ page, context }) => {
   await signInAs(context, "member");
   await page.goto("/");
-  for (const place of ["Quêtes", "Ranking", "Artisans"]) {
+  for (const place of ["Quêtes", "Artisans"]) {
     await expect(page.getByTitle(`${place} : bientôt`)).toBeVisible();
   }
   // The Raid of the tavern, after the one of the header.

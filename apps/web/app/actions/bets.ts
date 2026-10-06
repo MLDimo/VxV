@@ -49,5 +49,23 @@ export async function stakeOnBet(_previous: ActionState, form: FormData): Promis
     await application.bets.stake(member, betId, String(form.get("choiceId") ?? ""), amount);
     await application.betAnnouncements.announceQuietly(betId);
     return `Mise de ${formatGold(amount)} enregistrée : à payer au trésorier.`;
-  }, ["/", "/paris", `/paris/${betId}`]);
+  }, ["/", "/paris", `/paris/${betId}`, "/paris/tresorerie"]);
+}
+
+/** An officer declares the winning choice, or cancels the bet (intent "cancel"), with a reason. */
+export async function endBet(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const officer = await requireOfficer();
+  const betId = String(form.get("betId") ?? "");
+  const reason = String(form.get("reason") ?? "");
+  return runFormAction(async () => {
+    const application = getApplication();
+    if (form.get("intent") === "cancel") {
+      await application.bets.cancel(officer, betId, reason);
+      await application.betAnnouncements.announceQuietly(betId);
+      return "Pari annulé : le trésorier rendra les mises payées.";
+    }
+    await application.bets.declareResult(officer, betId, String(form.get("choiceId") ?? ""), reason);
+    await application.betAnnouncements.announceQuietly(betId);
+    return "Résultat déclaré.";
+  }, ["/", "/paris", `/paris/${betId}`, "/paris/tresorerie", "/journal"]);
 }

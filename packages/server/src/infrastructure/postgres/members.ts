@@ -2,6 +2,7 @@ import type { MemberRepository } from "../../application/ports.ts";
 import type { Member, MemberRole } from "../../domain/members.ts";
 import type { SqlClient } from "../sql.ts";
 import { expectRow } from "./rows.ts";
+import { isUuid } from "./uuid.ts";
 
 interface MemberRow {
   id: string;
@@ -28,6 +29,9 @@ export function memberRepository(sql: SqlClient): MemberRepository {
     },
 
     async findById(id) {
+      if (!isUuid(id)) {
+        return undefined;
+      }
       const [row] = await sql.query<MemberRow>(`select ${COLUMNS} from members where id = $1`, [id]);
       return row && toMember(row);
     },

@@ -1,8 +1,10 @@
-import type { JournalAction } from "@vxv/server";
+import { canManageTreasury, fullName, type JournalAction } from "@vxv/server";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "@vxv/server/domain/journalDescriptions";
+import { CashPage } from "@/components/CashPage";
 import { formatDateTime } from "@/components/format";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
+import { requireMember } from "@/server/session";
 
 /** The stamp of each officer action (§7.7): its category, in its ink. */
 const STAMPS: Record<JournalAction, { label: string; className: string }> = {
@@ -15,20 +17,31 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "loot.council": { label: "LOOT", className: "border-stamp-loot text-stamp-loot" },
   "loot.correct": { label: "LOOT", className: "border-stamp-loot text-stamp-loot" },
   "bet.create": { label: "PARI", className: "border-stamp-bet text-stamp-bet" },
+  "bet.result": { label: "PARI", className: "border-stamp-bet text-stamp-bet" },
+  "bet.cancel": { label: "PARI", className: "border-stamp-bet text-stamp-bet" },
+  "season.start": { label: "GUILDE", className: "border-ink-brown text-ink-brown" },
 };
 
-/** The accounts book (§7.7): the guild's cash on the left (to come), the officers' journal on the right. */
+/** The accounts book (§7.7): the guild's cash on the left, the officers' journal on the right. */
 export default async function JournalPage() {
-  const entries = await getApplication().journal.listRecent();
+  const member = await requireMember();
+  const { journal, cash, characters } = getApplication();
+  const [entries, overview, guild] = await Promise.all([
+    journal.listRecent(),
+    cash.overview(),
+    characters.listInGuild(),
+  ]);
+  const givers = guild.flatMap((character) =>
+    character.isMain && character.memberId !== undefined
+      ? [{ memberId: character.memberId, name: fullName(character) }]
+      : [],
+  );
   return (
     <>
       <ScreenHeader title="Journal" />
       <div className="leather mt-8 p-4">
         <div className="grid gap-1 lg:grid-cols-[1fr_1.4fr]">
-          <section className="ruled-page p-6 shadow-[inset_-24px_0_30px_-18px_rgba(70,40,10,0.55)]">
-            <h2 className="font-pixel text-xl">La caisse</h2>
-            <p className="mt-4 text-sm">Bientôt : dons, dettes et caisse de la guilde, avec les paris.</p>
-          </section>
+          <CashPage overview={overview} treasurer={canManageTreasury(member.roles)} givers={givers} />
           <section className="ruled-page p-6 shadow-[inset_24px_0_30px_-18px_rgba(70,40,10,0.55)]">
             <h2 className="font-pixel text-xl">Journal des officiers</h2>
             <p className="mt-1 text-sm">

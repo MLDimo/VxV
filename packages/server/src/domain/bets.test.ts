@@ -2,14 +2,20 @@ import { describe, expect, it } from "vitest";
 import {
   betBook,
   cleanChoices,
+  collectionRefusal,
+  debtOf,
+  endRefusal,
   isDebt,
+  isOpen,
   newBetRefusal,
   PAID_STAKE,
   payout,
   potentialGain,
   refund,
+  paymentRefusal,
   settle,
   stakeRefusal,
+  standing,
   type BetChoice,
   type Stake,
 } from "./bets.ts";
@@ -34,6 +40,9 @@ function stake(choiceId: string, amount: number, paid = false): Stake {
     amount,
     placedAt: new Date("2026-10-06T20:00:00Z"),
     paidAt: paid ? new Date("2026-10-06T20:30:00Z") : undefined,
+    outcome: undefined,
+    gain: undefined,
+    collectedAt: undefined,
   };
 }
 
@@ -144,7 +153,7 @@ describe("bets", () => {
     });
 
     it("takes whole gold pieces on one of the bet's choices until the closing time, unless the stake is paid", () => {
-      const bet = { choices: CHOICES, closesAt: later };
+      const bet = { choices: CHOICES, closesAt: later, endedAt: undefined };
       expect(stakeRefusal(bet, { choiceId: "tank", amount: 1, existing: undefined }, now)).toBeUndefined();
       expect(stakeRefusal(bet, { choiceId: "tank", amount: 1, existing: undefined }, later)).toMatch(/fermé/);
       expect(stakeRefusal(bet, { choiceId: "other", amount: 1, existing: undefined }, now)).toMatch(/choix/);
@@ -152,6 +161,51 @@ describe("bets", () => {
       expect(stakeRefusal(bet, { choiceId: "tank", amount: 2.5, existing: undefined }, now)).toMatch(/entières/);
       const paid = { paidAt: now };
       expect(stakeRefusal(bet, { choiceId: "tank", amount: 5, existing: paid }, now)).toBe(PAID_STAKE);
+    });
+  });
+
+  describe("ending and the treasurer", () => {
+    const now = new Date("2026-10-06T20:00:00Z");
+    const PAID = new Date("2026-10-06T20:30:00Z");
+
+    it("closes a bet once it ended, even before its closing time, and ends it once", () => {
+      const bet = { choices: CHOICES, closesAt: new Date("2026-10-08T19:00:00Z"), endedAt: undefined };
+      expect(isOpen(bet, now)).toBe(true);
+      expect(isOpen({ ...bet, endedAt: now }, now)).toBe(false);
+      expect(endRefusal(bet, "tank")).toBeUndefined();
+      expect(endRefusal(bet, undefined)).toBeUndefined();
+      expect(endRefusal(bet, "other")).toMatch(/choix gagnant/);
+      expect(endRefusal({ ...bet, endedAt: now }, "tank")).toMatch(/déjà terminé/);
+    });
+
+    it("tells where each stake stands with the treasurer", () => {
+      const placed = { amount: 50, paidAt: undefined, outcome: undefined, gain: undefined, collectedAt: undefined };
+      expect(standing(placed)).toBe("toPay");
+      expect(standing({ ...placed, paidAt: PAID })).toBe("paid");
+      expect(standing({ ...placed, outcome: "lost", gain: 0 })).toBe("debt");
+      expect(standing({ ...placed, outcome: "lost", gain: 0, paidAt: PAID })).toBe("settled");
+      expect(standing({ ...placed, outcome: "won", gain: 225 })).toBe("toCollect");
+      expect(standing({ ...placed, outcome: "won", gain: 50 })).toBe("settled");
+      expect(standing({ ...placed, outcome: "won", gain: 225, collectedAt: PAID })).toBe("collected");
+      expect(standing({ ...placed, outcome: "refunded", gain: 50 })).toBe("settled");
+      expect(standing({ ...placed, outcome: "refunded", gain: 50, paidAt: PAID })).toBe("toCollect");
+      expect(
+        debtOf([
+          { ...placed, outcome: "lost", gain: 0 },
+          { ...placed, amount: 30, outcome: "lost", gain: 0 },
+        ]),
+      ).toBe(80);
+    });
+
+    it("notes a stake paid once, and a gain handed over once, when there is one", () => {
+      const placed = { amount: 50, paidAt: undefined, outcome: undefined, gain: undefined, collectedAt: undefined };
+      expect(paymentRefusal(placed)).toBeUndefined();
+      expect(paymentRefusal({ ...placed, paidAt: PAID })).toMatch(/déjà payée/);
+      expect(paymentRefusal({ ...placed, collectedAt: PAID })).toMatch(/déjà versé/);
+      expect(collectionRefusal({ ...placed, outcome: "won", gain: 225 })).toBeUndefined();
+      expect(collectionRefusal({ ...placed, outcome: "won", gain: 225, collectedAt: PAID })).toMatch(/déjà versé/);
+      expect(collectionRefusal({ ...placed, outcome: "lost", gain: 0 })).toMatch(/rien à verser/);
+      expect(collectionRefusal(placed)).toMatch(/rien à verser/);
     });
   });
 });

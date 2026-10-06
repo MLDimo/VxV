@@ -45,3 +45,9 @@ export function wallClockToInstant(wallClock: string, timeZone = GUILD_TIME_ZONE
   const firstGuess = asIfUtc - zoneOffset(new Date(asIfUtc), timeZone);
   return new Date(asIfUtc - zoneOffset(new Date(firstGuess), timeZone));
 }
+
+/** The first instant of the instant's month, in the time zone: the start of "this month". */
+export function startOfMonth(instant: Date, timeZone = GUILD_TIME_ZONE): Date {
+  const yearMonth = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit" }).format(instant);
+  return wallClockToInstant(`${yearMonth}-01T00:00`, timeZone);
+}

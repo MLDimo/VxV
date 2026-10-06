@@ -4,6 +4,7 @@ import { PLACES, type Place } from "@vxv/design";
 const SECTION_HREFS: Partial<Record<Place["id"], string>> = {
   raid: "/raid",
   dice: "/paris",
+  ranking: "/ranking",
   journal: "/journal",
 };
 

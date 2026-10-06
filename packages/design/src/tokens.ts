@@ -55,6 +55,12 @@ export const COLORS = {
   "stamp-quest": "#2E7A44",
   "stamp-bet": "#B0306E",
   "stamp-raid": "#3A5AA0",
+  "ink-gain": "#2E7A44",
+  "ink-loss": "#8A1F2C",
+  // Ranking (§7.5): the podium's metals, and the ground behind the portraits (§8)
+  silver: "#D9DBE6",
+  bronze: "#D08A5A",
+  "avatar-ground": "#141828",
 } as const;
 
 export type ColorToken = keyof typeof COLORS;

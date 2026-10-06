@@ -1,3 +1,4 @@
+import type { StakeStanding } from "./bets.ts";
 import { GUILD_TIME_ZONE } from "./dateTime.ts";
 import type { LootMethod } from "./history.ts";
 import type { SignupRole, SignupStatus } from "./signups.ts";
@@ -69,6 +70,22 @@ const ODDS = new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumF
 export function formatGold(amount: number): string {
   return `${WHOLE.format(amount)}${NO_BREAK}po`;
 }
+
+/** A movement of gold: "+500 po", "−850 po". */
+export function formatSignedGold(amount: number): string {
+  const sign = amount > 0 ? "+" : amount < 0 ? "−" : "";
+  return `${sign}${formatGold(Math.abs(amount))}`;
+}
+
+/** Where a stake stands with the treasurer. */
+export const STAKE_STANDING_LABELS: Record<StakeStanding, string> = {
+  toPay: "À payer",
+  paid: "Payée",
+  debt: "Dette",
+  toCollect: "À verser",
+  collected: "Versé",
+  settled: "Réglée",
+};
 
 /** What one po brings back on a choice: "× 4,50"; a dash while nobody staked on it. */
 export function formatOdds(odds: number | undefined): string {

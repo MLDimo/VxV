@@ -23,3 +23,21 @@ restent ouverts à sa relecture.
   dans le salon `DISCORD_BETS_CHANNEL_ID` s'il est défini, sinon dans le salon des raids.
 - Site : la section « Le Dé Pipé » (`/paris`) montre les paris ouverts sur la table de jeu, puis les fermés ; chaque
   pari a sa page avec toutes les mises (paris transparents).
+- Résultat : un officier déclare le choix gagnant, ou annule le pari (chaque mise est rendue), avec un motif au
+  journal ; cela termine le pari, même avant son heure de fermeture. La part de l'organisation entre dans la caisse
+  au résultat (une dette jamais réglée se corrigerait par une dépense).
+- Trésorerie : seul le rôle trésorier valide l'or qui change de mains en jeu (décision du 3 octobre) : mise reçue
+  (ou dette réglée), gain ou remboursement versé. Une mise gagnante non payée est déduite de son gain ; une mise
+  perdue non payée devient une dette, qui empêche de parier jusqu'à son règlement. Chaque validation est visible de
+  tous (page « Trésorerie » du Dé Pipé, `/paris/tresorerie`).
+- Caisse de la guilde : solde, entrées et sorties du mois, et chaque mouvement avec son motif, sur la page gauche du
+  Journal. Le trésorier inscrit les dons (avec leur donateur, pour le titre « Sugar Daddy » de la P13), les dépenses
+  et les récompenses ; aucun mouvement ne se modifie ni ne s'efface : une erreur se corrige par un autre mouvement.
+- Classement des parieurs (Ranking, `/ranking`) : gain net (gains moins mises), total gagné, nombre de paris et
+  taux de réussite, sur les paris terminés dans la période (depuis toujours, ce mois, la saison) ; les paris annulés
+  ne comptent pas. À gain net égal, le plus gros total gagné passe devant. La dette d'un parieur s'affiche à côté de
+  son nom, quelle que soit la période.
+- Saisons : un officier lance la suivante avec un motif au journal ; seule la période « Saison » repart de zéro. Avant
+  la première saison, ce classement est vide.
+- Avatars : portraits de la charte (§8) choisis par race, classe et sexe du personnage principal, avec le repli prévu
+  (même race et classe, puis même classe, puis même race) ; les neuf portraits livrés couvrent les neuf classes.

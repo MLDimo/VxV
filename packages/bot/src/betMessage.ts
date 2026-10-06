@@ -20,12 +20,33 @@ export function betUrl(siteUrl: string, betId: string): string {
   return `${siteUrl}/paris/${betId}`;
 }
 
+/** How a closed bet stands: waiting for its result, won by a choice, or cancelled. */
+function ending(
+  { closesAt, endedAt, winningChoiceId, choices }: AnnouncedBet["bet"],
+  stakes: AnnouncedBet["stakes"],
+  pool: number,
+) {
+  if (endedAt === undefined) {
+    return `🔒 Fermé depuis ${timestamp(closesAt, "F")} : le résultat sera déclaré par un officier.`;
+  }
+  const winner = choices.find((choice) => choice.id === winningChoiceId);
+  if (winner === undefined) {
+    return "↩️ Pari annulé : chaque mise est rendue par le trésorier.";
+  }
+  const winners = stakes.filter((stake) => stake.outcome === "won");
+  const shared = winners.reduce((total, stake) => total + (stake.gain ?? 0), 0);
+  return (
+    `🏆 Résultat : « ${winner.label} » · ${count(winners.length, "gagnant")}, ` +
+    `${formatGold(pool - shared)} pour la caisse. Gains à récupérer auprès du trésorier.`
+  );
+}
+
 /** The bet's message: when it closes, the pool, and each choice's share and odds; the buttons while it is open. */
 export function betMessage({ bet, stakes, open }: AnnouncedBet, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
   const book = betBook(bet, stakes);
   const closing = open
     ? `⏳ Fermeture ${timestamp(bet.closesAt, "F")} (${timestamp(bet.closesAt, "R")})`
-    : `🔒 Fermé depuis ${timestamp(bet.closesAt, "F")} : le résultat sera déclaré par un officier.`;
+    : ending(bet, stakes, book.pool);
   const pool =
     `💰 Cagnotte ${formatGold(book.pool)} · ${count(book.bettors, "parieur")} · ` +
     `${String(ORGANISATION_PERCENT)} % pour la caisse de la guilde`;
@@ -45,7 +66,7 @@ export function betMessage({ bet, stakes, open }: AnnouncedBet, siteUrl: string)
         footer: {
           text: open
             ? "Mise en po, 1 po au moins, à payer au trésorier ; modifiable tant qu'elle n'est pas payée."
-            : "Les cotes sont définitives.",
+            : "Les cotes sont définitives. Une mise perdue non payée devient une dette.",
         },
       },
     ],

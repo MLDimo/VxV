@@ -1,20 +1,28 @@
-import { notFound } from "next/navigation";
-import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
+import { canManageRaids } from "@vxv/server";
+import { standing } from "@vxv/server/domain/bets";
+import { formatDateTime, formatGold, STAKE_STANDING_LABELS } from "@vxv/server/domain/labels";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { BetEndForm } from "@/components/BetEndForm";
 import { BetTable } from "@/components/BetTable";
+import { DiceNav } from "@/components/DiceNav";
 import { MemberName } from "@/components/MemberName";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
-/** A bet: its table, and every stake, as everybody sees them (§11: transparent bets). */
+const OUTCOMES = { won: "Gagné", lost: "Perdu", refunded: "Remboursé" } as const;
+
+/** A bet: its table, every stake as everybody sees it (§11: transparent bets), and the officers' result. */
 export default async function BetPage({ params }: { params: Promise<{ id: string }> }) {
   const member = await requireMember();
   const view = await getApplication().bets.find((await params).id);
   if (view === undefined) {
     notFound();
   }
-  const labels = new Map(view.bet.choices.map((choice) => [choice.id, choice.label]));
+  const { bet, stakes } = view;
+  const labels = new Map(bet.choices.map((choice) => [choice.id, choice.label]));
+  const ended = bet.endedAt !== undefined;
   return (
     <>
       <ScreenHeader kicker="La salle de jeu" kickerClassName="text-neon" title="Le Dé Pipé">
@@ -22,12 +30,13 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
           Tous les paris
         </Link>
       </ScreenHeader>
+      <DiceNav />
       <div className="mt-8">
         <BetTable view={view} member={member} />
       </div>
       <section className="panel mt-8">
         <h2 className="font-pixel text-xl text-ivory">Les mises</h2>
-        {view.stakes.length === 0 ? (
+        {stakes.length === 0 ? (
           <p className="mt-3 text-lavender">Aucune mise pour l&apos;instant.</p>
         ) : (
           <table className="mt-3 w-full text-left text-sm">
@@ -36,19 +45,26 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
                 <th className="py-2 pr-3">Joueur</th>
                 <th className="py-2 pr-3">Choix</th>
                 <th className="py-2 pr-3">Mise</th>
+                {ended && <th className="py-2 pr-3">Résultat</th>}
                 <th className="py-2 pr-3">Statut</th>
                 <th className="py-2">Le</th>
               </tr>
             </thead>
             <tbody>
-              {view.stakes.map((stake) => (
+              {stakes.map((stake) => (
                 <tr key={stake.id}>
                   <td className="py-1 pr-3">
                     <MemberName name={stake.memberName} characterClass={stake.memberClass} />
                   </td>
                   <td className="py-1 pr-3">{labels.get(stake.choiceId)}</td>
                   <td className="py-1 pr-3">{formatGold(stake.amount)}</td>
-                  <td className="py-1 pr-3">{stake.paidAt === undefined ? "À payer" : "Payée"}</td>
+                  {ended && (
+                    <td className="py-1 pr-3">
+                      {stake.outcome === undefined ? "—" : OUTCOMES[stake.outcome]}
+                      {stake.outcome === "won" && stake.gain !== undefined && ` (${formatGold(stake.gain)})`}
+                    </td>
+                  )}
+                  <td className="py-1 pr-3">{STAKE_STANDING_LABELS[standing(stake)]}</td>
                   <td className="py-1">{formatDateTime(stake.placedAt)}</td>
                 </tr>
               ))}
@@ -56,6 +72,16 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
           </table>
         )}
       </section>
+      {!ended && canManageRaids(member.roles) && (
+        <section className="panel-officer mt-8">
+          <h2 className="font-pixel text-xl text-gold">Officiers · résultat du pari</h2>
+          <p className="mt-2 text-sm text-lavender">
+            Le résultat termine le pari : les gains sont calculés et la part de l&apos;organisation entre dans la
+            caisse. Annuler rend chaque mise.
+          </p>
+          <BetEndForm betId={bet.id} choices={bet.choices} />
+        </section>
+      )}
     </>
   );
 }

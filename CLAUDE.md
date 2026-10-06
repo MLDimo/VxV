@@ -68,7 +68,13 @@ et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
 - **P11 Paris** : en cours.
   - 11.1 à 11.4 : paris, choix et mises en base ; ouverture par un officier (site, `/vxv_pari`), mises depuis le
     site et Discord (boutons « Miser » et « Retirer ma mise »), cotes en direct dans le message du pari
-    (`packages/server/src/domain/bets.ts`, section « Le Dé Pipé » du site, `/paris`).
+    (`packages/server/src/domain/bets.ts`, section « Le Dé Pipé » du site, `/paris`) ;
+  - 11.5, 11.6 et 11.9 : résultat ou annulation par un officier (gains, message Discord, journal), trésorerie
+    (mises reçues, dettes qui bloquent les paris, gains versés, historique, `/paris/tresorerie`, rôle trésorier
+    seul), caisse de la guilde en ajout seul sur la page gauche du Journal (part des paris, dons, dépenses) ;
+  - 11.7 : classement des parieurs (Ranking, `/ranking` : podium à fanions, avatars, périodes) et saisons lancées
+    par un officier.
+  - Reste 11.8 : le bundle `VXV_Paris` en jeu.
 - P12 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
