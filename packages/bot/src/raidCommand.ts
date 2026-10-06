@@ -2,7 +2,7 @@ import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES } from "@vxv/server";
 import { normalizeForSearch } from "@vxv/server/domain/characterSearch";
 import { ApplicationCommandOptionType, InteractionResponseType } from "discord-api-types/v10";
 import { focusedOption, integerOption, stringOption, type BotContext, type SlashCommand } from "./commands.ts";
-import { parseRaidStart } from "./dateInput.ts";
+import { parseRaidStart } from "@vxv/server/domain/raidStart";
 import { actingMember } from "./members.ts";
 import { ephemeral } from "./responses.ts";
 

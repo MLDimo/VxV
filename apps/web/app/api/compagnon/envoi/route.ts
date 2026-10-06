@@ -11,7 +11,13 @@ const MAX_CHARACTERS = 50;
 const MAX_CHANGES = 200;
 const MAX_SOFT_RESERVES = 20;
 
-const changeBase = { id: z.string().min(1).max(160), eventId: z.string().max(60), author: z.string().max(100) };
+const changeBase = {
+  id: z.string().min(1).max(160),
+  eventId: z.string().max(60),
+  author: z.string().max(100),
+  // When the author made it in game (Unix seconds): the latest change wins.
+  at: z.number().int().positive().optional(),
+};
 /** A change made in game (addon/VXV_Raid/Changes.lua); one of a kind this website does not know is left aside. */
 const changeSchema = z.discriminatedUnion("kind", [
   z.object({
@@ -31,6 +37,15 @@ const changeSchema = z.discriminatedUnion("kind", [
     kind: z.literal("exclusion"),
     itemId: z.number().int().nonnegative(),
     excluded: z.boolean(),
+    reason: z.string().max(500),
+  }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("event"),
+    date: z.string().max(10),
+    time: z.string().max(5),
+    raidIds: z.array(z.string().max(60)).min(1).max(5),
+    softReserves: z.number().int(),
     reason: z.string().max(500),
   }),
 ]);
@@ -60,7 +75,11 @@ export async function POST(request: Request): Promise<Response> {
       characters,
       changes: changes.flatMap((change) => {
         const parsed = changeSchema.safeParse(change);
-        return parsed.success ? [parsed.data] : [];
+        if (!parsed.success) {
+          return [];
+        }
+        const { at, ...made } = parsed.data;
+        return [{ ...made, madeAt: at === undefined ? undefined : new Date(at * MS_PER_SECOND) }];
       }),
     });
     return Response.json(report);

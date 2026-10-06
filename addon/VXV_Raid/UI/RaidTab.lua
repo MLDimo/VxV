@@ -6,7 +6,7 @@ local RaidTab = {}
 ns.RaidTab = RaidTab
 
 local BossAlert, Choices, EventData, Import = ns.BossAlert, ns.Choices, ns.EventData, ns.Import
-local Invitations = ns.Invitations
+local EventDialog, Invitations = ns.EventDialog, ns.Invitations
 local LogExport, RaidData, RaidLog, RaidView = ns.LogExport, ns.RaidData, ns.RaidLog, ns.RaidView
 local RowList, SignupDialog = ns.RowList, ns.SignupDialog
 
@@ -27,7 +27,7 @@ local content, header
 local lists, buttons, badges = {}, {}, {}
 local officerPanel
 -- The officers' buttons, top to bottom.
-local OFFICER_ACTIONS = { "import", "open", "inviteAll", "exclusions", "export" }
+local OFFICER_ACTIONS = { "import", "open", "inviteAll", "exclusions", "create", "export" }
 
 --- A panel of the grid with its title; returns the panel and the frame under the title.
 local function addPanel(x, y, width, height, title, officer)
@@ -146,6 +146,7 @@ local function addOfficerPanel(x, y, height)
         open = { "Ouvrir les invitations", Invitations.Toggle },
         inviteAll = { "Inviter tout le roster", Invitations.InviteAll },
         exclusions = { "Exclure des objets", Choices.Exclusions },
+        create = { "Créer un événement", EventDialog.Open },
         export = { "Exporter le journal du raid", LogExport.Open },
     }
     for _, key in ipairs(OFFICER_ACTIONS) do

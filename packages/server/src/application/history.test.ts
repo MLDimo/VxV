@@ -34,7 +34,7 @@ describe("loot history", () => {
     const eventId = await createEvent(sql, me, new Date("2026-12-10T20:00:00Z"), ["onyxia"]);
     const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => new Date("2026-12-01T12:00:00Z") });
     await signups.signUp(me, eventId, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
-    await softReserveRepository(sql).replaceForCharacter(eventId, deja.id, [20]);
+    await softReserveRepository(sql).replaceForCharacter(eventId, deja.id, [20], new Date("2026-12-01T12:00:00Z"));
     return eventId;
   }
 

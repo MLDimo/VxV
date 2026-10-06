@@ -8,6 +8,7 @@ import type { SqlClient } from "../infrastructure/sql.ts";
 import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createAddonExport } from "./addonExport.ts";
+import { createEvents } from "./events.ts";
 import { createExclusions } from "./exclusions.ts";
 import { createGameChanges } from "./gameChanges.ts";
 import { createSignups } from "./signups.ts";
@@ -33,6 +34,8 @@ describe("changes made in game", () => {
     signups = createSignups({ unitOfWork, clock });
     changes = createGameChanges({
       unitOfWork,
+      clock,
+      events: createEvents({ unitOfWork, clock }),
       signups,
       softReserves: createSoftReserves({ unitOfWork, clock }),
       exclusions: createExclusions({ unitOfWork }),
@@ -144,5 +147,89 @@ describe("changes made in game", () => {
       eventId,
     );
     expect(text.split("\n")).toContain("C;Thom Leboss#1#1;1;Inscription enregistrée sur le site.");
+  });
+
+  describe("events created in game (P9.2)", () => {
+    const creation = (id: string, author: string, changes: Partial<Record<string, unknown>> = {}): GameChange =>
+      ({
+        id,
+        eventId: "",
+        author,
+        kind: "event",
+        date: "15/12",
+        time: "21:00",
+        raidIds: ["onyxia"],
+        softReserves: 2,
+        reason: "Raid du lundi",
+        ...changes,
+      }) as GameChange;
+
+    it("creates the officer's event, publishes it on Discord, and tells the game with every event's data", async () => {
+      const [outcome] = await changes.receive(officer, [creation("Ðéjà Vu#9#1", "Ðéjà Vu")]);
+      expect(outcome).toEqual({
+        id: "Ðéjà Vu#9#1",
+        eventId: undefined,
+        author: "Ðéjà Vu",
+        accepted: true,
+        message: "Événement du 15/12/2026 21:00 créé et annoncé sur Discord.",
+      });
+      const created = await sql.query<{ id: string; soft_reserves_per_player: number }>(
+        "select id, soft_reserves_per_player from events where starts_at = '2026-12-15T20:00:00Z'",
+      );
+      expect(created[0]?.soft_reserves_per_player).toBe(2);
+      expect(announced).toEqual([created[0]?.id]);
+      const text = await createAddonExport({ unitOfWork: createUnitOfWork(sql), clock: () => NOW }).exportEvent(
+        officer,
+        eventId,
+      );
+      expect(text.split("\n")).toContain("C;Ðéjà Vu#9#1;1;Événement du 15/12/2026 21:00 créé et annoncé sur Discord.");
+    });
+
+    it("refuses a member, and a date the website cannot read", async () => {
+      expect(await changes.receive(member, [creation("Thom Leboss#9#1", "Thom Leboss")])).toEqual([
+        expect.objectContaining({ accepted: false, message: "Cette action est réservée aux officiers." }),
+      ]);
+      expect(await changes.receive(officer, [creation("Ðéjà Vu#9#2", "Ðéjà Vu", { date: "31/02" })])).toEqual([
+        expect.objectContaining({ accepted: false, message: expect.stringContaining("15/10") }),
+      ]);
+    });
+  });
+
+  describe("conflicts with the website (P9.4)", () => {
+    const minutes = (count: number) => new Date(NOW.getTime() + count * 60 * 1000);
+    const reserves = (id: string, itemIds: number[], madeAt: Date): GameChange => ({
+      id,
+      eventId,
+      author: "Thom Leboss",
+      madeAt,
+      kind: "reserves",
+      itemIds,
+    });
+
+    it("does not apply a change made in game before the website's latest one", async () => {
+      await changes.receive(member, [{ ...signup("Thom Leboss#1#1"), madeAt: minutes(-30) }]);
+      const [thom] = await characterRepository(sql).listByMember(member.id);
+      await signups.signUp(member, eventId, {
+        characterId: thom?.id ?? "",
+        role: "dps",
+        spec: "Ombre",
+        status: "late",
+      });
+      expect(await changes.receive(member, [{ ...signup("Thom Leboss#2#1"), madeAt: minutes(-10) }])).toEqual([
+        expect.objectContaining({ accepted: false, message: expect.stringContaining("plus ancien") }),
+      ]);
+      expect((await signups.listForEvent(eventId))[0]?.spec).toBe("Ombre");
+    });
+
+    it("applies the changes made in game in the order they were made, whenever they arrive", async () => {
+      await changes.receive(member, [{ ...signup("Thom Leboss#1#1"), madeAt: minutes(-30) }]);
+      await changes.receive(member, [reserves("Thom Leboss#3#1", [21], minutes(-3))]);
+      expect(await changes.receive(member, [reserves("Thom Leboss#2#1", [20], minutes(-4))])).toEqual([
+        expect.objectContaining({ accepted: false }),
+      ]);
+      expect(await changes.receive(member, [reserves("Thom Leboss#4#1", [20], minutes(-2))])).toEqual([
+        expect.objectContaining({ accepted: true }),
+      ]);
+    });
   });
 });

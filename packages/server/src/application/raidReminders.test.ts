@@ -48,7 +48,7 @@ describe("raid reminders", () => {
     const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => now });
     await signups.signUp(me, tonight, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
     await signups.signUp(officer, tonight, { characterId: eole.id, role: "healer", spec: "Sacré", status: "late" });
-    await softReserveRepository(sql).replaceForCharacter(tonight, deja.id, [20]);
+    await softReserveRepository(sql).replaceForCharacter(tonight, deja.id, [20], now);
 
     expect(await reminders.sendDue(now)).toBe(1);
     expect(

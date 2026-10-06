@@ -8,6 +8,7 @@ import { createEvent, createMember, createRaidWithLoot } from "../test/fixtures.
 import { createTestDatabase } from "../testing.ts";
 import { createCharacters } from "./characters.ts";
 import { createCompanionUploads, type CompanionUpload } from "./companionUploads.ts";
+import { createEvents } from "./events.ts";
 import { createExclusions } from "./exclusions.ts";
 import { createGameChanges } from "./gameChanges.ts";
 import { createRaidLogs } from "./raidLogs.ts";
@@ -44,6 +45,8 @@ describe("companion uploads", () => {
       characters: createCharacters({ unitOfWork }),
       gameChanges: createGameChanges({
         unitOfWork,
+        clock,
+        events: createEvents({ unitOfWork, clock }),
         signups: createSignups({ unitOfWork, clock }),
         softReserves: createSoftReserves({ unitOfWork, clock }),
         exclusions: createExclusions({ unitOfWork }),

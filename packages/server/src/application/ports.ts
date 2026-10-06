@@ -122,8 +122,10 @@ export interface SignupRepository {
   /** The signed-up members' Discord ids, answers and whether they chose soft reserves. */
   listReminderTargets(eventId: string): Promise<ReminderTarget[]>;
   findByMember(eventId: string, memberId: string): Promise<Signup | undefined>;
-  /** Creates the sign-up of this character, or updates it. */
-  save(signup: SignupChoice & { eventId: string; memberId: string }): Promise<void>;
+  /** Creates the sign-up of this character, or updates it, as changed at the given instant. */
+  save(signup: SignupChoice & { eventId: string; memberId: string }, changedAt: Date): Promise<void>;
+  /** When the member's sign-up and its soft reserves last changed, or undefined without sign-up. */
+  changedAt(eventId: string, memberId: string): Promise<{ signup: Date; reserves: Date | undefined } | undefined>;
   delete(eventId: string, characterId: string): Promise<void>;
 }
 
@@ -147,8 +149,8 @@ export interface LootHistoryRepository {
 
 export interface SoftReserveRepository {
   listByEvent(eventId: string): Promise<SoftReserve[]>;
-  /** The character's soft reserves for the event become exactly these items. */
-  replaceForCharacter(eventId: string, characterId: string, itemIds: readonly number[]): Promise<void>;
+  /** The character's soft reserves for the event become exactly these items, as changed at the given instant. */
+  replaceForCharacter(eventId: string, characterId: string, itemIds: readonly number[], changedAt: Date): Promise<void>;
   deleteForItem(eventId: string, itemId: number): Promise<void>;
 }
 
@@ -187,9 +189,9 @@ export interface RaidLogRepository {
 /** What became of the changes made in game, by id. */
 export interface GameChangeRepository {
   find(changeId: string): Promise<GameChangeOutcome | undefined>;
-  save(outcome: GameChangeOutcome, sentBy: string): Promise<void>;
-  /** The event's changes, in the order received. */
-  listByEvent(eventId: string): Promise<GameChangeOutcome[]>;
+  save(outcome: GameChangeOutcome, sentBy: string, receivedAt: Date): Promise<void>;
+  /** The event's changes, then the events created in game since the given instant, in the order received. */
+  listForEvent(eventId: string, createdSince: Date): Promise<GameChangeOutcome[]>;
 }
 
 /** When the latest copy of some data, read in game, was imported ("roster"). */
