@@ -112,4 +112,10 @@ restent ouverts à sa relecture.
   Annuaire par métier, du plus haut niveau au plus bas, avec la date de la dernière lecture.
 - Le compagnon 1.3 envoie les textes de tout bundle sans les connaître ; le site répond avec ses messages en liste
   (`texts`), affichés tels quels : les métiers, puis le deathroll, ne demandent plus de nouvelle version.
+- En jeu (14.1, 14.4) : seuls les métiers du joueur sont relevés, et au niveau que dit sa liste de métiers (une
+  fenêtre de métier ouverte par le lien d'un autre joueur est ignorée). Les recettes relues identiques ne repartent
+  pas. Partage : chaque addon dit ses métiers à la guilde quand ils changent ; à la connexion, il dit la liste de
+  ce qu'il a (personnage, métier, dates) et demande celle des autres ; il chuchote à leur propriétaire les demandes
+  de ce qui lui manque. L'annuaire du site arrive par le compagnon seulement : relayé par les officiers, il
+  occuperait le canal plusieurs minutes. Un officier équipé du compagnon envoie au site les métiers qu'il entend.
 

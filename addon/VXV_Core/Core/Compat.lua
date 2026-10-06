@@ -47,6 +47,12 @@ local ALIASES = {
     AddTooltipPostCall = { "TooltipDataProcessor.AddTooltipPostCall" },
     AddMessageEventFilter = { "ChatFrameUtil.AddMessageEventFilter", "ChatFrame_AddMessageEventFilter" },
     AddInitializedFrameCallback = { "ScrollUtil.AddInitializedFrameCallback" },
+    -- Professions (phase 0, T10): the list with each level, and the open window's recipes.
+    GetProfessions = { "GetProfessions" },
+    GetProfessionInfo = { "GetProfessionInfo" },
+    GetBaseProfessionInfo = { "C_TradeSkillUI.GetBaseProfessionInfo" },
+    GetAllRecipeIDs = { "C_TradeSkillUI.GetAllRecipeIDs" },
+    GetRecipeInfo = { "C_TradeSkillUI.GetRecipeInfo" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.
