@@ -20,6 +20,29 @@ const OPEN_TAB = (name: string) => `
   SlashCmdList.VXV("")
   FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "${name}" end):Run("OnClick")
 `;
+/** Lua: the accounts book of the Journal, its cover (filled with leather) and its pages (filled with parchment);
+ * fills(token, under) finds the textures filled with a token's color under a frame. */
+const BOOK = `
+  local function fills(token, under)
+    local r, g, b = VXV.Theme.Color(token)
+    local found = {}
+    local function walk(frame)
+      for _, child in ipairs(frame.children or {}) do
+        local color = child.kind == "Texture" and child.color
+        if color and math.abs(color[1] - r) < 0.001 and math.abs(color[2] - g) < 0.001
+          and math.abs(color[3] - b) < 0.001 then
+          found[#found + 1] = child
+        end
+        walk(child)
+      end
+    end
+    walk(under)
+    return found
+  end
+  local cover = fills("leather", VXV_Window)[1].parent
+  local pages = {}
+  for _, fill in ipairs(fills("parchment", cover)) do pages[#pages + 1] = fill.parent end
+`;
 const EXPORT = 'FindButton(VXV_Window, "Exporter le journal du raid")';
 const TAB_ROWS = `
   local texts = {}
@@ -167,30 +190,55 @@ describe("record of the raid", () => {
   it("draws the Journal's parchment pages above the book's leather cover", () => {
     const { client } = startRaid();
     client(OPEN_TAB("Journal"));
-    // The cover is the frame filled with leather; its pages, filled with parchment, must lie above it.
     const levels = client(`
-      local function filledWith(token, under)
-        local r, g, b = VXV.Theme.Color(token)
-        local found = {}
-        local function walk(frame)
-          for _, child in ipairs(frame.children or {}) do
-            local color = child.kind == "Texture" and child.color
-            if color and math.abs(color[1] - r) < 0.001 and math.abs(color[2] - g) < 0.001
-              and math.abs(color[3] - b) < 0.001 then
-              found[#found + 1] = child.parent
-            end
-            walk(child)
-          end
-        end
-        walk(under)
-        return found
-      end
-      local cover = filledWith("leather", VXV_Window)[1]
-      local pages = {}
-      for _, page in ipairs(filledWith("parchment", cover)) do pages[#pages + 1] = page.frameLevel end
-      return { cover = cover.frameLevel, pages = pages }
+      ${BOOK}
+      local levels = {}
+      for _, page in ipairs(pages) do levels[#levels + 1] = page.frameLevel end
+      return { cover = cover.frameLevel, pages = levels }
     `) as unknown as { cover: number; pages: number[] };
     expect(levels.pages).toHaveLength(2);
     expect(Math.min(...levels.pages)).toBeGreaterThan(levels.cover);
+  });
+
+  it("writes every line of the Journal's pages on a rule, within the page", () => {
+    const officer = playOnyxia().player(OFFICER);
+    officer.client(OPEN_TAB("Journal"));
+    // From the middle of each text (titles, page texts, the list's rows) down to the first rule under it.
+    const pages = officer.client(`
+      ${BOOK}
+      local result = {}
+      for _, page in ipairs(pages) do
+        local rules, middles, bounded = {}, {}, true
+        for _, rule in ipairs(fills("ruling", page)) do rules[#rules + 1] = -rule.points[1][3] end
+        table.sort(rules)
+        for _, child in ipairs(page.children) do
+          if child.kind == "FontString" then
+            middles[#middles + 1] = -child.points[1][5]
+            bounded = bounded and #child.points == 2 and child.wordWrap == false
+          elseif child.kind == "Frame" then
+            local top = -child.points[1][3]
+            for _, row in ipairs(child.children[1].scrollChild.children) do
+              if row.shown then middles[#middles + 1] = top - row.points[1][3] + row.height / 2 end
+            end
+          end
+        end
+        local gaps = {}
+        for _, middle in ipairs(middles) do
+          local gap = math.huge
+          for _, y in ipairs(rules) do
+            if y > middle then gap = math.min(gap, y - middle) end
+          end
+          gaps[#gaps + 1] = gap
+        end
+        result[#result + 1] = { gaps = gaps, line = rules[2] - rules[1], bounded = bounded }
+      end
+      return result
+    `) as unknown as { gaps: number[]; line: number; bounded: boolean }[];
+    const gaps = pages.flatMap((page) => page.gaps);
+    expect(gaps.length).toBeGreaterThan(10);
+    expect(new Set(gaps).size).toBe(1);
+    expect(gaps[0]).toBeGreaterThan(0);
+    expect(gaps[0]).toBeLessThan((pages[0]?.line ?? 0) / 2);
+    expect(pages.map((page) => page.bounded)).toEqual([true, true]);
   });
 });
