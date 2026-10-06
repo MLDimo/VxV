@@ -12,3 +12,6 @@ next-env.d.ts
 *.tsbuildinfo
 playwright-report/
 test-results/
+graphify-out/
+# Graphify's Claude Code hooks, with this machine's path to graphify.
+.claude/settings.json

@@ -261,3 +261,15 @@ déprécie la file d'attente), donc pas de `Promise.all` dans `application/` ni 
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
 - Build 70235 (6 octobre, `docs/phase-0/sessions/2026-10-06.txt`) : `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés ; anciennes globales absentes (`InviteUnit`, `ConvertToRaid`, `GetNumSkillLines`, `GetNumTradeSkills` : passer par `C_PartyInfo` et `C_TradeSkillUI`) ; événement `TRADE_SKILL_UPDATE` refusé (`TRADE_SKILL_LIST_UPDATE` accepté).
 - Habillage (mesuré le 5 octobre, `docs/design/mesure-en-jeu-2026-10-05.md`) : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.
+
+## graphify
+
+Graphe du code, de la documentation et du schéma SQL dans `graphify-out/`, local à chaque machine (ignoré par git ;
+`.graphifyignore` écarte les fichiers générés, les journaux de la sonde et les médias).
+
+- Pour une question sur le code, d'abord `graphify query "<question>"`, puis `graphify path "<A>" "<B>"` pour le lien
+  entre deux éléments et `graphify explain "<concept>"` pour un concept : ils renvoient un sous-graphe ciblé, plus court
+  que `graphify-out/GRAPH_REPORT.md` ou une recherche brute.
+- `graphify-out/GRAPH_REPORT.md` seulement pour une vue d'ensemble de l'architecture.
+- Après une modification du code ou un `git pull` : `graphify update .` (analyse locale, sans appel à un modèle).
+- Pas de `graphify hook install` : les hooks git du projet vivent dans `.githooks` (dont le `pre-push`).
