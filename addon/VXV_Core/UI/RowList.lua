@@ -8,7 +8,7 @@ local _, ns = ...
 local RowList = {}
 ns.RowList = RowList
 
-local Bus, Theme, Tooltip = ns.Bus, ns.Theme, ns.Tooltip
+local Bus, Theme, Tokens, Tooltip = ns.Bus, ns.Theme, ns.Tokens, ns.Tooltip
 
 -- Palettes: the dark panels of the screens, and the parchment of the accounts book (§7.7), whose rows all sit on
 -- the page's lines.
@@ -189,6 +189,37 @@ function RowList.Fill(frame, margin, rows, events)
     end
     frame:SetScript("OnShow", render)
     for _, event in ipairs(events) do
+        Bus.On(event, render)
+    end
+    render()
+    return list
+end
+
+-- A screen's margins, and the top of its grid under the head.
+local SCREEN_PADDING, SCREEN_GRID_TOP = 22, 96
+
+--- A place's screen of one titled list (the Ranking's tabs): the place's head (its subtitle, its name), a subtitle,
+--- and the list, filled again each time the screen shows and after each of the bus events. Options: { place,
+--- heading, rows(), subtitle(), events }. Returns the list.
+function RowList.Screen(frame, options)
+    local place = {}
+    for _, candidate in ipairs(Tokens.places) do
+        if candidate.id == options.place then
+            place = candidate
+        end
+    end
+    local kicker, title = Theme.ScreenHeader(frame, place.subtitle, place.kicker, place.name)
+    kicker:SetPoint("TOPLEFT", SCREEN_PADDING, -SCREEN_PADDING)
+    local subtitle = Theme.Text(frame, "text", 13, "muted")
+    subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -6)
+    local list = RowList.Panel(frame, SCREEN_PADDING, SCREEN_GRID_TOP, frame:GetWidth() - 2 * SCREEN_PADDING,
+        frame:GetHeight() - SCREEN_GRID_TOP - SCREEN_PADDING, options.heading)
+    local function render()
+        subtitle:SetText(options.subtitle and options.subtitle() or "")
+        list.SetRows(options.rows())
+    end
+    frame:SetScript("OnShow", render)
+    for _, event in ipairs(options.events or {}) do
         Bus.On(event, render)
     end
     render()

@@ -65,7 +65,8 @@ local function debts()
     return #rows > 0 and rows or { row("line", "Aucune dette de deathroll.") }
 end
 
-local function ranking()
+--- The deathroll's ranking since always, as the website exports it (P15.7).
+function DeathrollTab.Ranking()
     local data, rows = DeathrollData.Current(), {}
     for _, entry in ipairs(data and data.ranking or {}) do
         rows[#rows + 1] = row("line", ("%d. %s · %s · %d parties"):format(entry.rank,
@@ -78,7 +79,7 @@ local function render()
     lists.members.SetRows(members())
     lists.live.SetRows(live())
     lists.debts.SetRows(debts())
-    lists.ranking.SetRows(ranking())
+    lists.ranking.SetRows(DeathrollTab.Ranking())
 end
 
 local function challenge()

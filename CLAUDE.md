@@ -147,9 +147,11 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
 - Pixel art : aucun arrondi (retirés du thème), reliefs en anneaux d'ombres pleines, survol prune et or, zones officier à liseré or.
 - Pixelify Sans pour les titres, onglets, plaques, boutons et gros chiffres ; Manrope pour le texte. Polices et images servies par le site (`apps/web/public`), licences OFL à côté des polices.
 - Un lieu = un onglet, même nom partout : Taverne, Raid, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal.
+- Fond de chaque écran : la taverne cadrée sur son lieu, très sombre (`backdrop` de `packages/design/src/places.ts`),
+  dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
-- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit.
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll ; Ranking : Paris (`VXV_Paris`), Deathroll (`VXV_Deathroll`), Titres (`VXV_Titles`), comme sur le site.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus (vu sur le Journal le 5 octobre).
 

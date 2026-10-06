@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
+import { PlaceBackdrop } from "@/components/PlaceBackdrop";
 
-/** The inner screens: a centered column under the header. */
+/** The inner screens: a centered column under the header, over their place's background. */
 export default function SectionsLayout({ children }: { children: ReactNode }) {
-  return <div className="mx-auto max-w-6xl px-4 py-8">{children}</div>;
+  return (
+    <>
+      <PlaceBackdrop />
+      <div className="mx-auto max-w-6xl px-4 py-8">{children}</div>
+    </>
+  );
 }

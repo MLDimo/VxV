@@ -68,7 +68,8 @@ VXV = {
     --- (name, width, height, title): a small window in the charter, closed by Escape; returns it and its body.
     CreateDialog = ns.Dialog.Create,
     --- Lists of text rows scrolled with the wheel: RowList.Create(parent, topOffset, palette), RowList.RULE; in a
-    --- titled panel of a screen, RowList.Panel; filling a tab of the reduced mode, RowList.Fill.
+    --- titled panel of a screen, RowList.Panel; filling a tab of the reduced mode, RowList.Fill; a place's screen of
+    --- one list, RowList.Screen.
     RowList = ns.RowList,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
