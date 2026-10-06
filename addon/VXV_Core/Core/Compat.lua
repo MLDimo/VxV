@@ -33,7 +33,7 @@ local ALIASES = {
     -- Interface
     GetCursorPosition = { "GetCursorPosition" },
     GetMinimapShape = { "GetMinimapShape" }, -- optional: defined by minimap addons only
-    -- Sound: optional until measured on Forever (the probe's inventory lists it); silent when absent.
+    -- Sound (measured on 6 October, build 70235).
     PlaySound = { "PlaySound" },
 }
 

@@ -56,7 +56,7 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - 8.1 prochain boss : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du pack) ; ailleurs, le premier boss debout des raids de l'événement, dans leur ordre ; un joueur qui rejoint le raid en retard apprend du maître du butin (ou du chef) les boss déjà tués ;
   - 8.2 panneau : en tête de « SR du raid » sur l'écran Raid (son butin et qui l'a réservé), et dans le mode réduit ;
   - 8.3 alerte : message au milieu de l'écran et son de l'avertissement de raid, une fois par boss où le joueur a une SR ; désactivable (`/vxv alerte` ou le bouton « Alerte » de l'écran Raid).
-  L'entrée dans une instance n'a pas d'événement mesuré sur Forever : la position est relue toutes les 5 s. `PlaySound` passe par Compat tant qu'il n'est pas mesuré (ajouté à l'inventaire de la sonde, avec `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA`).
+  La position est relue toutes les 5 s (`PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` sont acceptés depuis la mesure du 6 octobre, mais pas encore vus se déclencher) ; le son passe par Compat (`PlaySound` mesuré le 6 octobre).
   Validation en attente : l'alerte sur un raid enchaînant deux instances (raids ouverts le 9 décembre ; en bêta, « La salle des Thanes » seule).
 - **P9 Inscriptions bidirectionnelles** : code terminé :
   - 9.1 inscription en jeu et 9.3 message Discord à jour : faits en P7.5 (changement en attente puis confirmé, le site met à jour le message de l'événement) ;
@@ -179,7 +179,7 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Une migration lue par le code fusionné se déploie en production aussitôt la fusion faite (`deploy-database.yml`, cible production) : le site part en production automatiquement, la base non.
 - Les règles d'intégrité vivent dans le schéma (contraintes) et sont couvertes par des tests PGlite (`supabase/tests`). `@vxv/database/testing` fournit une base migrée pour les tests des autres paquets.
 
-## Contraintes WoW Forever (mesurées en P0, build 70170)
+## Contraintes WoW Forever (mesurées en P0, build 70170 ; inventaire refait sur le build 70235 le 6 octobre)
 
 - Client moderne : utiliser uniquement les API `C_*`. Les anciennes globales sont absentes (`SendAddonMessage`, `GetLootMethod` vérifiées).
 - SavedVariables : relues correctement après `/reload` et après redémarrage sur le build 70170 (ancien bug de la bêta corrigé).
@@ -198,4 +198,5 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.
 - Métiers : `GetProfessions` ; recettes connues via `C_TradeSkillUI`, quand la fenêtre du métier est ouverte.
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
+- Build 70235 (6 octobre, `docs/phase-0/sessions/2026-10-06.txt`) : `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés ; anciennes globales absentes (`InviteUnit`, `ConvertToRaid`, `GetNumSkillLines`, `GetNumTradeSkills` : passer par `C_PartyInfo` et `C_TradeSkillUI`) ; événement `TRADE_SKILL_UPDATE` refusé (`TRADE_SKILL_LIST_UPDATE` accepté).
 - Habillage (mesuré le 5 octobre, `docs/design/mesure-en-jeu-2026-10-05.md`) : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.
