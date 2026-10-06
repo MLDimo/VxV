@@ -4,7 +4,7 @@ Outil de guilde pour WoW Forever : addon en jeu, site web, bot Discord et app co
 Gestion des raids, soft reserves (SR), attribution et suivi du loot, puis paris, missions, titres, artisans et deathroll.
 Le plan de référence est le PDF « VXV - Plan de développement » v1.0 du 3 octobre 2026 : 16 phases (P0 à P15),
 avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` (SR+, historique, droits, modèle de données)
-et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
+et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
 
 ## État d'avancement
 
@@ -92,7 +92,13 @@ et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
   récoltes, l'addon compte une récolte par fenêtre de butin contenant une herbe, un minerai ou un cuir (décision du
   propriétaire, `Gathering.lua`).
   Validation en attente : une mission d'une semaine menée jusqu'au classement.
-- P13 à P15 : pas commencées.
+- **P13 Titres** : en cours.
+  - 13.1, 13.2 et 13.5 : titres calculés par le site sur la saison (paris, dernière mission, objets reçus, morts en
+    raid, dons à la caisse ; `packages/server/src/domain/titles.ts`), réattribués chaque mercredi à 5 h UTC (tâche
+    Vercel), historique en base, catégorie « Titres » du Ranking (`/ranking/titres`), rôles Discord « ◆ <titre> » et
+    annonce de la semaine.
+  - À venir : journal de raid `VXV-LOG-2` (dégâts, soins, résurrections) et bundle `VXV_Titles` (titres en jeu).
+- P14 et P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
 

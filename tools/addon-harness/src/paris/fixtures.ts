@@ -69,6 +69,7 @@ export const TAVERN_BETS: AddonBetsFacts = {
         label: "Flacons",
         reason: "Raid",
         recordedByName: "Trésorier",
+        memberId: undefined,
         memberName: undefined,
       },
     ],

@@ -1,0 +1,144 @@
+import type { PGliteInterface } from "@electric-sql/pglite";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Member } from "../domain/members.ts";
+import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
+import { createDiscordGuild } from "../infrastructure/discord/guild.ts";
+import { characterRepository } from "../infrastructure/postgres/characters.ts";
+import { raidLogRepository } from "../infrastructure/postgres/raidLogs.ts";
+import { raidRecordRepository } from "../infrastructure/postgres/raidRecords.ts";
+import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
+import type { SqlClient } from "../infrastructure/sql.ts";
+import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import { createTestDatabase } from "../testing.ts";
+import { createBets } from "./bets.ts";
+import { createCash } from "./cash.ts";
+import type { AnnouncedTitles } from "./ports.ts";
+import { createTitles, titleRole, type Titles } from "./titles.ts";
+
+const WEDNESDAY = new Date("2026-10-07T05:00:00Z");
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+describe("titles", () => {
+  let database: PGliteInterface;
+  let sql: SqlClient;
+  let discord: FakeDiscord;
+  let titles: Titles;
+  let announced: AnnouncedTitles[];
+  let now: Date;
+  let officer: Member;
+  let vorn: Member;
+  let morgane: Member;
+
+  /** A member with their main character, as Discord knows them. */
+  async function memberWithMain(name: string): Promise<Member> {
+    const member = await createMember(sql, "member", name.split(" ")[0]);
+    const [main] = await createGuildCharacters(sql, name);
+    await characterRepository(sql).link(main.id, member.id);
+    await characterRepository(sql).setMain(member.id, main.id);
+    return member;
+  }
+
+  beforeEach(async () => {
+    ({ database, sql } = await createTestDatabase());
+    discord = createFakeDiscord();
+    vi.stubGlobal("fetch", discord.fetch);
+    now = WEDNESDAY;
+    announced = [];
+    const unitOfWork = createUnitOfWork(sql);
+    titles = createTitles({
+      unitOfWork,
+      clock: () => now,
+      guild: createDiscordGuild({ token: "token", guildId: "guild" }),
+      announcer: {
+        announce: async (titlesOfWeek) => {
+          announced.push(titlesOfWeek);
+        },
+      },
+    });
+    officer = await createMember(sql, "officer", "Officier");
+    vorn = await memberWithMain("Vorn Cendrelune");
+    morgane = await memberWithMain("Morgane Nuitsombre");
+
+    // A bet Vorn won against Morgane, before the reassignment.
+    const clock = () => new Date("2026-10-05T20:00:00Z");
+    const bets = createBets({ unitOfWork, clock });
+    const betId = await bets.create(
+      officer,
+      { title: "Qui meurt ?", choices: ["Oui", "Non"], closesAt: new Date("2026-10-06T20:00:00Z") },
+      "Pari",
+    );
+    const [yes, no] = (await bets.find(betId))?.bet.choices ?? [];
+    await bets.stake(vorn, betId, yes?.id ?? "", 100);
+    await bets.stake(morgane, betId, no?.id ?? "", 150);
+    await bets.declareResult(officer, betId, yes?.id ?? "", "Résultat");
+    // A raid: Morgane received the head, Vorn died three times.
+    await createRaidWithLoot(sql);
+    const eventId = await createEvent(sql, officer, new Date("2026-10-04T20:00:00Z"), ["onyxia"]);
+    const [morganeMain] = await characterRepository(sql).listByMember(morgane.id);
+    await raidRecordRepository(sql).addLoots(eventId, [
+      {
+        encounterId: 2,
+        itemId: 20,
+        characterId: morganeMain?.id ?? "",
+        method: "free_roll",
+        lootedAt: new Date("2026-10-04T21:00:00Z"),
+      },
+    ]);
+    await raidLogRepository(sql).save(
+      eventId,
+      ["VXV-LOG-1", `R;${eventId};1791144000;1791151200`, "D;Vorn Cendrelune;3"].join("\n"),
+      new Date("2026-10-04T23:00:00Z"),
+    );
+    // Vorn gives to the guild's cash.
+    const treasurer = await createMember(sql, "treasurer", "Trésorier");
+    await createCash({ unitOfWork, clock }).record(
+      treasurer,
+      { kind: "donation", amount: 500, label: "Don", memberId: vorn.id },
+      "Don",
+    );
+  });
+
+  afterEach(async () => {
+    vi.unstubAllGlobals();
+    await database.close();
+  });
+
+  it("gives the titles each Wednesday over the season, with their Discord roles and the announcement", async () => {
+    expect(await titles.reassign()).toBe(true);
+    const [week] = await titles.weeks();
+    expect(week?.week).toBe("2026-10-07");
+    expect(week?.holders.map(({ titleId, memberName, score }) => [titleId, memberName, score])).toEqual([
+      ["debtKing", "Morgane Nuitsombre", 150],
+      ["floorTaster", "Vorn Cendrelune", 3],
+      ["gamblingKing", "Vorn Cendrelune", 125],
+      ["sugarDaddy", "Vorn Cendrelune", 500],
+      ["wellFed", "Morgane Nuitsombre", 1],
+    ]);
+    expect(discord.roleNamesOf(vorn.discordId).sort()).toEqual(
+      [titleRole("Goûteur de sol"), titleRole("Roi du gambling"), titleRole("Sugar Daddy")].sort(),
+    );
+    expect(discord.roleNamesOf(morgane.discordId).sort()).toEqual(
+      [titleRole("Bien gras"), titleRole("Roi de la dette")].sort(),
+    );
+    expect(announced[0]?.holders.find((holder) => holder.title === "Numéro UNO")).toMatchObject({ holder: undefined });
+    // Once a week only.
+    now = new Date(WEDNESDAY.getTime() + 60 * 60 * 1000);
+    expect(await titles.reassign()).toBe(false);
+  });
+
+  it("takes a title's role from its former holder the next week, and keeps the history", async () => {
+    await titles.reassign();
+    // Morgane gives more than Vorn: she becomes Sugar Daddy.
+    const treasurer = await createMember(sql, "treasurer", "Trésorière");
+    await createCash({ unitOfWork: createUnitOfWork(sql), clock: () => now }).record(
+      treasurer,
+      { kind: "donation", amount: 900, label: "Don", memberId: morgane.id },
+      "Don",
+    );
+    now = new Date(WEDNESDAY.getTime() + WEEK_MS);
+    expect(await titles.reassign()).toBe(true);
+    expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Sugar Daddy"));
+    expect(discord.roleNamesOf(morgane.discordId)).toContain(titleRole("Sugar Daddy"));
+    expect((await titles.weeks()).map((week) => week.week)).toEqual(["2026-10-14", "2026-10-07"]);
+  });
+});

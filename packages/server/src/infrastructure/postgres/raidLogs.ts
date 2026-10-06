@@ -32,5 +32,14 @@ export function raidLogRepository(sql: SqlClient): RaidLogRepository {
       );
       return found.filter((entry): entry is { event: RaidEvent; content: string } => entry.event !== undefined);
     },
+
+    async listStartedSince(since) {
+      const rows = await sql.query<{ starts_at: Date; content: string }>(
+        `select events.starts_at, raid_logs.content from raid_logs join events on events.id = raid_logs.event_id
+         where $1::timestamptz is null or events.starts_at >= $1 order by events.starts_at`,
+        [since ?? null],
+      );
+      return rows.map((row) => ({ startsAt: row.starts_at, content: row.content }));
+    },
   };
 }

@@ -5,6 +5,7 @@ import { Avatar } from "@/components/Avatar";
 import { Badge } from "@/components/Badge";
 import { MemberName } from "@/components/MemberName";
 import { Podium } from "@/components/Podium";
+import { RankingNav } from "@/components/RankingNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SeasonForm } from "@/components/SeasonForm";
 import { getApplication } from "@/server/application";
@@ -66,11 +67,7 @@ export default async function RankingPage({
         </Badge>
       </ScreenHeader>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Catégories" className="flex gap-3">
-          <Link href="/ranking" className="tab" aria-current="page">
-            Paris
-          </Link>
-        </nav>
+        <RankingNav current="/ranking" />
         <nav aria-label="Période" className="flex gap-2">
           {RANKING_PERIODS.map((candidate) => (
             <Link

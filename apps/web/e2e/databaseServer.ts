@@ -3,7 +3,12 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { renderSeedSql } from "@vxv/data-generator/seedSql";
 import { createMigratedPGlite } from "@vxv/database/testing";
 import { loadRaids } from "@vxv/raid-data";
-import { createDiscordBetAnnouncer, createDiscordMissionAnnouncer, createDiscordRaidAnnouncer } from "@vxv/bot";
+import {
+  createDiscordBetAnnouncer,
+  createDiscordMissionAnnouncer,
+  createDiscordRaidAnnouncer,
+  createDiscordTitleAnnouncer,
+} from "@vxv/bot";
 import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
 import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, WEB_ENVIRONMENT, type E2ESeed } from "./environment";
@@ -34,6 +39,11 @@ const app = createApplication({
   missionAnnouncer: createDiscordMissionAnnouncer({
     ...rest,
     channelId: WEB_ENVIRONMENT.DISCORD_MISSIONS_CHANNEL_ID,
+    siteUrl: WEB_ENVIRONMENT.SITE_URL,
+  }),
+  titleAnnouncer: createDiscordTitleAnnouncer({
+    ...rest,
+    channelId: WEB_ENVIRONMENT.DISCORD_TITLES_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
 });

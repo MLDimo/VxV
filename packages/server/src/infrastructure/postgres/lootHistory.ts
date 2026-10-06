@@ -136,5 +136,15 @@ export function lootHistoryRepository(sql: SqlClient): LootHistoryRepository {
       }
       return pastEvents;
     },
+
+    async listReceivedSince(since) {
+      const rows = await sql.query<{ member_id: string; looted_at: Date }>(
+        `select characters.member_id, loots.looted_at from loots
+         join characters on characters.id = loots.character_id
+         where characters.member_id is not null and ($1::timestamptz is null or loots.looted_at >= $1)`,
+        [since ?? null],
+      );
+      return rows.map((row) => ({ memberId: row.member_id, at: row.looted_at }));
+    },
   };
 }

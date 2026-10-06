@@ -34,6 +34,7 @@ describe("parseConfig", () => {
         raidChannelId: "444",
         betsChannelId: "444",
         missionsChannelId: "444",
+        titlesChannelId: "444",
         roles: { treasurer: "2", officer: "3", gm: "4" },
       },
     });

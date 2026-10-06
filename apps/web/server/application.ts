@@ -1,5 +1,10 @@
 import "server-only";
-import { createDiscordBetAnnouncer, createDiscordMissionAnnouncer, createDiscordRaidAnnouncer } from "@vxv/bot";
+import {
+  createDiscordBetAnnouncer,
+  createDiscordMissionAnnouncer,
+  createDiscordRaidAnnouncer,
+  createDiscordTitleAnnouncer,
+} from "@vxv/bot";
 import { createApplication, createDiscordGuild, createPgSqlClient, type Application } from "@vxv/server";
 import { getConfig } from "./config";
 
@@ -17,6 +22,7 @@ export function getApplication(): Application {
       announcer: createDiscordRaidAnnouncer({ ...rest, channelId: discord.raidChannelId, siteUrl }),
       betAnnouncer: createDiscordBetAnnouncer({ ...rest, channelId: discord.betsChannelId, siteUrl }),
       missionAnnouncer: createDiscordMissionAnnouncer({ ...rest, channelId: discord.missionsChannelId, siteUrl }),
+      titleAnnouncer: createDiscordTitleAnnouncer({ ...rest, channelId: discord.titlesChannelId, siteUrl }),
     });
   }
   return application;

@@ -1,7 +1,7 @@
 # Décisions du 6 octobre 2026
 
 Complète le plan de développement v1.0 et les décisions des 3 et 5 octobre. Le propriétaire a confié la P11
-(paris) puis la P12 (missions) en autonomie : les choix ci-dessous précisent le plan là où il ne tranche pas, et
+(paris), la P12 (missions) puis la P13 (titres) en autonomie : les choix ci-dessous précisent le plan là où il ne tranche pas, et
 restent ouverts à sa relecture.
 
 ## P11 : paris
@@ -73,3 +73,21 @@ restent ouverts à sa relecture.
   d'herboristerie, de minage et de dépeçage restent, comptées par l'addon : une fenêtre de butin qui contient une
   herbe, un minerai (ou une pierre) ou un cuir compte pour une récolte, quel que soit le nombre d'objets. Seules les
   récoltes faites addon actif comptent.
+
+## P13 : titres
+
+- Chaque titre va au membre en tête sur sa règle, calculée sur la saison en cours (depuis toujours sans saison). À
+  égalité, le premier à atteindre le score le garde. Un titre sans aucun score positif ne va à personne.
+- Titres calculés sur les données déjà en base : Roi du gambling (plus gros gain net aux paris), Roi de la dette (plus
+  grosse perte nette), Numéro UNO (vainqueur de la dernière mission validée), Bien gras (le plus d'objets reçus en
+  raid), Goûteur de sol (le plus de morts dans les journaux de raid VXV), Sugar Daddy (plus gros donateur à la caisse).
+  Les paris annulés ne comptent pas.
+- Réattribution chaque mercredi à 5 h UTC, après le reset (tâche Vercel `/api/cron/titres`), une seule fois par
+  semaine ; l'historique de chaque semaine reste en base et le site en montre huit (Ranking, catégorie « Titres »).
+- Discord : chaque titre est un rôle « ◆ <titre> », créé par le bot s'il manque, retiré à l'ancien détenteur et donné
+  au nouveau ; les titres de la semaine sont annoncés dans `DISCORD_TITLES_CHANNEL_ID` s'il est défini, sinon le salon
+  des raids. Le rôle du bot doit être placé au-dessus de ces rôles dans les réglages du serveur.
+- Titres de raid à venir (journal `VXV-LOG-2`) : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans
+  le compteur du jeu après chaque boss, et Lève toi copaing (résurrections acceptées). Princesse (soins reçus) est
+  abandonné : le compteur du jeu ne mesure pas les soins reçus sur Forever. Il cheat c'est sûr et Loser attendent le
+  deathroll (P15).

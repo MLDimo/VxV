@@ -20,6 +20,7 @@ import { sessionRepository } from "./sessions.ts";
 import { signupRepository } from "./signups.ts";
 import { softReserveRepository } from "./softReserves.ts";
 import { syncMarkRepository } from "./syncMarks.ts";
+import { titleRepository } from "./titles.ts";
 
 function createRepositories(sql: SqlClient): Repositories {
   return {
@@ -46,6 +47,7 @@ function createRepositories(sql: SqlClient): Repositories {
     missions: missionRepository(sql),
     counterReadings: counterReadingRepository(sql),
     missionRewards: missionRewardRepository(sql),
+    titles: titleRepository(sql),
   };
 }
 

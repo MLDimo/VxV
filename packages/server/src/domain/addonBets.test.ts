@@ -60,6 +60,7 @@ describe("bets for the addon", () => {
             label: "Flacons",
             reason: "Raid",
             recordedByName: "Trésorier",
+            memberId: undefined,
             memberName: undefined,
           },
         ],
