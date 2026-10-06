@@ -24,6 +24,8 @@ Core\SendQueue.lua
 Core\Comm.lua
 Core\GroupChat.lua
 Core\Presence.lua
+Core\SharedData.lua
+Core\PendingChanges.lua
 
 # Interface: the charter's theme, window, Taverne tab, /vxv, minimap icon.
 UI\Tokens.lua

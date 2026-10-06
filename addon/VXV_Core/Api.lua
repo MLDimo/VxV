@@ -24,6 +24,13 @@ VXV = {
     --- (kind, handler(payload, sender)) to receive them. Kinds start with the bundle's name ("raid.data").
     Broadcast = ns.Comm.Broadcast,
     OnMessage = ns.Comm.On,
+    --- (name, source): data the guild's addons pass on to each other, from the officers; returns { Send, Start }.
+    --- See Core/SharedData.lua.
+    ShareData = ns.SharedData.Create,
+    --- (options): changes made in game, waiting for the website, relayed by an officer with the companion; and
+    --- (): whether the player's companion brought data at this launch. See Core/PendingChanges.lua.
+    PendingChanges = ns.PendingChanges.Create,
+    CompanionSeen = ns.PendingChanges.CompanionSeen,
     --- (text): an announcement in the group's channel, held during a boss encounter.
     SayToGroup = ns.GroupChat.Say,
     --- The Blizzard API whose names vary, with the pcall contract (ok, ...): see Core/Compat.lua.
