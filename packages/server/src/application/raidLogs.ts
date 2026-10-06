@@ -28,10 +28,8 @@ interface Recorded {
 /** The names of the event's bosses and items, for the recap and the journal. */
 async function raidNames(repositories: Repositories, event: RaidEvent) {
   const raidIds = event.raids.map((raid) => raid.id);
-  const [bosses, loot] = await Promise.all([
-    repositories.raids.listBosses(raidIds),
-    repositories.bossLoot.listForRaids(raidIds),
-  ]);
+  const bosses = await repositories.raids.listBosses(raidIds);
+  const loot = await repositories.bossLoot.listForRaids(raidIds);
   return {
     bosses: new Map(bosses.map((boss) => [boss.encounterId, boss.name])),
     items: new Map(loot.map((item) => [item.itemId, item.name])),
@@ -54,11 +52,9 @@ async function record(
   if (event === undefined) {
     throw new ValidationError(UNKNOWN_EVENT);
   }
-  const [characters, names, kept] = await Promise.all([
-    repositories.characters.listAll(),
-    raidNames(repositories, event),
-    repositories.raidLogs.find(event.id),
-  ]);
+  const characters = await repositories.characters.listAll();
+  const names = await raidNames(repositories, event);
+  const kept = await repositories.raidLogs.find(event.id);
   const plan = planRaidLogImport(log, {
     characters,
     encounterIds: new Set(names.bosses.keys()),
@@ -186,13 +182,14 @@ export function createRaidLogs({
     async publishDueRecaps(): Promise<number> {
       const startedBefore = new Date(clock().getTime() - EVENT_LISTED_AFTER_START_MS);
       const due = await unitOfWork.run(async (repositories) => {
-        const unannounced = await repositories.raidLogs.listUnannounced(startedBefore);
-        return Promise.all(
-          unannounced.map(async ({ event, content }) => ({
+        const recaps = [];
+        for (const { event, content } of await repositories.raidLogs.listUnannounced(startedBefore)) {
+          recaps.push({
             event,
             recap: buildRaidRecap(event, parseRaidLog(content), await raidNames(repositories, event)),
-          })),
-        );
+          });
+        }
+        return recaps;
       });
       let published = 0;
       for (const { event, recap } of due) {

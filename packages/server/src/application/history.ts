@@ -33,10 +33,8 @@ export function createHistory({ unitOfWork }: { unitOfWork: UnitOfWork }) {
         throw new ValidationError("Choisissez comment l'objet a été attribué.");
       }
       await unitOfWork.run(async ({ lootHistory, characters, journal }) => {
-        const [loot, character] = await Promise.all([
-          lootHistory.findById(lootId),
-          characters.findById(correction.characterId),
-        ]);
+        const loot = await lootHistory.findById(lootId);
+        const character = await characters.findById(correction.characterId);
         if (loot === undefined) {
           throw new ValidationError("Ce loot n'existe pas.");
         }
