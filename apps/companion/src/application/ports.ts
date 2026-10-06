@@ -44,12 +44,16 @@ export interface Upload {
   characters: { name: string; race: string; sex: number }[];
   /** Changes made in game, the player's and those an officer relays: the website checks them. */
   changes: { id: string }[];
+  /** Game counters read by the addon (P12.4): the player's, and those an officer relays. */
+  counters: { name: string; type: string; value: number; at: number }[];
 }
 
 export interface UploadReport {
   roster?: string;
   raidLogs: string[];
   characters: number;
+  /** How many counter readings were new, if any were sent. */
+  counters?: string;
   /** What became of the changes made in game, if any were sent. */
   changes?: string;
 }

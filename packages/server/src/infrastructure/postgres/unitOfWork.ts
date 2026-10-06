@@ -11,6 +11,7 @@ import { gameChangeRepository } from "./gameChanges.ts";
 import { journalRepository } from "./journal.ts";
 import { lootHistoryRepository } from "./lootHistory.ts";
 import { memberRepository } from "./members.ts";
+import { counterReadingRepository, missionRepository, missionRewardRepository } from "./missions.ts";
 import { raidLogRepository } from "./raidLogs.ts";
 import { raidRecordRepository } from "./raidRecords.ts";
 import { raidRepository } from "./raids.ts";
@@ -42,6 +43,9 @@ function createRepositories(sql: SqlClient): Repositories {
     stakes: stakeRepository(sql),
     cash: cashRepository(sql),
     seasons: seasonRepository(sql),
+    missions: missionRepository(sql),
+    counterReadings: counterReadingRepository(sql),
+    missionRewards: missionRewardRepository(sql),
   };
 }
 

@@ -28,6 +28,7 @@ export const WEB_ENVIRONMENT = {
   DISCORD_LINK_CHANNEL_ID: "20",
   DISCORD_RAID_CHANNEL_ID: "21",
   DISCORD_BETS_CHANNEL_ID: "22",
+  DISCORD_MISSIONS_CHANNEL_ID: "23",
   DISCORD_ROLE_TREASURER: DISCORD_ROLES.treasurer,
   DISCORD_ROLE_OFFICER: DISCORD_ROLES.officer,
   DISCORD_ROLE_GM: DISCORD_ROLES.gm,
@@ -74,4 +75,6 @@ export interface E2ESeed {
   raidLogEventId: string;
   /** Event without sign-ups, whose raid log an officer's companion sends. */
   companionEventId: string;
+  /** A mission over a few seconds after the seed, Ciel Gris ahead: for the validation and the rewards. */
+  endedMissionId: string;
 }

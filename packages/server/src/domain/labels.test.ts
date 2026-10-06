@@ -3,6 +3,8 @@ import {
   formatDuration,
   formatGold,
   formatOdds,
+  formatPlace,
+  formatRemaining,
   formatShare,
   formatShortEventDate,
   formatSignedGold,
@@ -26,6 +28,17 @@ describe("labels", () => {
     expect(plain(formatShare(0.42))).toBe("42 %");
     expect(plain(formatSignedGold(500))).toBe("+500 po");
     expect(plain(formatSignedGold(-850))).toBe("−850 po");
+  });
+
+  it("writes what remains in days and hours, else in hours and minutes", () => {
+    const hour = 60 * 60 * 1000;
+    expect(formatRemaining(76 * hour + 30 * 60 * 1000)).toBe("3 j 4 h");
+    expect(formatRemaining(5 * hour + 12 * 60 * 1000)).toBe("5 h 12");
+    expect(formatRemaining(-hour)).toBe("0 min");
+  });
+
+  it("writes a place in a ranking", () => {
+    expect([1, 2, 3].map(formatPlace)).toEqual(["1er", "2e", "3e"]);
   });
 
   it("writes a duration in hours and minutes, or minutes alone", () => {

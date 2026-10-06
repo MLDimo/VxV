@@ -14,6 +14,8 @@ import { createGameChanges } from "./application/gameChanges.ts";
 import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
+import { createMissionAnnouncements } from "./application/missionAnnouncements.ts";
+import { createMissions } from "./application/missions.ts";
 import { createRaidLogs } from "./application/raidLogs.ts";
 import { createRanking } from "./application/ranking.ts";
 import { createRaidReminders } from "./application/raidReminders.ts";
@@ -21,7 +23,7 @@ import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
 import { createTreasury } from "./application/treasury.ts";
-import type { BetAnnouncer, Clock, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+import type { BetAnnouncer, Clock, GuildGateway, MissionAnnouncer, RaidAnnouncer } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "./infrastructure/sql.ts";
@@ -35,6 +37,8 @@ export interface ApplicationConfig {
   announcer: RaidAnnouncer;
   /** The bets' channel, where each bet has its message. */
   betAnnouncer: BetAnnouncer;
+  /** The missions' channel, where each mission has its message. */
+  missionAnnouncer: MissionAnnouncer;
   clock?: Clock;
 }
 
@@ -45,6 +49,7 @@ export function createApplication({
   guild,
   announcer,
   betAnnouncer,
+  missionAnnouncer,
   clock = () => new Date(),
 }: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
@@ -56,6 +61,8 @@ export function createApplication({
   const exclusions = createExclusions({ unitOfWork });
   const raidAnnouncements = createRaidAnnouncements({ unitOfWork, announcer });
   const events = createEvents({ unitOfWork, clock });
+  const missions = createMissions({ unitOfWork, clock });
+  const missionAnnouncements = createMissionAnnouncements({ unitOfWork, announcer: missionAnnouncer, clock });
   const bets = createBets({ unitOfWork, clock });
   const betAnnouncements = createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock });
   const gameChanges = createGameChanges({
@@ -72,7 +79,14 @@ export function createApplication({
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
-    companionUploads: createCompanionUploads({ roster, raidLogs, characters, gameChanges }),
+    companionUploads: createCompanionUploads({
+      roster,
+      raidLogs,
+      characters,
+      gameChanges,
+      missions,
+      missionAnnouncements,
+    }),
     roster,
     characters,
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
@@ -92,6 +106,8 @@ export function createApplication({
     treasury: createTreasury({ unitOfWork, clock }),
     cash: createCash({ unitOfWork, clock }),
     ranking: createRanking({ unitOfWork, clock }),
+    missions,
+    missionAnnouncements,
   };
 }
 

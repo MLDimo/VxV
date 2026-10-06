@@ -1,39 +1,7 @@
-import { createHash, randomBytes } from "node:crypto";
-import { expect, test, type APIRequestContext, type BrowserContext, type Page } from "@playwright/test";
-import { SEED_ROSTER, WEB_ENVIRONMENT, type E2ESessions } from "./environment";
+import { expect, test } from "@playwright/test";
+import { linkCompanion, linkPage, pkce, PORT, STATE } from "./companionLink";
+import { SEED_ROSTER, WEB_ENVIRONMENT } from "./environment";
 import { readSeed, signInAs } from "./sessions";
-
-const PORT = 53682;
-const STATE = randomBytes(16).toString("base64url");
-
-/** The companion's secret and the challenge it sends first. */
-function pkce() {
-  const verifier = randomBytes(32).toString("base64url");
-  return { verifier, challenge: createHash("sha256").update(verifier).digest("base64url") };
-}
-
-const linkPage = (challenge: string) => `/compagnon/relier?port=${PORT}&etat=${STATE}&defi=${challenge}`;
-
-/** The member links a companion, as the app does it: returns its token. */
-async function linkCompanion(
-  page: Page,
-  context: BrowserContext,
-  request: APIRequestContext,
-  who: keyof E2ESessions = "member",
-): Promise<string> {
-  await signInAs(context, who);
-  const { verifier, challenge } = pkce();
-  let code = "";
-  await page.route(`http://127.0.0.1:${PORT}/**`, async (route) => {
-    code = new URL(route.request().url()).searchParams.get("code") ?? "";
-    await route.fulfill({ body: "" });
-  });
-  await page.goto(linkPage(challenge));
-  await page.getByRole("button", { name: "Relier le compagnon" }).click();
-  await expect.poll(() => code).not.toBe("");
-  const exchange = await request.post("/api/compagnon/jeton", { data: { code, verifier } });
-  return ((await exchange.json()) as { token: string }).token;
-}
 
 test("a member links the companion, which then acts for them until unlinked", async ({ page, context, request }) => {
   await signInAs(context, "member");

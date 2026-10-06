@@ -15,6 +15,7 @@ export function getInteractionHandler(): InteractionHandler {
       linkChannelId: discord.linkChannelId,
       raidChannelId: discord.raidChannelId,
       betsChannelId: discord.betsChannelId,
+      missionsChannelId: discord.missionsChannelId,
     });
   }
   return handler;

@@ -3,7 +3,7 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { renderSeedSql } from "@vxv/data-generator/seedSql";
 import { createMigratedPGlite } from "@vxv/database/testing";
 import { loadRaids } from "@vxv/raid-data";
-import { createDiscordBetAnnouncer, createDiscordRaidAnnouncer } from "@vxv/bot";
+import { createDiscordBetAnnouncer, createDiscordMissionAnnouncer, createDiscordRaidAnnouncer } from "@vxv/bot";
 import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
 import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, WEB_ENVIRONMENT, type E2ESeed } from "./environment";
@@ -29,6 +29,11 @@ const app = createApplication({
   betAnnouncer: createDiscordBetAnnouncer({
     ...rest,
     channelId: WEB_ENVIRONMENT.DISCORD_BETS_CHANNEL_ID,
+    siteUrl: WEB_ENVIRONMENT.SITE_URL,
+  }),
+  missionAnnouncer: createDiscordMissionAnnouncer({
+    ...rest,
+    channelId: WEB_ENVIRONMENT.DISCORD_MISSIONS_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
 });
@@ -161,6 +166,25 @@ await reserveJambieres(bonusEventId);
 const raidLogEventId = await createThanesEvent("2031-04-02T20:00:00Z", "Événement des tests du journal de raid");
 const companionEventId = await createThanesEvent("2031-04-09T20:00:00Z", "Événement des tests du compagnon");
 
+// A mission that ends a few seconds after the seed, long before the tests start: Ciel Gris won 15 honorable kills.
+const MISSION_LENGTH_MS = 3000;
+const missionStart = new Date();
+const endedMissionId = await app.missions.create(
+  officer.member,
+  {
+    type: "honorableKills",
+    title: "Le Chasseur de têtes",
+    reward: 1000,
+    startsAt: missionStart,
+    endsAt: new Date(missionStart.getTime() + MISSION_LENGTH_MS),
+  },
+  "Quête des tests de récompenses",
+);
+await app.missions.recordReadings(officer.member, [
+  { name: "Ciel Gris", type: "honorableKills", value: 10, at: new Date(missionStart.getTime() - 1000) },
+  { name: "Ciel Gris", type: "honorableKills", value: 25, at: new Date(missionStart.getTime() + 1000) },
+]);
+
 const seed: E2ESeed = {
   sessions: {
     officer: officer.token,
@@ -177,6 +201,7 @@ const seed: E2ESeed = {
   bonusEventId,
   raidLogEventId,
   companionEventId,
+  endedMissionId,
 };
 await writeFile(SEED_FILE, JSON.stringify(seed));
 

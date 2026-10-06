@@ -19,8 +19,9 @@ indispensable aux officiers. Code : `apps/companion` ; versions publiées : http
    - toutes les 5 minutes, il prépare pour le jeu les données du prochain raid et des paris : en jeu, `/reload` les
      charge ;
    - après chaque `/reload` ou déconnexion, il envoie au site ce que l'addon a enregistré (inscription, SR et mises
-     faites en jeu, et pour un officier : exclusions, événements créés, liste de guilde, journaux de raid). La modification
-     la plus récente gagne : un changement fait en jeu avant une modification sur le site n'est pas appliqué.
+     faites en jeu, compteurs du jeu pour les missions, et pour un officier : exclusions, événements créés, liste de
+     guilde, journaux de raid). La modification la plus récente gagne : un changement fait en jeu avant une
+     modification sur le site n'est pas appliqué.
 
 Mises à jour : automatiques sous Windows (installées à la fermeture du compagnon, ou tout de suite avec « Redémarrer ») ;
 sur Mac, le compagnon annonce la nouvelle version et ouvre la page de téléchargement.

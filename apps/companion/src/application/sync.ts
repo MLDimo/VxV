@@ -75,6 +75,9 @@ function unsent(outbox: Outbox, officer: boolean, sent: ReadonlySet<string>): { 
       raidLogs: officer ? outbox.raidLogs.filter((log) => isNew(`log:${log}`)) : [],
       characters: outbox.characters.filter((look) => isNew(`look:${look.name}:${look.race}:${String(look.sex)}`)),
       changes: outbox.changes.filter((change) => isNew(`change:${change.id}`)),
+      counters: outbox.counters.filter((reading) =>
+        isNew(`counter:${reading.name}:${reading.type}:${String(reading.at)}`),
+      ),
     },
     keys,
   };
@@ -99,6 +102,7 @@ export async function synchronize(
       ...(report.roster === undefined ? [] : [report.roster]),
       ...report.raidLogs,
       ...(report.changes === undefined ? [] : [report.changes]),
+      ...(report.counters === undefined ? [] : [report.counters]),
     );
   }
   const { raid, paris } = await site.download(token);

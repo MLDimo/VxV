@@ -50,11 +50,32 @@ export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastru
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
-export type { AnnouncedBet, AnnouncedRaid, BetAnnouncer, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+export type {
+  AnnouncedBet,
+  AnnouncedMission,
+  AnnouncedRaid,
+  BetAnnouncer,
+  GuildGateway,
+  MessageAnnouncer,
+  MissionAnnouncer,
+  RaidAnnouncer,
+} from "./application/ports.ts";
 export type { BetView } from "./application/bets.ts";
 export type { CashOverview } from "./application/cash.ts";
 export type { Season } from "./application/ports.ts";
 export type { Ranking } from "./application/ranking.ts";
+export type { MissionView } from "./application/missions.ts";
+export {
+  MISSION_TYPE_LABELS,
+  MISSION_TYPES,
+  REWARD_SHARES,
+  type HallOfFameEntry,
+  type Mission,
+  type MissionRewardRecord,
+  type MissionScore,
+  type MissionStatus,
+  type MissionType,
+} from "./domain/missions.ts";
 export { RANKING_PERIODS, type BettorRank, type RankingPeriod } from "./domain/ranking.ts";
 export {
   CASH_KIND_LABELS,

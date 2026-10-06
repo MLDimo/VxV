@@ -1,6 +1,13 @@
 import { TAVERN_CARDS } from "@vxv/design";
-import { composition, type BetView, type Composition, type RaidEvent } from "@vxv/server";
-import { count, formatGold, formatShortEventDate, raidTitle } from "@vxv/server/domain/labels";
+import {
+  composition,
+  MISSION_TYPE_LABELS,
+  type BetView,
+  type Composition,
+  type MissionView,
+  type RaidEvent,
+} from "@vxv/server";
+import { count, formatGold, formatRemaining, formatShortEventDate, raidTitle } from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { HomeCard } from "@/components/HomeCard";
 import { PlaceTiles } from "@/components/PlaceTiles";
@@ -70,11 +77,44 @@ function NextBet({ kicker, view }: { kicker: string; view: BetView | undefined }
   );
 }
 
+/** The quest of the week's card: the running mission, its leader and its reward. */
+function CurrentQuest({ kicker, view, now }: { kicker: string; view: MissionView | undefined; now: Date }) {
+  if (view === undefined) {
+    return (
+      <HomeCard kicker={kicker} title="Aucune quête en cours">
+        <p>Les officiers publient les quêtes sur le site et sur Discord.</p>
+        <Link href="/quetes" className="button-gold">
+          Voir le tableau
+        </Link>
+      </HomeCard>
+    );
+  }
+  const [leader] = view.scores;
+  return (
+    <HomeCard kicker={kicker} title={view.mission.title}>
+      <p>
+        {MISSION_TYPE_LABELS[view.mission.type].name} · {formatGold(view.mission.reward)} · se termine dans{" "}
+        {formatRemaining(view.mission.endsAt.getTime() - now.getTime())}
+      </p>
+      <p>
+        {leader === undefined
+          ? "Personne en tête pour l'instant."
+          : `En tête : ${leader.memberName} (${String(leader.score)})`}
+      </p>
+      <Link href={`/quetes/${view.mission.id}`} className="button-gold">
+        Voir le tableau
+      </Link>
+    </HomeCard>
+  );
+}
+
 /** The tavern (§4, §5): the scene with its places, then the cards of the moment. */
 export default async function TavernPage() {
-  const { events, signups, bets } = getApplication();
+  const { events, signups, bets, missions } = getApplication();
   const [next] = await events.listUpcoming();
   const nextBet = (await bets.list()).find((view) => view.open);
+  const quest = (await missions.list()).find((view) => view.status === "running");
+  const now = new Date();
   const counts = next && composition(await signups.listForEvent(next.id));
   const hrefs = sectionHrefs();
   return (
@@ -99,6 +139,8 @@ export default async function TavernPage() {
             <NextRaid key={card.place} kicker={card.kicker} event={next} counts={counts} />
           ) : card.place === "dice" ? (
             <NextBet key={card.place} kicker={card.kicker} view={nextBet} />
+          ) : card.place === "quests" ? (
+            <CurrentQuest key={card.place} kicker={card.kicker} view={quest} now={now} />
           ) : (
             <HomeCard key={card.place} kicker={card.kicker} title="Bientôt">
               <p>{card.soon}</p>
