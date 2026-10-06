@@ -60,6 +60,17 @@ export default tseslint.config(
       ],
     },
   },
+  // A transaction's client runs one query at a time: pg deprecates queuing several (removed in pg 9).
+  {
+    files: ["packages/server/src/application/**/*.ts", "packages/server/src/infrastructure/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        { object: "Promise", property: "all", message: "One query after the other inside a transaction." },
+      ],
+    },
+  },
   // The companion follows the same layers; its Electron glue (main/) and window (renderer/) sit on top.
   {
     files: ["apps/companion/src/domain/**/*.ts"],

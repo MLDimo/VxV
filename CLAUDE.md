@@ -213,6 +213,8 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - `domain/` : règles pures, aucune dépendance.
 - `application/` : cas d'usage ; ne connaissent que les interfaces de `ports.ts` (dépôts, unité de travail, horloge).
 - `infrastructure/` : SQL brut sur PostgreSQL (`SqlClient` : pg en production, PGlite dans les tests).
+Dans une transaction, une requête après l'autre : le client d'une transaction n'en exécute qu'une à la fois (pg
+déprécie la file d'attente), donc pas de `Promise.all` dans `application/` ni `infrastructure/` (règle ESLint).
 `createApplication` assemble le tout. Les composants exécutés dans le navigateur n'importent que `@vxv/server/domain/*` (pur, sans pilote PostgreSQL), jamais `@vxv/server`. Chaque cas d'usage s'exécute dans une transaction (`UnitOfWork`), journal compris. Les tests des cas d'usage tournent sur une vraie base migrée (PGlite), sans doublure.
 
 ## Conventions TypeScript (site, bot, compagnon, outils)

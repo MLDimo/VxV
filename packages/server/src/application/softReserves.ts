@@ -34,10 +34,8 @@ async function requireEvent(repositories: Repositories, eventId: string): Promis
 
 /** Checks the chosen items against the event's loot, exclusions and allowance; returns the item ids. */
 async function checkChoice(repositories: Repositories, event: RaidEvent, itemIds: readonly string[]) {
-  const [loot, excluded] = await Promise.all([
-    repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id)),
-    repositories.exclusions.listByEvent(event.id),
-  ]);
+  const loot = await repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id));
+  const excluded = await repositories.exclusions.listByEvent(event.id);
   const check = checkSoftReserveChoice(itemIds, {
     allowance: event.softReservesPerPlayer,
     lootItemIds: new Set(loot.map((item) => item.itemId)),
@@ -55,13 +53,11 @@ export async function loadBoardItems(
   event: RaidEvent,
   myCharacterId: string | undefined,
 ): Promise<BoardItem[]> {
-  const [loot, reserves, excludedItemIds, ownersByItem, pastEventsByReserve] = await Promise.all([
-    repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id)),
-    repositories.softReserves.listByEvent(event.id),
-    repositories.exclusions.listByEvent(event.id),
-    repositories.lootHistory.countSignedUpOwners(event.id),
-    repositories.lootHistory.pastEventsForReserves(event.id),
-  ]);
+  const loot = await repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id));
+  const reserves = await repositories.softReserves.listByEvent(event.id);
+  const excludedItemIds = await repositories.exclusions.listByEvent(event.id);
+  const ownersByItem = await repositories.lootHistory.countSignedUpOwners(event.id);
+  const pastEventsByReserve = await repositories.lootHistory.pastEventsForReserves(event.id);
   return buildBoard({ loot, reserves, excludedItemIds, ownersByItem, pastEventsByReserve, myCharacterId });
 }
 

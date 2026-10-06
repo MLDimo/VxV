@@ -27,10 +27,14 @@ export function raidLogRepository(sql: SqlClient): RaidLogRepository {
         [startedBefore],
       );
       const events = eventRepository(sql);
-      const found = await Promise.all(
-        rows.map(async (row) => ({ event: await events.findById(row.event_id), content: row.content })),
-      );
-      return found.filter((entry): entry is { event: RaidEvent; content: string } => entry.event !== undefined);
+      const found: { event: RaidEvent; content: string }[] = [];
+      for (const row of rows) {
+        const event = await events.findById(row.event_id);
+        if (event !== undefined) {
+          found.push({ event, content: row.content });
+        }
+      }
+      return found;
     },
 
     async listStartedSince(since) {
