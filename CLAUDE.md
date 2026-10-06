@@ -120,7 +120,15 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     qu'il entend. L'annuaire du site (`VXV-ARTISANS-1`) n'arrive que par le compagnon (`VXV.SiteData` avec
     `shared = false` : trop gros pour le relais des officiers).
   Validation en attente : une recette apprise qui apparaît chez un autre membre après la synchro.
-- P15 : pas commencée.
+- **P15 Deathroll** : en cours.
+  - Site : parties jouées en jeu, reçues par le compagnon (texte `VXV-DEATHROLL-1` par partie, envoyé par un joueur
+    ou relayé par un officier) et vérifiées (le défié roll le premier, chacun ensuite de 1 au résultat précédent, fin
+    au premier 1) ; pari de la guilde sur la partie créé et réglé par le système de paris (mêmes règles, part de la
+    caisse) ; dette du perdant jusqu'à la confirmation du gagnant (site, ou ligne `Y` venue du jeu), comptée avec
+    celles des paris (`application/debts.ts` : une dette bloque paris et deathrolls) ; Le Dé Pipé › Deathroll
+    (`/paris/deathroll`), Ranking › Deathroll (`/ranking/deathroll`, périodes) ; titres « Il cheat c'est sûr » et
+    « Loser » ; grosses mises (1 000 po et plus) annoncées dans le salon des paris ; export `VXV-DEATHROLLS-1`.
+  - À venir : socle (plusieurs modules par lieu, rolls lus par le socle) et bundle `VXV_Deathroll`.
 
 ## Design (charte « La Taverne »)
 
@@ -190,6 +198,10 @@ La table complète est dans le README. Règles :
   (personnage), `P` (métier, niveau, lectures) et `R` (recettes connues), lues par
   `packages/server/src/domain/artisans.ts`. Annuaire (du site vers l'addon) : `VXV-ARTISANS-1`, écrit par
   `domain/addonArtisans.ts`. Même règle de version.
+- Deathroll (P15) : une partie de l'addon vers le site, `VXV-DEATHROLL-1` (`G` partie, `R` rolls, `B` mises de la
+  guilde, `Y` paiement confirmé), lue par `packages/server/src/domain/deathrolls.ts` ; du site vers l'addon,
+  `VXV-DEATHROLLS-1` (`X` membres bloqués par une dette, `D` parties à payer, `K` classement, `H` dernières parties),
+  écrit par `domain/addonDeathrolls.ts`. Même règle de version.
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-2` (depuis la P13 ; le site lit encore `VXV-LOG-1`), puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts, dégâts et soins du compteur du jeu sur les boss tués, résurrections acceptées), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.

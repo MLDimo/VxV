@@ -1,23 +1,15 @@
-import { canManageRaids, RANKING_PERIODS, type BettorRank, type RankingPeriod } from "@vxv/server";
+import { canManageRaids, type BettorRank } from "@vxv/server";
 import { formatDateTime, formatGold, formatShare, formatSignedGold } from "@vxv/server/domain/labels";
-import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
 import { Badge } from "@/components/Badge";
 import { MemberName } from "@/components/MemberName";
+import { PeriodNav, periodOf } from "@/components/PeriodNav";
 import { Podium } from "@/components/Podium";
 import { RankingNav } from "@/components/RankingNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SeasonForm } from "@/components/SeasonForm";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
-
-const PERIOD_LABELS: Record<RankingPeriod, string> = { always: "Depuis toujours", month: "Ce mois", season: "Saison" };
-/** The period in the address: ?periode=mois. */
-const PERIOD_PARAMS: Record<RankingPeriod, string> = { always: "toujours", month: "mois", season: "saison" };
-
-function periodOf(param: string | string[] | undefined): RankingPeriod {
-  return RANKING_PERIODS.find((period) => PERIOD_PARAMS[period] === param) ?? "always";
-}
 
 function Row({ rank, mine, widest }: { rank: BettorRank; mine: boolean; widest: number }) {
   return (
@@ -68,18 +60,7 @@ export default async function RankingPage({
       </ScreenHeader>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <RankingNav current="/ranking" />
-        <nav aria-label="Période" className="flex gap-2">
-          {RANKING_PERIODS.map((candidate) => (
-            <Link
-              key={candidate}
-              href={`/ranking?periode=${PERIOD_PARAMS[candidate]}`}
-              className={candidate === period ? "button-gold" : "button-wood"}
-              aria-current={candidate === period ? "page" : undefined}
-            >
-              {PERIOD_LABELS[candidate]}
-            </Link>
-          ))}
-        </nav>
+        <PeriodNav base="/ranking" current={period} />
       </div>
       {bettors.length === 0 ? (
         <p className="mt-8 text-lavender">

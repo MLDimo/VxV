@@ -1,7 +1,6 @@
 import {
   betBook,
   cleanChoices,
-  debtOf,
   endRefusal,
   isOpen,
   newBetRefusal,
@@ -11,11 +10,12 @@ import {
   type Bet,
   type BetBook,
   type NewBet,
+  type Settlement,
   type Stake,
 } from "../domain/bets.ts";
 import type { BetCreationRecord, BetEndRecord } from "../domain/journal.ts";
-import { formatGold } from "../domain/labels.ts";
 import type { Member } from "../domain/members.ts";
+import { debtRefusal, memberDebt } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
@@ -31,6 +31,37 @@ export interface BetView {
   stakes: Stake[];
   book: BetBook;
   open: boolean;
+}
+
+/**
+ * Ends a bet: with its winning choice, the stakes are settled and the organisation's share goes to the guild's cash
+ * (recorded by the member who ends it, with the reason); without one, every stake is given back.
+ */
+export async function settleBet(
+  repositories: Repositories,
+  bet: Bet,
+  stakes: readonly Stake[],
+  winningChoiceId: string | undefined,
+  { recordedBy, reason, now }: { recordedBy: string; reason: string; now: Date },
+): Promise<Settlement> {
+  const settlement = winningChoiceId === undefined ? refund(stakes) : settle(stakes, winningChoiceId);
+  await repositories.bets.end(bet.id, winningChoiceId, now);
+  await repositories.stakes.settle(settlement.stakes);
+  if (settlement.organisation > 0) {
+    await repositories.cash.record(
+      {
+        kind: "bet_share",
+        amount: settlement.organisation,
+        label: `Pari « ${bet.title} » : part de l'organisation`,
+        reason,
+        recordedBy,
+        betId: bet.id,
+        memberId: undefined,
+      },
+      now,
+    );
+  }
+  return settlement;
 }
 
 export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
@@ -63,24 +94,11 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
       if (refusal !== undefined) {
         throw new ValidationError(refusal);
       }
-      const now = clock();
-      const settlement = winningChoiceId === undefined ? refund(stakes) : settle(stakes, winningChoiceId);
-      await repositories.bets.end(bet.id, winningChoiceId, now);
-      await repositories.stakes.settle(settlement.stakes);
-      if (settlement.organisation > 0) {
-        await repositories.cash.record(
-          {
-            kind: "bet_share",
-            amount: settlement.organisation,
-            label: `Pari « ${bet.title} » : part de l'organisation`,
-            reason: motive,
-            recordedBy: officer.id,
-            betId: bet.id,
-            memberId: undefined,
-          },
-          now,
-        );
-      }
+      const settlement = await settleBet(repositories, bet, stakes, winningChoiceId, {
+        recordedBy: officer.id,
+        reason: motive,
+        now: clock(),
+      });
       const after: BetEndRecord = {
         title: bet.title,
         winner: bet.choices.find((choice) => choice.id === winningChoiceId)?.label,
@@ -162,11 +180,9 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
         if (refusal !== undefined) {
           throw new ValidationError(refusal);
         }
-        const debt = debtOf(await repositories.stakes.listByMember(member.id));
+        const debt = await memberDebt(repositories, member.id);
         if (debt > 0) {
-          throw new ValidationError(
-            `Tu dois ${formatGold(debt)} au trésorier : règle ta dette pour parier de nouveau.`,
-          );
+          throw new ValidationError(debtRefusal(debt));
         }
         await repositories.stakes.save({ betId: bet.id, memberId: member.id, choiceId, amount }, now);
         return requireView(repositories, bet.id);
