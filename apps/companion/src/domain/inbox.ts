@@ -13,24 +13,38 @@ const MS_PER_SECOND = 1000;
 export interface Inbox {
   /** The next event as VXV-RAID text, as an officer would paste it; none when no event is planned. */
   raid: string | undefined;
-  /** The bets as VXV-PARIS text (P11.8), for VXV_Paris; none from a website without bets. */
-  paris: string | undefined;
-  /** The missions as VXV-QUETES text (P12.8), for VXV_Missions; none from a website without missions. */
-  quetes: string | undefined;
+  /** Each bundle's data by the inbox field it reads: paris (VXV-PARIS), quetes (VXV-QUETES), titres (VXV-TITRES)… */
+  bundles: Readonly<Record<string, string>>;
   writtenAt: Date;
+}
+
+// A bundle's field: a lowercase name, other than the inbox's own.
+const BUNDLE_FIELD = /^[a-z]+$/;
+const OWN_FIELDS = new Set(["version", "raid"]);
+
+/**
+ * Each bundle's data the website brought (apps/web/app/api/compagnon/donnees), by field: any lowercase name holding
+ * { text }. The fields a newer website adds reach the addon without any update of the companion.
+ */
+export function bundleTexts(download: Readonly<Record<string, unknown>>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(download).flatMap(([field, value]) => {
+      const text = typeof value === "object" && value !== null && "text" in value ? value.text : undefined;
+      return BUNDLE_FIELD.test(field) && !OWN_FIELDS.has(field) && typeof text === "string" ? [[field, text]] : [];
+    }),
+  );
 }
 
 /**
  * The inbox as the Lua file the game reads at /reload (contract with addon/VXV_Sync/Inbox.lua). It goes into the
  * bundle's private namespace: no global.
  */
-export function renderInbox({ raid, paris, quetes, writtenAt }: Inbox): string {
+export function renderInbox({ raid, bundles, writtenAt }: Inbox): string {
   const inbox = {
+    ...bundles,
     version: INBOX_VERSION,
     writtenAt: Math.floor(writtenAt.getTime() / MS_PER_SECOND),
     ...(raid === undefined ? {} : { raid }),
-    ...(paris === undefined ? {} : { paris }),
-    ...(quetes === undefined ? {} : { quetes }),
   };
   return [
     "-- Written by the VXV companion at each synchronisation: do not edit, the next one replaces it.",

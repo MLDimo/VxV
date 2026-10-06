@@ -1,6 +1,7 @@
 import { createAddonBets } from "./application/addonBets.ts";
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAddonMissions } from "./application/addonMissions.ts";
+import { createAddonTitles } from "./application/addonTitles.ts";
 import { createAuth } from "./application/auth.ts";
 import { createBetAnnouncements } from "./application/betAnnouncements.ts";
 import { createBets } from "./application/bets.ts";
@@ -88,6 +89,7 @@ export function createApplication({
     bets,
     betAnnouncements,
   });
+  const titles = createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
@@ -121,7 +123,8 @@ export function createApplication({
     missions,
     missionAnnouncements,
     addonMissions: createAddonMissions({ unitOfWork, clock, missions }),
-    titles: createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer }),
+    titles,
+    addonTitles: createAddonTitles({ unitOfWork, clock, titles }),
   };
 }
 

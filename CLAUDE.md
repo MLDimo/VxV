@@ -100,7 +100,12 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
   - Titres de raid : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans le compteur du jeu après chaque
     boss tué, une fois hors combat (`VXV_Raid/Meter.lua`, session notée à la mort du boss) ; Lève toi copaing
     (résurrections acceptées : le joueur relevé le dit au groupe, `Raised.lua`). Journal `VXV-LOG-2`.
-  - À venir : bundle `VXV_Titles` (titres en jeu).
+  - 13.3, 13.4 et 13.6 en jeu : bundle `VXV_Titles` (catégorie Ranking de la grande fenêtre et du mode réduit,
+    ligne dans l'infobulle d'un membre, titres avant ses messages dans le canal de guilde et après son nom dans la
+    liste de guilde, mesurés en phase 0, T9). Données `VXV-TITRES-1` (noms et règles compris : un nouveau titre ne
+    demande pas de mise à jour de l'addon) apportées par le compagnon et relayées par les officiers.
+  Validation en attente : une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu
+  par un membre sans compagnon ; le compteur de dégâts lu par identifiant (`/vxvtest meter read` après un combat).
 - P14 et P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -129,7 +134,7 @@ La table complète est dans le README. Règles :
 
 - **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
-- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`) qui ne dépend que du socle.
+- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`) qui ne dépend que du socle.
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
@@ -153,7 +158,7 @@ La table complète est dans le README. Règles :
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
 - Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-2`, puis une ligne par enregistrement (événement avec ses raids, officiers, objets, inscrits, journal, réponses aux changements faits en jeu), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
-- Compagnon (P7) : il écrit `VXV_Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit `VXV_SyncDB` sans l'exécuter ; contrats décrits dans `addon/VXV_Sync/Companion.lua` et `Outbox.lua`. Les autres bundles passent par le bus du socle : `sync.inbox` (données apportées), `sync.put` (kind, clé, valeur à envoyer), `modules.started` (tous les modules démarrés).
+- Compagnon (P7) : il écrit `VXV_Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit `VXV_SyncDB` sans l'exécuter ; contrats décrits dans `addon/VXV_Sync/Companion.lua` et `Outbox.lua`. Depuis la version 1.2, il recopie dans la boîte de réception toute donnée de bundle que le site fournit (`{ text }` sous le nom du champ) : un nouveau lieu ne demande pas de nouvelle version du compagnon. Les autres bundles passent par le bus du socle : `sync.inbox` (données apportées), `sync.put` (kind, clé, valeur à envoyer), `modules.started` (tous les modules démarrés).
 - Paris (contrat du site vers l'addon, P11.8) : première ligne `VXV-PARIS-1`, puis une ligne par enregistrement
   (export, officiers, personnages des membres, paris et leurs choix, mises, caisse, classement, réponses aux mises
   faites en jeu), écrites par `packages/server/src/domain/addonBets.ts` et lues par `addon/VXV_Paris/BetsData.lua`.
@@ -161,6 +166,12 @@ La table complète est dans le README. Règles :
 - Missions (contrat du site vers l'addon, P12.8) : première ligne `VXV-QUETES-1`, puis une ligne par enregistrement
   (export, officiers, personnages des membres, missions, classements, récompenses, hall of fame), écrites par
   `packages/server/src/domain/addonMissions.ts` et lues par `addon/VXV_Missions/QuestsData.lua`. Même règle de version.
+- Titres (contrat du site vers l'addon, P13.3) : première ligne `VXV-TITRES-1`, puis les lignes communes et une ligne
+  `T` par titre (nom, règle, détenteur), écrites par `packages/server/src/domain/addonTitles.ts` et lues par
+  `addon/VXV_Titles/TitlesData.lua`. Même règle de version.
+- Données du site pour un bundle (paris, missions, titres) : `VXV.SiteData` (`VXV_Core/Core/SiteData.lua`) les lit,
+  les garde, les prend du compagnon et des officiers ; chaque format commence par les mêmes lignes `P` (export),
+  `O` (officiers) et `M` (personnages des membres), écrites par `addonHead` (`packages/server/src/domain/addonText.ts`).
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-2` (depuis la P13 ; le site lit encore `VXV-LOG-1`), puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts, dégâts et soins du compteur du jeu sur les boss tués, résurrections acceptées), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.

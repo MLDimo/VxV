@@ -289,7 +289,7 @@ function AdvanceTime(seconds)
 end
 
 -- Addon messages: what this client sent, for the tests to deliver to the other players' clients.
-Enum = { SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3 } }
+Enum = { SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3 }, TooltipDataType = { Unit = 2 } }
 SentAddonMessages = {}
 --- Messages longer than the 255 bytes the server carries (it would cut them silently).
 OversizedMessages = {}
@@ -382,9 +382,14 @@ end
 --- The player's group, set by the tests: the other members' names, whether it is a raid, and who leads.
 --- Raid units start with the player (raid1), party units are the others (party1 to party4).
 Group = { members = {}, raid = false, leader = true }
+--- Other units the tests name ("target", "mouseover"), by unit.
+Units = {}
 function GetUnitName(unit)
     if unit == "player" then
         return Player.name
+    end
+    if Units[unit] ~= nil then
+        return Units[unit]
     end
     local kind, index = unit:match("^(%a+)(%d+)$")
     index = tonumber(index)
@@ -516,4 +521,69 @@ FontFamilies = {}
 function CreateFontFamily(name, members)
     FontFamilies[name] = members
     return { name = name, members = members }
+end
+
+-- Showing a title (phase 0, T9). Tooltips: the post-calls by data type; UnitTooltip(unit) shows the unit's
+-- tooltip and returns the lines the post-calls added.
+local tooltipPostCalls = {}
+TooltipDataProcessor = {
+    AddTooltipPostCall = function(dataType, callback)
+        tooltipPostCalls[#tooltipPostCalls + 1] = { dataType = dataType, callback = callback }
+    end,
+}
+function UnitTooltip(unit)
+    local lines = {}
+    local tooltip = {
+        GetUnit = function() return GetUnitName(unit), unit end,
+        AddLine = function(_, text) lines[#lines + 1] = text end,
+    }
+    for _, postCall in ipairs(tooltipPostCalls) do
+        if postCall.dataType == Enum.TooltipDataType.Unit then
+            postCall.callback(tooltip)
+        end
+    end
+    return lines
+end
+-- The chat's message filters by event; ChatShows(event, text, author) returns the text the chat shows, or nil when
+-- a filter hides the message.
+local chatFilters = {}
+ChatFrameUtil = {
+    AddMessageEventFilter = function(event, filter)
+        chatFilters[event] = chatFilters[event] or {}
+        table.insert(chatFilters[event], filter)
+    end,
+}
+function ChatShows(event, text, author)
+    for _, filter in ipairs(chatFilters[event] or {}) do
+        local hidden, newText, newAuthor = filter({}, event, text, author)
+        if hidden then
+            return nil
+        end
+        if newText ~= nil then
+            text, author = newText, newAuthor
+        end
+    end
+    return text
+end
+-- The guild window (Blizzard_Communities, loaded at login on Forever) and its list; GuildRowShows(name) fills a new
+-- row with a member's name and returns the name the row shows.
+local rowCallbacks = {}
+CommunitiesFrame = { MemberList = { ScrollBox = {} } }
+ScrollUtil = {
+    AddInitializedFrameCallback = function(scrollBox, callback, owner)
+        if scrollBox == CommunitiesFrame.MemberList.ScrollBox then
+            rowCallbacks[#rowCallbacks + 1] = { callback = callback, owner = owner }
+        end
+    end,
+}
+function GuildRowShows(name)
+    local text = name
+    local row = { NameFrame = { Name = {
+        GetText = function() return text end,
+        SetText = function(_, value) text = value end,
+    } } }
+    for _, hook in ipairs(rowCallbacks) do
+        hook.callback(hook.owner, row)
+    end
+    return text
 end

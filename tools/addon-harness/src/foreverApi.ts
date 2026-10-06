@@ -55,6 +55,9 @@ const USED_IN_GAME = [
   // "/vxvtest meter read". Added to the probe's inventory for the next session.
   "C_DamageMeter.GetAvailableCombatSessions",
   "C_DamageMeter.GetCombatSessionFromID",
+  // Showing a title (phase 0, T9, 3 October): a tooltip's line and the guild list's rows, called by the probe.
+  "TooltipDataProcessor.AddTooltipPostCall",
+  "ScrollUtil.AddInitializedFrameCallback",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

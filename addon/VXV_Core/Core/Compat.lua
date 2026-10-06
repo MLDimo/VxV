@@ -43,6 +43,10 @@ local ALIASES = {
     -- The game's damage meter (phase 0, T7): one session per combat, by id, readable out of combat.
     GetAvailableCombatSessions = { "C_DamageMeter.GetAvailableCombatSessions" },
     GetCombatSessionFromID = { "C_DamageMeter.GetCombatSessionFromID" },
+    -- Showing the titles (phase 0, T9): a player's tooltip, the guild channel's filter, the guild list's rows.
+    AddTooltipPostCall = { "TooltipDataProcessor.AddTooltipPostCall" },
+    AddMessageEventFilter = { "ChatFrameUtil.AddMessageEventFilter", "ChatFrame_AddMessageEventFilter" },
+    AddInitializedFrameCallback = { "ScrollUtil.AddInitializedFrameCallback" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

@@ -1,5 +1,5 @@
 import { SiteError, UnlinkedError } from "../application/errors.ts";
-import type { Account, LinkRequest, NextRaid, SitePort, Upload, UploadReport } from "../application/ports.ts";
+import type { Account, Download, LinkRequest, SitePort, Upload, UploadReport } from "../application/ports.ts";
 
 const HTTP_UNAUTHORIZED = 401;
 const UNREACHABLE = "Le site VXV ne répond pas : vérifie ta connexion à Internet.";
@@ -48,7 +48,7 @@ export function createSiteApi(siteUrl: string): SitePort {
       return call("/api/compagnon/moi", {}, token);
     },
 
-    download(token: string): Promise<{ raid: NextRaid | null; paris?: { text: string }; quetes?: { text: string } }> {
+    download(token: string): Promise<Download> {
       return call("/api/compagnon/donnees", {}, token);
     },
 
