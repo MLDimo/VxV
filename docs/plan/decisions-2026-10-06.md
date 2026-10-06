@@ -1,7 +1,7 @@
 # Décisions du 6 octobre 2026
 
 Complète le plan de développement v1.0 et les décisions des 3 et 5 octobre. Le propriétaire a confié la P11
-(paris), la P12 (missions) puis la P13 (titres) en autonomie : les choix ci-dessous précisent le plan là où il ne tranche pas, et
+(paris), la P12 (missions), la P13 (titres), puis la P14 (artisans) et la P15 (deathroll) en autonomie : les choix ci-dessous précisent le plan là où il ne tranche pas, et
 restent ouverts à sa relecture.
 
 ## P11 : paris
@@ -99,3 +99,17 @@ restent ouverts à sa relecture.
   personnages). Seuls les joueurs équipés de l'addon les voient.
 - Princesse (soins reçus) est abandonné : le compteur du jeu ne mesure pas les soins reçus sur Forever (11 types
   mesurés le 3 octobre, aucun pour les soins reçus). Il cheat c'est sûr et Loser attendent le deathroll (P15).
+
+## P14 : artisans
+
+- Relevé (mesuré en phase 0, T10) : le niveau de chaque métier à chaque connexion (`GetProfessions`), les recettes
+  apprises à l'ouverture de la fenêtre du métier (`C_TradeSkillUI`), pour chaque personnage du compte (main et
+  rerolls). Une lecture remplace une lecture plus ancienne du même personnage et du même métier ; un niveau relu
+  sans ses recettes garde les recettes connues.
+- Site : un membre envoie les métiers de ses personnages, un officier aussi ceux qu'il a entendus en jeu (comme les
+  compteurs des missions). Recherche « Qui peut fabriquer… ? » sur le nom des recettes tel que le jeu l'écrit (le
+  nom de l'objet fabriqué, en général), sans accents ni casse, tous les mots cherchés ; au plus 30 recettes.
+  Annuaire par métier, du plus haut niveau au plus bas, avec la date de la dernière lecture.
+- Le compagnon 1.3 envoie les textes de tout bundle sans les connaître ; le site répond avec ses messages en liste
+  (`texts`), affichés tels quels : les métiers, puis le deathroll, ne demandent plus de nouvelle version.
+

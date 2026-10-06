@@ -106,7 +106,14 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     demande pas de mise à jour de l'addon) apportées par le compagnon et relayées par les officiers.
   Validation en attente : une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu
   par un membre sans compagnon ; le compteur de dégâts lu par identifiant (`/vxvtest meter read` après un combat).
-- P14 et P15 : pas commencées.
+- **P14 Annuaire des artisans** : en cours.
+  - 14.2 et 14.3 sur le site : métiers des personnages et recettes connues en base (`professions`, `recipes`,
+    `known_recipes`), la lecture la plus récente gagnante ; envoyés par le compagnon (un membre pour ses personnages,
+    un officier pour ceux qu'il relaie) ; « Qui peut fabriquer… ? » sur la page Artisans (`/artisans`, recherche
+    sans accents ni casse) avec l'annuaire par métier ; annuaire exporté vers l'addon (`VXV-ARTISANS-1`).
+  - Compagnon 1.3 : il envoie au site les textes de tout bundle (`texts` de `VXV_SyncDB`), chacun une seule fois.
+  - À venir : bundle `VXV_Artisans` (relevé en jeu, partage dans la guilde, recherche).
+- P15 : pas commencée.
 
 ## Design (charte « La Taverne »)
 
@@ -158,7 +165,7 @@ La table complète est dans le README. Règles :
 - Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
 - Export de la liste de guilde (contrat avec le site, P2.4) : première ligne `VXV-ROSTER-1`, puis une ligne `Prénom;Nom;CLASSE` par personnage (classe = jeton du jeu, ex. `ROGUE`). Tout changement de format incrémente le numéro de version.
 - Données d'un événement (contrat du site vers l'addon, P5) : première ligne `VXV-RAID-2`, puis une ligne par enregistrement (événement avec ses raids, officiers, objets, inscrits, journal, réponses aux changements faits en jeu), décrites dans `packages/server/src/domain/addonExport.ts`. Même règle de version.
-- Compagnon (P7) : il écrit `VXV_Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit `VXV_SyncDB` sans l'exécuter ; contrats décrits dans `addon/VXV_Sync/Companion.lua` et `Outbox.lua`. Depuis la version 1.2, il recopie dans la boîte de réception toute donnée de bundle que le site fournit (`{ text }` sous le nom du champ) : un nouveau lieu ne demande pas de nouvelle version du compagnon. Les autres bundles passent par le bus du socle : `sync.inbox` (données apportées), `sync.put` (kind, clé, valeur à envoyer), `modules.started` (tous les modules démarrés).
+- Compagnon (P7) : il écrit `VXV_Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit `VXV_SyncDB` sans l'exécuter ; contrats décrits dans `addon/VXV_Sync/Companion.lua` et `Outbox.lua`. Depuis la version 1.2, il recopie dans la boîte de réception toute donnée de bundle que le site fournit (`{ text }` sous le nom du champ) ; depuis la 1.3, il envoie au site tous les textes que les bundles rangent dans `VXV_SyncDB.texts` (par type puis clé ; le site lit les types qu'il connaît, `metiers` pour l'instant) : un nouveau lieu ne demande pas de nouvelle version du compagnon. Les autres bundles passent par le bus du socle : `sync.inbox` (données apportées), `sync.put` (kind, clé, valeur à envoyer), `modules.started` (tous les modules démarrés).
 - Paris (contrat du site vers l'addon, P11.8) : première ligne `VXV-PARIS-1`, puis une ligne par enregistrement
   (export, officiers, personnages des membres, paris et leurs choix, mises, caisse, classement, réponses aux mises
   faites en jeu), écrites par `packages/server/src/domain/addonBets.ts` et lues par `addon/VXV_Paris/BetsData.lua`.
@@ -172,6 +179,10 @@ La table complète est dans le README. Règles :
 - Données du site pour un bundle (paris, missions, titres) : `VXV.SiteData` (`VXV_Core/Core/SiteData.lua`) les lit,
   les garde, les prend du compagnon et des officiers ; chaque format commence par les mêmes lignes `P` (export),
   `O` (officiers) et `M` (personnages des membres), écrites par `addonHead` (`packages/server/src/domain/addonText.ts`).
+- Métiers d'un personnage (contrat de l'addon vers le site, P14) : première ligne `VXV-METIERS-1`, puis `C`
+  (personnage), `P` (métier, niveau, lectures) et `R` (recettes connues), lues par
+  `packages/server/src/domain/artisans.ts`. Annuaire (du site vers l'addon) : `VXV-ARTISANS-1`, écrit par
+  `domain/addonArtisans.ts`. Même règle de version.
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-2` (depuis la P13 ; le site lit encore `VXV-LOG-1`), puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts, dégâts et soins du compteur du jeu sur les boss tués, résurrections acceptées), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.

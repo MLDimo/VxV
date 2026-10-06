@@ -1,6 +1,6 @@
 import { readLuaData, LuaDataError } from "@vxv/lua";
 import { bundleTexts, renderInbox } from "../domain/inbox.ts";
-import { mergeOutboxes, readOutbox, type Outbox } from "../domain/outbox.ts";
+import { mergeOutboxes, readOutbox, textDigest, type Outbox } from "../domain/outbox.ts";
 import { SiteError } from "./errors.ts";
 import type { GameFiles, SitePort, Upload } from "./ports.ts";
 
@@ -78,6 +78,12 @@ function unsent(outbox: Outbox, officer: boolean, sent: ReadonlySet<string>): { 
       counters: outbox.counters.filter((reading) =>
         isNew(`counter:${reading.name}:${reading.type}:${String(reading.at)}`),
       ),
+      texts: Object.fromEntries(
+        Object.entries(outbox.texts).flatMap(([kind, byKey]) => {
+          const fresh = Object.entries(byKey).filter(([key, text]) => isNew(`text:${kind}:${key}:${textDigest(text)}`));
+          return fresh.length === 0 ? [] : [[kind, Object.fromEntries(fresh)]];
+        }),
+      ),
     },
     keys,
   };
@@ -103,6 +109,7 @@ export async function synchronize(
       ...report.raidLogs,
       ...(report.changes === undefined ? [] : [report.changes]),
       ...(report.counters === undefined ? [] : [report.counters]),
+      ...(report.texts ?? []),
     );
   }
   const download = await site.download(token);

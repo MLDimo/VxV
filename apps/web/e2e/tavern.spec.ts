@@ -1,12 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { readSeed, signInAs } from "./sessions";
 
-test("the tavern opens the places already built and announces the others", async ({ page, context }) => {
+test("the tavern opens every place", async ({ page, context }) => {
   await signInAs(context, "member");
   await page.goto("/");
-  for (const place of ["Artisans"]) {
-    await expect(page.getByTitle(`${place} : bientôt`)).toBeVisible();
-  }
+  await expect(page.getByTitle(/ : bientôt$/)).toHaveCount(0);
   // The Raid of the tavern, after the one of the header.
   await page.getByRole("link", { name: "Raid", exact: true }).last().click();
   await expect(page).toHaveURL(/\/raid$/);
@@ -15,6 +13,10 @@ test("the tavern opens the places already built and announces the others", async
   await page.goto("/");
   await page.getByRole("link", { name: "Le Dé Pipé", exact: true }).last().click();
   await expect(page).toHaveURL(/\/paris$/);
+
+  await page.goto("/");
+  await page.getByRole("link", { name: "Artisans", exact: true }).last().click();
+  await expect(page).toHaveURL(/\/artisans$/);
 
   await page.goto("/");
   await page.getByRole("link", { name: "Journal", exact: true }).last().click();

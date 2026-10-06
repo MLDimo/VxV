@@ -101,6 +101,7 @@ test("an officer's companion sends the roster, the raid's record and the charact
     raidLogs: ["Journal du raid importé : 1 boss tué, 2 présents, 0 objets ajoutés."],
     characters: 1,
     changes: "1 changement fait en jeu : 1 accepté, 0 refusés.",
+    texts: [],
   });
   // Sent again by another officer's companion: nothing new.
   const again = await request.post("/api/compagnon/envoi", { headers, data: upload });

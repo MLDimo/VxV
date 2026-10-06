@@ -245,6 +245,32 @@ describe("initial schema", () => {
     });
   });
 
+  describe("professions", () => {
+    it("records a known recipe only with its character's profession", async () => {
+      const member = await insertMember(database, "1");
+      const character = await insertCharacter(database, {
+        firstName: "Sira",
+        lastName: "Ventargent",
+        memberId: member,
+      });
+      await database.query("insert into recipes (id, profession_id, name) values (3275, 129, 'Bandage en lin')");
+      const know = () =>
+        database.query("insert into known_recipes (character_id, profession_id, recipe_id) values ($1, 129, 3275)", [
+          character,
+        ]);
+      await expect(know()).rejects.toThrow(/foreign key/);
+      await database.query(
+        `insert into professions (character_id, profession_id, name, skill_level, max_level, read_at, sent_by)
+         values ($1, 129, 'Secourisme', 22, 75, now(), $2)`,
+        [character, member],
+      );
+      await know();
+      await expect(
+        database.query("insert into recipes (id, profession_id, name) values (3276, 129, '  ')"),
+      ).rejects.toThrow(/recipes_name_not_blank/);
+    });
+  });
+
   describe("titles", () => {
     const award = (memberId: string, title: string, score: number) =>
       database.query(

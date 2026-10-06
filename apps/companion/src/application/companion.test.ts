@@ -261,6 +261,7 @@ describe("companion", () => {
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
         changes: [],
         counters: [],
+        texts: {},
       });
       expect(companion.state().lastUpload).toEqual({
         at: NOW,
@@ -278,6 +279,33 @@ describe("companion", () => {
         characters: [],
         changes: [],
         counters: [],
+        texts: {},
+      });
+    });
+
+    it("sends each bundle's text once, then again when the game saves it changed", async () => {
+      vi.useFakeTimers();
+      const { companion, site, savedData } = setUp({}, "saved-token");
+      vi.mocked(site.me).mockResolvedValue({ name: "Thom", roles: ["member"] });
+      const professions = (level: number) =>
+        [
+          "VXV_SyncDB = {",
+          `\t["texts"] = { ["metiers"] = { ["Thom Leboss"] = "VXV-METIERS-1\\nP;129;Secourisme;${String(level)}" } },`,
+          "}",
+        ].join("\n");
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: professions(22), modifiedAt: 1 });
+      await companion.start();
+      expect(vi.mocked(site.upload).mock.calls[0]?.[1].texts).toEqual({
+        metiers: { "Thom Leboss": "VXV-METIERS-1\nP;129;Secourisme;22" },
+      });
+      // The same text saved again goes nowhere; a new level goes.
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: professions(22), modifiedAt: 2 });
+      await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
+      expect(site.upload).toHaveBeenCalledTimes(1);
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: professions(23), modifiedAt: 3 });
+      await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
+      expect(vi.mocked(site.upload).mock.calls[1]?.[1].texts).toEqual({
+        metiers: { "Thom Leboss": "VXV-METIERS-1\nP;129;Secourisme;23" },
       });
     });
 
@@ -291,6 +319,7 @@ describe("companion", () => {
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
         changes: [],
         counters: [],
+        texts: {},
       });
     });
   });

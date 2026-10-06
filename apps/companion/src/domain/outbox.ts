@@ -26,7 +26,11 @@ export interface Outbox {
   changes: { id: string; [field: string]: unknown }[];
   /** The game counters the addon read (P12.4), the latest of each character and counter. */
   counters: CounterReading[];
+  /** Each bundle's texts for the website, by kind then key ("metiers" → "Prénom Nom" → VXV-METIERS text). */
+  texts: Texts;
 }
+
+export type Texts = Readonly<Record<string, Readonly<Record<string, string>>>>;
 
 /** A character's game counter as the addon read it, at an instant (Unix seconds). */
 export interface CounterReading {
@@ -38,7 +42,7 @@ export interface CounterReading {
 
 export type OutboxReading = { kind: "read"; outbox: Outbox } | { kind: "newer" } | { kind: "none" };
 
-const EMPTY: Outbox = { roster: undefined, raidLogs: [], characters: [], changes: [], counters: [] };
+const EMPTY: Outbox = { roster: undefined, raidLogs: [], characters: [], changes: [], counters: [], texts: {} };
 
 function isTable(value: LuaData | undefined): value is { readonly [key: string]: LuaData } {
   return typeof value === "object";
@@ -65,7 +69,7 @@ export function readOutbox(variables: Record<string, LuaData>): OutboxReading {
   if (typeof saved.version === "number" && saved.version > OUTBOX_VERSION) {
     return { kind: "newer" };
   }
-  const { roster, raidLogs, characters, changes, counters } = saved;
+  const { roster, raidLogs, characters, changes, counters, texts } = saved;
   return {
     kind: "read",
     outbox: {
@@ -99,8 +103,45 @@ export function readOutbox(variables: Record<string, LuaData>): OutboxReading {
               : [],
           )
         : [],
+      texts: isTable(texts)
+        ? Object.fromEntries(
+            Object.entries(texts).flatMap(([kind, byKey]) =>
+              isTable(byKey)
+                ? [
+                    [
+                      kind,
+                      Object.fromEntries(
+                        Object.entries(byKey).filter(
+                          (entry): entry is [string, string] => typeof entry[1] === "string",
+                        ),
+                      ),
+                    ],
+                  ]
+                : [],
+            ),
+          )
+        : {},
     },
   };
+}
+
+/** Each kind's texts of both, the second's winning for a key both have. */
+function mergeTexts(first: Texts, second: Texts): Texts {
+  const kinds = new Set([...Object.keys(first), ...Object.keys(second)]);
+  return Object.fromEntries([...kinds].map((kind) => [kind, { ...first[kind], ...second[kind] }]));
+}
+
+const FNV_OFFSET = 0x811c9dc5;
+const FNV_PRIME = 0x01000193;
+const HEX = 16;
+
+/** A short fingerprint of a text (FNV-1a, 32 bits): remembers a text sent without keeping the whole text. */
+export function textDigest(text: string): string {
+  let hash = FNV_OFFSET;
+  for (const unit of new TextEncoder().encode(text)) {
+    hash = Math.imul(hash ^ unit, FNV_PRIME) >>> 0;
+  }
+  return hash.toString(HEX);
 }
 
 /** The outboxes of several accounts, as one: the latest roster, every raid's record and character. */
@@ -116,6 +157,7 @@ export function mergeOutboxes(outboxes: readonly Outbox[]): Outbox {
       characters: [...merged.characters, ...outbox.characters],
       changes: [...merged.changes, ...outbox.changes],
       counters: [...merged.counters, ...outbox.counters],
+      texts: mergeTexts(merged.texts, outbox.texts),
     }),
     EMPTY,
   );

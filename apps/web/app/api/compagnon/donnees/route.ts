@@ -7,13 +7,14 @@ import { asCompanion } from "@/server/companionApi";
  */
 export async function GET(request: Request): Promise<Response> {
   return asCompanion(request, async () => {
-    const { addonExport, addonBets, addonMissions, addonTitles } = getApplication();
+    const { addonExport, addonBets, addonMissions, addonTitles, addonArtisans } = getApplication();
     const next = await addonExport.exportNextEvent();
     return Response.json({
       raid: next === undefined ? null : { text: next.text, title: next.title, startsAt: next.startsAt.toISOString() },
       paris: { text: await addonBets.exportBets() },
       quetes: { text: await addonMissions.exportMissions() },
       titres: { text: await addonTitles.exportTitles() },
+      artisans: { text: await addonArtisans.exportArtisans() },
     });
   });
 }

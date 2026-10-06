@@ -12,6 +12,7 @@ import { journalRepository } from "./journal.ts";
 import { lootHistoryRepository } from "./lootHistory.ts";
 import { memberRepository } from "./members.ts";
 import { counterReadingRepository, missionRepository, missionRewardRepository } from "./missions.ts";
+import { professionRepository } from "./professions.ts";
 import { raidLogRepository } from "./raidLogs.ts";
 import { raidRecordRepository } from "./raidRecords.ts";
 import { raidRepository } from "./raids.ts";
@@ -47,6 +48,7 @@ function createRepositories(sql: SqlClient): Repositories {
     missions: missionRepository(sql),
     counterReadings: counterReadingRepository(sql),
     missionRewards: missionRewardRepository(sql),
+    professions: professionRepository(sql),
     titles: titleRepository(sql),
   };
 }

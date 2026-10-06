@@ -1,3 +1,4 @@
+import type { ProfessionReading, Recipe } from "../domain/artisans.ts";
 import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
 import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
@@ -286,6 +287,40 @@ export interface CounterReadingRepository {
   listUntil(type: MissionType, until: Date): Promise<CounterReading[]>;
 }
 
+/** A character's profession as the website keeps it (P14), with who plays the character. */
+export interface ArtisanProfession {
+  characterId: string;
+  /** "Prénom Nom". */
+  characterName: string;
+  characterClass: string;
+  memberId: string | undefined;
+  professionId: number;
+  name: string;
+  level: number;
+  maxLevel: number;
+  readAt: Date;
+  /** Undefined while the profession's window was never opened in game. */
+  recipesReadAt: Date | undefined;
+}
+
+export interface KnownRecipe {
+  characterId: string;
+  professionId: number;
+  recipeId: number;
+}
+
+export interface ProfessionRepository {
+  /**
+   * Keeps the profession's level when read later than the known one, and its recipes when read later than the known
+   * ones; returns whether anything changed.
+   */
+  save(characterId: string, reading: ProfessionReading, sentBy: string): Promise<boolean>;
+  /** The guild's characters' professions, the guild's characters only. */
+  listAll(): Promise<ArtisanProfession[]>;
+  listRecipes(): Promise<(Recipe & { professionId: number })[]>;
+  listKnown(): Promise<KnownRecipe[]>;
+}
+
 export interface MissionRewardRepository {
   save(missionId: string, rewards: readonly MissionReward[]): Promise<void>;
   /** The rewards of these missions, by mission then place. */
@@ -366,6 +401,7 @@ export interface Repositories {
   missions: MissionRepository;
   counterReadings: CounterReadingRepository;
   missionRewards: MissionRewardRepository;
+  professions: ProfessionRepository;
   titles: TitleRepository;
 }
 
