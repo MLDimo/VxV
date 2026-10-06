@@ -12,11 +12,21 @@ local Theme = VXV.Theme
 local PADDING = 22
 local BOOK_TOP = 80
 local COVER = 14
-local SPINE, SPINE_SHADOW, SPINE_ALPHA = 4, 18, 0.35
+local SPINE = 4
+-- The spine's shadow on a page: strips of a growing width, darker by layers near the spine (pixel art, §3).
+local SHADE_STRIPS, SHADE_STEP, SHADE_ALPHA = 4, 3, 0.07
 -- The right page is 1.4 times as wide as the left one, as on the website.
 local LEFT_SHARE = 1 / 2.4
+-- A page is ruled from top to bottom, a line every RULE pixels. Each text is centred on its line, whose rule runs
+-- under the text, at INK pixels from the line's top: the rows of the list too, which are a line high.
+local RULE = RowList.RULE
+local INK = RULE - 5
+local PAGE_MARGIN = 14
 local PAGE_PADDING = 22
-local PAGE_HEAD = 64
+-- The lines of a page: its title, its text, and on the right page the list from the fourth line.
+local TEXT_LINE, LIST_LINE = 1, 3
+local CASH = { "Bientôt : dons, dettes et caisse de la guilde,", "avec les paris." }
+local INTRO = "Les raids enregistrés en jeu et les modifications des officiers, avec leur motif."
 
 local content, list
 
@@ -24,28 +34,43 @@ local function render()
     list.SetRows(JournalView.Rows(RaidLog.All(), RaidData.Current()))
 end
 
---- A parchment page on the cover, its title and its lines every RULE pixels; the spine on one side. A child of
---- the cover, it lies a level above it: the game draws the textures of frames on the same level layer by layer,
---- and the leather would hide the parchment.
-local function addPage(cover, x, width, height, title, spineSide)
+--- The top of a page's line, from 0.
+local function lineTop(index)
+    return PAGE_MARGIN + index * RULE
+end
+
+--- Writes a text on a line of the page, within its margins.
+local function write(page, index, text, style, size)
+    local fontString = Theme.Text(page, style, size, "ink-brown")
+    local y = -(lineTop(index) + RULE / 2)
+    fontString:SetPoint("LEFT", page, "TOPLEFT", PAGE_PADDING, y)
+    fontString:SetPoint("RIGHT", page, "TOPRIGHT", -PAGE_PADDING, y)
+    fontString:SetWordWrap(false)
+    fontString:SetText(text)
+end
+
+--- A parchment page of some lines on the cover, its title on the first one; the spine on one side. A child of the
+--- cover, it lies a level above it: the game draws the textures of frames on the same level layer by layer, and the
+--- leather would hide the parchment.
+local function addPage(cover, x, width, height, lines, title, spineSide)
     local page = CreateFrame("Frame", nil, cover)
     page:SetPoint("TOPLEFT", x, -COVER)
     page:SetSize(width, height)
     Theme.Fill(page, "parchment"):SetAllPoints()
-    for y = PAGE_HEAD + RowList.RULE, height - PAGE_PADDING, RowList.RULE do
+    for index = 0, lines - 1 do
         local rule = Theme.Fill(page, "ruling", "BORDER")
-        rule:SetPoint("TOPLEFT", 0, -y)
-        rule:SetPoint("TOPRIGHT", 0, -y)
+        rule:SetPoint("TOPLEFT", 0, -(lineTop(index) + INK))
+        rule:SetPoint("TOPRIGHT", 0, -(lineTop(index) + INK))
         rule:SetHeight(1)
     end
-    local shadow = Theme.Fill(page, "leather-shade", "BORDER")
-    shadow:SetPoint("TOP" .. spineSide)
-    shadow:SetPoint("BOTTOM" .. spineSide)
-    shadow:SetWidth(SPINE_SHADOW)
-    shadow:SetAlpha(SPINE_ALPHA)
-    local heading = Theme.Text(page, "pixelBold", 20, "ink-brown")
-    heading:SetPoint("TOPLEFT", PAGE_PADDING, -PAGE_PADDING)
-    heading:SetText(title)
+    for strip = 1, SHADE_STRIPS do
+        local shade = Theme.Fill(page, "leather-shade", "ARTWORK")
+        shade:SetPoint("TOP" .. spineSide)
+        shade:SetPoint("BOTTOM" .. spineSide)
+        shade:SetWidth(strip * SHADE_STEP)
+        shade:SetAlpha(SHADE_ALPHA)
+    end
+    write(page, 0, title, "pixelBold", 20)
     return page
 end
 
@@ -66,21 +91,19 @@ function JournalTab.Build(frame)
     local pages = width - 2 * COVER - SPINE
     local leftWidth = math.floor(pages * LEFT_SHARE)
     local pageHeight = height - 2 * COVER
-    local left = addPage(cover, COVER, leftWidth, pageHeight, "La caisse", "RIGHT")
-    local soon = Theme.Text(left, "text", 13, "ink-brown")
-    soon:SetPoint("TOPLEFT", PAGE_PADDING, -PAGE_HEAD)
-    soon:SetText("Bientôt : dons, dettes et caisse de la guilde, avec les paris.")
+    local lines = math.floor((pageHeight - 2 * PAGE_MARGIN) / RULE)
+    local left = addPage(cover, COVER, leftWidth, pageHeight, lines, "La caisse", "RIGHT")
+    for index, text in ipairs(CASH) do
+        write(left, TEXT_LINE + index - 1, text, "text", 12)
+    end
 
     local rightWidth = pages - leftWidth
-    local right = addPage(cover, COVER + leftWidth + SPINE, rightWidth, pageHeight, "Journal", "LEFT")
-    local intro = Theme.Text(right, "text", 12, "ink-brown")
-    intro:SetPoint("TOPLEFT", PAGE_PADDING, -(PAGE_PADDING + 26))
-    intro:SetText("Les raids enregistrés en jeu et les modifications des officiers, avec leur motif.")
-    -- The list's height is a whole number of lines, so that its rows stay on the page's lines when it scrolls.
-    local lines = math.floor((pageHeight - PAGE_HEAD - PAGE_PADDING) / RowList.RULE)
+    local right = addPage(cover, COVER + leftWidth + SPINE, rightWidth, pageHeight, lines, "Journal", "LEFT")
+    write(right, TEXT_LINE, INTRO, "text", 12)
+    -- The list fills the page's last lines: it scrolls by whole lines, its rows stay on the rules.
     local body = CreateFrame("Frame", nil, right)
-    body:SetPoint("TOPLEFT", PAGE_PADDING, -PAGE_HEAD)
-    body:SetSize(rightWidth - 2 * PAGE_PADDING, lines * RowList.RULE)
+    body:SetPoint("TOPLEFT", PAGE_PADDING, -lineTop(LIST_LINE))
+    body:SetSize(rightWidth - 2 * PAGE_PADDING, (lines - LIST_LINE) * RULE)
     list = RowList.Create(body, 0, "parchment")
     render()
 end
