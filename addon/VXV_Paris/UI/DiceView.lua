@@ -5,7 +5,7 @@ local _, ns = ...
 local DiceView = {}
 ns.DiceView = DiceView
 
-local Bets, Book, Gold, Stakes = ns.Bets, ns.Book, ns.Gold, ns.Stakes
+local Bets, Book, Gold, Stakes = ns.Bets, ns.Book, VXV.Gold, ns.Stakes
 
 local DATE = "%d/%m %H:%M"
 local EXAMPLE_STAKE = 10

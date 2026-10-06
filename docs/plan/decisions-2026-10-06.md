@@ -62,3 +62,8 @@ restent ouverts à sa relecture.
 - Hall of fame : missions gagnées, gains, position moyenne sur les missions où le joueur a au moins un point.
 - Discord : `/vxv_mission` (officiers) publie une mission qui commence aussitôt ; son message, avec le classement, suit
   les relevés. Salon `DISCORD_MISSIONS_CHANNEL_ID` s'il est défini, sinon celui des raids.
+- En jeu (12.3, 12.5, 12.8) : le bundle `VXV_Missions` lit les compteurs à la connexion puis chaque minute, hors combat
+  (les statistiques sont illisibles en combat), garde chaque changement pour le compagnon et le dit à la guilde : un
+  officier équipé le relaie pour un membre sans compagnon, et chacun voit les scores en direct. Les victoires
+  honorables sont lues dès maintenant ; les statistiques de pêche et de récolte le seront une fois leurs identifiants
+  mesurés sur Forever.

@@ -6,7 +6,6 @@
 ## Dependencies: VXV_Core
 
 # The bets as the website exports them (VXV-PARIS), how they travel in the guild, and the stakes made in game.
-Gold.lua
 BetsData.lua
 Book.lua
 Bets.lua

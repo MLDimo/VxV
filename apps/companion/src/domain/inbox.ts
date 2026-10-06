@@ -15,6 +15,8 @@ export interface Inbox {
   raid: string | undefined;
   /** The bets as VXV-PARIS text (P11.8), for VXV_Paris; none from a website without bets. */
   paris: string | undefined;
+  /** The missions as VXV-QUETES text (P12.8), for VXV_Missions; none from a website without missions. */
+  quetes: string | undefined;
   writtenAt: Date;
 }
 
@@ -22,12 +24,13 @@ export interface Inbox {
  * The inbox as the Lua file the game reads at /reload (contract with addon/VXV_Sync/Inbox.lua). It goes into the
  * bundle's private namespace: no global.
  */
-export function renderInbox({ raid, paris, writtenAt }: Inbox): string {
+export function renderInbox({ raid, paris, quetes, writtenAt }: Inbox): string {
   const inbox = {
     version: INBOX_VERSION,
     writtenAt: Math.floor(writtenAt.getTime() / MS_PER_SECOND),
     ...(raid === undefined ? {} : { raid }),
     ...(paris === undefined ? {} : { paris }),
+    ...(quetes === undefined ? {} : { quetes }),
   };
   return [
     "-- Written by the VXV companion at each synchronisation: do not edit, the next one replaces it.",

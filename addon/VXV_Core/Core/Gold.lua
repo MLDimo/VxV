@@ -1,6 +1,6 @@
 local _, ns = ...
 
---- Amounts in gold pieces, written as the website writes them: "1 000 po", "+500 po", "× 4,50".
+--- Amounts in gold pieces, written as the website writes them: "1 000 po", "+500 po", "× 4,50" (VXV.Gold).
 local Gold = {}
 ns.Gold = Gold
 
