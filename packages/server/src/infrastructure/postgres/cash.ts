@@ -10,6 +10,7 @@ interface CashRow {
   label: string;
   reason: string;
   recorded_by_name: string;
+  member_id: string | null;
   member_name: string | null;
 }
 
@@ -38,7 +39,7 @@ export function cashRepository(sql: SqlClient): CashRepository {
       // The giver is shown by their main character, else by their Discord name.
       const rows = await sql.query<CashRow>(
         `select cash_movements.id::text as id, occurred_at, kind, amount, label, reason,
-                recorder.discord_name as recorded_by_name,
+                recorder.discord_name as recorded_by_name, cash_movements.member_id,
                 coalesce(main.first_name || ' ' || main.last_name, giver.discord_name) as member_name
          from cash_movements
          join members recorder on recorder.id = cash_movements.recorded_by
@@ -54,6 +55,7 @@ export function cashRepository(sql: SqlClient): CashRepository {
         label: row.label,
         reason: row.reason,
         recordedByName: row.recorded_by_name,
+        memberId: row.member_id ?? undefined,
         memberName: row.member_name ?? undefined,
       }));
     },

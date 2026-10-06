@@ -59,12 +59,17 @@ export type {
   MessageAnnouncer,
   MissionAnnouncer,
   RaidAnnouncer,
+  AnnouncedTitles,
+  TitleAnnouncer,
+  TitleHolder,
 } from "./application/ports.ts";
 export type { BetView } from "./application/bets.ts";
 export type { CashOverview } from "./application/cash.ts";
 export type { Season } from "./application/ports.ts";
 export type { Ranking } from "./application/ranking.ts";
 export type { MissionView } from "./application/missions.ts";
+export { titleRole, type TitleWeek } from "./application/titles.ts";
+export { TITLES, type TitleId } from "./domain/titles.ts";
 export {
   MISSION_TYPE_LABELS,
   MISSION_TYPES,

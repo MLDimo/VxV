@@ -245,6 +245,22 @@ describe("initial schema", () => {
     });
   });
 
+  describe("titles", () => {
+    const award = (memberId: string, title: string, score: number) =>
+      database.query(
+        "insert into title_awards (week, title, member_id, score, awarded_at) values ($1, $2, $3, $4, now())",
+        ["2026-10-07", title, memberId, score],
+      );
+
+    it("gives each title once a week, for a positive score", async () => {
+      const member = await insertMember(database, "1");
+      await award(member, "gamblingKing", 125);
+      await award(member, "wellFed", 3);
+      await expect(award(await insertMember(database, "2"), "gamblingKing", 200)).rejects.toThrow(/title_awards_pkey/);
+      await expect(award(member, "debtKing", 0)).rejects.toThrow(/title_awards_score_check/);
+    });
+  });
+
   describe("journal", () => {
     async function insertEntry(reason: string): Promise<void> {
       const actorId = await insertMember(database, "officer");

@@ -22,6 +22,7 @@ import type {
   NewMission,
 } from "../domain/missions.ts";
 import type { RankedStake } from "../domain/ranking.ts";
+import type { TitleAward } from "../domain/titles.ts";
 import type { LedgerStake } from "../domain/treasury.ts";
 
 export interface DiscordIdentity {
@@ -160,6 +161,8 @@ export interface LootHistoryRepository {
   correct(lootId: string, characterId: string, method: LootMethod): Promise<void>;
   /** For each soft reserve of the event (by reserveKey), what happened at every earlier event, newest first. */
   pastEventsForReserves(eventId: string): Promise<Map<string, PastEventForItem[]>>;
+  /** The items received since the instant (all of them without one), by the member of the character. */
+  listReceivedSince(since: Date | undefined): Promise<{ memberId: string; at: Date }[]>;
 }
 
 export interface SoftReserveRepository {
@@ -199,6 +202,8 @@ export interface RaidLogRepository {
   save(eventId: string, content: string, receivedAt: Date): Promise<void>;
   /** Events started before the instant, whose record is kept and whose recap is not published yet. */
   listUnannounced(startedBefore: Date): Promise<{ event: RaidEvent; content: string }[]>;
+  /** The records of the raids started since the instant (all of them without one), with their start. */
+  listStartedSince(since: Date | undefined): Promise<{ startsAt: Date; content: string }[]>;
 }
 
 /** What became of the changes made in game, by id. */
@@ -289,6 +294,23 @@ export interface MissionRewardRepository {
   markPaid(missionId: string, rank: number, treasurerId: string, at: Date): Promise<void>;
 }
 
+/** A title's holder for a week, with what the website shows of them. */
+export interface TitleHolder {
+  week: string;
+  titleId: string;
+  memberId: string;
+  memberName: string;
+  memberClass: string | undefined;
+  discordId: string;
+  score: number;
+}
+
+export interface TitleRepository {
+  saveWeek(week: string, awards: readonly TitleAward[], awardedAt: Date): Promise<void>;
+  /** The holders of the latest weeks, the latest week first. */
+  listLatestWeeks(weeks: number): Promise<TitleHolder[]>;
+}
+
 export interface Season {
   number: number;
   startedAt: Date;
@@ -344,6 +366,7 @@ export interface Repositories {
   missions: MissionRepository;
   counterReadings: CounterReadingRepository;
   missionRewards: MissionRewardRepository;
+  titles: TitleRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */
@@ -361,6 +384,9 @@ export interface GuildGateway {
   setOnlyRoleAmong(discordId: string, roleName: string, group: readonly string[]): Promise<void>;
   /** The Discord roles the member holds on the server, or undefined when they are no longer on it. */
   fetchRoleIds(discordId: string): Promise<string[] | undefined>;
+  /** Gives the member this role, creating it if needed; and takes it away. */
+  addRole(discordId: string, roleName: string): Promise<void>;
+  removeRole(discordId: string, roleName: string): Promise<void>;
 }
 
 /** An event and its sign-ups, as shown in its Discord message. */
@@ -408,3 +434,14 @@ export interface AnnouncedMission {
 
 /** The missions' channel, where each mission has its message, with its ranking. */
 export type MissionAnnouncer = MessageAnnouncer<AnnouncedMission>;
+
+/** The week's titles, as their Discord announcement shows them: each title and its holder, if any. */
+export interface AnnouncedTitles {
+  week: string;
+  holders: readonly { title: string; rule: string; holder: string | undefined; score: number }[];
+}
+
+/** Where the bot announces each week's titles on Discord. */
+export interface TitleAnnouncer {
+  announce(titles: AnnouncedTitles): Promise<void>;
+}

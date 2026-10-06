@@ -23,8 +23,16 @@ import { createRaidReminders } from "./application/raidReminders.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
+import { createTitles } from "./application/titles.ts";
 import { createTreasury } from "./application/treasury.ts";
-import type { BetAnnouncer, Clock, GuildGateway, MissionAnnouncer, RaidAnnouncer } from "./application/ports.ts";
+import type {
+  BetAnnouncer,
+  Clock,
+  GuildGateway,
+  MissionAnnouncer,
+  RaidAnnouncer,
+  TitleAnnouncer,
+} from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "./infrastructure/sql.ts";
@@ -40,6 +48,8 @@ export interface ApplicationConfig {
   betAnnouncer: BetAnnouncer;
   /** The missions' channel, where each mission has its message. */
   missionAnnouncer: MissionAnnouncer;
+  /** Where each week's titles are announced. */
+  titleAnnouncer: TitleAnnouncer;
   clock?: Clock;
 }
 
@@ -51,6 +61,7 @@ export function createApplication({
   announcer,
   betAnnouncer,
   missionAnnouncer,
+  titleAnnouncer,
   clock = () => new Date(),
 }: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
@@ -110,6 +121,7 @@ export function createApplication({
     missions,
     missionAnnouncements,
     addonMissions: createAddonMissions({ unitOfWork, clock, missions }),
+    titles: createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer }),
   };
 }
 

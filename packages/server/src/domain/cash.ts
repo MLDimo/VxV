@@ -28,7 +28,8 @@ export interface CashMovement {
   label: string;
   reason: string;
   recordedByName: string;
-  /** The giver of a donation. */
+  /** The giver of a donation: their id, and their name as shown. */
+  memberId: string | undefined;
   memberName: string | undefined;
 }
 

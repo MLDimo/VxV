@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/recaps",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/titres",
+      "schedule": "0 5 * * 3"
     }
   ]
 }
