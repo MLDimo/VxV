@@ -95,28 +95,37 @@ local function shareScores()
     end
 end
 
-local function read()
+--- Reads every counter of the player's character, and tells what moved.
+local function readCounters()
     local name = VXV.PlayerName()
-    if name ~= nil then
-        local moved = false
-        for _, kind in ipairs(Counters.Readable()) do
-            local value, now = Counters.Read(kind), time()
-            if value ~= nil and note(name, kind, value, now) then
-                moved = true
-                VXV.Broadcast(COUNTER, { type = kind, value = value, at = now })
-            end
-        end
-        if moved then
-            shareScores()
+    if name == nil then
+        return
+    end
+    local moved = false
+    for _, kind in ipairs(Counters.Readable()) do
+        local value, now = Counters.Read(kind), time()
+        if value ~= nil and note(name, kind, value, now) then
+            moved = true
+            VXV.Broadcast(COUNTER, { type = kind, value = value, at = now })
         end
     end
-    C_Timer.After(READ_EVERY_SECONDS, read)
+    if moved then
+        shareScores()
+    end
+end
+
+local function tick()
+    readCounters()
+    C_Timer.After(READ_EVERY_SECONDS, tick)
 end
 
 --- Reads the counters a few seconds after login (the client fills them late), then every minute.
 function Readings.Start()
-    C_Timer.After(FIRST_READ_SECONDS, read)
+    C_Timer.After(FIRST_READ_SECONDS, tick)
 end
+
+-- A gathering counted by the addon: read at once.
+VXV.On("quetes.gathered", readCounters)
 
 -- An officer with the companion relays the counters of the others; the website checks that the relay is an officer.
 VXV.OnMessage(COUNTER, function(payload, sender)

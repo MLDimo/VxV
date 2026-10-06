@@ -80,7 +80,7 @@ et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
     données et les changements faits en jeu sont passés dans le socle (`VXV.ShareData`, `VXV.PendingChanges`).
   Validation en attente : un pari réel mené jusqu'au versement des gains ; publier le compagnon 1.1 (données des
   paris).
-- **P12 Tableau de missions** : code terminé, sauf les identifiants des statistiques de récolte.
+- **P12 Tableau de missions** : code terminé.
   - 12.1, 12.2, 12.4 à 12.7 : missions, relevés des compteurs par personnage et récompenses en base ; publication par
     un officier (site `/quetes`, `/vxv_mission`, message Discord avec le classement), relevés envoyés par le
     compagnon (et relayés par un officier), classement en direct sur le site, validation du résultat par un officier,
@@ -88,9 +88,10 @@ et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
   - 12.3, 12.5 et 12.8 en jeu : bundle `VXV_Missions` (onglet Quêtes, carte de la Taverne, mode réduit ; compteurs
     lus à la connexion puis chaque minute hors combat, gardés pour le compagnon, relayés par un officier ; score en
     direct dans la guilde). Données `VXV-QUETES-1` apportées par le compagnon et relayées par les officiers.
-  En attente : les identifiants des statistiques de récolte et de pêche sur Forever (`/vxvtest counters list`), à
-  renseigner dans `addon/VXV_Missions/Counters.lua` (seules les victoires honorables sont lues en jeu d'ici là) ;
-  publier le compagnon 1.1 ; une mission d'une semaine menée jusqu'au classement.
+  Compteurs : pêche = statistique 1456, victoires honorables = `GetPVPLifetimeStats` ; le jeu ne comptant pas les
+  récoltes, l'addon compte une récolte par fenêtre de butin contenant une herbe, un minerai ou un cuir (décision du
+  propriétaire, `Gathering.lua`).
+  Validation en attente : une mission d'une semaine menée jusqu'au classement.
 - P13 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -228,6 +229,9 @@ Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
 - Sans clic du joueur (réaction à un événement) : `C_PartyInfo.InviteUnit`, `C_PartyInfo.ConvertToRaid`, `C_ChatInfo.SendChatMessage` (hors boss) et `RandomRoll` fonctionnent.
 - `/roll` : lu dans CHAT_MSG_SYSTEM avec le format du jeu `RANDOM_ROLL_RESULT`, pour tous les joueurs.
 - Pendant une rencontre de boss : envoi de chat bloqué (ADDON_ACTION_BLOCKED, même depuis un clic), messages du groupe et messages système secrets (`/roll` compris). Tout redevient normal après ENCOUNTER_END.
+- Statistiques (mesurées le 6 octobre, build 70235) : 196 compteurs, dont « Poissons et autres objets pêchés » (1456) et
+  « Nombre total de victoires honorables » (588) ; aucun compteur de récoltes (herbes, minerais, peaux).
+- `string.format` du jeu (Lua 5.1) refuse `nil` et les booléens ; le banc d'essai est aussi strict.
 - Compteur de dégâts du jeu (`C_DamageMeter`) : secret pendant le combat, lisible après pour tout le groupe ; nom secret pour un joueur qui a quitté le groupe.
 - Morts du groupe : `UnitIsDeadOrGhost` et les noms des membres restent lisibles pendant un boss.
 - Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.

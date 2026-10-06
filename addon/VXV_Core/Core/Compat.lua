@@ -38,6 +38,8 @@ local ALIASES = {
     -- The game's counters (phase 0, T8): the Statistics tab, readable out of combat, and the honorable kills.
     GetStatistic = { "GetStatistic" },
     GetPVPLifetimeStats = { "GetPVPLifetimeStats" },
+    -- Items (phase 0 inventory): their class and subclass, among others.
+    GetItemInfo = { "C_Item.GetItemInfo", "GetItemInfo" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

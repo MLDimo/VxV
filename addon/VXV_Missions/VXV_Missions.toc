@@ -6,6 +6,7 @@
 ## Dependencies: VXV_Core
 
 # The missions as the website exports them (VXV-QUETES), how they travel in the guild, and the game's counters.
+Gathering.lua
 Counters.lua
 QuestsData.lua
 Quests.lua

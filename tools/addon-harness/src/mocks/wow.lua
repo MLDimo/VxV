@@ -338,11 +338,37 @@ function FromHex(hex)
 end
 
 -- The player of this client: an undead woman ("Scourge", sex 3) unless a test says otherwise.
+--- The game's Lua 5.1: string.format takes strings and numbers only (fengari's Lua 5.3 would write "nil").
+do
+    local format = string.format
+    string.format = function(pattern, ...)
+        for index = 1, select("#", ...) do
+            local kind = type((select(index, ...)))
+            if kind ~= "string" and kind ~= "number" then
+                error(("bad argument #%d to 'format' (string expected, got %s)"):format(index + 1, kind), 2)
+            end
+        end
+        return format(pattern, ...)
+    end
+end
+
 --- The game's counters (T8): the honorable kills, and the Statistics tab's values by id (a string, as the game
 --- shows them; "--" for a counter never moved).
 Counters = { honorableKills = 0, statistics = {} }
 function GetPVPLifetimeStats() return Counters.honorableKills, 0, 0 end
 function GetStatistic(id) return Counters.statistics[id] or "--" end
+
+--- Items the client has in its cache: { [item id] = { name, classID, subclassID } }; nil for any other.
+ItemInfo = {}
+C_Item = {
+    GetItemInfo = function(link)
+        local info = ItemInfo[tonumber(tostring(link):match("item:(%d+)"))]
+        if info == nil then
+            return nil
+        end
+        return info.name, link, 1, 1, 1, "", "", 20, "", 0, 0, info.classID, info.subclassID
+    end,
+}
 
 Player = { name = "Ðéjà Vu", inGuild = true, race = "Scourge", sex = 3 }
 function UnitRace(unit)
