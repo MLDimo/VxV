@@ -1,5 +1,5 @@
 import { readLuaData, LuaDataError } from "@vxv/lua";
-import { renderInbox } from "../domain/inbox.ts";
+import { bundleTexts, renderInbox } from "../domain/inbox.ts";
 import { mergeOutboxes, readOutbox, type Outbox } from "../domain/outbox.ts";
 import { SiteError } from "./errors.ts";
 import type { GameFiles, SitePort, Upload } from "./ports.ts";
@@ -105,8 +105,9 @@ export async function synchronize(
       ...(report.counters === undefined ? [] : [report.counters]),
     );
   }
-  const { raid, paris, quetes } = await site.download(token);
-  const inbox = renderInbox({ raid: raid?.text, paris: paris?.text, quetes: quetes?.text, writtenAt: now });
+  const download = await site.download(token);
+  const { raid } = download;
+  const inbox = renderInbox({ raid: raid?.text, bundles: bundleTexts(download), writtenAt: now });
   const outdated: string[] = [];
   for (const installation of installations) {
     if (!(await gameFiles.writeInbox(installation, inbox))) {

@@ -1,0 +1,17 @@
+## Interface: 16001
+## Title: VXV Titles
+## Notes: Les titres de la semaine de VXV : dans le Ranking, les infobulles, le canal et la liste de guilde.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The titles as the website exports them (VXV-TITRES), and where the guild sees them in game.
+TitlesData.lua
+Titles.lua
+Display.lua
+
+# Interface: the Ranking screen and the reduced mode.
+UI\TitlesView.lua
+UI\RankingTab.lua
+
+Bootstrap.lua

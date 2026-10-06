@@ -3,8 +3,9 @@ local _, ns = ...
 --- The player's companion: what it brought (ns.Inbox, from External/Inbox.lua written on this computer) is handed
 --- to the other bundles once their modules started, as "sync.inbox" (inbox). Nothing happens without it.
 --- Contract with the companion (apps/companion/src/domain/inbox.ts):
---- { version = 1, writtenAt = Unix seconds, raid = the next event as VXV-RAID text, or nil, paris = the bets as
---- VXV-PARIS text (P11.8), or nil, quetes = the missions as VXV-QUETES text (P12.8), or nil }.
+--- { version = 1, writtenAt = Unix seconds, raid = the next event as VXV-RAID text, or nil, then each bundle's data
+--- under its field: paris (VXV-PARIS, P11.8), quetes (VXV-QUETES, P12.8), titres (VXV-TITRES, P13.3)… }. Since
+--- version 1.2, the companion carries any field the website adds: a new bundle needs no update of the companion.
 local Companion = {}
 ns.Companion = Companion
 

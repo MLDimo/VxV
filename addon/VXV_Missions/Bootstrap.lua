@@ -7,7 +7,6 @@ VXV.RegisterModule({
         ns.QuestsData.Restore(data)
         ns.Gathering.Restore(data)
         ns.Readings.Restore(data)
-        ns.Quests.Sharing.Start()
         ns.Readings.Start()
     end,
     tab = {

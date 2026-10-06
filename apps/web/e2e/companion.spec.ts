@@ -41,10 +41,11 @@ test("the companion brings the next event to the addon, as an officer would past
 }) => {
   const token = await linkCompanion(page, context, request);
   const response = await request.get("/api/compagnon/donnees", { headers: { Authorization: `Bearer ${token}` } });
-  const { raid, paris, quetes } = (await response.json()) as {
+  const { raid, paris, quetes, titres } = (await response.json()) as {
     raid: { text: string; title: string; startsAt: string };
     paris: { text: string };
     quetes: { text: string };
+    titres: { text: string };
   };
   // The soonest event is the one starting 10 minutes after the seed.
   expect(raid.title).toBe("La salle des Thanes");
@@ -56,6 +57,8 @@ test("the companion brings the next event to the addon, as an officer would past
   expect(paris.text.split("\n")[0]).toBe("VXV-PARIS-1");
   // And the missions, for Les Quêtes in game (P12.8).
   expect(quetes.text.split("\n")[0]).toBe("VXV-QUETES-1");
+  // And the titles of the week, for the game's displays (P13.3).
+  expect(titres.text.split("\n")[0]).toBe("VXV-TITRES-1");
   expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
 });
 

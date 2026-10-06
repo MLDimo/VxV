@@ -14,7 +14,6 @@ local PADDING, GAP = 22, 16
 local GRID_TOP = 96
 local RIGHT = 340
 local OTHERS_SHARE = 0.45
-local PANEL_PADDING, PANEL_TITLE = 14, 40
 
 local content, subtitle
 local lists = {}
@@ -27,23 +26,6 @@ local function render()
     lists.fame.SetRows(QuestsView.HallOfFame(data))
 end
 
---- A panel with its title and a list; the parchment one (§7.4) for the quest of the week.
-local function addPanel(x, y, width, height, title, parchment)
-    local panel = Theme.Panel(content)
-    panel:SetPoint("TOPLEFT", x, -y)
-    panel:SetSize(width, height)
-    if parchment then
-        Theme.Fill(panel, "parchment", "BORDER"):SetAllPoints()
-    end
-    local heading = Theme.Text(panel, "pixel", 16, parchment and "ink-brown" or "ivory")
-    heading:SetPoint("TOPLEFT", PANEL_PADDING, -12)
-    heading:SetText(title)
-    local body = CreateFrame("Frame", nil, panel)
-    body:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_TITLE)
-    body:SetSize(width - 2 * PANEL_PADDING, height - PANEL_TITLE - PANEL_PADDING)
-    return RowList.Create(body, 0, parchment and "parchment" or nil)
-end
-
 function QuestsTab.Build(frame)
     content = frame
     local kicker, title = Theme.ScreenHeader(content, "Le tableau des quêtes", "gain", "Quêtes")
@@ -52,11 +34,12 @@ function QuestsTab.Build(frame)
     subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -6)
     local width, height = content:GetWidth(), content:GetHeight() - GRID_TOP - PADDING
     local boardWidth = width - 2 * PADDING - RIGHT - GAP
-    lists.board = addPanel(PADDING, GRID_TOP, boardWidth, height, "Quête de la semaine", true)
+    lists.board = RowList.Panel(content, PADDING, GRID_TOP, boardWidth, height, "Quête de la semaine", "parchment")
     local x = PADDING + boardWidth + GAP
     local othersHeight = math.floor(height * OTHERS_SHARE)
-    lists.others = addPanel(x, GRID_TOP, RIGHT, othersHeight, "À venir et terminées")
-    lists.fame = addPanel(x, GRID_TOP + othersHeight + GAP, RIGHT, height - othersHeight - GAP, "Hall of fame")
+    lists.others = RowList.Panel(content, x, GRID_TOP, RIGHT, othersHeight, "À venir et terminées")
+    local fameTop = GRID_TOP + othersHeight + GAP
+    lists.fame = RowList.Panel(content, x, fameTop, RIGHT, height - othersHeight - GAP, "Hall of fame")
     content:SetScript("OnShow", render)
     render()
 end

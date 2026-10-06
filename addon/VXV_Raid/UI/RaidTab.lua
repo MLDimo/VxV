@@ -17,7 +17,7 @@ local GRID_TOP = 96
 -- Columns of 270 and 300 pixels around the composition (§7.1); in each, the share of its first panel.
 local LEFT, RIGHT = 270, 300
 local SMALL_SHARE, COMPOSITION_SHARE = 0.4, 0.6
-local PANEL_PADDING, PANEL_TITLE = 14, 40
+local PANEL_PADDING = Theme.PANEL_PADDING
 local BUTTON_HEIGHT, BUTTON_GAP, JOIN_HEIGHT = 24, 6, 30
 local BADGE_HEIGHT, BADGE_PADDING, BADGE_ALPHA = 24, 16, 0.14
 -- The small button on the right of a panel's title (§7.1: « Changer »).
@@ -28,20 +28,6 @@ local lists, buttons, badges = {}, {}, {}
 local officerPanel
 -- The officers' buttons, top to bottom.
 local OFFICER_ACTIONS = { "import", "open", "inviteAll", "exclusions", "create", "export" }
-
---- A panel of the grid with its title; returns the panel and the frame under the title.
-local function addPanel(x, y, width, height, title, officer)
-    local panel = Theme.Panel(content, officer)
-    panel:SetPoint("TOPLEFT", x, -y)
-    panel:SetSize(width, height)
-    local heading = Theme.Text(panel, "pixel", 16, "ivory")
-    heading:SetPoint("TOPLEFT", PANEL_PADDING, -12)
-    heading:SetText(title)
-    local body = CreateFrame("Frame", nil, panel)
-    body:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_TITLE)
-    body:SetSize(width - 2 * PANEL_PADDING, height - PANEL_TITLE - PANEL_PADDING)
-    return panel, body
-end
 
 local function addBadge(index)
     local badge = CreateFrame("Frame", nil, content)
@@ -140,7 +126,7 @@ end
 
 local function addOfficerPanel(x, y, height)
     local body
-    officerPanel, body = addPanel(x, y, LEFT, height, "Officier", true)
+    officerPanel, body = Theme.TitledPanel(content, x, y, LEFT, height, "Officier", "officer")
     local actions = {
         import = { "Charger les données", Import.Open },
         open = { "Ouvrir les invitations", Invitations.Toggle },
@@ -186,7 +172,7 @@ function RaidTab.Build(frame)
     end
 
     local meHeight, officerHeight = split(SMALL_SHARE)
-    local mePanel, meBody = addPanel(PADDING, GRID_TOP, LEFT, meHeight, "Mon inscription")
+    local mePanel, meBody = Theme.TitledPanel(content, PADDING, GRID_TOP, LEFT, meHeight, "Mon inscription")
     lists.me = listAbove(meBody, JOIN_HEIGHT + BUTTON_GAP)
     buttons.join = Theme.Button(mePanel, "pixel", "Rejoindre le raid", LEFT - 2 * PANEL_PADDING, JOIN_HEIGHT)
     buttons.join:SetPoint("BOTTOM", 0, PANEL_PADDING)
@@ -195,18 +181,18 @@ function RaidTab.Build(frame)
     addOfficerPanel(PADDING, GRID_TOP + meHeight + GAP, officerHeight)
 
     local compositionHeight, reservesHeight = split(COMPOSITION_SHARE)
-    local _, compositionBody = addPanel(x2, GRID_TOP, center, compositionHeight, "Composition")
+    local _, compositionBody = Theme.TitledPanel(content, x2, GRID_TOP, center, compositionHeight, "Composition")
     lists.composition = RowList.Create(compositionBody)
-    local reservesPanel, reservesBody = addPanel(x2, GRID_TOP + compositionHeight + GAP, center, reservesHeight,
-        "SR du raid")
+    local reservesPanel, reservesBody = Theme.TitledPanel(content, x2, GRID_TOP + compositionHeight + GAP, center,
+        reservesHeight, "SR du raid")
     lists.raidReserves = RowList.Create(reservesBody)
     buttons.alert = titleButton(reservesPanel, "Alerte : oui", BossAlert.Toggle)
 
     local myHeight, lootsHeight = split(SMALL_SHARE)
-    local myPanel, myBody = addPanel(x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
+    local myPanel, myBody = Theme.TitledPanel(content, x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
     lists.myReserves = RowList.Create(myBody)
     buttons.reserves = titleButton(myPanel, "Choisir", Choices.Reserves)
-    local _, lootsBody = addPanel(x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight, "Derniers loots")
+    local _, lootsBody = Theme.TitledPanel(content, x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight, "Derniers loots")
     lists.loots = RowList.Create(lootsBody)
     -- What depends on the time (the lock, the start) is up to date each time the screen shows.
     content:SetScript("OnShow", render)

@@ -92,5 +92,10 @@ restent ouverts à sa relecture.
   secrets pendant) ; les joueurs hors du groupe ne comptent pas. Lève toi copaing compte les résurrections acceptées
   (le joueur relevé, comme le dit le plan) : une offre du jeu suivie du retour à la vie dans la minute ; un retour par
   le cadavre ne compte pas. Les journaux `VXV-LOG-1` des addons pas encore mis à jour restent lus, sans ces lignes.
+- En jeu (13.3, 13.4) : les titres de la semaine viennent du site comme les paris et les missions (compagnon, puis
+  relais d'un officier), avec leurs noms et leurs règles : un titre ajouté côté site s'affiche sans mise à jour de
+  l'addon (13.6). Ils sont visibles dans le Ranking de l'addon, dans l'infobulle d'un membre (une ligne par titre),
+  avant ses messages dans le canal de guilde et après son nom dans la liste de guilde (tous ses titres, sur tous ses
+  personnages). Seuls les joueurs équipés de l'addon les voient.
 - Princesse (soins reçus) est abandonné : le compteur du jeu ne mesure pas les soins reçus sur Forever (11 types
   mesurés le 3 octobre, aucun pour les soins reçus). Il cheat c'est sûr et Loser attendent le deathroll (P15).

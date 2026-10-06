@@ -12,6 +12,9 @@ export interface LinkRequest {
 }
 
 /** The next event, or the one being played, as the website gives it to the companion. */
+/** What the website brings for the addon (apps/web/app/api/compagnon/donnees). */
+export type Download = { raid: NextRaid | null } & Readonly<Record<string, unknown>>;
+
 export interface NextRaid {
   /** VXV-RAID text, as an officer would paste it in game. */
   text: string;
@@ -30,9 +33,8 @@ export interface SitePort {
   me(token: string): Promise<Account>;
   /** Asks the website to forget the token; never fails. */
   unlink(token: string): Promise<void>;
-  /** What the addon needs from the website. */
-  /** The next event, and the bets and missions (absent from a website older than P11.8 and P12.8). */
-  download(token: string): Promise<{ raid: NextRaid | null; paris?: { text: string }; quetes?: { text: string } }>;
+  /** What the addon needs from the website: the next event, then each bundle's data as { text } under its field. */
+  download(token: string): Promise<Download>;
   /** What the addon saved for the website; the website says what it made of it, in French. */
   upload(token: string, upload: Upload): Promise<UploadReport>;
 }

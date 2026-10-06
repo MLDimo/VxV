@@ -15,7 +15,6 @@ local GRID_TOP = 96
 local RIGHT = 340
 -- The right column's panels, by their share of its height.
 local MINE_SHARE, RANKING_SHARE = 0.34, 0.33
-local PANEL_PADDING, PANEL_TITLE = 14, 40
 local BADGE_HEIGHT, BADGE_PADDING, BADGE_GAP, BADGE_ALPHA = 24, 16, 6, 0.14
 
 local content, header
@@ -59,20 +58,6 @@ local function render()
     lists.cash.SetRows(DiceView.Cash(data))
 end
 
---- A panel of the grid with its title, and a list under it.
-local function addPanel(x, y, width, height, title)
-    local panel = Theme.Panel(content)
-    panel:SetPoint("TOPLEFT", x, -y)
-    panel:SetSize(width, height)
-    local heading = Theme.Text(panel, "pixel", 16, "ivory")
-    heading:SetPoint("TOPLEFT", PANEL_PADDING, -12)
-    heading:SetText(title)
-    local body = CreateFrame("Frame", nil, panel)
-    body:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_TITLE)
-    body:SetSize(width - 2 * PANEL_PADDING, height - PANEL_TITLE - PANEL_PADDING)
-    return RowList.Create(body)
-end
-
 function DiceTab.Build(frame)
     content = frame
     header = {}
@@ -83,14 +68,15 @@ function DiceTab.Build(frame)
 
     local width, height = content:GetWidth(), content:GetHeight() - GRID_TOP - PADDING
     local tableWidth = width - 2 * PADDING - RIGHT - GAP
-    lists.table = addPanel(PADDING, GRID_TOP, tableWidth, height, "La table de jeu")
+    lists.table = RowList.Panel(content, PADDING, GRID_TOP, tableWidth, height, "La table de jeu")
     local x = PADDING + tableWidth + GAP
     local mineHeight = math.floor(height * MINE_SHARE)
     local rankingHeight = math.floor(height * RANKING_SHARE)
     local cashHeight = height - mineHeight - rankingHeight - 2 * GAP
-    lists.mine = addPanel(x, GRID_TOP, RIGHT, mineHeight, "Mes paris")
-    lists.ranking = addPanel(x, GRID_TOP + mineHeight + GAP, RIGHT, rankingHeight, "Classement")
-    lists.cash = addPanel(x, GRID_TOP + mineHeight + rankingHeight + 2 * GAP, RIGHT, cashHeight, "La caisse")
+    lists.mine = RowList.Panel(content, x, GRID_TOP, RIGHT, mineHeight, "Mes paris")
+    lists.ranking = RowList.Panel(content, x, GRID_TOP + mineHeight + GAP, RIGHT, rankingHeight, "Classement")
+    local cashTop = GRID_TOP + mineHeight + rankingHeight + 2 * GAP
+    lists.cash = RowList.Panel(content, x, cashTop, RIGHT, cashHeight, "La caisse")
     -- What depends on the time (the closing of the bets) is up to date each time the screen shows.
     content:SetScript("OnShow", render)
     render()
