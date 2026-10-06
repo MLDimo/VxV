@@ -87,7 +87,10 @@ restent ouverts à sa relecture.
 - Discord : chaque titre est un rôle « ◆ <titre> », créé par le bot s'il manque, retiré à l'ancien détenteur et donné
   au nouveau ; les titres de la semaine sont annoncés dans `DISCORD_TITLES_CHANNEL_ID` s'il est défini, sinon le salon
   des raids. Le rôle du bot doit être placé au-dessus de ces rôles dans les réglages du serveur.
-- Titres de raid à venir (journal `VXV-LOG-2`) : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans
-  le compteur du jeu après chaque boss, et Lève toi copaing (résurrections acceptées). Princesse (soins reçus) est
-  abandonné : le compteur du jeu ne mesure pas les soins reçus sur Forever. Il cheat c'est sûr et Loser attendent le
-  deathroll (P15).
+- Titres de raid (journal `VXV-LOG-2`) : Chibrax au max (dégâts) et Remboursé par la Sécu (soins) additionnent le
+  compteur du jeu de chaque boss tué, lu par l'addon de chaque membre une fois sorti du combat (les montants sont
+  secrets pendant) ; les joueurs hors du groupe ne comptent pas. Lève toi copaing compte les résurrections acceptées
+  (le joueur relevé, comme le dit le plan) : une offre du jeu suivie du retour à la vie dans la minute ; un retour par
+  le cadavre ne compte pas. Les journaux `VXV-LOG-1` des addons pas encore mis à jour restent lus, sans ces lignes.
+- Princesse (soins reçus) est abandonné : le compteur du jeu ne mesure pas les soins reçus sur Forever (11 types
+  mesurés le 3 octobre, aucun pour les soins reçus). Il cheat c'est sûr et Loser attendent le deathroll (P15).

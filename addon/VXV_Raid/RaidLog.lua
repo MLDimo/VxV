@@ -2,14 +2,15 @@ local _, ns = ...
 
 --- The record of each raid, kept in the saved data by event (plan 6.7): bosses killed, players present at the
 --- kills, deaths during the encounters, and every item given. The master looter's addon records each give as
---- it happens and sends it to the group: their record is the reference. Exported for the website as VXV-LOG-1.
+--- it happens and sends it to the group: their record is the reference. Since P13, the game's damage meter over the
+--- bosses killed (Meter.lua) and the resurrections accepted (Raised.lua). Exported for the website as VXV-LOG-2.
 local RaidLog = {}
 ns.RaidLog = RaidLog
 
 local BossLoot, Distribution, Group, RaidData = ns.BossLoot, ns.Distribution, ns.Group, ns.RaidData
 
 local RECORDED = "loot.recorded"
-local HEADER = "VXV-LOG-1"
+local HEADER = "VXV-LOG-2"
 local DEATH_CHECK_SECONDS = 1
 -- Older raids are forgotten: the website keeps them all.
 local MAX_LOGS = 20
@@ -34,6 +35,8 @@ function RaidLog.Restore(data)
     saved = data
     saved.logs = type(saved.logs) == "table" and saved.logs or {}
     for _, log in pairs(saved.logs) do
+        -- The logs of the addon before P13 have no meter and no resurrections.
+        log.meter, log.raised = log.meter or {}, log.raised or {}
         upload(log)
     end
 end
@@ -67,7 +70,7 @@ function RaidLog.Current()
     local log = saved.logs[event.id]
     if log == nil then
         log = { eventId = event.id, title = event.title, startsAt = event.startsAt, kills = {}, present = {},
-            deaths = {}, loots = {} }
+            deaths = {}, loots = {}, meter = {}, raised = {} }
         saved.logs[event.id] = log
         forgetOldest()
     end
@@ -156,6 +159,28 @@ local function addLoot(eventId, loot)
     end
 end
 
+--- The meter of a boss killed (Meter.lua), { [name] = { damage, healing } }, added to each character's total.
+function RaidLog.AddMeter(eventId, readings)
+    local log = saved and saved.logs[eventId]
+    if log == nil or next(readings) == nil then
+        return
+    end
+    for name, reading in pairs(readings) do
+        local total = log.meter[name] or { damage = 0, healing = 0 }
+        log.meter[name] = { damage = total.damage + reading.damage, healing = total.healing + reading.healing }
+    end
+    changed(log)
+end
+
+--- A resurrection the character accepted (Raised.lua).
+function RaidLog.AddRaised(eventId, name)
+    local log = saved and saved.logs[eventId]
+    if log ~= nil then
+        log.raised[name] = (log.raised[name] or 0) + 1
+        changed(log)
+    end
+end
+
 --- The master looter's give, captured whether made from the panel or from the game's own menu.
 local function onGive(slot, candidateIndex)
     local drop, log = BossLoot.Current(), RaidLog.Current()
@@ -205,7 +230,8 @@ end
 
 --- The log as the website imports it, one record per line:
 --- R;event id;start (Unix seconds);end; K;encounter id;time; P;character present; L;encounter id;item id;
---- winner;method;time; D;character;deaths. Any change of format increments the version.
+--- winner;method;time; D;character;deaths; M;character;damage;healing; A;character;resurrections accepted.
+--- Any change of format increments the version.
 function RaidLog.Export(log)
     local lines = { HEADER, table.concat({ "R", log.eventId, log.startedAt or "", log.endedAt or "" }, ";") }
     for _, kill in ipairs(log.kills) do
@@ -220,6 +246,12 @@ function RaidLog.Export(log)
     end
     for _, name in ipairs(sortedNames(log.deaths)) do
         lines[#lines + 1] = table.concat({ "D", name, log.deaths[name] }, ";")
+    end
+    for _, name in ipairs(sortedNames(log.meter)) do
+        lines[#lines + 1] = table.concat({ "M", name, log.meter[name].damage, log.meter[name].healing }, ";")
+    end
+    for _, name in ipairs(sortedNames(log.raised)) do
+        lines[#lines + 1] = table.concat({ "A", name, log.raised[name] }, ";")
     end
     return table.concat(lines, "\n")
 end

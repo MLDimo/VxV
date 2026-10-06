@@ -51,6 +51,19 @@ local function call(api, name, ...)
     logSession(label, result)
 end
 
+--- The latest session's id, as VXV_Raid notes a boss's session at its kill (P13).
+local function latestSessionId(api)
+    local ok, sessions = pcall(api.GetAvailableCombatSessions)
+    local latest
+    for _, session in pairs(ok and type(sessions) == "table" and sessions or {}) do
+        local id = type(session) == "table" and session.sessionID
+        if not Util.IsSecret(id) and type(id) == "number" and (latest == nil or id > latest) then
+            latest = id
+        end
+    end
+    return latest
+end
+
 local function read()
     local api = meterApi()
     if not api then
@@ -63,9 +76,14 @@ local function read()
         log.Fail("Enum.DamageMeterType ou Enum.DamageMeterSessionType absent (voir /vxvtest meter list)")
         return
     end
+    local latest = latestSessionId(api)
     for _, meterTypeName in ipairs(METER_TYPES) do
         for _, sessionType in pairs(sessionTypes) do
             call(api, "GetCombatSessionFromType", sessionType, meterTypes[meterTypeName])
+        end
+        -- The last combat by its id: VXV_Raid reads each boss this way (P13).
+        if latest ~= nil then
+            call(api, "GetCombatSessionFromID", latest, meterTypes[meterTypeName])
         end
     end
 end

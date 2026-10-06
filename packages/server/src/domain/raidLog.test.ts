@@ -15,6 +15,9 @@ const LOG = [
   "L;1084;99;Thom Leboss;free_roll;1796940680",
   "D;Thom Leboss;1",
   "D;Ðéjà Vu;3",
+  "M;Thom Leboss;182000;4500",
+  "M;Ðéjà Vu;96000;0",
+  "A;Ðéjà Vu;2",
 ].join("\n");
 
 function character(id: string, firstName: string, lastName: string): Character {
@@ -39,10 +42,22 @@ describe("parseRaidLog", () => {
       { name: "Thom Leboss", count: 1 },
       { name: "Ðéjà Vu", count: 3 },
     ]);
+    expect(log.meter).toEqual([
+      { name: "Thom Leboss", damage: 182000, healing: 4500 },
+      { name: "Ðéjà Vu", damage: 96000, healing: 0 },
+    ]);
+    expect(log.raised).toEqual([{ name: "Ðéjà Vu", count: 2 }]);
+  });
+
+  it("still reads the version 1 of an addon not updated yet, without the meter and the resurrections", () => {
+    const log = parseRaidLog(["VXV-LOG-1", "R;e1;;", "D;Thom Leboss;1"].join("\n"));
+    expect(log).toMatchObject({ eventId: "e1", deaths: [{ name: "Thom Leboss", count: 1 }], meter: [], raised: [] });
   });
 
   it("lists every problem with its line number", () => {
-    const broken = [RAID_LOG_HEADER, "R;e1;;", "L;1084;20;Thom Leboss;cadeau;1", "K;boss;1"].join("\n");
+    const broken = [RAID_LOG_HEADER, "R;e1;;", "L;1084;20;Thom Leboss;cadeau;1", "K;boss;1", "M;Thom Leboss;-5;0"].join(
+      "\n",
+    );
     expect(() => parseRaidLog(broken)).toThrow(RaidLogFormatError);
     try {
       parseRaidLog(broken);
@@ -50,9 +65,10 @@ describe("parseRaidLog", () => {
       expect((error as RaidLogFormatError).problems).toEqual([
         "Ligne 3 illisible : recopiez le journal depuis l'addon.",
         "Ligne 4 illisible : recopiez le journal depuis l'addon.",
+        "Ligne 5 illisible : recopiez le journal depuis l'addon.",
       ]);
     }
-    expect(() => parseRaidLog("VXV-ROSTER-1")).toThrow(/doit commencer par la ligne VXV-LOG-1/);
+    expect(() => parseRaidLog("VXV-ROSTER-1")).toThrow(/doit commencer par la ligne VXV-LOG-2/);
     expect(() => parseRaidLog(`${RAID_LOG_HEADER}\nP;Thom Leboss`)).toThrow(/ligne R manquante/);
   });
 });

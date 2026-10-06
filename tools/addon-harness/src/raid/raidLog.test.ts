@@ -16,6 +16,19 @@ const LOG = `
   table.sort(present)
   return { kills = kills, loots = loots, present = present, deaths = log.deaths }
 `;
+/** Lua: the game's meter and the resurrections in the current event's log. */
+const TITLES_LOG = `
+  local _, ns = ...
+  local log = ns.RaidLog.Current()
+  return { meter = log.meter, raised = log.raised }
+`;
+/** Lua: a boss killed, whose session of the game's meter holds these amounts by meter type (0 damage, 2 healing). */
+const KILL_WITH_METER = (sessionId: number, damage: string, healing: string) => `
+  MeterSessions[${String(sessionId)}] = { [0] = { ${damage} }, [2] = { ${healing} } }
+  InCombat = true
+  Fire("ENCOUNTER_START", 1084, "Onyxia", 9, 40)
+  Fire("ENCOUNTER_END", 1084, "Onyxia", 9, 40, 1)
+`;
 const OPEN_TAB = (name: string) => `
   SlashCmdList.VXV("")
   FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "${name}" end):Run("OnClick")
@@ -113,7 +126,7 @@ describe("record of the raid", () => {
     officer.client(`${EXPORT}:Run("OnClick")`);
     const exported = (officer.client("return VXV_TextWindow.editBox:GetText()") as string).split("\n");
     expect(exported).toEqual([
-      "VXV-LOG-1",
+      "VXV-LOG-2",
       expect.stringMatching(/^R;e1;\d+;\d+$/),
       expect.stringMatching(/^K;1084;\d+$/),
       "P;Aube Claire",
@@ -132,7 +145,7 @@ describe("record of the raid", () => {
     expect(thom.client(`return IsVisible(${EXPORT})`)).toBe(false);
   });
 
-  it("exports a log the website reads (contract VXV-LOG-1)", () => {
+  it("exports a log the website reads (contract VXV-LOG-2)", () => {
     const officer = playOnyxia().player(OFFICER);
     officer.client(`SlashCmdList.VXV("journal")`);
     const log = parseRaidLog(officer.client("return VXV_TextWindow.editBox:GetText()") as string);
@@ -147,6 +160,77 @@ describe("record of the raid", () => {
       deaths: [{ name: "Thom Leboss", count: 1 }],
     });
     expect(log.startedAt?.getTime()).toBeLessThanOrEqual(log.endedAt?.getTime() ?? 0);
+  });
+
+  it("adds up the game's meter of each boss killed, read once out of combat, for the group's members", () => {
+    const guild = raidWithData([OFFICER, "Thom Leboss", "Aube Claire"]);
+    for (const player of guild.players) {
+      player.client(
+        KILL_WITH_METER(
+          7,
+          `["${OFFICER}"] = 1000.6, ["Thom Leboss"] = 500, ["Passant Inconnu"] = 900`,
+          `["Aube Claire"] = 800`,
+        ),
+      );
+    }
+    settle(guild, 3);
+    const officer = guild.player(OFFICER);
+    // Secret during the combat: nothing read yet.
+    expect(officer.bundles.VXV_Raid?.run(TITLES_LOG)).toEqual({ meter: {}, raised: {} });
+    for (const player of guild.players) {
+      player.client("InCombat = false");
+    }
+    settle(guild, 3);
+    for (const player of guild.players) {
+      player.client(KILL_WITH_METER(8, `["Thom Leboss"] = 250`, `["Aube Claire"] = 100`) + " InCombat = false");
+    }
+    settle(guild, 3);
+    expect(officer.bundles.VXV_Raid?.run(TITLES_LOG)).toEqual({
+      meter: {
+        [OFFICER]: { damage: 1000, healing: 0 },
+        "Thom Leboss": { damage: 750, healing: 0 },
+        "Aube Claire": { damage: 0, healing: 900 },
+      },
+      raised: {},
+    });
+    officer.client(`SlashCmdList.VXV("journal")`);
+    const log = parseRaidLog(officer.client("return VXV_TextWindow.editBox:GetText()") as string);
+    expect(log.meter).toEqual([
+      { name: "Aube Claire", damage: 0, healing: 900 },
+      { name: "Thom Leboss", damage: 750, healing: 0 },
+      { name: OFFICER, damage: 1000, healing: 0 },
+    ]);
+    for (const player of guild.players) {
+      expect(player.errors()).toEqual([]);
+    }
+  });
+
+  it("counts a resurrection the player accepted, on every member's log, but not a run back to the corpse", () => {
+    const guild = raidWithData([OFFICER, "Thom Leboss", "Aube Claire"]);
+    const thom = guild.player("Thom Leboss");
+    // Raised from the corpse: accepted.
+    thom.client('Dead["Thom Leboss"] = true Fire("RESURRECT_REQUEST", "Aube Claire")');
+    thom.client('Dead["Thom Leboss"] = false Fire("PLAYER_ALIVE")');
+    settle(guild, 3);
+    // Released while offered, then back from the corpse: not a resurrection.
+    thom.client('Dead["Thom Leboss"] = true Fire("RESURRECT_REQUEST", "Aube Claire") Fire("PLAYER_ALIVE")');
+    thom.client('Dead["Thom Leboss"] = false Fire("PLAYER_UNGHOST")');
+    // An offer left to expire, then back from the corpse: not one either.
+    thom.client('Dead["Thom Leboss"] = true Fire("RESURRECT_REQUEST", "Aube Claire")');
+    settle(guild, 61);
+    thom.client('Dead["Thom Leboss"] = false Fire("PLAYER_UNGHOST")');
+    // Raised as a ghost: accepted.
+    thom.client('Dead["Thom Leboss"] = true Fire("RESURRECT_REQUEST", "Aube Claire")');
+    thom.client('Dead["Thom Leboss"] = false Fire("PLAYER_UNGHOST")');
+    settle(guild, 3);
+    for (const name of [OFFICER, "Thom Leboss", "Aube Claire"]) {
+      expect(guild.player(name).bundles.VXV_Raid?.run(TITLES_LOG)).toEqual({ meter: {}, raised: { "Thom Leboss": 2 } });
+    }
+    const exported = guild
+      .player(OFFICER)
+      .bundles.VXV_Raid?.run("local _, ns = ... return ns.RaidLog.Export(ns.RaidLog.Current())");
+    expect(parseRaidLog(exported as string).raised).toEqual([{ name: "Thom Leboss", count: 2 }]);
+    expect(thom.errors()).toEqual([]);
   });
 
   it("ignores a give that does not come from the master looter", () => {

@@ -13,7 +13,7 @@ export function RaidLogImportForm({ eventId }: { eventId: string }) {
       <input type="hidden" name="eventId" value={eventId} />
       <label className="block">
         <span className="text-sm text-lavender">Journal du raid copié depuis l&apos;addon</span>
-        <textarea name="log" required rows={6} className="field font-mono text-xs" placeholder={"VXV-LOG-1\nR;…"} />
+        <textarea name="log" required rows={6} className="field font-mono text-xs" placeholder={"VXV-LOG-2\nR;…"} />
       </label>
       <label className="block">
         <span className="text-sm text-lavender">Motif de l&apos;import (visible dans le journal)</span>

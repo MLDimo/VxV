@@ -97,7 +97,10 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     raid, dons à la caisse ; `packages/server/src/domain/titles.ts`), réattribués chaque mercredi à 5 h UTC (tâche
     Vercel), historique en base, catégorie « Titres » du Ranking (`/ranking/titres`), rôles Discord « ◆ <titre> » et
     annonce de la semaine.
-  - À venir : journal de raid `VXV-LOG-2` (dégâts, soins, résurrections) et bundle `VXV_Titles` (titres en jeu).
+  - Titres de raid : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans le compteur du jeu après chaque
+    boss tué, une fois hors combat (`VXV_Raid/Meter.lua`, session notée à la mort du boss) ; Lève toi copaing
+    (résurrections acceptées : le joueur relevé le dit au groupe, `Raised.lua`). Journal `VXV-LOG-2`.
+  - À venir : bundle `VXV_Titles` (titres en jeu).
 - P14 et P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -158,7 +161,7 @@ La table complète est dans le README. Règles :
 - Missions (contrat du site vers l'addon, P12.8) : première ligne `VXV-QUETES-1`, puis une ligne par enregistrement
   (export, officiers, personnages des membres, missions, classements, récompenses, hall of fame), écrites par
   `packages/server/src/domain/addonMissions.ts` et lues par `addon/VXV_Missions/QuestsData.lua`. Même règle de version.
-- Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-1`, puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
+- Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-2` (depuis la P13 ; le site lit encore `VXV-LOG-1`), puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts, dégâts et soins du compteur du jeu sur les boss tués, résurrections acceptées), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
 - Confiance entre addons : les données d'un événement ne sont gardées que si leur expéditeur figure parmi les officiers nommés par le site, dans les nouvelles données comme dans celles déjà gardées.

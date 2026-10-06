@@ -173,6 +173,9 @@ C_DamageMeter = {
     GetCombatSessionFromType = function()
         return { totalAmount = 1000, combatSources = { { name = "Jean Dupont", totalAmount = 600 } } }
     end,
+    GetCombatSessionFromID = function()
+        return { totalAmount = 1000, combatSources = { { name = "Jean Dupont", totalAmount = 600 } } }
+    end,
 }
 
 -- Display (T9): hooks run at once on a fake tooltip and on a normal then a secret guild message.

@@ -40,6 +40,9 @@ local ALIASES = {
     GetPVPLifetimeStats = { "GetPVPLifetimeStats" },
     -- Items (phase 0 inventory): their class and subclass, among others.
     GetItemInfo = { "C_Item.GetItemInfo", "GetItemInfo" },
+    -- The game's damage meter (phase 0, T7): one session per combat, by id, readable out of combat.
+    GetAvailableCombatSessions = { "C_DamageMeter.GetAvailableCombatSessions" },
+    GetCombatSessionFromID = { "C_DamageMeter.GetCombatSessionFromID" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

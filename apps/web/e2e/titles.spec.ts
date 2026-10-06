@@ -5,7 +5,17 @@ import { signInAs } from "./sessions";
 
 /** The Discord users of the prepared members who may have received items in raid. */
 const MEMBERS_DISCORD_IDS = ["100", "200", "500", "600"];
-const TITLE_NAMES = ["Roi du gambling", "Roi de la dette", "Numéro UNO", "Bien gras", "Goûteur de sol", "Sugar Daddy"];
+const TITLE_NAMES = [
+  "Roi du gambling",
+  "Roi de la dette",
+  "Numéro UNO",
+  "Bien gras",
+  "Goûteur de sol",
+  "Chibrax au max",
+  "Remboursé par la Sécu",
+  "Lève toi copaing",
+  "Sugar Daddy",
+];
 
 test("each Wednesday the titles are given once: the Ranking shows them, Discord announces them and gives the roles", async ({
   page,
