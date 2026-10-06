@@ -15,6 +15,17 @@ local SEND_PAUSE_SECONDS = 30
 -- A member offered newer data asks again when they did not arrive (pieces lost while logging in).
 local ASK_AGAIN_SECONDS = 45
 local MAX_ASKS = 3
+-- Players' clocks may be wrong: data dated further in the future would block every later update.
+local CLOCK_TOLERANCE_SECONDS = 24 * 60 * 60
+
+--- Whether data an addon of the guild sent replace the current ones: newer, and sent by an officer named in both
+--- (in the new ones only, for a member who has none yet). Data: { exportedAt, officers = { [name] = true } }.
+function SharedData.Accepts(data, current, sender)
+    if sender == nil or not data.officers[sender] or data.exportedAt > time() + CLOCK_TOLERANCE_SECONDS then
+        return false
+    end
+    return current == nil or (current.officers[sender] == true and data.exportedAt > current.exportedAt)
+end
 
 --- Shares a bundle's data under its name ("raid": messages raid.data, raid.ask and raid.offer). The source tells
 --- the data: { Text(), ExportedAt() (Unix seconds, 0 without data), IsOfficer(name), Receive(text, sender) }.

@@ -1,0 +1,22 @@
+## Interface: 16001
+## Title: VXV Paris
+## Notes: Le Dé Pipé de VXV : les paris de la guilde, les mises, la caisse et le classement des parieurs.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The bets as the website exports them (VXV-PARIS), how they travel in the guild, and the stakes made in game.
+Gold.lua
+BetsData.lua
+Book.lua
+Bets.lua
+Companion.lua
+Stakes.lua
+
+# Interface: Le Dé Pipé's screen and card, the reduced mode, the stake dialog.
+UI\DiceView.lua
+UI\StakeDialog.lua
+UI\DiceTab.lua
+UI\DiceCompact.lua
+
+Bootstrap.lua

@@ -27,6 +27,8 @@ VXV = {
     --- (name, source): data the guild's addons pass on to each other, from the officers; returns { Send, Start }.
     --- See Core/SharedData.lua.
     ShareData = ns.SharedData.Create,
+    --- (data, current, sender): whether data sent by an addon of the guild replace the current ones.
+    AcceptsSharedData = ns.SharedData.Accepts,
     --- (options): changes made in game, waiting for the website, relayed by an officer with the companion; and
     --- (): whether the player's companion brought data at this launch. See Core/PendingChanges.lua.
     PendingChanges = ns.PendingChanges.Create,

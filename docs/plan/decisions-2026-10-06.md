@@ -41,3 +41,7 @@ restent ouverts à sa relecture.
   la première saison, ce classement est vide.
 - Avatars : portraits de la charte (§8) choisis par race, classe et sexe du personnage principal, avec le repli prévu
   (même race et classe, puis même classe, puis même race) ; les neuf portraits livrés couvrent les neuf classes.
+- En jeu (11.8) : le bundle `VXV_Paris` montre les paris ouverts avec leurs cotes, la mise du joueur, ses paris, le
+  classement depuis toujours et la caisse ; une mise faite en jeu attend le site, comme les inscriptions (P7.5),
+  et passe par le compagnon du joueur ou d'un officier. La caisse s'affiche aussi sur la page gauche du Journal.
+  Pour recevoir les données des paris, les membres équipés du compagnon doivent passer à sa version 1.1.
