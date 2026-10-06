@@ -6,6 +6,7 @@ VXV.RegisterModule({
     Enable = function(data)
         ns.RaidData.Restore(data)
         ns.RaidLog.Restore(data)
+        ns.Changes.Restore(data)
         ns.Sharing.Start()
         ns.Freshness.Start()
     end,

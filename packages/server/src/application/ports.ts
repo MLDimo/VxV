@@ -1,5 +1,6 @@
 import type { Appearance, Character } from "../domain/characters.ts";
 import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
+import type { GameChangeOutcome } from "../domain/gameChanges.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
@@ -183,6 +184,14 @@ export interface RaidLogRepository {
   listUnannounced(startedBefore: Date): Promise<{ event: RaidEvent; content: string }[]>;
 }
 
+/** What became of the changes made in game, by id. */
+export interface GameChangeRepository {
+  find(changeId: string): Promise<GameChangeOutcome | undefined>;
+  save(outcome: GameChangeOutcome, sentBy: string): Promise<void>;
+  /** The event's changes, in the order received. */
+  listByEvent(eventId: string): Promise<GameChangeOutcome[]>;
+}
+
 /** When the latest copy of some data, read in game, was imported ("roster"). */
 export interface SyncMarkRepository {
   find(kind: string): Promise<Date | undefined>;
@@ -205,6 +214,7 @@ export interface Repositories {
   raidRecords: RaidRecordRepository;
   raidLogs: RaidLogRepository;
   syncMarks: SyncMarkRepository;
+  gameChanges: GameChangeRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

@@ -41,12 +41,16 @@ export interface Upload {
   roster?: { text: string; capturedAt: number };
   raidLogs: string[];
   characters: { name: string; race: string; sex: number }[];
+  /** Changes made in game, the player's and those an officer relays: the website checks them. */
+  changes: { id: string }[];
 }
 
 export interface UploadReport {
   roster?: string;
   raidLogs: string[];
   characters: number;
+  /** What became of the changes made in game, if any were sent. */
+  changes?: string;
 }
 
 /** Listens on this computer only, for the browser coming back from the website's link page. */

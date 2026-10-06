@@ -78,7 +78,7 @@ describe("Raid screen", () => {
     });
     expect(texts(view.me)).toEqual([
       "Tu n'es pas inscrit avec ce personnage.",
-      "Inscris-toi sur le site ou avec le bouton du message Discord.",
+      "Inscris-toi ci-dessous, sur le site ou sur Discord.",
     ]);
     expect(view.composition).toEqual({});
     expect(errors()).toEqual([]);

@@ -59,9 +59,22 @@ local function newRegion(kind)
     function region:SetHeight(height) self.height = height end
     function region:GetWidth() return self.width end
     function region:GetHeight() return self.height end
-    function region:Show() self.shown = true end
+    -- Like the game, a frame shown again runs its OnShow script.
+    function region:Show()
+        local hidden = not self.shown
+        self.shown = true
+        if hidden and self.scripts ~= nil and self.scripts.OnShow ~= nil then
+            self.scripts.OnShow(self)
+        end
+    end
     function region:Hide() self.shown = false end
-    function region:SetShown(shown) self.shown = shown end
+    function region:SetShown(shown)
+        if shown then
+            self:Show()
+        else
+            self:Hide()
+        end
+    end
     function region:IsShown() return self.shown end
     function region:SetAlpha(alpha) self.alpha = alpha end
     return region

@@ -15,6 +15,7 @@ Attribution.lua
 Rolls.lua
 Sharing.lua
 Companion.lua
+Changes.lua
 Notices.lua
 Freshness.lua
 Invitations.lua
@@ -30,6 +31,9 @@ UI\CompactView.lua
 UI\LootView.lua
 UI\JournalView.lua
 UI\Import.lua
+UI\SignupDialog.lua
+UI\ItemChoice.lua
+UI\Choices.lua
 UI\LogExport.lua
 UI\RaidTab.lua
 UI\RaidCompact.lua

@@ -4,7 +4,8 @@ local _, ns = ...
 --- /reload and logout, the companion reads them then. Filled only when the player has the companion.
 --- Contract with the companion (apps/companion/src/domain/outbox.ts):
 --- { version = 1, roster = { text = VXV-ROSTER text, capturedAt = Unix seconds },
----   raidLogs = { [event id] = VXV-LOG text }, characters = { ["Prénom Nom"] = { race = token, sex = 2 or 3 } } }.
+---   raidLogs = { [event id] = VXV-LOG text }, characters = { ["Prénom Nom"] = { race = token, sex = 2 or 3 } },
+---   changes = { [change id] = a change made in game (VXV_Raid/Changes.lua) } }.
 --- Other bundles add to it with VXV.Emit("sync.put", kind, key, value); a nil value removes the key.
 local Outbox = {}
 ns.Outbox = Outbox
@@ -13,7 +14,7 @@ local Companion = ns.Companion
 
 local FORMAT_VERSION = 1
 --- The kinds of data, each a table of keys, taken to the website.
-local KINDS = { "raidLogs", "characters" }
+local KINDS = { "raidLogs", "characters", "changes" }
 
 local db
 

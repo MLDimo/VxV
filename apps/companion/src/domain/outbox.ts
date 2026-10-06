@@ -22,14 +22,28 @@ export interface Outbox {
   /** Records of raids as VXV-LOG text. */
   raidLogs: string[];
   characters: CharacterLook[];
+  /** Changes made in game (addon/VXV_Raid/Changes.lua), as the website checks them: { id, kind, … }. */
+  changes: { id: string; [field: string]: unknown }[];
 }
 
 export type OutboxReading = { kind: "read"; outbox: Outbox } | { kind: "newer" } | { kind: "none" };
 
-const EMPTY: Outbox = { roster: undefined, raidLogs: [], characters: [] };
+const EMPTY: Outbox = { roster: undefined, raidLogs: [], characters: [], changes: [] };
 
 function isTable(value: LuaData | undefined): value is { readonly [key: string]: LuaData } {
   return typeof value === "object";
+}
+
+/** A table of the saved data as JSON: a list keyed "1", "2"… becomes an array, and so does an empty table. */
+function toJson(value: LuaData): unknown {
+  if (typeof value !== "object") {
+    return value;
+  }
+  const entries = Object.entries(value);
+  const isList = entries.every(([key], index) => key === String(index + 1));
+  return isList
+    ? entries.map(([, item]) => toJson(item))
+    : Object.fromEntries(entries.map(([key, item]) => [key, toJson(item)]));
 }
 
 /** The outbox in the variables of the saved file; values of another type are left aside. */
@@ -41,7 +55,7 @@ export function readOutbox(variables: Record<string, LuaData>): OutboxReading {
   if (typeof saved.version === "number" && saved.version > OUTBOX_VERSION) {
     return { kind: "newer" };
   }
-  const { roster, raidLogs, characters } = saved;
+  const { roster, raidLogs, characters, changes } = saved;
   return {
     kind: "read",
     outbox: {
@@ -59,6 +73,11 @@ export function readOutbox(variables: Record<string, LuaData>): OutboxReading {
               : [],
           )
         : [],
+      changes: isTable(changes)
+        ? Object.values(changes).flatMap((change) =>
+            isTable(change) && typeof change.id === "string" ? [{ ...(toJson(change) as object), id: change.id }] : [],
+          )
+        : [],
     },
   };
 }
@@ -74,6 +93,7 @@ export function mergeOutboxes(outboxes: readonly Outbox[]): Outbox {
           : merged.roster,
       raidLogs: [...merged.raidLogs, ...outbox.raidLogs.filter((log) => !merged.raidLogs.includes(log))],
       characters: [...merged.characters, ...outbox.characters],
+      changes: [...merged.changes, ...outbox.changes],
     }),
     EMPTY,
   );

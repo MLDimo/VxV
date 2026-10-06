@@ -90,9 +90,19 @@ export const ONYXIA_NIGHT: AddonEventFacts = {
       reason: "Pour le tank principal",
     },
   ],
+  changes: [],
   exportedAt: new Date("2026-12-10T19:45:00Z"),
 };
 
+/** The raid of the tests' event as its data pack registers it: Onyxia, then the guardian. */
+export const ONYXIA_PACK = `
+  VXV_RaidData = { onyxia = { name = "Repaire d'Onyxia", instanceId = 249, bosses = {
+      { encounterId = 1084, name = "Onyxia", loot = {
+          { itemId = 20, name = "Tête d'Onyxia" }, { itemId = 21, name = "Sac en peau" },
+          { itemId = 30, name = "Écaille d'Onyxia" }, { itemId = 40, name = "Bâton du dragon" } } },
+      { encounterId = 1085, name = "Gardienne", loot = { { itemId = 10, name = "Cape de la gardienne" } } },
+  } } }
+`;
 /** The text an officer copies from the website's event page. */
 export function websiteText(facts: AddonEventFacts = ONYXIA_NIGHT): string {
   return formatAddonEvent(facts);

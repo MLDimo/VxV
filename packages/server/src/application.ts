@@ -6,6 +6,7 @@ import { createCompanionUploads } from "./application/companionUploads.ts";
 import { createDiscordProfiles } from "./application/discordProfiles.ts";
 import { createEvents } from "./application/events.ts";
 import { createExclusions } from "./application/exclusions.ts";
+import { createGameChanges } from "./application/gameChanges.ts";
 import { createHistory } from "./application/history.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
@@ -41,19 +42,30 @@ export function createApplication({
   const roster = createRoster({ unitOfWork });
   const characters = createCharacters({ unitOfWork });
   const raidLogs = createRaidLogs({ unitOfWork, announcer, clock });
+  const signups = createSignups({ unitOfWork, clock });
+  const softReserves = createSoftReserves({ unitOfWork, clock });
+  const exclusions = createExclusions({ unitOfWork });
+  const raidAnnouncements = createRaidAnnouncements({ unitOfWork, announcer });
+  const gameChanges = createGameChanges({
+    unitOfWork,
+    signups,
+    softReserves,
+    exclusions,
+    announcements: raidAnnouncements,
+  });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
-    companionUploads: createCompanionUploads({ roster, raidLogs, characters }),
+    companionUploads: createCompanionUploads({ roster, raidLogs, characters, gameChanges }),
     roster,
     characters,
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
-    raidAnnouncements: createRaidAnnouncements({ unitOfWork, announcer }),
+    raidAnnouncements,
     raidReminders: createRaidReminders({ unitOfWork, announcer }),
     events: createEvents({ unitOfWork, clock }),
-    signups: createSignups({ unitOfWork, clock }),
-    softReserves: createSoftReserves({ unitOfWork, clock }),
-    exclusions: createExclusions({ unitOfWork }),
+    signups,
+    softReserves,
+    exclusions,
     history: createHistory({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
     addonExport: createAddonExport({ unitOfWork, clock }),

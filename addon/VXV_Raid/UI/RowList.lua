@@ -131,8 +131,8 @@ function RowList.Create(parent, topOffset, paletteName)
     end
 
     local list = {}
-    --- Shows these rows, reusing the row frames.
-    function list.SetRows(rows)
+    --- Shows these rows, reusing the row frames; from the top, unless keepScroll (a row changed in place).
+    function list.SetRows(rows, keepScroll)
         local top = 0
         for index, row in ipairs(rows) do
             local frame = frames[index] or newRow()
@@ -163,7 +163,9 @@ function RowList.Create(parent, topOffset, paletteName)
             frames[index]:Hide()
         end
         content:SetHeight(top)
-        scroll:SetVerticalScroll(0)
+        if not keepScroll then
+            scroll:SetVerticalScroll(0)
+        end
     end
     return list
 end

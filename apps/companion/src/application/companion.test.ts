@@ -13,7 +13,7 @@ import type { Settings, SitePort } from "./ports.ts";
 
 const member = { name: "Martin", roles: ["member", "officer"] };
 const NEXT_RAID = {
-  text: "VXV-RAID-1\nE;e1;1796932800;1796931900;2;Onyxia",
+  text: "VXV-RAID-2\nE;e1;1796932800;1796931900;2;Onyxia",
   title: "Onyxia",
   startsAt: "2026-12-10T20:00:00.000Z",
 };
@@ -63,6 +63,7 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
       ...(upload.roster === undefined ? {} : { roster: "Liste de guilde à jour." }),
       raidLogs: upload.raidLogs.map(() => "Journal du raid importé."),
       characters: upload.characters.length,
+      ...(upload.changes.length === 0 ? {} : { changes: `${String(upload.changes.length)} changement fait en jeu.` }),
     })),
   };
   const dependencies: CompanionDependencies = {
@@ -205,7 +206,7 @@ describe("companion", () => {
     it("brings the next event to the game at launch", async () => {
       const { companion, inboxes } = setUp({}, "saved-token");
       await companion.start();
-      expect(inboxes.get("/Applications/World of Warcraft/_classic_")).toContain('raid = "VXV-RAID-1\\010E;e1;');
+      expect(inboxes.get("/Applications/World of Warcraft/_classic_")).toContain('raid = "VXV-RAID-2\\010E;e1;');
       expect(companion.state().lastSync).toEqual({
         at: NOW,
         raid: { title: "Onyxia", startsAt: "2026-12-10T20:00:00.000Z" },
@@ -250,6 +251,7 @@ describe("companion", () => {
         roster: { text: "VXV-ROSTER-1\nÐéjà;Vu;ROGUE", capturedAt: 1796904000 },
         raidLogs: ["VXV-LOG-1\nR;e1;1796904000;1796904120"],
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
+        changes: [],
       });
       expect(companion.state().lastUpload).toEqual({
         at: NOW,
@@ -265,6 +267,7 @@ describe("companion", () => {
       expect(site.upload).toHaveBeenLastCalledWith("saved-token", {
         raidLogs: ["VXV-LOG-1\nR;e2;1;2"],
         characters: [],
+        changes: [],
       });
     });
 
@@ -276,6 +279,7 @@ describe("companion", () => {
       expect(site.upload).toHaveBeenCalledWith("saved-token", {
         raidLogs: [],
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
+        changes: [],
       });
     });
   });

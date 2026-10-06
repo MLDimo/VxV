@@ -1,3 +1,4 @@
+import type { GameChange, GameChangeOutcome } from "../domain/gameChanges.ts";
 import { describeRaidLogImport, describeRosterImport } from "../domain/journalDescriptions.ts";
 import { count } from "../domain/labels.ts";
 import type { Member } from "../domain/members.ts";
@@ -16,6 +17,8 @@ export interface CompanionUpload {
   raidLogs: readonly string[];
   /** The player's own characters as the game draws them. */
   characters: readonly GameCharacter[];
+  /** Changes made in game: the player's own, and for an officer those relayed from other players. */
+  changes: readonly GameChange[];
 }
 
 /** What the website made of it, in French, for the companion's window. */
@@ -24,6 +27,8 @@ export interface CompanionUploadReport {
   raidLogs: string[];
   /** Characters whose appearance was kept. */
   characters: number;
+  /** What became of the changes made in game, if any were sent. */
+  changes: string | undefined;
 }
 
 const OFFICERS_ONLY = "Réservé aux officiers.";
@@ -35,6 +40,14 @@ export interface CompanionUploadDependencies {
     receiveFromCompanion(officer: Member, text: string): Promise<{ summary: RaidLogImportSummary; news: number }>;
   };
   characters: { recordAppearances(member: Member, seen: readonly GameCharacter[]): Promise<number> };
+  gameChanges: { receive(sender: Member, changes: readonly GameChange[]): Promise<GameChangeOutcome[]> };
+}
+
+/** "3 changements faits en jeu : 2 acceptés, 1 refusé." */
+function describeChanges(outcomes: readonly GameChangeOutcome[]): string {
+  const accepted = outcomes.filter((outcome) => outcome.accepted).length;
+  const parts = [count(accepted, "accepté"), count(outcomes.length - accepted, "refusé")];
+  return `${count(outcomes.length, "changement fait en jeu", "changements faits en jeu")} : ${parts.join(", ")}.`;
 }
 
 function describeRoster(outcome: RosterUploadOutcome): string {
@@ -68,11 +81,12 @@ async function described(work: () => Promise<string>): Promise<string> {
   }
 }
 
-export function createCompanionUploads({ roster, raidLogs, characters }: CompanionUploadDependencies) {
+export function createCompanionUploads({ roster, raidLogs, characters, gameChanges }: CompanionUploadDependencies) {
   return {
     /**
-     * Takes what the member's addon saved: their characters' appearance, and for an officer the guild's roster and
-     * the raids' records. Several officers send the same data: each use case keeps only what is new.
+     * Takes what the member's addon saved: their characters' appearance, the changes made in game, and for an officer
+     * the guild's roster and the raids' records. Several players send the same data: each use case keeps only what
+     * is new.
      */
     async receive(member: Member, upload: CompanionUpload): Promise<CompanionUploadReport> {
       const officer = canManageRaids(member.roles);
@@ -80,6 +94,8 @@ export function createCompanionUploads({ roster, raidLogs, characters }: Compani
         roster: undefined,
         raidLogs: [],
         characters: await characters.recordAppearances(member, upload.characters),
+        changes:
+          upload.changes.length === 0 ? undefined : describeChanges(await gameChanges.receive(member, upload.changes)),
       };
       const sentRoster = upload.roster;
       if (sentRoster !== undefined) {

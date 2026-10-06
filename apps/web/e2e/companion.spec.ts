@@ -77,7 +77,7 @@ test("the companion brings the next event to the addon, as an officer would past
   // The soonest event is the one starting 10 minutes after the seed.
   expect(raid.title).toBe("La salle des Thanes");
   expect(raid.text.split("\n").slice(0, 2)).toEqual([
-    "VXV-RAID-1",
+    "VXV-RAID-2",
     expect.stringMatching(`^E;${readSeed().lockedEventId};`),
   ]);
   expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
@@ -102,6 +102,18 @@ test("an officer's companion sends the roster, the raid's record and the charact
       ].join("\n"),
     ],
     characters: [{ name: "Ciel Gris", race: "Orc", sex: 2 }],
+    changes: [
+      {
+        id: "Ciel Gris#1796900000#1",
+        eventId: readSeed().companionEventId,
+        author: "Ciel Gris",
+        kind: "signup",
+        role: "tank",
+        spec: "Protection",
+        status: "present",
+      },
+      { id: "x", kind: "unknown" },
+    ],
   };
   const headers = { Authorization: `Bearer ${token}` };
   const response = await request.post("/api/compagnon/envoi", { headers, data: upload });
@@ -109,10 +121,17 @@ test("an officer's companion sends the roster, the raid's record and the charact
     roster: "Liste de guilde à jour.",
     raidLogs: ["Journal du raid importé : 1 boss tué, 2 présents, 0 objets ajoutés."],
     characters: 1,
+    changes: "1 changement fait en jeu : 1 accepté, 0 refusés.",
   });
   // Sent again by another officer's companion: nothing new.
   const again = await request.post("/api/compagnon/envoi", { headers, data: upload });
-  expect(((await again.json()) as { raidLogs: string[] }).raidLogs).toEqual(["Journal du raid à jour."]);
+  expect(await again.json()).toMatchObject({
+    raidLogs: ["Journal du raid à jour."],
+    changes: "1 changement fait en jeu : 1 accepté, 0 refusés.",
+  });
+  // The change went back to the game with the event's data, and the sign-up shows on the website.
+  await page.goto(`/evenements/${readSeed().companionEventId}`);
+  await expect(page.getByRole("group", { name: "Tank" })).toContainText("1Ciel Gris");
   expect((await request.post("/api/compagnon/envoi", { headers, data: { raidLogs: "x" } })).status()).toBe(400);
 });
 
