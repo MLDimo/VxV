@@ -1,7 +1,6 @@
-import { flag, line, seconds, text } from "./addonText.ts";
+import { addonHead, flag, line, seconds, text, type AddonReaders } from "./addonText.ts";
 import { standing, type Bet, type Stake } from "./bets.ts";
 import type { CashMovement, CashSummary } from "./cash.ts";
-import { fullName, type Character } from "./characters.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { BettorRank } from "./ranking.ts";
 
@@ -12,24 +11,17 @@ export const ADDON_BETS_HEADER = "VXV-PARIS-1";
 export const ADDON_CASH_MOVEMENTS = 10;
 export const ADDON_RANKED_BETTORS = 10;
 
-export interface AddonBetsFacts {
+export interface AddonBetsFacts extends AddonReaders {
   bets: readonly { bet: Bet; stakes: readonly Stake[] }[];
-  /** Characters of the officers and the guild master: the addon takes the bets' data from them only. */
-  officers: readonly Character[];
-  /** The guild's characters linked to a member: the addon finds the player's member by the character played. */
-  characters: readonly Character[];
   cash: CashSummary & { movements: readonly CashMovement[] };
   ranking: readonly BettorRank[];
   /** What became of the stakes made in game, in the order received. */
   changes: readonly GameChangeOutcome[];
-  exportedAt: Date;
 }
 
 /**
- * The bets as the companion hands them to the addon, one record per line:
- * P;export (Unix seconds)
- * O;officer character
- * M;member id;character of the member
+ * The bets as the companion hands them to the addon, one record per line, after the head of every bundle's data
+ * (addonHead: P, O and M):
  * B;bet id;closing (Unix seconds);end (Unix seconds, 0 while it runs);winning choice id, empty without;title
  * H;bet id;choice id;label (the bet's choices, in order)
  * S;bet id;member id;member;class token, empty without main;choice id;amount;standing;gain, 0 while it runs
@@ -41,12 +33,7 @@ export interface AddonBetsFacts {
  */
 export function formatAddonBets(facts: AddonBetsFacts): string {
   return [
-    ADDON_BETS_HEADER,
-    line("P", seconds(facts.exportedAt)),
-    ...facts.officers.map((officer) => line("O", fullName(officer))),
-    ...facts.characters.flatMap((character) =>
-      character.memberId === undefined ? [] : [line("M", character.memberId, fullName(character))],
-    ),
+    ...addonHead(ADDON_BETS_HEADER, facts),
     ...facts.bets.flatMap(({ bet, stakes }) => [
       line(
         "B",

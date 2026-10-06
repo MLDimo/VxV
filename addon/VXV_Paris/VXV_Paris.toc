@@ -9,7 +9,6 @@
 BetsData.lua
 Book.lua
 Bets.lua
-Companion.lua
 Stakes.lua
 
 # Interface: Le Dé Pipé's screen and card, the reduced mode, the stake dialog.

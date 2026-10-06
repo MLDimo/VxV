@@ -11,7 +11,6 @@ VXV.RegisterModule({
     Enable = function(data)
         ns.BetsData.Restore(data)
         ns.Stakes.Restore(data)
-        ns.Bets.Sharing.Start()
         tellCash(ns.BetsData.Current())
     end,
     tab = {

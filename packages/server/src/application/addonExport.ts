@@ -3,6 +3,7 @@ import { EVENT_LISTED_AFTER_START_MS, type RaidEvent } from "../domain/events.ts
 import { raidTitle } from "../domain/labels.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
+import { addonReaders } from "./addonReaders.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
 import { loadBoardItems } from "./softReserves.ts";
@@ -21,22 +22,18 @@ export interface NextEventExport {
 export function createAddonExport({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
   /** The event as text for the addon: sign-ups, soft reserves, the officers it trusts and the journal. */
   async function format(repositories: Repositories, event: RaidEvent): Promise<string> {
-    const [signups, board, members, characters, journal, changes] = await Promise.all([
-      repositories.signups.listByEvent(event.id),
-      loadBoardItems(repositories, event, undefined),
-      repositories.members.listAll(),
-      repositories.characters.listAll(),
-      repositories.journal.listForEvent(event.id),
-      repositories.gameChanges.listForEvent(event.id, new Date(clock().getTime() - EVENT_CREATION_ANSWERS_MS)),
-    ]);
-    const managers = new Set(members.filter((member) => canManageRaids(member.roles)).map((member) => member.id));
+    // One query after the other: a transaction's client runs one at a time.
+    const signups = await repositories.signups.listByEvent(event.id);
+    const board = await loadBoardItems(repositories, event, undefined);
+    const characters = await repositories.characters.listAll();
+    const journal = await repositories.journal.listForEvent(event.id);
+    const since = new Date(clock().getTime() - EVENT_CREATION_ANSWERS_MS);
+    const changes = await repositories.gameChanges.listForEvent(event.id, since);
     return formatAddonEvent({
       event,
       signups,
       board,
-      officers: characters.filter(
-        (character) => character.inGuild && character.memberId !== undefined && managers.has(character.memberId),
-      ),
+      officers: (await addonReaders(repositories)).officers,
       mainCharacterIds: new Set(characters.filter((character) => character.isMain).map((character) => character.id)),
       journal,
       changes,

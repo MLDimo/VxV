@@ -8,7 +8,7 @@ local _, ns = ...
 local RowList = {}
 ns.RowList = RowList
 
-local Theme, Tooltip = ns.Theme, ns.Tooltip
+local Bus, Theme, Tooltip = ns.Bus, ns.Theme, ns.Tooltip
 
 -- Palettes: the dark panels of the screens, and the parchment of the accounts book (§7.7), whose rows all sit on
 -- the page's lines.
@@ -167,5 +167,30 @@ function RowList.Create(parent, topOffset, paletteName)
             scroll:SetVerticalScroll(0)
         end
     end
+    return list
+end
+
+--- A titled panel of a screen's grid holding a list (Theme.TitledPanel, whose style also picks the palette);
+--- returns the list.
+function RowList.Panel(parent, x, y, width, height, title, style)
+    local _, body = Theme.TitledPanel(parent, x, y, width, height, title, style)
+    return RowList.Create(body, 0, style == "parchment" and "parchment" or nil)
+end
+
+--- Fills a frame, within a margin, with a list of rows() shown each time the frame shows and after each of the bus
+--- events: the simple tabs of the reduced mode. Returns the list.
+function RowList.Fill(frame, margin, rows, events)
+    local body = CreateFrame("Frame", nil, frame)
+    body:SetPoint("TOPLEFT", margin, -margin)
+    body:SetSize(frame:GetWidth() - 2 * margin, frame:GetHeight() - 2 * margin)
+    local list = RowList.Create(body)
+    local function render()
+        list.SetRows(rows())
+    end
+    frame:SetScript("OnShow", render)
+    for _, event in ipairs(events) do
+        Bus.On(event, render)
+    end
+    render()
     return list
 end

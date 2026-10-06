@@ -5,15 +5,6 @@ local _, ns = ...
 local Quests = {}
 ns.Quests = Quests
 
-local QuestsData = ns.QuestsData
-
-Quests.Sharing = VXV.ShareData("quetes", {
-    Text = QuestsData.Text,
-    ExportedAt = QuestsData.ExportedAt,
-    IsOfficer = QuestsData.IsOfficer,
-    Receive = QuestsData.Receive,
-})
-
 -- Scores told live in the guild (P12.5), by mission then member: { name, class, score, reachedAt }.
 local live = {}
 

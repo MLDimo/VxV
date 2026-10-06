@@ -194,6 +194,28 @@ function Theme.Panel(parent, officer)
     return panel
 end
 
+-- A titled panel's margins around its content, and the room of its title above.
+local PANEL_PADDING, PANEL_TITLE, PANEL_HEADING_TOP = 14, 40, 12
+Theme.PANEL_PADDING = PANEL_PADDING
+
+--- A panel of a screen's grid with its title, at x, y of the parent; its style is nil, "officer" (§3, gold edge)
+--- or "parchment" (§7.4, the quest of the week). Returns the panel and the frame under its title.
+function Theme.TitledPanel(parent, x, y, width, height, title, style)
+    local panel = Theme.Panel(parent, style == "officer")
+    panel:SetPoint("TOPLEFT", x, -y)
+    panel:SetSize(width, height)
+    if style == "parchment" then
+        Theme.Fill(panel, "parchment", "BORDER"):SetAllPoints()
+    end
+    local heading = Theme.Text(panel, "pixel", 16, style == "parchment" and "ink-brown" or "ivory")
+    heading:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_HEADING_TOP)
+    heading:SetText(title)
+    local body = CreateFrame("Frame", nil, panel)
+    body:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_TITLE)
+    body:SetSize(width - 2 * PANEL_PADDING, height - PANEL_TITLE - PANEL_PADDING)
+    return panel, body
+end
+
 -- Bevelled buttons (§3): background, light and dark edges inside, ink ring outside; hover in plum, gold ring.
 local BUTTONS = {
     pixel = { background = "amethyst-button", light = "amethyst-light", shade = "amethyst-shade", text = "ivory",

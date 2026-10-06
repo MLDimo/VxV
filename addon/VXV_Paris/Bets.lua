@@ -5,15 +5,6 @@ local _, ns = ...
 local Bets = {}
 ns.Bets = Bets
 
-local BetsData = ns.BetsData
-
-Bets.Sharing = VXV.ShareData("paris", {
-    Text = BetsData.Text,
-    ExportedAt = BetsData.ExportedAt,
-    IsOfficer = BetsData.IsOfficer,
-    Receive = BetsData.Receive,
-})
-
 --- The website's id of the player's member, found by the character played; nil when it is linked to nobody.
 function Bets.MemberId(data)
     return data ~= nil and data.members[VXV.PlayerName() or ""] or nil
