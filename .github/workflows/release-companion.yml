@@ -1,0 +1,73 @@
+name: Release companion
+
+# A tag such as compagnon-v1.2.0 publishes the companion's installers in the public repository of its releases
+# (MLDimo/vxv-compagnon, tag v1.2.0), where the installed companions find their updates. A manual run builds the
+# installers without publishing them (dry run).
+on:
+  push:
+    tags: ["compagnon-v*"]
+  workflow_dispatch:
+
+env:
+  RELEASES_REPOSITORY: MLDimo/vxv-compagnon
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  build:
+    name: Installer (${{ matrix.os }})
+    needs: tests
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Version
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then version="${GITHUB_REF_NAME#compagnon-v}"; else version="0.0.0-dev.$GITHUB_RUN_NUMBER"; fi
+          npm version "$version" --no-git-tag-version -w @vxv/companion
+      - run: npm run build -w @vxv/companion
+      - name: Installer
+        working-directory: apps/companion
+        run: npx electron-builder --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: companion-${{ matrix.os }}
+          path: |
+            apps/companion/release/VXV-Compagnon*
+            apps/companion/release/latest*.yml
+
+  publish:
+    name: Publish
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    env:
+      # Fine-grained token allowed to write the contents of the releases' repository only.
+      GH_TOKEN: ${{ secrets.COMPANION_RELEASES_TOKEN }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+      - name: Release in the public repository
+        run: |
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::notice::No COMPANION_RELEASES_TOKEN secret yet: installers built but not published."
+            exit 0
+          fi
+          version="${GITHUB_REF_NAME#compagnon-v}"
+          prerelease=""
+          if [[ "$version" == *-* ]]; then prerelease="--prerelease"; fi
+          gh release create "v$version" release/* --repo "$RELEASES_REPOSITORY" --title "VXV Compagnon $version" \
+            --notes "Compagnon VXV $version : installeur Windows (VXV-Compagnon-Setup.exe) et Mac (VXV-Compagnon.dmg)." $prerelease

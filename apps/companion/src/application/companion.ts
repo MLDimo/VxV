@@ -1,7 +1,16 @@
 import { findInstallations, usualGameFolders, type Computer, type FolderReader } from "../domain/installations.ts";
 import { SiteError, UnlinkedError } from "./errors.ts";
 import { linkAccount } from "./link.ts";
-import type { Account, GameFiles, LoopbackListener, Settings, SettingsStore, SitePort, TokenStore } from "./ports.ts";
+import type {
+  Account,
+  GameFiles,
+  LoopbackListener,
+  Settings,
+  SettingsStore,
+  SitePort,
+  TokenStore,
+  UpdateNotice,
+} from "./ports.ts";
 import { synchronize, type SyncReport } from "./sync.ts";
 
 /** The companion synchronises this often while it runs, and at once after a link or a new folder. */
@@ -27,6 +36,8 @@ export interface CompanionState {
   /** The last problem met, in French, until the next action. */
   notice: string | undefined;
   version: string;
+  /** A newer version of the companion, once known. */
+  update: UpdateNotice | undefined;
 }
 
 export interface CompanionDependencies {
@@ -70,6 +81,7 @@ export function createCompanion(dependencies: CompanionDependencies) {
     lastUpload: undefined,
     notice: undefined,
     version: dependencies.version,
+    update: undefined,
   };
 
   function update(changes: Partial<CompanionState>): void {
@@ -230,6 +242,11 @@ export function createCompanion(dependencies: CompanionDependencies) {
       const installations = await detect(settings);
       update({ installations, notice: installations.length === 0 ? NO_ADDON_THERE : undefined });
       await syncNow();
+    },
+
+    /** A newer version of the companion is known: the window offers it. */
+    announceUpdate(notice: UpdateNotice): void {
+      update({ update: notice });
     },
 
     async setLaunchAtLogin(on: boolean): Promise<void> {

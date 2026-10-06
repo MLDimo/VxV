@@ -18,6 +18,9 @@ function Links({ member }: { member: Member }) {
       <Link href="/personnages" className={NAV_LINK}>
         Mes personnages
       </Link>
+      <Link href="/compagnon" className={NAV_LINK}>
+        Compagnon
+      </Link>
       {canManageRaids(member.roles) && (
         <Link href="/officiers/liste-de-guilde" className={`${NAV_LINK} text-gold`}>
           Liste de guilde

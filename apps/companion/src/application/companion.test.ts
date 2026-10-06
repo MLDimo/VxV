@@ -194,6 +194,14 @@ describe("companion", () => {
     expect(companion.state().notice).toBe("Aucune version du jeu avec l'addon VXV dans ce dossier.");
   });
 
+  it("offers a newer version of the companion once known", async () => {
+    const { companion } = setUp();
+    await companion.start();
+    expect(companion.state().update).toBeUndefined();
+    companion.announceUpdate({ version: "1.1.0", ready: true });
+    expect(companion.state().update).toEqual({ version: "1.1.0", ready: true });
+  });
+
   it("starts with the computer or not, as the player chooses", async () => {
     const { companion, dependencies, saved } = setUp();
     await companion.start();

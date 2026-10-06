@@ -98,6 +98,18 @@ body {
   color: var(--color-loss);
 }
 
+.update {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--color-alert);
+  box-shadow: 0 0 0 2px var(--color-gold);
+  color: var(--color-gold-light);
+  font-weight: 700;
+}
+
 .notice {
   padding: 10px 14px;
   background: color-mix(in srgb, var(--color-loss) 14%, transparent);

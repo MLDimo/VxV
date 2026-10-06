@@ -17,6 +17,7 @@ const bridge: CompanionBridge = {
   setLaunchAtLogin: (on) => act("setLaunchAtLogin", on),
   syncNow: () => act("syncNow"),
   openSite: () => act("openSite"),
+  update: () => act("update"),
 };
 
 contextBridge.exposeInMainWorld("vxv", bridge);

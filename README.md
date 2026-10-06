@@ -25,9 +25,10 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `apps/web` | Site et API, Next.js 16 sur Vercel ([vxv-web.vercel.app](https://vxv-web.vercel.app)), et adresse des interactions du bot (`/api/discord/interactions`) | P2, P3 |
 | `packages/server` | Cœur du serveur partagé par le site et le bot : domaine, cas d'usage, PostgreSQL (`@vxv/server`) | P2 |
 | `packages/bot` | Bot Discord en interactions HTTP : signature, commandes, boutons (`@vxv/bot`), hébergé par `apps/web` | P3 |
-| `apps/companion` | Compagnon de bureau (Electron, Windows et Mac) : relie le jeu au site (`@vxv/companion`) | P7 |
-| `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`…) | P1.5 puis P4 |
+| `apps/companion` | Compagnon de bureau (Electron, Windows et Mac) : relie le jeu au site (`@vxv/companion`, [guide](docs/compagnon.md)) | P7 |
+| `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Sync`, `VXV_Data_<Raid>`…) | P1.5 puis P4 |
 | `packages/raid-data` | Schéma et validation des données de raid (`@vxv/raid-data`) | P1.4 |
+| `packages/lua` | Données Lua 5.1 : écriture pour l'addon, lecture des SavedVariables du jeu sans les exécuter (`@vxv/lua`) | P7 |
 | `packages/design` | Jetons de la charte « La Taverne » (couleurs, polices) et thème du site généré (`@vxv/design`) | Habillage |
 | `data/raids` | Source des données de raid en JSON, une par raid ([format](data/raids/README.md)) | P1.4 |
 | `tools/data-generator` | Génère les packs de l'addon et le script SQL des raids dans `dist/generated` (`npm run generate`) | P1.5 |
@@ -58,3 +59,7 @@ L'envoi sur CurseForge et Wago s'active dès que les projets existent, sans modi
 | --- | --- | --- |
 | CurseForge | `CF_API_KEY` | `CF_PROJECT_ID`, `CF_GAME_VERSION_IDS` |
 | Wago | `WAGO_API_TOKEN` | `WAGO_PROJECT_ID`, `WAGO_PATCH_FIELD`, `WAGO_PATCH` |
+
+## Publier le compagnon
+
+Une étiquette `compagnon-v<version>` sur `main` construit les installeurs Windows et Mac et les publie dans le dépôt public [MLDimo/vxv-compagnon](https://github.com/MLDimo/vxv-compagnon), d'où les compagnons installés se mettent à jour. Mise en place du secret et détails : [docs/compagnon.md](docs/compagnon.md).

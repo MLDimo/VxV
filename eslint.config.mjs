@@ -26,6 +26,7 @@ export default tseslint.config(
     ignores: [
       "**/node_modules/",
       "**/dist/",
+      "apps/companion/release/",
       ".vercel/",
       "tools/VXV_Probe/",
       "apps/web/.next/",

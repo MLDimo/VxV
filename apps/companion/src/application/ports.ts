@@ -95,3 +95,9 @@ export interface GameFiles {
   savedFiles(installation: string): Promise<SavedFile[]>;
   read(path: string): Promise<Uint8Array>;
 }
+
+/** A newer version of the companion: downloaded and ready to install (Windows), or to download (Mac). */
+export interface UpdateNotice {
+  version: string;
+  ready: boolean;
+}

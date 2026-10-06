@@ -7,6 +7,7 @@ import { listenForReturn } from "../infrastructure/loopback.ts";
 import { createSiteApi } from "../infrastructure/siteApi.ts";
 import { createSettingsFile, createTokenFile } from "../infrastructure/storage.ts";
 import { CHANNELS, type Action } from "./bridge.ts";
+import { applyUpdate, watchUpdates } from "./updates.ts";
 
 /** The website the companion works with; another one for development (VXV_SITE_URL=http://localhost:3000). */
 const SITE_URL = process.env.VXV_SITE_URL ?? "https://vxv-web.vercel.app";
@@ -96,6 +97,7 @@ function actions(companion: Companion): Record<Action, (...args: unknown[]) => P
     setLaunchAtLogin: (on) => companion.setLaunchAtLogin(on === true),
     syncNow: () => companion.syncNow(),
     openSite: () => shell.openExternal(SITE_URL),
+    update: async () => applyUpdate(companion.state().update),
   };
 }
 
@@ -142,6 +144,7 @@ async function start(): Promise<void> {
   if (!startedHidden) {
     showWindow();
   }
+  watchUpdates(companion.announceUpdate);
   await companion.start();
 }
 

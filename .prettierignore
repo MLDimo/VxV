@@ -2,6 +2,7 @@
 *.md
 *.lua
 dist/
+apps/companion/release/
 docs/
 tools/VXV_Probe/
 package-lock.json
