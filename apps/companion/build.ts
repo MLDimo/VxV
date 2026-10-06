@@ -1,4 +1,5 @@
 import { copyFile, cp, mkdir, rm, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { FONTS, fontFile, renderPlainCss } from "@vxv/design";
 import { build } from "esbuild";
 
@@ -7,6 +8,8 @@ import { build } from "esbuild";
  * (browser), its page and styles, the charter's fonts and the images. electron-builder packages dist/ as is.
  */
 const root = new URL("./", import.meta.url);
+// A path of the system: on Windows, a URL's pathname would give "/D:/…", which esbuild refuses.
+const rootPath = fileURLToPath(root);
 const dist = new URL("dist/", root);
 const renderer = new URL("renderer/", dist);
 const fonts = new URL("fonts/", renderer);
@@ -14,7 +17,7 @@ const fonts = new URL("fonts/", renderer);
 await rm(dist, { recursive: true, force: true });
 await build({
   entryPoints: { main: "src/main/main.ts", preload: "src/main/preload.ts" },
-  absWorkingDir: root.pathname,
+  absWorkingDir: rootPath,
   bundle: true,
   platform: "node",
   format: "cjs",
@@ -26,7 +29,7 @@ await build({
 });
 await build({
   entryPoints: { renderer: "src/renderer/renderer.ts" },
-  absWorkingDir: root.pathname,
+  absWorkingDir: rootPath,
   bundle: true,
   platform: "browser",
   format: "iife",
