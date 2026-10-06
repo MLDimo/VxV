@@ -1,6 +1,6 @@
 import { fullName } from "../domain/characters.ts";
-import { parseRaidLog } from "../domain/raidLog.ts";
-import { awardTitles, TITLES, titleWeek, type TitleFacts } from "../domain/titles.ts";
+import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
+import { awardTitles, TITLES, titleWeek, type Tally, type TitleFacts } from "../domain/titles.ts";
 import type { Clock, GuildGateway, Repositories, TitleAnnouncer, TitleHolder, UnitOfWork } from "./ports.ts";
 
 /** Each title is a Discord role of this name, held by the week's holder. */
@@ -34,12 +34,18 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
       character.memberId === undefined ? [] : [[fullName(character), character.memberId] as const],
     ),
   );
-  const deaths = (await repositories.raidLogs.listStartedSince(since)).flatMap(({ startsAt, content }) =>
-    parseRaidLog(content).deaths.flatMap((death) => {
-      const memberId = byName.get(death.name);
-      return memberId === undefined ? [] : [{ memberId, count: death.count, at: startsAt }];
-    }),
-  );
+  // The raids' logs, read once: each line of a character counts for their member.
+  const logs = (await repositories.raidLogs.listStartedSince(since)).map(({ startsAt, content }) => ({
+    at: startsAt,
+    log: parseRaidLog(content),
+  }));
+  const tally = (lines: (log: RaidLog) => readonly { name: string; amount: number }[]): Tally =>
+    logs.flatMap(({ at, log }) =>
+      lines(log).flatMap(({ name, amount }) => {
+        const memberId = byName.get(name);
+        return memberId === undefined ? [] : [{ memberId, amount, at }];
+      }),
+    );
   return {
     bets: bets.map((stake) => ({
       memberId: stake.memberId,
@@ -50,7 +56,10 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
     lastMissionWinner:
       winner === undefined || last === undefined ? undefined : { memberId: winner.memberId, at: last.endsAt },
     loots: await repositories.lootHistory.listReceivedSince(since),
-    deaths,
+    deaths: tally((log) => log.deaths.map(({ name, count }) => ({ name, amount: count }))),
+    damage: tally((log) => log.meter.map(({ name, damage }) => ({ name, amount: damage }))),
+    healing: tally((log) => log.meter.map(({ name, healing }) => ({ name, amount: healing }))),
+    raised: tally((log) => log.raised.map(({ name, count }) => ({ name, amount: count }))),
     donations: (await repositories.cash.listAll()).flatMap((movement) =>
       movement.kind === "donation" && movement.memberId !== undefined && inSeason(movement.occurredAt)
         ? [{ memberId: movement.memberId, amount: movement.amount, at: movement.occurredAt }]

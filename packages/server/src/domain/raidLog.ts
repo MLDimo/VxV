@@ -3,7 +3,9 @@ import { LOOT_METHODS, type LootMethod } from "./history.ts";
 import { TextFormatError } from "./textFormat.ts";
 
 /** First line of a raid's record exported by the addon (contract with VXV_Raid); the number is the format version. */
-export const RAID_LOG_HEADER = "VXV-LOG-1";
+export const RAID_LOG_HEADER = "VXV-LOG-2";
+/** The versions still read: an addon not updated yet writes version 1, without the meter and the resurrections. */
+const READ_HEADERS: readonly string[] = ["VXV-LOG-1", RAID_LOG_HEADER];
 
 const MS_PER_SECOND = 1000;
 const FIELD_SEPARATOR = ";";
@@ -17,6 +19,10 @@ export interface RaidLog {
   present: string[];
   loots: { encounterId: number; itemId: number; winner: string; method: LootMethod; lootedAt: Date }[];
   deaths: { name: string; count: number }[];
+  /** The game's damage meter over the bosses killed (P13), by character. */
+  meter: { name: string; damage: number; healing: number }[];
+  /** The resurrections each character accepted during the raid (P13). */
+  raised: { name: string; count: number }[];
 }
 
 export class RaidLogFormatError extends TextFormatError {}
@@ -40,7 +46,8 @@ function isLootMethod(value: string | undefined): value is LootMethod {
 /**
  * Reads the record line by line, reporting every problem with its line number:
  * R;event id;start (Unix seconds);end, K;encounter id;time, P;character, L;encounter id;item id;winner;method;time,
- * D;character;deaths. Lines of an unknown kind are skipped.
+ * D;character;deaths, and since version 2 M;character;damage;healing and A;character;resurrections accepted.
+ * Lines of an unknown kind are skipped.
  */
 export function parseRaidLog(text: string): RaidLog {
   const lines = text
@@ -48,7 +55,7 @@ export function parseRaidLog(text: string): RaidLog {
     .map((content, index) => ({ number: index + 1, content: content.trim() }))
     .filter((line) => line.content !== "");
   const [header, ...rows] = lines;
-  if (header?.content !== RAID_LOG_HEADER) {
+  if (!READ_HEADERS.includes(header?.content ?? "")) {
     throw new RaidLogFormatError([
       `Le journal doit commencer par la ligne ${RAID_LOG_HEADER} : copiez-le depuis l'addon (onglet Butin).`,
     ]);
@@ -61,6 +68,8 @@ export function parseRaidLog(text: string): RaidLog {
     present: [],
     loots: [],
     deaths: [],
+    meter: [],
+    raised: [],
   };
   const problems: string[] = [];
   const readers: Record<string, (fields: string[]) => boolean> = {
@@ -102,6 +111,23 @@ export function parseRaidLog(text: string): RaidLog {
         return false;
       }
       log.deaths.push({ name, count: deaths });
+      return true;
+    },
+    M: ([, name, damage, healing]) => {
+      const damageDone = wholeNumber(damage);
+      const healingDone = wholeNumber(healing);
+      if (!name || damageDone === undefined || healingDone === undefined) {
+        return false;
+      }
+      log.meter.push({ name, damage: damageDone, healing: healingDone });
+      return true;
+    },
+    A: ([, name, count]) => {
+      const accepted = wholeNumber(count);
+      if (!name || accepted === undefined) {
+        return false;
+      }
+      log.raised.push({ name, count: accepted });
       return true;
     },
   };

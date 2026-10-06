@@ -51,6 +51,10 @@ const USED_IN_GAME = [
   "GameFontNormal",
   "UnitRace",
   "UnitSex",
+  // The game's damage meter (phase 0, T7, 3 October): both listed by "/vxvtest meter list", the sessions read by
+  // "/vxvtest meter read". Added to the probe's inventory for the next session.
+  "C_DamageMeter.GetAvailableCombatSessions",
+  "C_DamageMeter.GetCombatSessionFromID",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

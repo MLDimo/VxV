@@ -10,6 +10,17 @@ export const TITLES = [
   { id: "numberOne", name: "Numéro UNO", rule: "Vainqueur de la dernière mission de guilde terminée." },
   { id: "wellFed", name: "Bien gras", rule: "Le plus d'objets reçus en raid sur la saison." },
   { id: "floorTaster", name: "Goûteur de sol", rule: "Le plus de morts pendant les raids VXV sur la saison." },
+  { id: "topDamage", name: "Chibrax au max", rule: "Le plus de dégâts sur les boss tués en raid VXV sur la saison." },
+  {
+    id: "topHealing",
+    name: "Remboursé par la Sécu",
+    rule: "Le plus de soins sur les boss tués en raid VXV sur la saison.",
+  },
+  {
+    id: "mostRaised",
+    name: "Lève toi copaing",
+    rule: "Le plus de résurrections acceptées pendant les raids VXV sur la saison.",
+  },
   { id: "sugarDaddy", name: "Sugar Daddy", rule: "Le plus gros donateur à la caisse de la guilde sur la saison." },
 ] as const;
 
@@ -22,6 +33,9 @@ export interface TitleScore {
   reachedAt: Date;
 }
 
+/** Amounts of the members, each at its instant. */
+export type Tally = readonly { memberId: string; amount: number; at: Date }[];
+
 /** What the titles are computed from, over the season. */
 export interface TitleFacts {
   /** The members' stakes on the bets ended in the season, refunds aside. */
@@ -31,13 +45,18 @@ export interface TitleFacts {
   /** The items received in raid during the season, by the member of the character who received them. */
   loots: readonly { memberId: string; at: Date }[];
   /** The deaths in VXV raids during the season, by member and raid. */
-  deaths: readonly { memberId: string; count: number; at: Date }[];
+  deaths: Tally;
+  /** The game's damage meter over the bosses killed in VXV raids during the season, by member and raid. */
+  damage: Tally;
+  healing: Tally;
+  /** The resurrections accepted in VXV raids during the season, by member and raid. */
+  raised: Tally;
   /** The donations to the guild's cash during the season. */
-  donations: readonly { memberId: string; amount: number; at: Date }[];
+  donations: Tally;
 }
 
 /** Each member's total of the amounts, reached at their latest one. */
-function totals(entries: readonly { memberId: string; amount: number; at: Date }[]): TitleScore[] {
+function totals(entries: Tally): TitleScore[] {
   const byMember = new Map<string, TitleScore>();
   for (const entry of entries) {
     const known = byMember.get(entry.memberId);
@@ -70,7 +89,10 @@ function scoresByTitle(facts: TitleFacts): Record<TitleId, TitleScore[]> {
         ? []
         : [{ memberId: facts.lastMissionWinner.memberId, score: 1, reachedAt: facts.lastMissionWinner.at }],
     wellFed: totals(facts.loots.map((loot) => ({ ...loot, amount: 1 }))),
-    floorTaster: totals(facts.deaths.map((death) => ({ ...death, amount: death.count }))),
+    floorTaster: totals(facts.deaths),
+    topDamage: totals(facts.damage),
+    topHealing: totals(facts.healing),
+    mostRaised: totals(facts.raised),
     sugarDaddy: totals(facts.donations),
   };
 }

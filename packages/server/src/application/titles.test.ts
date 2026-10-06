@@ -71,7 +71,7 @@ describe("titles", () => {
     await bets.stake(vorn, betId, yes?.id ?? "", 100);
     await bets.stake(morgane, betId, no?.id ?? "", 150);
     await bets.declareResult(officer, betId, yes?.id ?? "", "Résultat");
-    // A raid: Morgane received the head, Vorn died three times.
+    // A raid: Morgane received the head and healed most; Vorn died three times, raised twice, and hit hardest.
     await createRaidWithLoot(sql);
     const eventId = await createEvent(sql, officer, new Date("2026-10-04T20:00:00Z"), ["onyxia"]);
     const [morganeMain] = await characterRepository(sql).listByMember(morgane.id);
@@ -86,7 +86,14 @@ describe("titles", () => {
     ]);
     await raidLogRepository(sql).save(
       eventId,
-      ["VXV-LOG-1", `R;${eventId};1791144000;1791151200`, "D;Vorn Cendrelune;3"].join("\n"),
+      [
+        "VXV-LOG-2",
+        `R;${eventId};1791144000;1791151200`,
+        "D;Vorn Cendrelune;3",
+        "M;Vorn Cendrelune;182000;0",
+        "M;Morgane Nuitsombre;96000;240000",
+        "A;Vorn Cendrelune;2",
+      ].join("\n"),
       new Date("2026-10-04T23:00:00Z"),
     );
     // Vorn gives to the guild's cash.
@@ -111,14 +118,17 @@ describe("titles", () => {
       ["debtKing", "Morgane Nuitsombre", 150],
       ["floorTaster", "Vorn Cendrelune", 3],
       ["gamblingKing", "Vorn Cendrelune", 125],
+      ["mostRaised", "Vorn Cendrelune", 2],
       ["sugarDaddy", "Vorn Cendrelune", 500],
+      ["topDamage", "Vorn Cendrelune", 182000],
+      ["topHealing", "Morgane Nuitsombre", 240000],
       ["wellFed", "Morgane Nuitsombre", 1],
     ]);
     expect(discord.roleNamesOf(vorn.discordId).sort()).toEqual(
-      [titleRole("Goûteur de sol"), titleRole("Roi du gambling"), titleRole("Sugar Daddy")].sort(),
+      ["Goûteur de sol", "Roi du gambling", "Lève toi copaing", "Sugar Daddy", "Chibrax au max"].map(titleRole).sort(),
     );
     expect(discord.roleNamesOf(morgane.discordId).sort()).toEqual(
-      [titleRole("Bien gras"), titleRole("Roi de la dette")].sort(),
+      ["Bien gras", "Roi de la dette", "Remboursé par la Sécu"].map(titleRole).sort(),
     );
     expect(announced[0]?.holders.find((holder) => holder.title === "Numéro UNO")).toMatchObject({ holder: undefined });
     // Once a week only.

@@ -2,7 +2,16 @@ import { describe, expect, it } from "vitest";
 import { ahead, awardTitles, titleWeek, type TitleFacts } from "./titles.ts";
 
 const at = (day: number, hour = 20) => new Date(Date.UTC(2026, 9, day, hour));
-const NOTHING: TitleFacts = { bets: [], lastMissionWinner: undefined, loots: [], deaths: [], donations: [] };
+const NOTHING: TitleFacts = {
+  bets: [],
+  lastMissionWinner: undefined,
+  loots: [],
+  deaths: [],
+  damage: [],
+  healing: [],
+  raised: [],
+  donations: [],
+};
 
 describe("titles", () => {
   it("gives each title to the member ahead on its rule over the season", () => {
@@ -20,10 +29,20 @@ describe("titles", () => {
         { memberId: "kaelys", at: at(3) },
       ],
       deaths: [
-        { memberId: "vorn", count: 3, at: at(2) },
-        { memberId: "vorn", count: 2, at: at(9) },
-        { memberId: "ulric", count: 4, at: at(2) },
+        { memberId: "vorn", amount: 3, at: at(2) },
+        { memberId: "vorn", amount: 2, at: at(9) },
+        { memberId: "ulric", amount: 4, at: at(2) },
       ],
+      damage: [
+        { memberId: "ulric", amount: 182000, at: at(2) },
+        { memberId: "kaelys", amount: 96000, at: at(2) },
+        { memberId: "kaelys", amount: 110000, at: at(9) },
+      ],
+      healing: [
+        { memberId: "sira", amount: 240000, at: at(2) },
+        { memberId: "ulric", amount: 0, at: at(2) },
+      ],
+      raised: [{ memberId: "vorn", amount: 2, at: at(9) }],
       donations: [
         { memberId: "vorn", amount: 500, at: at(6) },
         { memberId: "brann", amount: 300, at: at(4) },
@@ -35,6 +54,9 @@ describe("titles", () => {
       { titleId: "numberOne", memberId: "sira", score: 1 },
       { titleId: "wellFed", memberId: "kaelys", score: 2 },
       { titleId: "floorTaster", memberId: "vorn", score: 5 },
+      { titleId: "topDamage", memberId: "kaelys", score: 206000 },
+      { titleId: "topHealing", memberId: "sira", score: 240000 },
+      { titleId: "mostRaised", memberId: "vorn", score: 2 },
       { titleId: "sugarDaddy", memberId: "vorn", score: 500 },
     ]);
   });

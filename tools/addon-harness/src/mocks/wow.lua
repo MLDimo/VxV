@@ -435,6 +435,27 @@ LootCandidates = {}
 Given = {}
 function GetMasterLootCandidate(_, index) return LootCandidates[index] end
 function GiveMasterLoot(slot, index) Given[#Given + 1] = { slot = slot, name = LootCandidates[index] } end
+--- The game's damage meter: its combat sessions by id, set by the tests as { [meter type] = { [name] = amount } };
+--- names and amounts are secret in combat, as on Forever.
+MeterSessions = {}
+C_DamageMeter = {
+    GetAvailableCombatSessions = function()
+        local list = {}
+        for id in pairs(MeterSessions) do
+            list[#list + 1] = { sessionID = id, name = "Combat", durationSeconds = 30 }
+        end
+        return list
+    end,
+    GetCombatSessionFromID = function(id, meterType)
+        local sources = {}
+        for name, amount in pairs((MeterSessions[id] or {})[meterType] or {}) do
+            sources[#sources + 1] = InCombat and { name = SECRET, totalAmount = SECRET }
+                or { name = name, totalAmount = amount }
+        end
+        return { combatSources = sources }
+    end,
+}
+
 --- Dead players, by name; tests set it.
 Dead = {}
 function UnitIsDeadOrGhost(unit) return Dead[GetUnitName(unit) or ""] == true end

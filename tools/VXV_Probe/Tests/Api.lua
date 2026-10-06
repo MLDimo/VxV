@@ -27,6 +27,8 @@ local FUNCTIONS = {
     "C_Timer.After", "C_Timer.NewTicker", "hooksecurefunc",
     -- Alert of the next boss (P8.3)
     "PlaySound", "SOUNDKIT",
+    -- Damage and healing titles (P13)
+    "C_DamageMeter.GetAvailableCombatSessions", "C_DamageMeter.GetCombatSessionFromID",
 }
 
 local EVENTS = {

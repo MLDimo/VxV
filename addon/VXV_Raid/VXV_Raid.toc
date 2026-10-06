@@ -22,6 +22,8 @@ Invitations.lua
 BossLoot.lua
 Distribution.lua
 RaidLog.lua
+Meter.lua
+Raised.lua
 Raids.lua
 
 # The next boss (P8): where the raid stands, the kills told to a late player, the alert and its message on screen.

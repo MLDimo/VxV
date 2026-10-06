@@ -68,7 +68,7 @@ describe("what the companion takes to the website (VXV_SyncDB)", () => {
     expect(client("return VXV_SyncDB.raidLogs.e1")).toBeUndefined();
     client('AdvanceTime(120) Fire("ENCOUNTER_END", 1084, "Onyxia", 9, 40, 1)');
     expect(String(client("return VXV_SyncDB.raidLogs.e1")).split("\n")).toEqual([
-      "VXV-LOG-1",
+      "VXV-LOG-2",
       "R;e1;1796904000;1796904120",
       "K;1084;1796904120",
     ]);
@@ -77,7 +77,7 @@ describe("what the companion takes to the website (VXV_SyncDB)", () => {
   it("hands over the logs of earlier raids at the next launch", () => {
     const { client } = startWithCompanion(EARLIER_RAID);
     expect(String(client("return VXV_SyncDB.raidLogs.e0")).split("\n")).toEqual([
-      "VXV-LOG-1",
+      "VXV-LOG-2",
       "R;e0;1796000100;1796001000",
       "K;1084;1796001000",
       "P;Ðéjà Vu",
