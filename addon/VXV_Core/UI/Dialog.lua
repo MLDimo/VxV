@@ -1,7 +1,7 @@
 local _, ns = ...
 
---- A small window in the charter, over the game (the loot panel, the text window): copper rings, a header with
---- its title and a close button, moved by dragging; named, so that Escape closes it.
+--- A small window in the charter, over the game and the windows (the loot panel, the text window): copper rings, a
+--- header with its title and a close button, moved by dragging; named, so that Escape closes it.
 local Dialog = {}
 ns.Dialog = Dialog
 
@@ -12,14 +12,17 @@ local BORDER = 7
 local HEADER_HEIGHT = 34
 local PADDING = 12
 local CLOSE_SIZE = 22
+-- Above the windows (HIGH strata): in the same strata, the panels of a screen, nested levels deep, would lie over
+-- the dialog's background (seen on 6 October with the sign-up opened from the Raid screen).
+local STRATA = "DIALOG"
 
 --- Creates the dialog, hidden; returns it and its body (sized, under the header).
-function Dialog.Create(name, width, height, title, strata)
+function Dialog.Create(name, width, height, title)
     local frame = CreateFrame("Frame", name, UIParent)
     frame:Hide()
     frame:SetSize(width, height)
     frame:SetPoint("CENTER")
-    frame:SetFrameStrata(strata or "HIGH")
+    frame:SetFrameStrata(STRATA)
     frame:SetMovable(true)
     frame:SetClampedToScreen(true)
     frame:EnableMouse(true)

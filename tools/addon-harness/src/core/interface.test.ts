@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { startCore } from "../core.ts";
+import { drawnAbove } from "../strata.ts";
 
 /** The window's state as the player would see it: shown or not, its tabs, the texts of the selected screen. */
 const WINDOW = `
@@ -287,6 +288,15 @@ describe("VXV_Core interface", () => {
         "Survole un lieu pour l'éclairer · clique pour entrer",
       );
     });
+  });
+
+  it("draws its dialogs over its windows, above the panels of their screens", () => {
+    const { client } = startCore();
+    client('SlashCmdList.VXV("") VXV.CreateDialog("VXV_TestDialog", 200, 100, "Test"):Show()');
+    client('VXV_Window.reduce:Run("OnClick")');
+    const strata = client("return { VXV_TestDialog.strata, VXV_Window.strata, VXV_CompactWindow.strata }") as unknown[];
+    expect(drawnAbove(strata[0], strata[1])).toBe(true);
+    expect(drawnAbove(strata[0], strata[2])).toBe(true);
   });
 
   it("opens in combat without any error: nothing in VXV's window is protected", () => {

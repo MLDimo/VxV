@@ -1,5 +1,6 @@
 import type { AddonEventFacts } from "@vxv/server/domain/addonExport";
 import { describe, expect, it } from "vitest";
+import { drawnAbove } from "../strata.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 import { ONYXIA_NIGHT, ONYXIA_PACK, startRaid, websiteText } from "./fixtures.ts";
 import { OFFICER, raidWithData, settle } from "./raidGroup.ts";
@@ -79,6 +80,13 @@ describe("next boss", () => {
     expect(raid.run(find)).toEqual(["Repaire d'Onyxia", "Onyxia", 0, false]);
     raid.run(`Instance.id = 534`);
     expect(raid.run(find)).toEqual(["Mont Hyjal", "Rage Froidhiver", 0, true]);
+  });
+
+  it("shows its alert over VXV's window", () => {
+    const { client } = thom();
+    client('Instance.id = 249 AdvanceTime(5) SlashCmdList.VXV("")');
+    expect(client(ALERT)).not.toBe(false);
+    expect(drawnAbove(client("return VXV_BossAlert.strata"), client("return VXV_Window.strata"))).toBe(true);
   });
 
   it("alerts once on a raid chaining two instances, at each boss where the player has a soft reserve", () => {
