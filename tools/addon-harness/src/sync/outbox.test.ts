@@ -36,6 +36,7 @@ describe("what the companion takes to the website (VXV_SyncDB)", () => {
       characters: {},
       changes: {},
       counters: {},
+      texts: {},
     });
     expect(errors()).toEqual([]);
   });

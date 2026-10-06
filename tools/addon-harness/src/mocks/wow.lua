@@ -370,7 +370,7 @@ C_Item = {
     end,
 }
 
-Player = { name = "Ðéjà Vu", inGuild = true, race = "Scourge", sex = 3 }
+Player = { name = "Ðéjà Vu", inGuild = true, race = "Scourge", sex = 3, class = "ROGUE" }
 function UnitRace(unit)
     if unit == "player" then
         return "Mort-vivant", Player.race, 5
@@ -587,3 +587,45 @@ function GuildRowShows(name)
     end
     return text
 end
+
+--- The player's class: localized name, token and id.
+function UnitClass(unit)
+    if unit == "player" then
+        return "Voleur", Player.class, 4
+    end
+end
+-- Professions (phase 0, T10), set by the tests: { { id, name, level, max, recipes = { [id] = { name, learned } } } },
+-- the list's five slots in order; ShownProfession is the profession whose window is open.
+Professions = {}
+ShownProfession = nil
+local PROFESSION_SLOTS = 5
+function GetProfessions()
+    local slots = {}
+    for index = 1, PROFESSION_SLOTS do
+        slots[index] = Professions[index] and index or nil
+    end
+    return unpack(slots, 1, PROFESSION_SLOTS)
+end
+function GetProfessionInfo(index)
+    local profession = Professions[index]
+    return profession.name, 0, profession.level, profession.max, 0, 0, profession.id
+end
+C_TradeSkillUI = {
+    GetBaseProfessionInfo = function()
+        local shown = ShownProfession
+        return shown and { professionID = shown.id, professionName = shown.name, skillLevel = shown.level,
+            maxSkillLevel = shown.max }
+    end,
+    GetAllRecipeIDs = function()
+        local ids = {}
+        for id in pairs(ShownProfession and ShownProfession.recipes or {}) do
+            ids[#ids + 1] = id
+        end
+        table.sort(ids)
+        return ids
+    end,
+    GetRecipeInfo = function(id)
+        local recipe = ShownProfession and ShownProfession.recipes[id]
+        return recipe and { recipeID = id, name = recipe.name, learned = recipe.learned }
+    end,
+}

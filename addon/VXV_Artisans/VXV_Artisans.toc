@@ -1,0 +1,18 @@
+## Interface: 16001
+## Title: VXV Artisans
+## Notes: Les artisans de VXV : qui sait fabriquer quoi dans la guilde, relevé par l'addon à l'ouverture des métiers.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The professions read in game, the directory the website exports (VXV-ARTISANS), and how they travel in the guild.
+Text.lua
+Directory.lua
+Professions.lua
+Sharing.lua
+
+# Interface: the Artisans screen.
+UI\ArtisansView.lua
+UI\ArtisansTab.lua
+
+Bootstrap.lua

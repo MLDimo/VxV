@@ -6,8 +6,10 @@ local _, ns = ...
 --- { version = 1, roster = { text = VXV-ROSTER text, capturedAt = Unix seconds },
 ---   raidLogs = { [event id] = VXV-LOG text }, characters = { ["Prénom Nom"] = { race = token, sex = 2 or 3 } },
 ---   changes = { [change id] = a change made in game (VXV_Raid/Changes.lua, VXV_Paris/Stakes.lua) },
----   counters = { ["Prénom Nom|type"] = { name, type, value, at = Unix seconds } } (game counters, VXV_Missions) }.
---- Other bundles add to it with VXV.Emit("sync.put", kind, key, value); a nil value removes the key.
+---   counters = { ["Prénom Nom|type"] = { name, type, value, at = Unix seconds } } (game counters, VXV_Missions),
+---   texts = { [kind] = { [key] = text } } (each bundle's texts: "metiers" → "Prénom Nom" → VXV-METIERS…) }.
+--- Other bundles add to it with VXV.Emit("sync.put", kind, key, value); a nil value removes the key. A kind other
+--- than the ones above goes to texts, which the companion takes to the website whatever their kind (since 1.3).
 local Outbox = {}
 ns.Outbox = Outbox
 
@@ -15,7 +17,7 @@ local Companion = ns.Companion
 
 local FORMAT_VERSION = 1
 --- The kinds of data, each a table of keys, taken to the website.
-local KINDS = { "raidLogs", "characters", "changes", "counters" }
+local KINDS = { "raidLogs", "characters", "changes", "counters", "texts" }
 
 local db
 
@@ -31,8 +33,14 @@ end
 
 --- Keeps a value of a kind under its key, for the companion; nil removes it.
 function Outbox.Put(kind, key, value)
-    if db ~= nil and Companion.IsPresent() and type(db[kind]) == "table" and key ~= nil then
+    if db == nil or not Companion.IsPresent() or key == nil then
+        return
+    end
+    if type(db[kind]) == "table" and kind ~= "texts" then
         db[kind][key] = value
+    elseif value == nil or type(value) == "string" then
+        db.texts[kind] = db.texts[kind] or {}
+        db.texts[kind][key] = value
     end
 end
 

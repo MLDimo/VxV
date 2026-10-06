@@ -58,6 +58,13 @@ const USED_IN_GAME = [
   // Showing a title (phase 0, T9, 3 October): a tooltip's line and the guild list's rows, called by the probe.
   "TooltipDataProcessor.AddTooltipPostCall",
   "ScrollUtil.AddInitializedFrameCallback",
+  // Professions (phase 0, T10, 3 October): the levels and the open window's recipes, called by the probe.
+  "GetProfessionInfo",
+  "C_TradeSkillUI.GetBaseProfessionInfo",
+  "C_TradeSkillUI.GetAllRecipeIDs",
+  "C_TradeSkillUI.GetRecipeInfo",
+  // The player's class (design measurement, 5 October: docs/design/mesure-en-jeu-2026-10-05.md).
+  "UnitClass",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

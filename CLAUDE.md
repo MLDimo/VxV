@@ -106,13 +106,20 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     demande pas de mise à jour de l'addon) apportées par le compagnon et relayées par les officiers.
   Validation en attente : une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu
   par un membre sans compagnon ; le compteur de dégâts lu par identifiant (`/vxvtest meter read` après un combat).
-- **P14 Annuaire des artisans** : en cours.
+- **P14 Annuaire des artisans** : code terminé.
   - 14.2 et 14.3 sur le site : métiers des personnages et recettes connues en base (`professions`, `recipes`,
     `known_recipes`), la lecture la plus récente gagnante ; envoyés par le compagnon (un membre pour ses personnages,
     un officier pour ceux qu'il relaie) ; « Qui peut fabriquer… ? » sur la page Artisans (`/artisans`, recherche
     sans accents ni casse) avec l'annuaire par métier ; annuaire exporté vers l'addon (`VXV-ARTISANS-1`).
   - Compagnon 1.3 : il envoie au site les textes de tout bundle (`texts` de `VXV_SyncDB`), chacun une seule fois.
-  - À venir : bundle `VXV_Artisans` (relevé en jeu, partage dans la guilde, recherche).
+  - 14.1 et 14.4 en jeu : bundle `VXV_Artisans` (lieu Artisans : recherche « Qui peut fabriquer… ? » et mes métiers) ;
+    niveaux relus à chaque connexion, recettes apprises à l'ouverture de la fenêtre du métier, pour chaque
+    personnage du compte (seulement les métiers du joueur, au niveau de sa liste : pas un métier lié par un autre).
+    Partage dans la guilde : chaque addon dit ses métiers quand ils changent, et à la connexion la liste de ce qu'il
+    a ; un addon à qui il en manque les demande en chuchotement. Un officier équipé du compagnon envoie au site ce
+    qu'il entend. L'annuaire du site (`VXV-ARTISANS-1`) n'arrive que par le compagnon (`VXV.SiteData` avec
+    `shared = false` : trop gros pour le relais des officiers).
+  Validation en attente : une recette apprise qui apparaît chez un autre membre après la synchro.
 - P15 : pas commencée.
 
 ## Design (charte « La Taverne »)
@@ -141,7 +148,7 @@ La table complète est dans le README. Règles :
 
 - **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
-- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`) qui ne dépend que du socle.
+- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`) qui ne dépend que du socle.
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
@@ -268,7 +275,7 @@ déprécie la file d'attente), donc pas de `Promise.all` dans `application/` ni 
 - Compteur de dégâts du jeu (`C_DamageMeter`) : secret pendant le combat, lisible après pour tout le groupe ; nom secret pour un joueur qui a quitté le groupe.
 - Morts du groupe : `UnitIsDeadOrGhost` et les noms des membres restent lisibles pendant un boss.
 - Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.
-- Métiers : `GetProfessions` ; recettes connues via `C_TradeSkillUI`, quand la fenêtre du métier est ouverte.
+- Métiers : `GetProfessions` et `GetProfessionInfo` (nom, niveau, maximum, ligne de compétence) ; recettes connues via `C_TradeSkillUI` (`GetBaseProfessionInfo`, `GetAllRecipeIDs`, `GetRecipeInfo` avec `learned`), une seconde après `TRADE_SKILL_SHOW`, quand la fenêtre du métier est ouverte.
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
 - Build 70235 (6 octobre, `docs/phase-0/sessions/2026-10-06.txt`) : `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés ; anciennes globales absentes (`InviteUnit`, `ConvertToRaid`, `GetNumSkillLines`, `GetNumTradeSkills` : passer par `C_PartyInfo` et `C_TradeSkillUI`) ; événement `TRADE_SKILL_UPDATE` refusé (`TRADE_SKILL_LIST_UPDATE` accepté).
 - Habillage (mesuré le 5 octobre, `docs/design/mesure-en-jeu-2026-10-05.md`) : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.

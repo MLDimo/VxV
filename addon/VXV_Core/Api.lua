@@ -26,6 +26,8 @@ VXV = {
     --- (kind, handler(payload, sender)) to receive them. Kinds start with the bundle's name ("raid.data").
     Broadcast = ns.Comm.Broadcast,
     OnMessage = ns.Comm.On,
+    --- (kind, payload, "Prénom Nom"): data of any size to one player connected with VXV.
+    Whisper = ns.Comm.Whisper,
     --- (name, source): data the guild's addons pass on to each other, from the officers; returns { Send, Start }.
     --- See Core/SharedData.lua.
     ShareData = ns.SharedData.Create,

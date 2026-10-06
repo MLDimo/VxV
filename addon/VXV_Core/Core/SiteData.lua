@@ -34,7 +34,8 @@ end
 
 --- A bundle's data. Options: name ("quetes": the companion's inbox field, the guild's messages, and the event
 --- "quetes.updated" (data) after each change), header ("VXV-QUETES-1"), New() (the bundle's part of empty data),
---- lines ({ [kind] = { number of fields, add(data, fields), false when a value is wrong } }).
+--- lines ({ [kind] = { number of fields, add(data, fields), false when a value is wrong } }), shared (false: data too
+--- big for the officers to pass them on, brought by the companion only).
 --- Returns { Parse(text), Restore(saved data), Text(), ExportedAt(), Current(), IsOfficer(name), FromCompanion(text) }.
 function SiteData.Create(options)
     local store = {}
@@ -105,7 +106,7 @@ function SiteData.Create(options)
         return true
     end
 
-    local sharing = SharedData.Create(options.name, {
+    local sharing = options.shared ~= false and SharedData.Create(options.name, {
         Text = store.Text,
         ExportedAt = store.ExportedAt,
         IsOfficer = store.IsOfficer,
@@ -122,12 +123,14 @@ function SiteData.Create(options)
     function store.Restore(data)
         saved = data
         current = store.Parse(data.text)
-        sharing.Start()
+        if sharing then
+            sharing.Start()
+        end
     end
 
     -- What the player's companion brought: kept when newer, then passed on to the guild by an officer.
     Bus.On("sync.inbox", function(inbox)
-        if store.FromCompanion(inbox[options.name]) and store.IsOfficer(Names.OfUnit("player")) then
+        if store.FromCompanion(inbox[options.name]) and sharing and store.IsOfficer(Names.OfUnit("player")) then
             sharing.Send()
         end
     end)
