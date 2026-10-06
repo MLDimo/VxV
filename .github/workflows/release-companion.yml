@@ -19,6 +19,8 @@ jobs:
     name: Installer (${{ matrix.os }})
     needs: tests
     strategy:
+      # Each installer is built to the end, whatever happens to the other.
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
