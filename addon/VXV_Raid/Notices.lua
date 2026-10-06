@@ -4,6 +4,8 @@ local _, ns = ...
 local Labels = ns.Labels
 
 local NEW_RAID = "Raid chargé par %s : %s, le %s. Tape /vxv pour voir les inscrits et les SR."
+-- Data brought by the player's own companion have no sender.
+local OWN_COMPANION = "ton compagnon VXV"
 local CHANGE = "|cffff8000Modification par %s :|r %s (motif : %s)"
 local MORE_CHANGES = "… et %d autres modifications : voir le Journal."
 local MAX_CHANGES_SHOWN = 3
@@ -37,7 +39,7 @@ VXV.On("raid.updated", function(event, previous, sender)
         return
     end
     if previous == nil or previous.id ~= event.id then
-        VXV.Print(NEW_RAID:format(sender, event.title, Labels.DateTime(event.startsAt)))
+        VXV.Print(NEW_RAID:format(sender or OWN_COMPANION, event.title, Labels.DateTime(event.startsAt)))
     else
         showChanges(event, previous)
     end

@@ -22,9 +22,11 @@ const OUTBOX = `
 /** French typography keeps numbers and units together: plain spaces here; class colors left out. */
 const plain = (texts: unknown) =>
   (texts as string[]).map((text) => text.replace(/[\u00a0\u202f]/gu, " ").replace(/\|c\w{8}(.*?)\|r/gu, "$1"));
-const outbox = (client: (code: string) => unknown): unknown[] => {
+const outbox = (client: (code: string) => unknown, type?: string): unknown[] => {
   const list = client(OUTBOX);
-  return Array.isArray(list) ? list : [];
+  return (Array.isArray(list) ? list : []).filter(
+    (reading) => type === undefined || (reading as { type: string }).type === type,
+  );
 };
 
 describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
@@ -48,9 +50,13 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
   it("reads the honorable kills, keeps each change for the companion and climbs the live ranking", () => {
     const { client, errors } = startQuests();
     client("Counters.honorableKills = 100 AdvanceTime(5)");
-    expect(outbox(client)).toEqual([{ name: "Ðéjà Vu", type: "honorableKills", value: 100, at: 1796904005 }]);
+    expect(outbox(client, "honorableKills")).toEqual([
+      { name: "Ðéjà Vu", type: "honorableKills", value: 100, at: 1796904005 },
+    ]);
     client("Counters.honorableKills = 120 AdvanceTime(60)");
-    expect(outbox(client)).toEqual([{ name: "Ðéjà Vu", type: "honorableKills", value: 120, at: 1796904065 }]);
+    expect(outbox(client, "honorableKills")).toEqual([
+      { name: "Ðéjà Vu", type: "honorableKills", value: 120, at: 1796904065 },
+    ]);
     client(OPEN_TAB("Quêtes"));
     const rows = plain(client(ROWS()));
     expect(rows).toContain("1. Ðéjà Vu · 20");
@@ -58,20 +64,49 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
     expect(rows).toContain("20 victoires honorables · 1er");
     // In combat, the counters are not read.
     client("InCombat = true Counters.honorableKills = 130 AdvanceTime(60)");
-    expect(outbox(client)).toEqual([expect.objectContaining({ value: 120 })]);
+    expect(outbox(client, "honorableKills")).toEqual([expect.objectContaining({ value: 120 })]);
     expect(errors()).toEqual([]);
   });
 
-  it("says when the game's counter of a quest is not read in game yet", () => {
-    const { client } = startQuests({
-      facts: {
-        ...GUILD_QUESTS,
-        missions: [{ mission: mission("q2", "fishing", "Le Grand Pêcheur"), scores: [], rewards: [] }],
-      },
-    });
+  it("reads the fishing from the game's statistics", () => {
+    const { client } = startQuests();
+    client('Counters.statistics[1456] = "12" AdvanceTime(5)');
+    expect(outbox(client)).toEqual(expect.arrayContaining([expect.objectContaining({ type: "fishing", value: 12 })]));
+  });
+
+  it("counts one gathering per loot window holding a herb, an ore or a leather, as the game does not", () => {
+    const { client } = startQuests();
+    client(`
+      ItemInfo[2447] = { name = "Pacifique", classID = 7, subclassID = 9 }
+      ItemInfo[2770] = { name = "Minerai de cuivre", classID = 7, subclassID = 7 }
+      ItemInfo[2835] = { name = "Pierre brute", classID = 7, subclassID = 7 }
+      ItemInfo[2318] = { name = "Cuir léger", classID = 7, subclassID = 6 }
+      ItemInfo[4865] = { name = "Griffe ébréchée", classID = 15, subclassID = 0 }
+      local function loot(...) CorpseLinks = { ... } Fire("LOOT_OPENED") end
+      loot("|Hitem:2447::|h[Pacifique]|h", "|Hitem:2447::|h[Pacifique]|h")
+      loot("|Hitem:2770::|h[Minerai de cuivre]|h", "|Hitem:2835::|h[Pierre brute]|h")
+      loot("|Hitem:2318::|h[Cuir léger]|h")
+      loot("|Hitem:4865::|h[Griffe ébréchée]|h")
+      loot("|Hitem:2447::|h[Pacifique]|h")
+    `);
+    const gathered = Object.fromEntries(
+      outbox(client).map((reading) => {
+        const { type, value } = reading as { type: string; value: number };
+        return [type, value];
+      }),
+    );
+    expect(gathered).toMatchObject({ herbalism: 2, mining: 1, skinning: 1 });
+  });
+
+  it("says when a quest counts what this addon does not read", () => {
+    const newer = {
+      ...GUILD_QUESTS,
+      missions: [{ mission: mission("q2", "cooking" as "fishing", "Le Chef"), scores: [], rewards: [] }],
+    };
+    const { client } = startQuests({ facts: newer });
     client(OPEN_TAB("Quêtes"));
     expect(plain(client(ROWS()))).toContain(
-      "Ce compteur n'est pas encore lu en jeu : le site compte les relevés du compagnon.",
+      "Ce compteur n'est pas lu en jeu : le site compte les relevés du compagnon.",
     );
   });
 

@@ -1,10 +1,12 @@
 local _, ns = ...
 
---- The game's counter each kind of mission reads (P12.3): only counters the game keeps itself, never what a player
---- says. The statistics' ids are those of WoW Forever's Statistics tab (phase 0, T8); a kind whose counter is not
---- measured yet is not read in game.
+--- The counter each kind of mission reads (P12.3), never what a player says: the game's own where it keeps one (the
+--- Statistics tab of WoW Forever, measured on 6 October, and the honorable kills), else the gatherings the addon
+--- counts itself (Gathering.lua: the game keeps no count of herbs, ores and skins).
 local Counters = {}
 ns.Counters = Counters
+
+local Gathering = ns.Gathering
 
 --- What each kind counts, as the website names it (packages/server/src/domain/missions.ts).
 Counters.LABELS = {
@@ -15,12 +17,10 @@ Counters.LABELS = {
     honorableKills = { name = "Victoires honorables", counts = "victoires honorables" },
 }
 
--- The Statistics tab's ids of the gathering counters, measured in game with the probe (/vxvtest counters list).
+-- The Statistics tab's ids, measured in game with the probe on 6 October (/vxvtest counters list): « Poissons et
+-- autres objets pêchés », every successful catch.
 local STATISTICS = {
-    fishing = nil,
-    herbalism = nil,
-    mining = nil,
-    skinning = nil,
+    fishing = 1456,
 }
 
 --- A counter's value as a whole number, or nil when the client hides it or has none.
@@ -40,14 +40,23 @@ local function statistic(id)
     end
 end
 
+local function gathered(kind)
+    return function()
+        return Gathering.Count(VXV.PlayerName(), kind)
+    end
+end
+
 local READERS = {
     honorableKills = function()
         local ok, kills = VXV.Compat.GetPVPLifetimeStats()
         return ok and number(kills) or nil
     end,
+    herbalism = gathered("herbalism"),
+    mining = gathered("mining"),
+    skinning = gathered("skinning"),
 }
 for kind, id in pairs(STATISTICS) do
-    READERS[kind] = id and statistic(id) or nil
+    READERS[kind] = statistic(id)
 end
 
 --- The kinds whose counter the game gives this addon, in a fixed order.

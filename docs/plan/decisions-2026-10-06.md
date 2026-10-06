@@ -67,3 +67,9 @@ restent ouverts à sa relecture.
   officier équipé le relaie pour un membre sans compagnon, et chacun voit les scores en direct. Les victoires
   honorables sont lues dès maintenant ; les statistiques de pêche et de récolte le seront une fois leurs identifiants
   mesurés sur Forever.
+- Compteurs mesurés le 6 octobre (sonde, `/vxvtest counters list`) : la pêche est la statistique 1456 « Poissons et
+  autres objets pêchés » ; les victoires honorables viennent de `GetPVPLifetimeStats`. Le jeu ne compte pas les
+  récoltes sur Forever (seulement le plus haut niveau de compétence). **Décision du propriétaire** : les missions
+  d'herboristerie, de minage et de dépeçage restent, comptées par l'addon : une fenêtre de butin qui contient une
+  herbe, un minerai (ou une pierre) ou un cuir compte pour une récolte, quel que soit le nombre d'objets. Seules les
+  récoltes faites addon actif comptent.

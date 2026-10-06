@@ -38,6 +38,17 @@ describe("the companion's data in game (VXV_Sync)", () => {
     expect(errors()).toEqual([]);
   });
 
+  it("tells the player, without any error, the raid their own companion brought", () => {
+    const { client, errors } = startRaid({
+      playerName: "Thom Leboss",
+      written: companionFiles({ raid: websiteText() }),
+    });
+    expect(client("return Printed")).toContain(
+      `${PREFIX}Raid chargé par ton compagnon VXV : Onyxia, le 10/12 20:00. Tape /vxv pour voir les inscrits et les SR.`,
+    );
+    expect(errors()).toEqual([]);
+  });
+
   it("lets an officer's companion feed the members connected without one", () => {
     const guild = startGuild(["Thom Leboss", "Ciel Gris"], { bundles: BUNDLES });
     settle(guild);
