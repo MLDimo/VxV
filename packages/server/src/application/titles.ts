@@ -1,6 +1,7 @@
 import { fullName } from "../domain/characters.ts";
 import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
 import { awardTitles, TITLES, titleWeek, type Tally, type TitleFacts } from "../domain/titles.ts";
+import { loserOf, winnerOf } from "./debts.ts";
 import type { Clock, GuildGateway, Repositories, TitleAnnouncer, TitleHolder, UnitOfWork } from "./ports.ts";
 
 /** Each title is a Discord role of this name, held by the week's holder. */
@@ -60,6 +61,13 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
     damage: tally((log) => log.meter.map(({ name, damage }) => ({ name, amount: damage }))),
     healing: tally((log) => log.meter.map(({ name, healing }) => ({ name, amount: healing }))),
     raised: tally((log) => log.raised.map(({ name, count }) => ({ name, amount: count }))),
+    deathrolls: (await repositories.deathrolls.listAll()).flatMap((game) => {
+      const winner = winnerOf(game).memberId;
+      const loser = loserOf(game).memberId;
+      return winner === undefined || loser === undefined || !inSeason(game.endedAt)
+        ? []
+        : [{ winnerId: winner, loserId: loser, stake: game.stake, endedAt: game.endedAt }];
+    }),
     donations: (await repositories.cash.listAll()).flatMap((movement) =>
       movement.kind === "donation" && movement.memberId !== undefined && inSeason(movement.occurredAt)
         ? [{ memberId: movement.memberId, amount: movement.amount, at: movement.occurredAt }]

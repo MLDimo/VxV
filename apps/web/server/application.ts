@@ -4,6 +4,7 @@ import {
   createDiscordMissionAnnouncer,
   createDiscordRaidAnnouncer,
   createDiscordTitleAnnouncer,
+  createDiscordDeathrollAnnouncer,
 } from "@vxv/bot";
 import { createApplication, createDiscordGuild, createPgSqlClient, type Application } from "@vxv/server";
 import { getConfig } from "./config";
@@ -23,6 +24,8 @@ export function getApplication(): Application {
       betAnnouncer: createDiscordBetAnnouncer({ ...rest, channelId: discord.betsChannelId, siteUrl }),
       missionAnnouncer: createDiscordMissionAnnouncer({ ...rest, channelId: discord.missionsChannelId, siteUrl }),
       titleAnnouncer: createDiscordTitleAnnouncer({ ...rest, channelId: discord.titlesChannelId, siteUrl }),
+      // The big deathrolls go with the bets.
+      deathrollAnnouncer: createDiscordDeathrollAnnouncer({ ...rest, channelId: discord.betsChannelId, siteUrl }),
     });
   }
   return application;

@@ -22,6 +22,8 @@ export const TITLES = [
     rule: "Le plus de résurrections acceptées pendant les raids VXV sur la saison.",
   },
   { id: "sugarDaddy", name: "Sugar Daddy", rule: "Le plus gros donateur à la caisse de la guilde sur la saison." },
+  { id: "cheater", name: "Il cheat c'est sûr", rule: "Plus gros gain net au deathroll sur la saison." },
+  { id: "loser", name: "Loser", rule: "Plus grosse perte nette au deathroll sur la saison." },
 ] as const;
 
 export type TitleId = (typeof TITLES)[number]["id"];
@@ -53,6 +55,8 @@ export interface TitleFacts {
   raised: Tally;
   /** The donations to the guild's cash during the season. */
   donations: Tally;
+  /** The deathrolls ended during the season, by the members who won and lost them. */
+  deathrolls: readonly { winnerId: string; loserId: string; stake: number; endedAt: Date }[];
 }
 
 /** Each member's total of the amounts, reached at their latest one. */
@@ -81,6 +85,12 @@ function scoresByTitle(facts: TitleFacts): Record<TitleId, TitleScore[]> {
   const nets = totals(
     facts.bets.map((bet) => ({ memberId: bet.memberId, amount: bet.gain - bet.amount, at: bet.endedAt })),
   );
+  const deathrolls = totals(
+    facts.deathrolls.flatMap((game) => [
+      { memberId: game.winnerId, amount: game.stake, at: game.endedAt },
+      { memberId: game.loserId, amount: -game.stake, at: game.endedAt },
+    ]),
+  );
   return {
     gamblingKing: nets,
     debtKing: nets.map((net) => ({ ...net, score: -net.score })),
@@ -94,6 +104,8 @@ function scoresByTitle(facts: TitleFacts): Record<TitleId, TitleScore[]> {
     topHealing: totals(facts.healing),
     mostRaised: totals(facts.raised),
     sugarDaddy: totals(facts.donations),
+    cheater: deathrolls,
+    loser: deathrolls.map((net) => ({ ...net, score: -net.score })),
   };
 }
 

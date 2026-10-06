@@ -18,6 +18,7 @@ import { createSoftReserves } from "./softReserves.ts";
 import { createBets } from "./bets.ts";
 import { createMissions } from "./missions.ts";
 import { createArtisans } from "./artisans.ts";
+import { createDeathrolls } from "./deathrolls.ts";
 
 const ROSTER = "VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nThom;Leboss;PRIEST";
 const CAPTURED_AT = new Date("2026-12-10T23:30:00Z");
@@ -60,6 +61,7 @@ describe("companion uploads", () => {
       missions: createMissions({ unitOfWork, clock }),
       missionAnnouncements: { announceQuietly: async () => true },
       artisans: createArtisans({ unitOfWork }),
+      deathrolls: createDeathrolls({ unitOfWork, clock, announcer: { announce: async () => {} } }),
     });
     officer = await createMember(sql, "officer", "Officier");
     await createRaidWithLoot(sql);

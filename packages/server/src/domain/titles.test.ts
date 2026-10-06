@@ -11,6 +11,7 @@ const NOTHING: TitleFacts = {
   healing: [],
   raised: [],
   donations: [],
+  deathrolls: [],
 };
 
 describe("titles", () => {
@@ -47,6 +48,10 @@ describe("titles", () => {
         { memberId: "vorn", amount: 500, at: at(6) },
         { memberId: "brann", amount: 300, at: at(4) },
       ],
+      deathrolls: [
+        { winnerId: "ulric", loserId: "brann", stake: 800, endedAt: at(3) },
+        { winnerId: "brann", loserId: "ulric", stake: 200, endedAt: at(4) },
+      ],
     });
     expect(awards).toEqual([
       { titleId: "gamblingKing", memberId: "vorn", score: 300 },
@@ -58,6 +63,8 @@ describe("titles", () => {
       { titleId: "topHealing", memberId: "sira", score: 240000 },
       { titleId: "mostRaised", memberId: "vorn", score: 2 },
       { titleId: "sugarDaddy", memberId: "vorn", score: 500 },
+      { titleId: "cheater", memberId: "ulric", score: 600 },
+      { titleId: "loser", memberId: "brann", score: 600 },
     ]);
   });
 

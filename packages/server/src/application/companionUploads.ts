@@ -43,6 +43,8 @@ export interface CompanionUploadReport {
 const OFFICERS_ONLY = "Réservé aux officiers.";
 /** The kind of text the artisans' professions come as (addon/VXV_Artisans). */
 export const PROFESSIONS_KIND = "metiers";
+/** The kind of text the deathroll games come as (addon/VXV_Deathroll). */
+export const DEATHROLL_KIND = "deathroll";
 
 /** The use cases an upload goes through, each checking the member's rights. */
 export interface CompanionUploadDependencies {
@@ -59,6 +61,7 @@ export interface CompanionUploadDependencies {
   /** The running missions' messages on Discord follow their ranking. */
   missionAnnouncements: { announceQuietly(missionId: string): Promise<boolean> };
   artisans: { recordFromGame(sender: Member, texts: readonly string[]): Promise<number> };
+  deathrolls: { recordFromGame(sender: Member, texts: readonly string[]): Promise<string[]> };
 }
 
 /** "3 changements faits en jeu : 2 acceptés, 1 refusé." */
@@ -107,6 +110,7 @@ export function createCompanionUploads({
   missions,
   missionAnnouncements,
   artisans,
+  deathrolls,
 }: CompanionUploadDependencies) {
   /** Keeps the new readings; the running missions' rankings on Discord follow them. */
   async function recordCounters(member: Member, readings: readonly GameCounterReading[]): Promise<string> {
@@ -146,6 +150,9 @@ export function createCompanionUploads({
             return changed > 0 ? `Métiers : ${count(changed, "mis à jour", "mis à jour")}.` : "Métiers à jour.";
           }),
         );
+      }
+      for (const text of upload.texts[DEATHROLL_KIND] ?? []) {
+        report.texts.push(await described(async () => (await deathrolls.recordFromGame(member, [text])).join(" ")));
       }
       const sentRoster = upload.roster;
       if (sentRoster !== undefined) {

@@ -1,5 +1,6 @@
 import { formatAddonTitles, type AddonTitlesFacts } from "@vxv/server/domain/addonTitles";
 import type { Character } from "@vxv/server/domain/characters";
+import { TITLES } from "@vxv/server/domain/titles";
 import { describe, expect, it } from "vitest";
 import { startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
@@ -49,7 +50,7 @@ describe("the titles in game (P13.3, P13.4)", () => {
     const { client, errors } = startTitles();
     client(OPEN_TAB("Ranking"));
     const rows = plain(client(ROWS));
-    expect(rows).toHaveLength(9);
+    expect(rows).toHaveLength(TITLES.length);
     expect(rows[0]).toBe("◆ Roi du gambling  Thom Leboss");
     expect(rows).toContain("◆ Bien gras  Personne cette semaine");
     expect(errors()).toEqual([]);

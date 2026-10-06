@@ -7,7 +7,7 @@ import { asCompanion } from "@/server/companionApi";
  */
 export async function GET(request: Request): Promise<Response> {
   return asCompanion(request, async () => {
-    const { addonExport, addonBets, addonMissions, addonTitles, addonArtisans } = getApplication();
+    const { addonExport, addonBets, addonMissions, addonTitles, addonArtisans, addonDeathrolls } = getApplication();
     const next = await addonExport.exportNextEvent();
     return Response.json({
       raid: next === undefined ? null : { text: next.text, title: next.title, startsAt: next.startsAt.toISOString() },
@@ -15,6 +15,7 @@ export async function GET(request: Request): Promise<Response> {
       quetes: { text: await addonMissions.exportMissions() },
       titres: { text: await addonTitles.exportTitles() },
       artisans: { text: await addonArtisans.exportArtisans() },
+      deathroll: { text: await addonDeathrolls.exportDeathrolls() },
     });
   });
 }

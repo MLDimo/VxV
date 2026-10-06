@@ -119,3 +119,20 @@ restent ouverts à sa relecture.
   de ce qui lui manque. L'annuaire du site arrive par le compagnon seulement : relayé par les officiers, il
   occuperait le canal plusieurs minutes. Un officier équipé du compagnon envoie au site les métiers qu'il entend.
 
+## P15 : deathroll
+
+- Une partie n'arrive au site qu'une fois finie, par le compagnon d'un de ses joueurs ou relayée par un officier ; le
+  site vérifie ses règles (deux joueurs liés à des membres, le défié roll le premier, chacun de 1 au résultat
+  précédent, fin au premier 1) et la garde une seule fois.
+- Paris (15.2) : les mises placées en jeu pendant la minute qui précède le premier roll arrivent avec la partie ; le
+  site crée alors un pari « Deathroll : A vs B » et le règle aussitôt avec les règles des paris (part de la caisse,
+  gains, mises à payer au trésorier). Une mise d'un joueur de la partie, d'un membre endetté ou sur un autre joueur
+  est écartée ; une mise invalide n'annule pas la partie.
+- Dette (15.6) : la mise du perdant est due au gagnant jusqu'à ce que celui-ci confirme le paiement, sur le site ou
+  en jeu (la partie repart vers le site avec sa confirmation, ligne `Y`). Toute dette (paris ou deathroll) bloque
+  les paris et les deathrolls.
+- Discord (15.5) : une partie à 1 000 po ou plus est annoncée dans le salon des paris quand elle arrive au site
+  (après la partie : le compagnon la remonte au /reload ou à la déconnexion).
+- Classement (15.7) : gain net, parties jouées, plus grosse victoire ; depuis toujours, ce mois, la saison. Titres
+  « Il cheat c'est sûr » (plus gros gain net de la saison) et « Loser » (plus grosse perte nette).
+

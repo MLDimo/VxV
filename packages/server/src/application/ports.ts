@@ -321,6 +321,68 @@ export interface ProfessionRepository {
   listKnown(): Promise<KnownRecipe[]>;
 }
 
+/** A player of a deathroll: their character, and the member who plays it, shown by their main character. */
+export interface DeathrollPlayer {
+  characterId: string;
+  /** "Prénom Nom". */
+  name: string;
+  characterClass: string;
+  memberId: string | undefined;
+  memberName: string | undefined;
+  memberClass: string | undefined;
+}
+
+/** A deathroll as the website keeps it (P15). */
+export interface StoredDeathroll {
+  id: string;
+  challenger: DeathrollPlayer;
+  challenged: DeathrollPlayer;
+  stake: number;
+  start: number;
+  acceptedAt: Date;
+  endedAt: Date;
+  loserCharacterId: string;
+  betId: string | undefined;
+  /** When the winner confirmed the payment; the loser owes the stake until then. */
+  paidAt: Date | undefined;
+  rolls: { characterId: string; high: number; result: number }[];
+}
+
+export interface NewDeathroll {
+  id: string;
+  challengerId: string;
+  challengedId: string;
+  stake: number;
+  start: number;
+  acceptedAt: Date;
+  endedAt: Date;
+  loserId: string;
+  betId: string | undefined;
+  rolls: { characterId: string; high: number; result: number }[];
+}
+
+export interface DeathrollRepository {
+  find(id: string): Promise<StoredDeathroll | undefined>;
+  save(game: NewDeathroll, sentBy: string, recordedAt: Date): Promise<void>;
+  /** Notes the payment confirmed; false when it was already. */
+  markPaid(id: string, at: Date): Promise<boolean>;
+  /** Every game, the latest first. */
+  listAll(): Promise<StoredDeathroll[]>;
+}
+
+/** A deathroll for a big stake, as announced on Discord (P15.5). */
+export interface AnnouncedDeathroll {
+  id: string;
+  winner: string;
+  loser: string;
+  stake: number;
+  rolls: number;
+}
+
+export interface DeathrollAnnouncer {
+  announce(game: AnnouncedDeathroll): Promise<void>;
+}
+
 export interface MissionRewardRepository {
   save(missionId: string, rewards: readonly MissionReward[]): Promise<void>;
   /** The rewards of these missions, by mission then place. */
@@ -402,6 +464,7 @@ export interface Repositories {
   counterReadings: CounterReadingRepository;
   missionRewards: MissionRewardRepository;
   professions: ProfessionRepository;
+  deathrolls: DeathrollRepository;
   titles: TitleRepository;
 }
 

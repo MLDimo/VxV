@@ -271,6 +271,31 @@ describe("initial schema", () => {
     });
   });
 
+  describe("deathrolls", () => {
+    it("takes the loser among the players, and each roll in its range", async () => {
+      const member = await insertMember(database, "1");
+      const thom = await insertCharacter(database, { firstName: "Thom", lastName: "Leboss", memberId: member });
+      const vorn = await insertCharacter(database, { firstName: "Vorn", lastName: "Cendrelune" });
+      const sira = await insertCharacter(database, { firstName: "Sira", lastName: "Ventargent" });
+      const game = (id: string, loser: string) =>
+        database.query(
+          `insert into deathrolls (id, challenger_id, challenged_id, stake, start_number, accepted_at, ended_at, loser_id,
+                                   sent_by, recorded_at)
+           values ($1, $2, $3, 500, 1000, now(), now(), $4, $5, now())`,
+          [id, thom, vorn, loser, member],
+        );
+      await expect(game("g0", sira)).rejects.toThrow(/deathrolls_loser_plays/);
+      await game("g1", vorn);
+      const roll = (high: number, result: number) =>
+        database.query(
+          "insert into deathroll_rolls (deathroll_id, position, character_id, high, result) values ('g1', $1, $2, $3, $4)",
+          [high, vorn, high, result],
+        );
+      await roll(1000, 412);
+      await expect(roll(87, 88)).rejects.toThrow(/deathroll_rolls_in_range/);
+    });
+  });
+
   describe("titles", () => {
     const award = (memberId: string, title: string, score: number) =>
       database.query(

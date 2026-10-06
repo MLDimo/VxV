@@ -15,6 +15,8 @@ const TITLE_NAMES = [
   "Remboursé par la Sécu",
   "Lève toi copaing",
   "Sugar Daddy",
+  "Il cheat c'est sûr",
+  "Loser",
 ];
 
 test("each Wednesday the titles are given once: the Ranking shows them, Discord announces them and gives the roles", async ({

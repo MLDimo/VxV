@@ -2,6 +2,8 @@ import { createAddonBets } from "./application/addonBets.ts";
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAddonArtisans } from "./application/addonArtisans.ts";
 import { createArtisans } from "./application/artisans.ts";
+import { createAddonDeathrolls } from "./application/addonDeathrolls.ts";
+import { createDeathrolls } from "./application/deathrolls.ts";
 import { createAddonMissions } from "./application/addonMissions.ts";
 import { createAddonTitles } from "./application/addonTitles.ts";
 import { createAuth } from "./application/auth.ts";
@@ -31,6 +33,7 @@ import { createTreasury } from "./application/treasury.ts";
 import type {
   BetAnnouncer,
   Clock,
+  DeathrollAnnouncer,
   GuildGateway,
   MissionAnnouncer,
   RaidAnnouncer,
@@ -53,6 +56,8 @@ export interface ApplicationConfig {
   missionAnnouncer: MissionAnnouncer;
   /** Where each week's titles are announced. */
   titleAnnouncer: TitleAnnouncer;
+  /** Where the deathrolls played for a big stake are announced. */
+  deathrollAnnouncer: DeathrollAnnouncer;
   clock?: Clock;
 }
 
@@ -65,6 +70,7 @@ export function createApplication({
   betAnnouncer,
   missionAnnouncer,
   titleAnnouncer,
+  deathrollAnnouncer,
   clock = () => new Date(),
 }: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
@@ -93,6 +99,7 @@ export function createApplication({
   });
   const titles = createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer });
   const artisans = createArtisans({ unitOfWork });
+  const deathrolls = createDeathrolls({ unitOfWork, clock, announcer: deathrollAnnouncer });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
@@ -104,6 +111,7 @@ export function createApplication({
       missions,
       missionAnnouncements,
       artisans,
+      deathrolls,
     }),
     roster,
     characters,
@@ -131,6 +139,8 @@ export function createApplication({
     addonTitles: createAddonTitles({ unitOfWork, clock, titles }),
     artisans,
     addonArtisans: createAddonArtisans({ unitOfWork, clock }),
+    deathrolls,
+    addonDeathrolls: createAddonDeathrolls({ unitOfWork, clock }),
   };
 }
 

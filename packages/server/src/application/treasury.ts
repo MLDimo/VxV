@@ -1,6 +1,7 @@
-import { collectionRefusal, debtOf, paymentRefusal, type Stake } from "../domain/bets.ts";
+import { collectionRefusal, paymentRefusal, type Stake } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
 import { treasuryBook, type TreasuryBook } from "../domain/treasury.ts";
+import { memberDebt } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkTreasurerAction } from "./officerActions.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
@@ -25,9 +26,9 @@ export function createTreasury({ unitOfWork, clock }: { unitOfWork: UnitOfWork; 
       );
     },
 
-    /** What the member owes: the stakes they lost without paying them. */
+    /** What the member owes: the stakes they lost without paying them, and the deathrolls they lost unpaid. */
     debtOf(member: Member): Promise<number> {
-      return unitOfWork.run(async ({ stakes }) => debtOf(await stakes.listByMember(member.id)));
+      return unitOfWork.run((repositories) => memberDebt(repositories, member.id));
     },
 
     /** The treasurer received the stake, or the debt it became. */
