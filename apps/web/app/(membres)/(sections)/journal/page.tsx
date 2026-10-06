@@ -20,6 +20,8 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "bet.result": { label: "PARI", className: "border-stamp-bet text-stamp-bet" },
   "bet.cancel": { label: "PARI", className: "border-stamp-bet text-stamp-bet" },
   "season.start": { label: "GUILDE", className: "border-ink-brown text-ink-brown" },
+  "mission.create": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
+  "mission.close": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
 };
 
 /** The accounts book (§7.7): the guild's cash on the left, the officers' journal on the right. */

@@ -30,7 +30,13 @@ describe("what the companion takes to the website (VXV_SyncDB)", () => {
   it("keeps nothing without the companion", () => {
     const { client, errors } = startCore({ bundles: BUNDLES });
     client(`${GUILD} Fire("GUILD_ROSTER_UPDATE")`);
-    expect(client("return VXV_SyncDB")).toEqual({ version: 1, raidLogs: {}, characters: {}, changes: {} });
+    expect(client("return VXV_SyncDB")).toEqual({
+      version: 1,
+      raidLogs: {},
+      characters: {},
+      changes: {},
+      counters: {},
+    });
     expect(errors()).toEqual([]);
   });
 

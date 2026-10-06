@@ -1,6 +1,8 @@
 import type {
   BetCreationRecord,
   BetEndRecord,
+  MissionCloseRecord,
+  MissionCreationRecord,
   SeasonStartRecord,
   EventCreationRecord,
   ExclusionRecord,
@@ -11,7 +13,15 @@ import type {
   RaidLogImportRecord,
   SoftReserveOverrideRecord,
 } from "./journal.ts";
-import { count, formatDateTime, formatGold, LOOT_METHOD_LABELS, raidTitle, softReserveCount } from "./labels.ts";
+import {
+  count,
+  formatDateTime,
+  formatGold,
+  formatPlace,
+  LOOT_METHOD_LABELS,
+  raidTitle,
+  softReserveCount,
+} from "./labels.ts";
 import type { RosterImportSummary } from "./roster.ts";
 
 export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
@@ -27,6 +37,8 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "bet.result": "Résultat d'un pari",
   "bet.cancel": "Pari annulé",
   "season.start": "Nouvelle saison",
+  "mission.create": "Publication d'une mission",
+  "mission.close": "Résultat d'une mission",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -103,6 +115,20 @@ function describeBetEnd(record: BetEndRecord): string {
   );
 }
 
+function describeMissionCreation(record: MissionCreationRecord): string {
+  return (
+    `« ${record.title} », ${formatGold(record.reward)} à gagner, ` +
+    `du ${formatDateTime(new Date(record.startsAt))} au ${formatDateTime(new Date(record.endsAt))}`
+  );
+}
+
+function describeMissionClose(record: MissionCloseRecord): string {
+  const winners = record.winners.map(
+    (winner) => `${formatPlace(winner.rank)} ${winner.name} (${formatGold(winner.amount)})`,
+  );
+  return `« ${record.title} » : ${winners.length === 0 ? "aucun gagnant" : winners.join(", ")}`;
+}
+
 /** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -128,6 +154,10 @@ export function describeJournalEntry(entry: JournalEntry): string {
     case "bet.result":
     case "bet.cancel":
       return describeBetEnd(entry.after as BetEndRecord);
+    case "mission.create":
+      return describeMissionCreation(entry.after as MissionCreationRecord);
+    case "mission.close":
+      return describeMissionClose(entry.after as MissionCloseRecord);
     case "season.start":
       return `Saison ${String((entry.after as SeasonStartRecord).number)} : les classements par saison repartent de zéro`;
   }

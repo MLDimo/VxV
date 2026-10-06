@@ -11,6 +11,16 @@ import type { RaidReminder, ReminderTarget } from "../domain/reminders.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
 import type { LootItem, PastEventForItem, SoftReserve } from "../domain/softReserves.ts";
+import type {
+  CounterReading,
+  Mission,
+  MissionReward,
+  MissionRewardRecord,
+  MissionScore,
+  MissionStatus,
+  MissionType,
+  NewMission,
+} from "../domain/missions.ts";
 import type { RankedStake } from "../domain/ranking.ts";
 import type { LedgerStake } from "../domain/treasury.ts";
 
@@ -244,6 +254,41 @@ export interface StakeRepository {
   listRanked(): Promise<RankedStake[]>;
 }
 
+export interface MissionRepository {
+  create(mission: NewMission, createdBy: string, createdAt: Date): Promise<string>;
+  /** Undefined when the id is unknown or malformed. */
+  findById(missionId: string): Promise<Mission | undefined>;
+  /** The latest ending first. */
+  listRecent(limit: number): Promise<Mission[]>;
+  /** Every closed mission, for the hall of fame. */
+  listClosed(): Promise<Mission[]>;
+  close(missionId: string, closedBy: string, at: Date): Promise<void>;
+  setDiscordMessage(missionId: string, message: DiscordMessage): Promise<void>;
+}
+
+/** A reading as an addon made it, for a character of the guild. */
+export interface NewCounterReading {
+  characterId: string;
+  type: MissionType;
+  value: number;
+  readAt: Date;
+}
+
+export interface CounterReadingRepository {
+  /** Keeps the readings not known yet; returns how many were new. */
+  add(readings: readonly NewCounterReading[], sentBy: string): Promise<number>;
+  /** The readings of this counter up to the instant, for the characters linked to a member. */
+  listUntil(type: MissionType, until: Date): Promise<CounterReading[]>;
+}
+
+export interface MissionRewardRepository {
+  save(missionId: string, rewards: readonly MissionReward[]): Promise<void>;
+  /** The rewards of these missions, by mission then place. */
+  listForMissions(missionIds: readonly string[]): Promise<MissionRewardRecord[]>;
+  /** The treasurer handed the reward over. */
+  markPaid(missionId: string, rank: number, treasurerId: string, at: Date): Promise<void>;
+}
+
 export interface Season {
   number: number;
   startedAt: Date;
@@ -265,6 +310,8 @@ export interface CashRecord {
   recordedBy: string;
   betId: string | undefined;
   memberId: string | undefined;
+  /** The mission whose reward was handed over. */
+  missionId?: string;
 }
 
 export interface CashRepository {
@@ -294,6 +341,9 @@ export interface Repositories {
   stakes: StakeRepository;
   cash: CashRepository;
   seasons: SeasonRepository;
+  missions: MissionRepository;
+  counterReadings: CounterReadingRepository;
+  missionRewards: MissionRewardRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */
@@ -339,9 +389,22 @@ export interface AnnouncedBet {
   open: boolean;
 }
 
-/** The bets' channel on Discord, where each bet has its message, with the pool and the odds. */
-export interface BetAnnouncer {
-  publish(bet: AnnouncedBet): Promise<DiscordMessage>;
+/** A channel on Discord where each item (a bet, a mission) has its message, refreshed as the item changes. */
+export interface MessageAnnouncer<Item> {
+  publish(item: Item): Promise<DiscordMessage>;
   /** Refreshes the message; false when it no longer exists (deleted on Discord). */
-  update(message: DiscordMessage, bet: AnnouncedBet): Promise<boolean>;
+  update(message: DiscordMessage, item: Item): Promise<boolean>;
 }
+
+/** The bets' channel, where each bet has its message, with the pool and the odds. */
+export type BetAnnouncer = MessageAnnouncer<AnnouncedBet>;
+
+/** A mission and its scores, as shown in its Discord message. */
+export interface AnnouncedMission {
+  mission: Mission;
+  status: MissionStatus;
+  scores: MissionScore[];
+}
+
+/** The missions' channel, where each mission has its message, with its ranking. */
+export type MissionAnnouncer = MessageAnnouncer<AnnouncedMission>;

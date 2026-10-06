@@ -17,8 +17,9 @@ export function cashRepository(sql: SqlClient): CashRepository {
   return {
     async record(movement, occurredAt) {
       await sql.query(
-        `insert into cash_movements (occurred_at, kind, amount, label, reason, recorded_by, bet_id, member_id)
-         values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        `insert into cash_movements (occurred_at, kind, amount, label, reason, recorded_by, bet_id, member_id,
+                                     mission_id)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
           occurredAt,
           movement.kind,
@@ -28,6 +29,7 @@ export function cashRepository(sql: SqlClient): CashRepository {
           movement.recordedBy,
           movement.betId ?? null,
           movement.memberId ?? null,
+          movement.missionId ?? null,
         ],
       );
     },

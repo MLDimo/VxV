@@ -17,6 +17,8 @@ export interface BotContext {
   raidChannelId: string;
   /** Channel where each bet has its message. */
   betsChannelId: string;
+  /** Channel where each mission has its message. */
+  missionsChannelId: string;
 }
 
 export interface SlashCommand {

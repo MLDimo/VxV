@@ -45,3 +45,20 @@ restent ouverts à sa relecture.
   classement depuis toujours et la caisse ; une mise faite en jeu attend le site, comme les inscriptions (P7.5),
   et passe par le compagnon du joueur ou d'un officier. La caisse s'affiche aussi sur la page gauche du Journal.
   Pour recevoir les données des paris, les membres équipés du compagnon doivent passer à sa version 1.1.
+
+## P12 : missions
+
+- Types : pêche, herboristerie, minage, dépeçage (nombre de récoltes) et victoires honorables ; la mission « monstres
+  gris » reste abandonnée (décision du 3 octobre). Durée d'une semaine par défaut, un mois au plus ; titre par défaut
+  selon le type (« Le Grand Pêcheur »…).
+- Score d'un membre : ce que le compteur du jeu de chacun de ses personnages liés (main et rerolls) a gagné pendant
+  la mission, depuis son dernier relevé avant le début, sinon depuis son premier relevé pendant la mission. À égalité,
+  le premier à atteindre le score (heure du relevé) passe devant.
+- Relevés : l'addon lit les compteurs et les garde pour le compagnon, qui les envoie au site ; un officier équipé
+  relaie ceux des membres sans compagnon. Le site n'accepte d'un membre que les relevés de ses propres personnages.
+- Résultat : validé par un officier une fois la mission finie (journal). Les trois premiers reçoivent 70 %, 20 % et
+  10 % de la récompense, arrondis à la po inférieure ; une place sans joueur garde sa part dans la caisse. Le
+  trésorier note chaque récompense versée : elle sort de la caisse, avec sa mission.
+- Hall of fame : missions gagnées, gains, position moyenne sur les missions où le joueur a au moins un point.
+- Discord : `/vxv_mission` (officiers) publie une mission qui commence aussitôt ; son message, avec le classement, suit
+  les relevés. Salon `DISCORD_MISSIONS_CHANNEL_ID` s'il est défini, sinon celui des raids.

@@ -10,6 +10,8 @@ const MAX_RAID_LOGS = 20;
 const MAX_CHARACTERS = 50;
 const MAX_CHANGES = 200;
 const MAX_SOFT_RESERVES = 20;
+/** Five counters for each character of an account, and the relays of an officer. */
+const MAX_COUNTERS = 500;
 
 const changeBase = {
   id: z.string().min(1).max(160),
@@ -71,6 +73,17 @@ const uploadSchema = z.object({
     .max(MAX_CHARACTERS)
     .default([]),
   changes: z.array(z.unknown()).max(MAX_CHANGES).default([]),
+  counters: z
+    .array(
+      z.object({
+        name: z.string().max(100),
+        type: z.string().max(30),
+        value: z.number().int().nonnegative(),
+        at: z.number().int().positive(),
+      }),
+    )
+    .max(MAX_COUNTERS)
+    .default([]),
 });
 
 /** The companion sends what the addon saved for the website, after a /reload or a logout (P7.4). */
@@ -80,7 +93,7 @@ export async function POST(request: Request): Promise<Response> {
     if (!upload.success) {
       return errorResponse("Envoi illisible : mets le compagnon à jour.");
     }
-    const { roster, raidLogs, characters, changes } = upload.data;
+    const { roster, raidLogs, characters, changes, counters } = upload.data;
     const report = await getApplication().companionUploads.receive(member, {
       roster: roster && { text: roster.text, capturedAt: new Date(roster.capturedAt * MS_PER_SECOND) },
       raidLogs,
@@ -93,6 +106,7 @@ export async function POST(request: Request): Promise<Response> {
         const { at, ...made } = parsed.data;
         return [{ ...made, madeAt: at === undefined ? undefined : new Date(at * MS_PER_SECOND) }];
       }),
+      counters: counters.map((reading) => ({ ...reading, at: new Date(reading.at * MS_PER_SECOND) })),
     });
     return Response.json(report);
   });

@@ -38,6 +38,14 @@ VXV_SyncDB = {
 			},
 		},
 	},
+	["counters"] = {
+		["Ðéjà Vu|fishing"] = {
+			["name"] = "Ðéjà Vu",
+			["type"] = "fishing",
+			["value"] = 412,
+			["at"] = 1796904200,
+		},
+	},
 }
 `;
 
@@ -62,6 +70,7 @@ describe("outbox of the addon", () => {
           },
           { id: "Ðéjà Vu#1796904100#7", kind: "reserves", itemIds: [] },
         ],
+        counters: [{ name: "Ðéjà Vu", type: "fishing", value: 412, at: 1796904200 }],
       },
     });
   });
@@ -69,7 +78,7 @@ describe("outbox of the addon", () => {
   it("leaves aside what it does not know, and tells a newer format or no data", () => {
     expect(read('VXV_SyncDB = { version = 1, raidLogs = { e1 = 3 }, characters = { X = "y" } }')).toEqual({
       kind: "read",
-      outbox: { roster: undefined, raidLogs: [], characters: [], changes: [] },
+      outbox: { roster: undefined, raidLogs: [], characters: [], changes: [], counters: [] },
     });
     expect(read("VXV_SyncDB = { version = 2 }")).toEqual({ kind: "newer" });
     expect(read("VXV_Other = 1")).toEqual({ kind: "none" });
@@ -82,14 +91,25 @@ describe("outbox of the addon", () => {
         raidLogs: ["log e1"],
         characters: [{ name: "A B", race: "Orc", sex: 2 }],
         changes: [{ id: "A B#1#1" }],
+        counters: [{ name: "A B", type: "fishing", value: 12, at: 1 }],
       },
-      { roster: { text: "new", capturedAt: 2 }, raidLogs: ["log e1", "log e2"], characters: [], changes: [] },
+      {
+        roster: { text: "new", capturedAt: 2 },
+        raidLogs: ["log e1", "log e2"],
+        characters: [],
+        changes: [],
+        counters: [{ name: "C D", type: "fishing", value: 3, at: 2 }],
+      },
     ]);
     expect(merged).toEqual({
       roster: { text: "new", capturedAt: 2 },
       raidLogs: ["log e1", "log e2"],
       characters: [{ name: "A B", race: "Orc", sex: 2 }],
       changes: [{ id: "A B#1#1" }],
+      counters: [
+        { name: "A B", type: "fishing", value: 12, at: 1 },
+        { name: "C D", type: "fishing", value: 3, at: 2 },
+      ],
     });
   });
 });

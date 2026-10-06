@@ -13,7 +13,9 @@ export type JournalAction =
   | "bet.create"
   | "bet.result"
   | "bet.cancel"
-  | "season.start";
+  | "season.start"
+  | "mission.create"
+  | "mission.close";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -91,6 +93,22 @@ export interface BetEndRecord {
   winners: number;
   /** What went to the guild's cash. */
   organisation: number;
+}
+
+/** What the journal keeps about a mission an officer published. */
+export interface MissionCreationRecord {
+  title: string;
+  type: string;
+  reward: number;
+  startsAt: string;
+  endsAt: string;
+}
+
+/** What the journal keeps about a mission's validated result: its winners and their rewards. */
+export interface MissionCloseRecord {
+  title: string;
+  reward: number;
+  winners: { rank: number; name: string; amount: number }[];
 }
 
 /** What the journal keeps about a new season of the rankings. */

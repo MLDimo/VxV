@@ -68,7 +68,8 @@ test.describe.serial("Discord bot", () => {
     const officer: TestActor = {
       userId: "100",
       name: "Officier Test",
-      roleIds: [DISCORD_ROLES.officer],
+      // As in the seed: the test officer is also the treasurer, and Discord's roles are the member's roles.
+      roleIds: [DISCORD_ROLES.officer, DISCORD_ROLES.treasurer],
       channelId: "1",
     };
     const plan = { raid: "salle-des-thanes", date: "20/03/2031", heure: "21h", motif: "Raid créé depuis Discord" };

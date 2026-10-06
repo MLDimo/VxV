@@ -5,6 +5,7 @@ import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
 import { TextFormatError } from "../domain/textFormat.ts";
 import type { GameCharacter } from "./characters.ts";
+import type { GameCounterReading } from "./missions.ts";
 import { ApplicationError } from "./errors.ts";
 import type { RaidLogImportSummary } from "./raidLogs.ts";
 import type { RosterUploadOutcome } from "./roster.ts";
@@ -19,6 +20,8 @@ export interface CompanionUpload {
   characters: readonly GameCharacter[];
   /** Changes made in game: the player's own, and for an officer those relayed from other players. */
   changes: readonly GameChange[];
+  /** Game counters the addon read (P12.4): the player's own, and for an officer those relayed. */
+  counters: readonly GameCounterReading[];
 }
 
 /** What the website made of it, in French, for the companion's window. */
@@ -29,6 +32,8 @@ export interface CompanionUploadReport {
   characters: number;
   /** What became of the changes made in game, if any were sent. */
   changes: string | undefined;
+  /** How many counter readings were new, if any were sent. */
+  counters: string | undefined;
 }
 
 const OFFICERS_ONLY = "Réservé aux officiers.";
@@ -41,6 +46,12 @@ export interface CompanionUploadDependencies {
   };
   characters: { recordAppearances(member: Member, seen: readonly GameCharacter[]): Promise<number> };
   gameChanges: { receive(sender: Member, changes: readonly GameChange[]): Promise<GameChangeOutcome[]> };
+  missions: {
+    recordReadings(sender: Member, readings: readonly GameCounterReading[]): Promise<number>;
+    list(): Promise<readonly { mission: { id: string }; status: string }[]>;
+  };
+  /** The running missions' messages on Discord follow their ranking. */
+  missionAnnouncements: { announceQuietly(missionId: string): Promise<boolean> };
 }
 
 /** "3 changements faits en jeu : 2 acceptés, 1 refusé." */
@@ -81,7 +92,27 @@ async function described(work: () => Promise<string>): Promise<string> {
   }
 }
 
-export function createCompanionUploads({ roster, raidLogs, characters, gameChanges }: CompanionUploadDependencies) {
+export function createCompanionUploads({
+  roster,
+  raidLogs,
+  characters,
+  gameChanges,
+  missions,
+  missionAnnouncements,
+}: CompanionUploadDependencies) {
+  /** Keeps the new readings; the running missions' rankings on Discord follow them. */
+  async function recordCounters(member: Member, readings: readonly GameCounterReading[]): Promise<string> {
+    const added = await missions.recordReadings(member, readings);
+    if (added > 0) {
+      for (const view of await missions.list()) {
+        if (view.status === "running") {
+          await missionAnnouncements.announceQuietly(view.mission.id);
+        }
+      }
+    }
+    return `${count(added, "nouveau relevé de compteur", "nouveaux relevés de compteurs")}.`;
+  }
+
   return {
     /**
      * Takes what the member's addon saved: their characters' appearance, the changes made in game, and for an officer
@@ -96,6 +127,7 @@ export function createCompanionUploads({ roster, raidLogs, characters, gameChang
         characters: await characters.recordAppearances(member, upload.characters),
         changes:
           upload.changes.length === 0 ? undefined : describeChanges(await gameChanges.receive(member, upload.changes)),
+        counters: upload.counters.length === 0 ? undefined : await recordCounters(member, upload.counters),
       };
       const sentRoster = upload.roster;
       if (sentRoster !== undefined) {

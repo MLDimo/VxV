@@ -97,6 +97,20 @@ export function formatShare(share: number): string {
   return `${WHOLE.format(share * 100)}${NO_BREAK}%`;
 }
 
+/** A place in a ranking: "1er", "2e", "3e". */
+export function formatPlace(rank: number): string {
+  return rank === 1 ? "1er" : `${String(rank)}e`;
+}
+
+const HOURS_PER_DAY = 24;
+
+/** What remains of a span, roughly: "3 j 4 h", else as formatDuration ("5 h 12", "12 min"). */
+export function formatRemaining(durationMs: number): string {
+  const hours = Math.floor(Math.max(0, durationMs) / (MINUTES_PER_HOUR * MS_PER_MINUTE));
+  const days = Math.floor(hours / HOURS_PER_DAY);
+  return days > 0 ? `${String(days)} j ${String(hours % HOURS_PER_DAY)} h` : formatDuration(Math.max(0, durationMs));
+}
+
 /** Raids of an evening joined in one title: "Onyxia + Mont Hyjal". */
 export function raidTitle(raidNames: readonly string[]): string {
   return raidNames.join(" + ");

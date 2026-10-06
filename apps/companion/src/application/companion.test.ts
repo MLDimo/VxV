@@ -260,6 +260,7 @@ describe("companion", () => {
         raidLogs: ["VXV-LOG-1\nR;e1;1796904000;1796904120"],
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
         changes: [],
+        counters: [],
       });
       expect(companion.state().lastUpload).toEqual({
         at: NOW,
@@ -276,6 +277,7 @@ describe("companion", () => {
         raidLogs: ["VXV-LOG-1\nR;e2;1;2"],
         characters: [],
         changes: [],
+        counters: [],
       });
     });
 
@@ -288,6 +290,7 @@ describe("companion", () => {
         raidLogs: [],
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
         changes: [],
+        counters: [],
       });
     });
   });

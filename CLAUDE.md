@@ -80,7 +80,14 @@ et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
     données et les changements faits en jeu sont passés dans le socle (`VXV.ShareData`, `VXV.PendingChanges`).
   Validation en attente : un pari réel mené jusqu'au versement des gains ; publier le compagnon 1.1 (données des
   paris).
-- P12 à P15 : pas commencées.
+- **P12 Tableau de missions** : en cours.
+  - 12.1, 12.2, 12.4 à 12.7 : missions, relevés des compteurs par personnage et récompenses en base ; publication par
+    un officier (site `/quetes`, `/vxv_mission`, message Discord avec le classement), relevés envoyés par le
+    compagnon (et relayés par un officier), classement en direct sur le site, validation du résultat par un officier,
+    récompenses 70 / 20 / 10 % versées par le trésorier depuis la caisse, hall of fame.
+  - Reste 12.3 et 12.8 : le bundle `VXV_Missions` (lecture des compteurs en jeu, onglet Quêtes), qui attend les
+    identifiants des statistiques du jeu sur Forever (`/vxvtest counters list`).
+- P13 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
 
