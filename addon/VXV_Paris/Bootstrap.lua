@@ -15,6 +15,8 @@ VXV.RegisterModule({
     end,
     tab = {
         place = "dice",
+        name = "Paris",
+        order = 1,
         Build = ns.DiceTab.Build,
         Card = function()
             return ns.DiceView.Card(ns.BetsData.Current(), time())

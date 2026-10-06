@@ -120,7 +120,7 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     qu'il entend. L'annuaire du site (`VXV-ARTISANS-1`) n'arrive que par le compagnon (`VXV.SiteData` avec
     `shared = false` : trop gros pour le relais des officiers).
   Validation en attente : une recette apprise qui apparaît chez un autre membre après la synchro.
-- **P15 Deathroll** : en cours.
+- **P15 Deathroll** : code terminé.
   - Site : parties jouées en jeu, reçues par le compagnon (texte `VXV-DEATHROLL-1` par partie, envoyé par un joueur
     ou relayé par un officier) et vérifiées (le défié roll le premier, chacun ensuite de 1 au résultat précédent, fin
     au premier 1) ; pari de la guilde sur la partie créé et réglé par le système de paris (mêmes règles, part de la
@@ -128,7 +128,17 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     celles des paris (`application/debts.ts` : une dette bloque paris et deathrolls) ; Le Dé Pipé › Deathroll
     (`/paris/deathroll`), Ranking › Deathroll (`/ranking/deathroll`, périodes) ; titres « Il cheat c'est sûr » et
     « Loser » ; grosses mises (1 000 po et plus) annoncées dans le salon des paris ; export `VXV-DEATHROLLS-1`.
-  - À venir : socle (plusieurs modules par lieu, rolls lus par le socle) et bundle `VXV_Deathroll`.
+  - En jeu : bundle `VXV_Deathroll`, onglet Deathroll du Dé Pipé (le socle accepte plusieurs modules par lieu :
+    sous-onglets « Paris » et « Deathroll », `tab.name` et `tab.order`). Défi chuchoté à un membre connecté avec
+    VXV, accepté ou refusé dans la minute ; au départ, annonce à la guilde (addon et canal de guilde,
+    `VXV.SayToGuild`) et une minute de paris dans la fenêtre du duel (pas les joueurs, pas un membre endetté) ;
+    puis bouton Roll au bon tour, de 1 au résultat précédent : le /roll du jeu (`RandomRoll`), lu dans le chat par
+    le socle (`Core/Rolls.lua`, événement `roll`) et dit à la guilde par l'addon du joueur. Fenêtre du duel animée
+    et synchronisée (chiffres qui défilent puis ralentissent, fond du violet au rouge, titres VXV sous les noms via
+    `titles.request`, sons de tension et de défaite, historique). Partie finie envoyée au site par le compagnon des
+    joueurs (ou d'un officier) ; dette du perdant, paiement confirmé par le gagnant dans l'onglet ; une dette
+    bloque les défis. Données du site `VXV-DEATHROLLS-1` (bloqués, dettes, classement).
+  Validation en attente : une partie complète jouée aux boutons entre deux membres, la dette chez le perdant.
 
 ## Design (charte « La Taverne »)
 
@@ -139,7 +149,7 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
 - Un lieu = un onglet, même nom partout : Taverne, Raid, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
-- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit.
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus (vu sur le Journal le 5 octobre).
 
@@ -156,7 +166,7 @@ La table complète est dans le README. Règles :
 
 - **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
-- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`) qui ne dépend que du socle.
+- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`, `VXV_Deathroll`) qui ne dépend que du socle.
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.

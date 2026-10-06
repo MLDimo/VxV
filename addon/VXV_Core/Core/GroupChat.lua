@@ -1,8 +1,8 @@
 local _, ns = ...
 
---- Announcements in the group's channel (raid, or party), for the players without the addon. The client refuses
---- chat during a boss encounter (measured in phase 0): announcements wait for its end. A text longer than a chat
---- message is cut between words, never inside a character.
+--- Announcements in the group's channel (raid, or party) or the guild's, for the players without the addon. The
+--- client refuses chat during a boss encounter (measured in phase 0): announcements wait for its end. A text longer
+--- than a chat message is cut between words, never inside a character.
 local GroupChat = {}
 ns.GroupChat = GroupChat
 
@@ -41,8 +41,7 @@ local function channel()
     return IsInGroup() and "PARTY" or nil
 end
 
-local function send(text)
-    local target = channel()
+local function send(text, target)
     if target == nil then
         return
     end
@@ -51,13 +50,24 @@ local function send(text)
     end
 end
 
+local function say(text, target)
+    if inEncounter then
+        waiting[#waiting + 1] = { text = text, target = target }
+    else
+        send(text, target())
+    end
+end
+
 --- Writes the text in the group's channel, now or right after the boss encounter.
 function GroupChat.Say(text)
-    if inEncounter then
-        waiting[#waiting + 1] = text
-    else
-        send(text)
-    end
+    say(text, channel)
+end
+
+--- Writes the text in the guild's channel, now or right after the boss encounter.
+function GroupChat.SayToGuild(text)
+    say(text, function()
+        return IsInGuild() and "GUILD" or nil
+    end)
 end
 
 Events.On("ENCOUNTER_START", function()
@@ -66,9 +76,9 @@ end)
 
 Events.On("ENCOUNTER_END", function()
     inEncounter = false
-    local texts = waiting
+    local held = waiting
     waiting = {}
-    for _, text in ipairs(texts) do
-        send(text)
+    for _, message in ipairs(held) do
+        send(message.text, message.target())
     end
 end)

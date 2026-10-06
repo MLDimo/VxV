@@ -219,7 +219,7 @@ function Distribution.State()
     return active, shown
 end
 
-VXV.On("raid.roll", function(roll)
+VXV.On("roll", function(roll)
     local round = active and active.round
     if round == nil or round.finished then
         return

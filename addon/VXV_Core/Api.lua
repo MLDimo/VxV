@@ -40,8 +40,9 @@ VXV = {
     --- (): whether the player's companion brought data at this launch. See Core/PendingChanges.lua.
     PendingChanges = ns.PendingChanges.Create,
     CompanionSeen = ns.PendingChanges.CompanionSeen,
-    --- (text): an announcement in the group's channel, held during a boss encounter.
+    --- (text): an announcement in the group's channel, or the guild's, held during a boss encounter.
     SayToGroup = ns.GroupChat.Say,
+    SayToGuild = ns.GroupChat.SayToGuild,
     --- The Blizzard API whose names vary, with the pcall contract (ok, ...): see Core/Compat.lua.
     Compat = ns.Compat,
     --- Names of the members connected with VXV, this player included, in alphabetical order.

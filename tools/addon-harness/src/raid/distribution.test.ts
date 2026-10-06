@@ -176,8 +176,8 @@ describe("attributing an item", () => {
 
 describe("reading the /roll results", () => {
   it("reads the name, the roll and the bounds with the game's format, and nothing from a secret message", () => {
-    const { raid } = startRaid();
-    const parse = (text: string) => raid.run(`local _, ns = ... return ns.Rolls.Parse(${text})`);
+    const { core } = startRaid();
+    const parse = (text: string) => core.run(`local _, ns = ... return ns.Rolls.Parse(${text})`);
     expect(parse('"Ðéjà Vu obtient un 98 (1-100)."')).toEqual({ name: "Ðéjà Vu", roll: 98, low: 1, high: 100 });
     expect(parse('"Ðéjà Vu a quitté le groupe."')).toBeUndefined();
     expect(parse("SECRET")).toBeUndefined();
