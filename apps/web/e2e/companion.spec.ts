@@ -73,13 +73,18 @@ test("the companion brings the next event to the addon, as an officer would past
 }) => {
   const token = await linkCompanion(page, context, request);
   const response = await request.get("/api/compagnon/donnees", { headers: { Authorization: `Bearer ${token}` } });
-  const { raid } = (await response.json()) as { raid: { text: string; title: string; startsAt: string } };
+  const { raid, paris } = (await response.json()) as {
+    raid: { text: string; title: string; startsAt: string };
+    paris: { text: string };
+  };
   // The soonest event is the one starting 10 minutes after the seed.
   expect(raid.title).toBe("La salle des Thanes");
   expect(raid.text.split("\n").slice(0, 2)).toEqual([
     "VXV-RAID-2",
     expect.stringMatching(`^E;${readSeed().lockedEventId};`),
   ]);
+  // The bets come along, for Le Dé Pipé in game (P11.8).
+  expect(paris.text.split("\n")[0]).toBe("VXV-PARIS-1");
   expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
 });
 

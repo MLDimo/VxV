@@ -12,8 +12,6 @@ local NOT_OFFICER = "Seuls les officiers chargent les données, et ce personnage
 local ALREADY_LOADED = "Ces données sont déjà chargées."
 local OLDER = "Tu as déjà des données plus récentes (copiées le %s)."
 local LOADED = "Données chargées : %s, le %s."
--- Players' clocks may be wrong: data dated further in the future would block every later update.
-local CLOCK_TOLERANCE_SECONDS = 24 * 60 * 60
 
 local saved = {}
 local current
@@ -100,13 +98,7 @@ end
 --- and the current data (the new ones only, for a member who has none yet). Refusals stay silent.
 function RaidData.Receive(text, sender)
     local event = EventData.Parse(text)
-    if event == nil or sender == nil or not event.officers[sender] then
-        return false
-    end
-    if (current ~= nil and not current.officers[sender]) or event.exportedAt > time() + CLOCK_TOLERANCE_SECONDS then
-        return false
-    end
-    if staleness(event) ~= nil then
+    if event == nil or not VXV.AcceptsSharedData(event, current, sender) then
         return false
     end
     keep(text, event, sender)

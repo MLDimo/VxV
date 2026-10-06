@@ -1,14 +1,14 @@
 local _, ns = ...
 
---- A list of text rows in the charter's fonts, scrolled with the mouse wheel; shared by the Raid and Journal
---- screens, the reduced mode and the loot panel. A row is { kind = "title" | "header" | "line" | "bar" | "card",
+--- A list of text rows in the charter's fonts, scrolled with the mouse wheel; shared by the bundles' screens, the
+--- reduced mode and the dialogs (VXV.RowList). A row is { kind = "title" | "header" | "line" | "bar" | "card",
 --- text, tooltip = { title, lines } or link = item link for the game's item tooltip, onClick, stamp = { text,
 --- color } }; a bar is { kind = "bar", share between 0 and 1, color = a token }; a card is a block with its text
 --- and a detail line under it.
 local RowList = {}
 ns.RowList = RowList
 
-local Theme = VXV.Theme
+local Theme, Tooltip = ns.Theme, ns.Tooltip
 
 -- Palettes: the dark panels of the screens, and the parchment of the accounts book (§7.7), whose rows all sit on
 -- the page's lines.
@@ -36,9 +36,9 @@ local CARD_GAP, CARD_PADDING, CARD_TEXT_TOP, CARD_DETAIL_TOP = 6, 12, -9, -31
 local function showTooltip(frame)
     local row = frame.row
     if row.link ~= nil then
-        VXV.ShowItemTooltip(frame, "ANCHOR_RIGHT", row.link)
+        Tooltip.ShowLink(frame, "ANCHOR_RIGHT", row.link)
     elseif row.tooltip ~= nil then
-        VXV.ShowTooltip(frame, "ANCHOR_RIGHT", row.tooltip.title, row.tooltip.lines)
+        Tooltip.Show(frame, "ANCHOR_RIGHT", row.tooltip.title, row.tooltip.lines)
     end
 end
 
@@ -111,7 +111,7 @@ function RowList.Create(parent, topOffset, paletteName)
         frame:SetWidth(width)
         frame:EnableMouse(true)
         frame:SetScript("OnEnter", showTooltip)
-        frame:SetScript("OnLeave", VXV.HideTooltip)
+        frame:SetScript("OnLeave", Tooltip.Hide)
         frame:SetScript("OnMouseUp", click)
         frame.label = Theme.Text(frame, "text", 13, "lavender")
         frame.label:SetWordWrap(false)

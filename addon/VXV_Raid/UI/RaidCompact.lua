@@ -6,7 +6,7 @@ local RaidCompact = {}
 ns.RaidCompact = RaidCompact
 
 local CompactView, Group, NextBoss, RaidData = ns.CompactView, ns.Group, ns.NextBoss, ns.RaidData
-local RaidLog, Raids, RowList = ns.RaidLog, ns.Raids, ns.RowList
+local RaidLog, Raids, RowList = ns.RaidLog, ns.Raids, VXV.RowList
 
 local Theme = VXV.Theme
 

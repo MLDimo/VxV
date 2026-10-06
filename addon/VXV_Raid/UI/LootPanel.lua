@@ -6,7 +6,7 @@ local LootPanel = {}
 ns.LootPanel = LootPanel
 
 local BossLoot, Distribution, Group, LootView = ns.BossLoot, ns.Distribution, ns.Group, ns.LootView
-local RaidData, RowList = ns.RaidData, ns.RowList
+local RaidData, RowList = ns.RaidData, VXV.RowList
 
 local Theme = VXV.Theme
 

@@ -197,6 +197,8 @@ export interface GameChangeRepository {
   save(outcome: GameChangeOutcome, sentBy: string, receivedAt: Date): Promise<void>;
   /** The event's changes, then the events created in game since the given instant, in the order received. */
   listForEvent(eventId: string, createdSince: Date): Promise<GameChangeOutcome[]>;
+  /** The stakes made in game on these bets, in the order received. */
+  listForBets(betIds: readonly string[]): Promise<GameChangeOutcome[]>;
 }
 
 /** When the latest copy of some data, read in game, was imported ("roster"). */

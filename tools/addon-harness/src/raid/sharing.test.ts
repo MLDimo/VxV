@@ -13,13 +13,10 @@ const EVENT = `
   return event and { title = event.title, exportedAt = event.exportedAt, signups = #event.signups, sender = sender }
 `;
 /** Counts the event's data this player sends, by wrapping the public API. */
-const COUNT_DATA_SENT = `
-  DataSent = 0
-  local broadcast = VXV.Broadcast
-  VXV.Broadcast = function(kind, ...)
-      if kind == "raid.data" then DataSent = DataSent + 1 end
-      return broadcast(kind, ...)
-  end
+/** Counts the event's data a player receives, by sender. */
+const COUNT_DATA_RECEIVED = `
+  DataFrom = {}
+  VXV.OnMessage("raid.data", function(_, sender) DataFrom[sender] = (DataFrom[sender] or 0) + 1 end)
 `;
 
 type Guild = ReturnType<typeof startGuild>;
@@ -115,17 +112,12 @@ describe("sharing the event in the guild", () => {
     settle(guild);
     importText(guild.player("Ðéjà Vu").client, websiteText(officers));
     settle(guild);
-    for (const player of guild.players) {
-      player.client(COUNT_DATA_SENT);
-    }
 
-    guild.join("Thom Leboss");
+    guild.join("Thom Leboss").client(COUNT_DATA_RECEIVED);
     settle(guild);
     expect(eventOf(guild, "Thom Leboss")).toMatchObject({ title: "Onyxia", sender: "Aube Claire" });
     // Aube Claire comes first in alphabetical order: she answers, and Ðéjà Vu stands back after her offer.
-    expect(
-      [guild.player("Ðéjà Vu"), guild.player("Aube Claire")].map((player) => player.client("return DataSent")),
-    ).toEqual([0, 1]);
+    expect(guild.player("Thom Leboss").client("return DataFrom")).toEqual({ "Aube Claire": 1 });
   });
 
   it("ignores data sent by a member the website does not name officer", () => {

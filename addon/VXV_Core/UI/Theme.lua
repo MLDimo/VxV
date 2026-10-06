@@ -164,6 +164,28 @@ function Theme.Recolor(edges, color)
     end
 end
 
+-- A text field: its height, and the margin of its text.
+local FIELD_HEIGHT, FIELD_PADDING = 26, 6
+Theme.FIELD_HEIGHT = FIELD_HEIGHT
+
+--- A text field on a dark ground with a thin ring, the text in our font; returns its frame (to place, of the given
+--- width) and its edit box. Escape and Enter leave it.
+function Theme.Field(parent, width, maxLetters)
+    local holder = CreateFrame("Frame", nil, parent)
+    holder:SetSize(width, FIELD_HEIGHT)
+    Theme.Fill(holder, "night"):SetAllPoints()
+    Theme.Rings(holder, { { "line", 1 } }, true)
+    local box = CreateFrame("EditBox", nil, holder)
+    box:SetPoint("TOPLEFT", FIELD_PADDING, 0)
+    box:SetPoint("BOTTOMRIGHT", -FIELD_PADDING, 0)
+    box:SetFontObject(Theme.Font("text", 13))
+    box:SetAutoFocus(false)
+    box:SetMaxLetters(maxLetters)
+    box:SetScript("OnEscapePressed", box.ClearFocus)
+    box:SetScript("OnEnterPressed", box.ClearFocus)
+    return holder, box
+end
+
 --- A panel (§3): dark background, ink then wood rings; the officers' panel has a gold ring.
 function Theme.Panel(parent, officer)
     local panel = CreateFrame("Frame", nil, parent)

@@ -6,12 +6,12 @@ local _, ns = ...
 local ItemChoice = {}
 ns.ItemChoice = ItemChoice
 
-local RowList = ns.RowList
+local RowList = VXV.RowList
 
 local Theme = VXV.Theme
 
 local WIDTH, HEIGHT = 440, 500
-local FOOTER_HEIGHT, FIELD_HEIGHT, FIELD_PADDING, BUTTON_WIDTH, BUTTON_HEIGHT = 92, 26, 6, 160, 30
+local FOOTER_HEIGHT, FIELD_PADDING, BUTTON_WIDTH, BUTTON_HEIGHT = 92, 6, 160, 30
 local REASON_LETTERS = 200
 local OVER_ALLOWANCE = "Tu as droit à %s."
 local NO_REASON = "Le motif est obligatoire : il apparaîtra dans le journal."
@@ -90,19 +90,8 @@ local function build()
     list = RowList.Create(listArea)
     counter = Theme.Text(body, "textBold", 13, "gold")
     counter:SetPoint("TOPLEFT", listArea, "BOTTOMLEFT", 0, -FIELD_PADDING)
-    reasonHolder = CreateFrame("Frame", nil, body)
+    reasonHolder, reasonBox = Theme.Field(body, body:GetWidth(), REASON_LETTERS)
     reasonHolder:SetPoint("BOTTOMLEFT", 0, BUTTON_HEIGHT + 2 * FIELD_PADDING)
-    reasonHolder:SetSize(body:GetWidth(), FIELD_HEIGHT)
-    Theme.Fill(reasonHolder, "night"):SetAllPoints()
-    Theme.Rings(reasonHolder, { { "line", 1 } }, true)
-    reasonBox = CreateFrame("EditBox", nil, reasonHolder)
-    reasonBox:SetPoint("TOPLEFT", FIELD_PADDING, 0)
-    reasonBox:SetPoint("BOTTOMRIGHT", -FIELD_PADDING, 0)
-    reasonBox:SetFontObject(Theme.Font("text", 13))
-    reasonBox:SetAutoFocus(false)
-    reasonBox:SetMaxLetters(REASON_LETTERS)
-    reasonBox:SetScript("OnEscapePressed", reasonBox.ClearFocus)
-    reasonBox:SetScript("OnEnterPressed", reasonBox.ClearFocus)
     problem = Theme.Text(body, "text", 13, "loss")
     problem:SetPoint("BOTTOMLEFT", 0, (BUTTON_HEIGHT - 13) / 2)
     local button = Theme.Button(body, "pixel", "Envoyer", BUTTON_WIDTH, BUTTON_HEIGHT)

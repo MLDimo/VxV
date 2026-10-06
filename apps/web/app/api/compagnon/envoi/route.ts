@@ -13,12 +13,16 @@ const MAX_SOFT_RESERVES = 20;
 
 const changeBase = {
   id: z.string().min(1).max(160),
-  eventId: z.string().max(60),
+  // A stake (VXV_Paris) is about a bet, not an event.
+  eventId: z.string().max(60).default(""),
   author: z.string().max(100),
   // When the author made it in game (Unix seconds): the latest change wins.
   at: z.number().int().positive().optional(),
 };
-/** A change made in game (addon/VXV_Raid/Changes.lua); one of a kind this website does not know is left aside. */
+/**
+ * A change made in game (addon/VXV_Raid/Changes.lua, addon/VXV_Paris/Stakes.lua); one of a kind this website does not
+ * know is left aside.
+ */
 const changeSchema = z.discriminatedUnion("kind", [
   z.object({
     ...changeBase,
@@ -48,6 +52,14 @@ const changeSchema = z.discriminatedUnion("kind", [
     softReserves: z.number().int(),
     reason: z.string().max(500),
   }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("stake"),
+    betId: z.string().max(60),
+    choiceId: z.string().max(60),
+    amount: z.number(),
+  }),
+  z.object({ ...changeBase, kind: z.literal("withdraw"), betId: z.string().max(60) }),
 ]);
 
 /** What the companion read in the addon's saved data (apps/companion/src/domain/outbox.ts). */

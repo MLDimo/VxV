@@ -1,7 +1,8 @@
 import { fullName, type Character } from "../domain/characters.ts";
 import type { NewRaidEvent } from "../domain/events.ts";
-import type { GameChange, GameChangeOutcome } from "../domain/gameChanges.ts";
-import { formatDateTime } from "../domain/labels.ts";
+import { isBetChange, type GameChange, type GameChangeOutcome } from "../domain/gameChanges.ts";
+import { formatDateTime, formatGold } from "../domain/labels.ts";
+import type { BetChoice } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
 import { parseRaidStart } from "../domain/raidStart.ts";
@@ -27,6 +28,12 @@ export interface GameChangeDependencies {
   events: { createEvent(officer: Member, event: NewRaidEvent, reason: string): Promise<string> };
   /** The event's message on Discord follows its sign-ups, and a new event gets one. */
   announcements: { announceQuietly(eventId: string): Promise<boolean> };
+  bets: {
+    stake(member: Member, betId: string, choiceId: string, amount: number): Promise<{ bet: { choices: BetChoice[] } }>;
+    withdraw(member: Member, betId: string): Promise<unknown>;
+  };
+  /** The bet's message on Discord follows its stakes. */
+  betAnnouncements: { announceQuietly(betId: string): Promise<boolean> };
 }
 
 export function createGameChanges({
@@ -37,6 +44,8 @@ export function createGameChanges({
   exclusions,
   events,
   announcements,
+  bets,
+  betAnnouncements,
 }: GameChangeDependencies) {
   /** Does the change as its author's member would on the website; returns what the game tells the author. */
   async function perform(author: { character: Character; member: Member }, change: GameChange): Promise<string> {
@@ -74,6 +83,16 @@ export function createGameChanges({
         await announcements.announceQuietly(eventId);
         return `Événement du ${formatDateTime(startsAt)} créé et annoncé sur Discord.`;
       }
+      case "stake": {
+        const { bet } = await bets.stake(author.member, change.betId, change.choiceId, change.amount);
+        await betAnnouncements.announceQuietly(change.betId);
+        const label = bet.choices.find((choice) => choice.id === change.choiceId)?.label ?? "";
+        return `Mise de ${formatGold(change.amount)} sur « ${label} » enregistrée : à payer au trésorier.`;
+      }
+      case "withdraw":
+        await bets.withdraw(author.member, change.betId);
+        await betAnnouncements.announceQuietly(change.betId);
+        return "Mise retirée.";
     }
   }
 
@@ -89,11 +108,17 @@ export function createGameChanges({
   /** What becomes of one change; undefined when it cannot be kept (unknown event, or relayed by a member). */
   async function receiveOne(sender: Member, change: GameChange): Promise<GameChangeOutcome | undefined> {
     const creation = change.kind === "event";
-    const known = await unitOfWork.run(async ({ gameChanges, events: stored }) => ({
+    const betId = isBetChange(change) ? change.betId : undefined;
+    const known = await unitOfWork.run(async ({ gameChanges, events: storedEvents, bets: storedBets }) => ({
       outcome: await gameChanges.find(change.id),
-      event: creation ? undefined : await stored.findById(change.eventId),
+      // The event or the bet the change is about must exist: the answer goes back with its data.
+      scope:
+        creation ||
+        (betId === undefined
+          ? (await storedEvents.findById(change.eventId)) !== undefined
+          : (await storedBets.findById(betId)) !== undefined),
     }));
-    if (known.outcome !== undefined || (!creation && known.event === undefined)) {
+    if (known.outcome !== undefined || !known.scope) {
       return known.outcome;
     }
     const author = await findAuthor(change.author);
@@ -101,7 +126,12 @@ export function createGameChanges({
     if (author !== undefined && author.member.id !== sender.id && !canManageRaids(sender.roles)) {
       return undefined;
     }
-    const base = { id: change.id, eventId: creation ? undefined : change.eventId, author: change.author };
+    const base = {
+      id: change.id,
+      eventId: creation || betId !== undefined ? undefined : change.eventId,
+      betId,
+      author: change.author,
+    };
     let outcome: GameChangeOutcome;
     if (author === undefined) {
       outcome = { ...base, accepted: false, message: UNKNOWN_AUTHOR };

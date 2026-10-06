@@ -1,0 +1,182 @@
+local _, ns = ...
+
+--- What Le Dé Pipé shows (§7.2), as rows for the core's lists: the open bets on the table with their odds and the
+--- player's stake, the player's bets, the bettors' ranking and the guild's cash. Built from the data alone.
+local DiceView = {}
+ns.DiceView = DiceView
+
+local Bets, Book, Gold, Stakes = ns.Bets, ns.Book, ns.Gold, ns.Stakes
+
+local DATE = "%d/%m %H:%M"
+local EXAMPLE_STAKE = 10
+local NO_DATA = "Aucune donnée des paris : un officier les envoie à la guilde, ou ton compagnon VXV les apporte."
+local NO_BET = "Aucun pari ouvert : les officiers les lancent sur le site et sur Discord."
+local UNLINKED = "Ce personnage n'est lié à aucun membre sur le site : lie-le avec /vxv_main ou /vxv_reroll."
+-- Where a stake stands with the treasurer (domain/bets.ts).
+local STANDINGS = {
+    toPay = "à payer", paid = "payée", debt = "dette", toCollect = "gain à récupérer", collected = "gain versé",
+    settled = "réglée",
+}
+
+local function row(kind, text, tooltip)
+    return { kind = kind, text = text, tooltip = tooltip }
+end
+
+--- The head of the screen: subtitle, and the badges of the player's debt and of the organisation's share.
+function DiceView.Header(data, memberId)
+    local debt = Bets.Debt(data, memberId)
+    return {
+        subtitle = data == nil and NO_DATA or ("Données du " .. date(DATE, data.exportedAt)),
+        badges = {
+            debt > 0 and { text = "Dette : " .. Gold.Format(debt), color = "loss" }
+                or { text = "Dette : aucune", color = "gain" },
+            { text = Book.ORGANISATION_PERCENT .. " % pour la caisse", color = "gold" },
+        },
+    }
+end
+
+--- The player's stake on the bet as it stands: waiting for the website, known by it, or none.
+local function myStake(bet, memberId, book)
+    local pending, stake, answer = Stakes.Pending(bet.id), Bets.StakeOf(bet, memberId), Stakes.Answer(bet.id)
+    local rows = {}
+    if pending ~= nil then
+        rows[#rows + 1] = row("line", pending.kind == "withdraw" and "Retrait de ta mise en attente du site"
+            or ("En attente du site : %s sur « %s »"):format(Gold.Format(pending.amount),
+                Bets.ChoiceLabel(bet, pending.choiceId)))
+    elseif stake ~= nil then
+        local gain = Book.Gain(book, stake.choiceId, stake.amount)
+        rows[#rows + 1] = row("line", ("Ma mise : %s sur « %s » · %s · gain possible %s"):format(
+            Gold.Format(stake.amount), Bets.ChoiceLabel(bet, stake.choiceId), STANDINGS[stake.standing] or "",
+            Gold.Format(gain)))
+    else
+        rows[#rows + 1] = row("line", "Pas de mise")
+    end
+    if answer ~= nil and not answer.accepted and pending == nil then
+        rows[#rows + 1] = row("line", VXV.Theme.Colored("Refusée : " .. answer.message, "loss"))
+    end
+    return rows
+end
+
+--- A bet on the table: when it closes and its pool, each choice's share and odds, the player's stake.
+function DiceView.Bet(bet, memberId)
+    local book = Book.Of(bet)
+    local rows = {
+        row("title", bet.title, { title = bet.title, lines = { "Clic : miser" } }),
+        row("line", ("Ferme le %s · cagnotte %s · %s"):format(date(DATE, bet.closesAt), Gold.Format(book.pool),
+            VXV.Count(book.bettors, "parieur"))),
+    }
+    for _, entry in ipairs(book.choices) do
+        rows[#rows + 1] = row("line", ("%s · %s · %s · %s"):format(entry.choice.label, Gold.Share(entry.share),
+            Gold.Format(entry.total), Gold.Odds(entry.odds)), {
+            title = entry.choice.label,
+            lines = { VXV.Count(entry.bettors, "parieur"), ("Gain pour %s : %s"):format(Gold.Format(EXAMPLE_STAKE),
+                Gold.Format(Book.Gain(book, entry.choice.id, EXAMPLE_STAKE))) },
+        })
+    end
+    for _, extra in ipairs(myStake(bet, memberId, book)) do
+        rows[#rows + 1] = extra
+    end
+    return rows
+end
+
+--- Le Dé Pipé's table: every open bet, closing soonest first; or why there is none. A bet's title opens the stake.
+function DiceView.Table(data, memberId, now, onStake)
+    if data == nil then
+        return { row("line", NO_DATA) }
+    end
+    local open = Bets.Open(data, now)
+    if #open == 0 then
+        return { row("line", NO_BET) }
+    end
+    local rows = {}
+    for _, bet in ipairs(open) do
+        for index, entry in ipairs(DiceView.Bet(bet, memberId)) do
+            if index == 1 then
+                entry.onClick = function()
+                    onStake(bet.id)
+                end
+            end
+            rows[#rows + 1] = entry
+        end
+    end
+    return rows
+end
+
+--- "Mes paris": the player's stake on each bet, latest bets first, with where it stands.
+function DiceView.MyStakes(data, memberId)
+    if data == nil then
+        return {}
+    end
+    if memberId == nil then
+        return { row("line", UNLINKED) }
+    end
+    local rows = {}
+    for _, bet in ipairs(data.bets) do
+        local stake = Bets.StakeOf(bet, memberId)
+        if stake ~= nil then
+            local result = stake.standing == "toCollect" and (" · " .. Gold.Format(stake.gain)) or ""
+            rows[#rows + 1] = row("line", ("%s : %s sur « %s » · %s%s"):format(bet.title, Gold.Format(stake.amount),
+                Bets.ChoiceLabel(bet, stake.choiceId), STANDINGS[stake.standing] or "", result))
+        end
+    end
+    if #rows == 0 then
+        rows[1] = row("line", "Aucune mise pour l'instant.")
+    end
+    return rows
+end
+
+--- The bettors since always, the best net gain first (P11.7).
+function DiceView.Ranking(data)
+    local rows = {}
+    for _, rank in ipairs(data ~= nil and data.ranking or {}) do
+        rows[#rows + 1] = row("line", ("%d. %s · %s · %s"):format(rank.rank, VXV.ClassColored(rank.name, rank.class),
+            Gold.Signed(rank.net), VXV.Count(rank.bets, "pari")))
+    end
+    if #rows == 0 then
+        rows[1] = row("line", "Aucun pari terminé pour l'instant.")
+    end
+    return rows
+end
+
+--- The guild's cash (P11.9) as lines of text: its balance, the month's entries and exits, the latest movements.
+--- Also shown on the Journal's left page (VXV_Raid), which gets them through the bus ("cash.updated").
+function DiceView.CashLines(data)
+    if data == nil then
+        return {}
+    end
+    local cash = data.cash
+    local lines = {
+        "Solde : " .. Gold.Format(cash.balance),
+        ("Ce mois : %s, %s"):format(Gold.Signed(cash.entries), Gold.Signed(cash.exits)),
+    }
+    for _, movement in ipairs(cash.movements) do
+        lines[#lines + 1] = ("%s · %s · %s"):format(date(DATE, movement.at), movement.label,
+            Gold.Signed(movement.amount))
+    end
+    return lines
+end
+
+--- The guild's cash as rows: the balance as their header.
+function DiceView.Cash(data)
+    local rows = {}
+    for index, text in ipairs(DiceView.CashLines(data)) do
+        rows[#rows + 1] = row(index == 1 and "header" or "line", text)
+    end
+    return rows
+end
+
+--- The Taverne's card: the bet closing soonest, or how bets come.
+function DiceView.Card(data, now)
+    local bet = Bets.Open(data, now)[1]
+    if bet == nil then
+        return { title = "Aucun pari ouvert", action = "Entrer",
+            lines = { "Les officiers lancent les paris sur le site et sur Discord." } }
+    end
+    local book = Book.Of(bet)
+    return {
+        title = bet.title,
+        lines = { ("Cagnotte %s · %s"):format(Gold.Format(book.pool), VXV.Count(book.bettors, "parieur")),
+            "Ferme le " .. date(DATE, bet.closesAt) },
+        action = "Entrer",
+    }
+end

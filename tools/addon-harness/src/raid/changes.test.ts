@@ -151,6 +151,7 @@ describe("changes made in game", () => {
         {
           id: change?.id ?? "",
           eventId: "e1",
+          betId: undefined,
           author: "Thom Leboss",
           accepted: false,
           message: "Un des objets choisis ne tombe pas dans les raids de cet événement.",

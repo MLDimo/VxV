@@ -11,7 +11,7 @@ local Theme = VXV.Theme
 
 local WIDTH, HEIGHT = 480, 390
 local HEADING_HEIGHT, TOGGLE_TOP, SECTION_GAP, TOGGLE_GAP = 18, 22, 66, 6
-local FIELD_HEIGHT, FIELD_PADDING, BUTTON_WIDTH, BUTTON_HEIGHT = 26, 6, 160, 30
+local FIELD_PADDING, BUTTON_WIDTH, BUTTON_HEIGHT = 6, 160, 30
 -- The website's limit for a specialisation.
 local MAX_SPEC_LETTERS = 30
 local STATUS_ORDER = { "present", "late", "maybe", "bench", "absent" }
@@ -51,19 +51,9 @@ end
 
 local function addSpecField(top)
     heading(top, "Spécialisation")
-    local holder = CreateFrame("Frame", nil, body)
+    local holder
+    holder, specBox = Theme.Field(body, body:GetWidth(), MAX_SPEC_LETTERS)
     holder:SetPoint("TOPLEFT", 0, -(top + TOGGLE_TOP))
-    holder:SetSize(body:GetWidth(), FIELD_HEIGHT)
-    Theme.Fill(holder, "night"):SetAllPoints()
-    Theme.Rings(holder, { { "line", 1 } }, true)
-    specBox = CreateFrame("EditBox", nil, holder)
-    specBox:SetPoint("TOPLEFT", FIELD_PADDING, 0)
-    specBox:SetPoint("BOTTOMRIGHT", -FIELD_PADDING, 0)
-    specBox:SetFontObject(Theme.Font("text", 13))
-    specBox:SetAutoFocus(false)
-    specBox:SetMaxLetters(MAX_SPEC_LETTERS)
-    specBox:SetScript("OnEscapePressed", specBox.ClearFocus)
-    specBox:SetScript("OnEnterPressed", specBox.ClearFocus)
 end
 
 local function send()

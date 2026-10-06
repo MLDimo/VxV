@@ -7,16 +7,11 @@ ns.Companion = Companion
 
 local RaidData, Sharing = ns.RaidData, ns.Sharing
 
-local seen = false
-
 VXV.On("sync.inbox", function(inbox)
-    seen = true
     if type(inbox.raid) == "string" and RaidData.FromCompanion(inbox.raid) and RaidData.IsOfficer(VXV.PlayerName()) then
         Sharing.Send()
     end
 end)
 
 --- True when the player's companion brought data at this launch: a /reload brings newer ones.
-function Companion.Seen()
-    return seen
-end
+Companion.Seen = VXV.CompanionSeen

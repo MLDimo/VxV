@@ -5,7 +5,7 @@ local _, ns = ...
 local JournalTab = {}
 ns.JournalTab = JournalTab
 
-local JournalView, RaidData, RaidLog, RowList = ns.JournalView, ns.RaidData, ns.RaidLog, ns.RowList
+local JournalView, RaidData, RaidLog, RowList = ns.JournalView, ns.RaidData, ns.RaidLog, VXV.RowList
 
 local Theme = VXV.Theme
 
@@ -25,10 +25,12 @@ local PAGE_MARGIN = 14
 local PAGE_PADDING = 22
 -- The lines of a page: its title, its text, and on the right page the list from the fourth line.
 local TEXT_LINE, LIST_LINE = 1, 3
-local CASH = { "Bientôt : dons, dettes et caisse de la guilde,", "avec les paris." }
+-- The cash's lines come from VXV_Paris ("cash.updated"); without them, where they come from.
+local CASH = { "La caisse arrive avec les paris :", "le compagnon VXV ou un officier les apporte." }
 local INTRO = "Les raids enregistrés en jeu et les modifications des officiers, avec leur motif."
 
 local content, list
+local cashLines, cashTexts = {}, {}
 
 local function render()
     list.SetRows(JournalView.Rows(RaidLog.All(), RaidData.Current()))
@@ -39,7 +41,7 @@ local function lineTop(index)
     return PAGE_MARGIN + index * RULE
 end
 
---- Writes a text on a line of the page, within its margins.
+--- Writes a text on a line of the page, within its margins; returns it, to change its text.
 local function write(page, index, text, style, size)
     local fontString = Theme.Text(page, style, size, "ink-brown")
     local y = -(lineTop(index) + RULE / 2)
@@ -47,6 +49,15 @@ local function write(page, index, text, style, size)
     fontString:SetPoint("RIGHT", page, "TOPRIGHT", -PAGE_PADDING, y)
     fontString:SetWordWrap(false)
     fontString:SetText(text)
+    return fontString
+end
+
+--- The cash's lines on the left page, as many as it holds.
+local function renderCash()
+    local texts = #cashTexts > 0 and cashTexts or CASH
+    for index, fontString in ipairs(cashLines) do
+        fontString:SetText(texts[index] or "")
+    end
 end
 
 --- A parchment page of some lines on the cover, its title on the first one; the spine on one side. A child of the
@@ -93,9 +104,10 @@ function JournalTab.Build(frame)
     local pageHeight = height - 2 * COVER
     local lines = math.floor((pageHeight - 2 * PAGE_MARGIN) / RULE)
     local left = addPage(cover, COVER, leftWidth, pageHeight, lines, "La caisse", "RIGHT")
-    for index, text in ipairs(CASH) do
-        write(left, TEXT_LINE + index - 1, text, "text", 12)
+    for index = TEXT_LINE, lines - 1 do
+        cashLines[#cashLines + 1] = write(left, index, "", "text", 12)
     end
+    renderCash()
 
     local rightWidth = pages - leftWidth
     local right = addPage(cover, COVER + leftWidth + SPINE, rightWidth, pageHeight, lines, "Journal", "LEFT")
@@ -116,3 +128,9 @@ end
 
 VXV.On("raid.log", refresh)
 VXV.On("raid.updated", refresh)
+VXV.On("cash.updated", function(texts)
+    cashTexts = texts or {}
+    if content ~= nil then
+        renderCash()
+    end
+end)

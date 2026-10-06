@@ -31,7 +31,8 @@ export interface SitePort {
   /** Asks the website to forget the token; never fails. */
   unlink(token: string): Promise<void>;
   /** What the addon needs from the website. */
-  download(token: string): Promise<{ raid: NextRaid | null }>;
+  /** The next event, and the bets (absent from a website older than P11.8). */
+  download(token: string): Promise<{ raid: NextRaid | null; paris?: { text: string } }>;
   /** What the addon saved for the website; the website says what it made of it, in French. */
   upload(token: string, upload: Upload): Promise<UploadReport>;
 }
