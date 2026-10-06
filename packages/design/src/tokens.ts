@@ -55,6 +55,8 @@ export const COLORS = {
   "stamp-quest": "#2E7A44",
   "stamp-bet": "#B0306E",
   "stamp-raid": "#3A5AA0",
+  "ink-gain": "#2E7A44",
+  "ink-loss": "#8A1F2C",
 } as const;
 
 export type ColorToken = keyof typeof COLORS;

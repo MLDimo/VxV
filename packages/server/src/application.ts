@@ -2,6 +2,7 @@ import { createAddonExport } from "./application/addonExport.ts";
 import { createAuth } from "./application/auth.ts";
 import { createBetAnnouncements } from "./application/betAnnouncements.ts";
 import { createBets } from "./application/bets.ts";
+import { createCash } from "./application/cash.ts";
 import { createCharacters } from "./application/characters.ts";
 import { createCompanion } from "./application/companion.ts";
 import { createCompanionUploads } from "./application/companionUploads.ts";
@@ -17,6 +18,7 @@ import { createRaidReminders } from "./application/raidReminders.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
+import { createTreasury } from "./application/treasury.ts";
 import type { BetAnnouncer, Clock, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
@@ -80,6 +82,8 @@ export function createApplication({
     raidLogs,
     bets: createBets({ unitOfWork, clock }),
     betAnnouncements: createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock }),
+    treasury: createTreasury({ unitOfWork, clock }),
+    cash: createCash({ unitOfWork, clock }),
   };
 }
 

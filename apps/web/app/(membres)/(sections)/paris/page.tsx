@@ -3,6 +3,8 @@ import { count, formatGold } from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { Badge } from "@/components/Badge";
 import { BetTable } from "@/components/BetTable";
+import { DebtBadge } from "@/components/DebtBadge";
+import { DiceNav } from "@/components/DiceNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
@@ -10,12 +12,14 @@ import { requireMember } from "@/server/session";
 /** Le Dé Pipé (§7.2): the open bets on the gaming table, then the closed ones. */
 export default async function BetsPage() {
   const member = await requireMember();
-  const bets = await getApplication().bets.list();
+  const { bets: allBets, treasury } = getApplication();
+  const [bets, debt] = await Promise.all([allBets.list(), treasury.debtOf(member)]);
   const open = bets.filter((view) => view.open);
   const closed = bets.filter((view) => !view.open);
   return (
     <>
       <ScreenHeader kicker="La salle de jeu" kickerClassName="text-neon" title="Le Dé Pipé">
+        <DebtBadge debt={debt} />
         <Badge tone="gold">{ORGANISATION_PERCENT} % pour la caisse</Badge>
         {canManageRaids(member.roles) && (
           <Link href="/paris/nouveau" className="button-wood text-gold">
@@ -23,6 +27,7 @@ export default async function BetsPage() {
           </Link>
         )}
       </ScreenHeader>
+      <DiceNav current="/paris" />
       <div className="mt-8 space-y-8">
         {open.length === 0 && (
           <p className="text-lavender">Aucun pari ouvert : les officiers les lancent ici et sur Discord.</p>

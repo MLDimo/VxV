@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration, formatGold, formatOdds, formatShare, formatShortEventDate } from "./labels.ts";
+import {
+  formatDuration,
+  formatGold,
+  formatOdds,
+  formatShare,
+  formatShortEventDate,
+  formatSignedGold,
+} from "./labels.ts";
 
 /** French typography keeps numbers and units together with no-break spaces. */
 const plain = (text: string) => text.replace(/\s/gu, " ");
@@ -17,6 +24,8 @@ describe("labels", () => {
     expect(plain(formatOdds(2.142857))).toBe("× 2,14");
     expect(formatOdds(undefined)).toBe("—");
     expect(plain(formatShare(0.42))).toBe("42 %");
+    expect(plain(formatSignedGold(500))).toBe("+500 po");
+    expect(plain(formatSignedGold(-850))).toBe("−850 po");
   });
 
   it("writes a duration in hours and minutes, or minutes alone", () => {

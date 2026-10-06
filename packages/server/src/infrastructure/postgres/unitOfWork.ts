@@ -2,6 +2,7 @@ import type { Repositories, UnitOfWork } from "../../application/ports.ts";
 import type { SqlClient } from "../sql.ts";
 import { betRepository, stakeRepository } from "./bets.ts";
 import { bossLootRepository } from "./bossLoot.ts";
+import { cashRepository } from "./cash.ts";
 import { characterRepository } from "./characters.ts";
 import { companionRepository } from "./companion.ts";
 import { eventRepository } from "./events.ts";
@@ -38,6 +39,7 @@ function createRepositories(sql: SqlClient): Repositories {
     gameChanges: gameChangeRepository(sql),
     bets: betRepository(sql),
     stakes: stakeRepository(sql),
+    cash: cashRepository(sql),
   };
 }
 

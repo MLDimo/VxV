@@ -1,4 +1,5 @@
-import type { Bet, DiscordMessage, NewBet, Stake } from "../domain/bets.ts";
+import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
+import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
 import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { GameChangeOutcome } from "../domain/gameChanges.ts";
@@ -10,6 +11,7 @@ import type { RaidReminder, ReminderTarget } from "../domain/reminders.ts";
 import type { RosterEntry } from "../domain/roster.ts";
 import type { Signup, SignupChoice } from "../domain/signups.ts";
 import type { LootItem, PastEventForItem, SoftReserve } from "../domain/softReserves.ts";
+import type { LedgerStake } from "../domain/treasury.ts";
 
 export interface DiscordIdentity {
   discordId: string;
@@ -26,6 +28,7 @@ export interface Session {
 export interface MemberRepository {
   /** Creates the member on first sign-in, or refreshes their Discord name and guild roles. */
   saveFromDiscord(identity: DiscordIdentity, roles: readonly MemberRole[]): Promise<Member>;
+  /** Undefined when the id is unknown or malformed. */
   findById(id: string): Promise<Member | undefined>;
   listAll(): Promise<Member[]>;
   /** The member's guild roles, as Discord gives them now. */
@@ -208,6 +211,8 @@ export interface BetRepository {
   /** The latest closing first. */
   listRecent(limit: number): Promise<Bet[]>;
   setDiscordMessage(betId: string, message: DiscordMessage): Promise<void>;
+  /** The bet ends: its winning choice, or none when it is cancelled. */
+  end(betId: string, winningChoiceId: string | undefined, endedAt: Date): Promise<void>;
 }
 
 export interface StakeRepository {
@@ -218,6 +223,37 @@ export interface StakeRepository {
   /** Creates the member's stake on the bet, or moves it to this choice and amount, as placed at the instant. */
   save(stake: Pick<Stake, "betId" | "memberId" | "choiceId" | "amount">, placedAt: Date): Promise<void>;
   delete(betId: string, memberId: string): Promise<void>;
+  /** Undefined when the id is unknown or malformed. */
+  findById(stakeId: string): Promise<Stake | undefined>;
+  /** Every stake of the member, on every bet. */
+  listByMember(memberId: string): Promise<Stake[]>;
+  /** What each stake of an ended bet brought back. */
+  settle(stakes: readonly SettledStake[]): Promise<void>;
+  /** The treasurer received the stake (or the debt it became). */
+  markPaid(stakeId: string, treasurerId: string, at: Date): Promise<void>;
+  /** The treasurer handed the member what the stake brought back. */
+  markCollected(stakeId: string, treasurerId: string, at: Date): Promise<void>;
+  /** Stakes the treasurer still has to deal with: not paid, or whose gain is not handed over yet. */
+  listPending(): Promise<LedgerStake[]>;
+  /** Stakes the treasurer validated, the latest validation first. */
+  listValidated(limit: number): Promise<LedgerStake[]>;
+}
+
+/** A movement of the guild's cash, as recorded: its amount signed. */
+export interface CashRecord {
+  kind: CashMovementKind;
+  amount: number;
+  label: string;
+  reason: string;
+  recordedBy: string;
+  betId: string | undefined;
+  memberId: string | undefined;
+}
+
+export interface CashRepository {
+  record(movement: CashRecord, occurredAt: Date): Promise<void>;
+  /** Every movement, the latest first. */
+  listAll(): Promise<CashMovement[]>;
 }
 
 export interface Repositories {
@@ -239,6 +275,7 @@ export interface Repositories {
   gameChanges: GameChangeRepository;
   bets: BetRepository;
   stakes: StakeRepository;
+  cash: CashRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

@@ -33,6 +33,10 @@ export interface Bet {
   createdAt: Date;
   /** The bet's message on Discord, once published. */
   discordMessage: DiscordMessage | undefined;
+  /** When an officer declared the result or cancelled the bet; no stake changes after. */
+  endedAt: Date | undefined;
+  /** The choice that won; undefined while the bet runs, and for a cancelled bet. */
+  winningChoiceId: string | undefined;
 }
 
 export interface DiscordMessage {
@@ -40,9 +44,20 @@ export interface DiscordMessage {
   messageId: string;
 }
 
-/** Stakes are taken until the closing time. */
-export function isOpen(bet: Pick<Bet, "closesAt">, now: Date): boolean {
-  return now < bet.closesAt;
+/** Stakes are taken until the closing time, unless the bet ended before. */
+export function isOpen(bet: Pick<Bet, "closesAt" | "endedAt">, now: Date): boolean {
+  return bet.endedAt === undefined && now < bet.closesAt;
+}
+
+/** Why an officer cannot end the bet with this winning choice (undefined for a cancellation), or undefined. */
+export function endRefusal(bet: Pick<Bet, "choices" | "endedAt">, winningChoiceId: string | undefined) {
+  if (bet.endedAt !== undefined) {
+    return "Ce pari est déjà terminé.";
+  }
+  if (winningChoiceId !== undefined && !bet.choices.some((choice) => choice.id === winningChoiceId)) {
+    return "Choisis le choix gagnant parmi ceux du pari.";
+  }
+  return undefined;
 }
 
 /** The choices an officer typed, trimmed, without the empty ones. */
@@ -73,7 +88,7 @@ export function newBetRefusal(bet: NewBet, now: Date): string | undefined {
 
 /** Why a member cannot stake this amount on this choice now, or undefined when they can. */
 export function stakeRefusal(
-  bet: Pick<Bet, "choices" | "closesAt">,
+  bet: Pick<Bet, "choices" | "closesAt" | "endedAt">,
   stake: { choiceId: string; amount: number; existing: Pick<Stake, "paidAt"> | undefined },
   now: Date,
 ): string | undefined {
@@ -106,6 +121,11 @@ export interface Stake {
   placedAt: Date;
   /** When the treasurer received the stake; a paid stake can no longer change. */
   paidAt: Date | undefined;
+  /** Once the bet ended: won, lost or refunded, and what it brings back. */
+  outcome: StakeOutcome | undefined;
+  gain: number | undefined;
+  /** When the treasurer handed the member what the stake brought back. */
+  collectedAt: Date | undefined;
 }
 
 /** What the pool looks like on one choice. */
@@ -212,4 +232,54 @@ export function payout(stake: Pick<Stake, "amount" | "paidAt">, settled: Pick<Se
 /** A lost stake that was never paid: a debt, which bars the member from betting until the treasurer has it. */
 export function isDebt(stake: Pick<Stake, "paidAt">, outcome: StakeOutcome | undefined): boolean {
   return outcome === "lost" && stake.paidAt === undefined;
+}
+
+/** Where a stake stands with the treasurer. */
+export type StakeStanding =
+  /** Placed, not paid yet: the treasurer awaits it. */
+  | "toPay"
+  | "paid"
+  /** Lost without being paid: the member owes it. */
+  | "debt"
+  /** What the stake brought back is owed to the member. */
+  | "toCollect"
+  | "collected"
+  /** Over: nothing more to hand over either way. */
+  | "settled";
+
+export function standing(stake: Pick<Stake, "amount" | "paidAt" | "outcome" | "gain" | "collectedAt">): StakeStanding {
+  if (stake.outcome === undefined || stake.gain === undefined) {
+    return stake.paidAt === undefined ? "toPay" : "paid";
+  }
+  if (isDebt(stake, stake.outcome)) {
+    return "debt";
+  }
+  if (payout(stake, { outcome: stake.outcome, gain: stake.gain }) === 0) {
+    return "settled";
+  }
+  return stake.collectedAt === undefined ? "toCollect" : "collected";
+}
+
+/** What the member owes in all: the stakes they lost without paying them. */
+export function debtOf(stakes: readonly Pick<Stake, "amount" | "paidAt" | "outcome" | "gain" | "collectedAt">[]) {
+  return sum(stakes.filter((stake) => standing(stake) === "debt").map((stake) => stake.amount));
+}
+
+/** Why the treasurer cannot note the stake paid, or undefined. */
+export function paymentRefusal(stake: Pick<Stake, "paidAt" | "collectedAt">): string | undefined {
+  if (stake.paidAt !== undefined) {
+    return "Cette mise est déjà payée.";
+  }
+  return stake.collectedAt === undefined ? undefined : "Le gain de cette mise est déjà versé, sa mise déduite.";
+}
+
+/** Why the treasurer cannot note what the stake brought back handed over, or undefined. */
+export function collectionRefusal(
+  stake: Pick<Stake, "amount" | "paidAt" | "outcome" | "gain" | "collectedAt">,
+): string | undefined {
+  const current = standing(stake);
+  if (current === "collected") {
+    return "Ce gain est déjà versé.";
+  }
+  return current === "toCollect" ? undefined : "Cette mise ne rapporte rien à verser.";
 }

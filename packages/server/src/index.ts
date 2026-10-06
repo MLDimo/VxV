@@ -45,13 +45,22 @@ export {
   type Member,
   type MemberRole,
 } from "./domain/members.ts";
-export { canManageRaids } from "./domain/permissions.ts";
+export { canManageRaids, canManageTreasury } from "./domain/permissions.ts";
 export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastructure/sql.ts";
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
 export type { AnnouncedBet, AnnouncedRaid, BetAnnouncer, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
 export type { BetView } from "./application/bets.ts";
+export type { CashOverview } from "./application/cash.ts";
+export {
+  CASH_KIND_LABELS,
+  MANUAL_CASH_KINDS,
+  type CashMovement,
+  type CashMovementKind,
+  type ManualCashKind,
+} from "./domain/cash.ts";
+export type { LedgerStake, TreasuryBook, TreasuryEntry } from "./domain/treasury.ts";
 export {
   MAX_BET_TITLE_LENGTH,
   MAX_CHOICE_LENGTH,
@@ -64,6 +73,8 @@ export {
   type BetChoice,
   type DiscordMessage,
   type Stake,
+  type StakeOutcome,
+  type StakeStanding,
 } from "./domain/bets.ts";
 export { RaidLogFormatError } from "./domain/raidLog.ts";
 export type { RaidRecap } from "./domain/raidRecap.ts";

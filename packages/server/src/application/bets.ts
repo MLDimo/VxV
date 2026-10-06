@@ -1,15 +1,20 @@
 import {
   betBook,
   cleanChoices,
+  debtOf,
+  endRefusal,
   isOpen,
   newBetRefusal,
+  refund,
+  settle,
   stakeRefusal,
   type Bet,
   type BetBook,
   type NewBet,
   type Stake,
 } from "../domain/bets.ts";
-import type { BetCreationRecord } from "../domain/journal.ts";
+import type { BetCreationRecord, BetEndRecord } from "../domain/journal.ts";
+import { formatGold } from "../domain/labels.ts";
 import type { Member } from "../domain/members.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
@@ -44,6 +49,55 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
       throw new ValidationError(UNKNOWN_BET);
     }
     return found;
+  }
+
+  /**
+   * An officer ends the bet: with its winning choice, the stakes are settled and the organisation's share goes to
+   * the guild's cash; without one, the bet is cancelled and every stake is given back.
+   */
+  async function end(officer: Member, betId: string, winningChoiceId: string | undefined, reason: string) {
+    const motive = checkOfficerAction(officer, reason);
+    await unitOfWork.run(async (repositories) => {
+      const { bet, stakes, book } = await requireView(repositories, betId);
+      const refusal = endRefusal(bet, winningChoiceId);
+      if (refusal !== undefined) {
+        throw new ValidationError(refusal);
+      }
+      const now = clock();
+      const settlement = winningChoiceId === undefined ? refund(stakes) : settle(stakes, winningChoiceId);
+      await repositories.bets.end(bet.id, winningChoiceId, now);
+      await repositories.stakes.settle(settlement.stakes);
+      if (settlement.organisation > 0) {
+        await repositories.cash.record(
+          {
+            kind: "bet_share",
+            amount: settlement.organisation,
+            label: `Pari « ${bet.title} » : part de l'organisation`,
+            reason: motive,
+            recordedBy: officer.id,
+            betId: bet.id,
+            memberId: undefined,
+          },
+          now,
+        );
+      }
+      const after: BetEndRecord = {
+        title: bet.title,
+        winner: bet.choices.find((choice) => choice.id === winningChoiceId)?.label,
+        pool: book.pool,
+        winners: settlement.stakes.filter((stake) => stake.outcome === "won").length,
+        organisation: settlement.organisation,
+      };
+      await repositories.journal.record({
+        actorId: officer.id,
+        action: winningChoiceId === undefined ? "bet.cancel" : "bet.result",
+        entity: "bet",
+        entityId: bet.id,
+        before: null,
+        after,
+        reason: motive,
+      });
+    });
   }
 
   return {
@@ -108,9 +162,25 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
         if (refusal !== undefined) {
           throw new ValidationError(refusal);
         }
+        const debt = debtOf(await repositories.stakes.listByMember(member.id));
+        if (debt > 0) {
+          throw new ValidationError(
+            `Tu dois ${formatGold(debt)} au trésorier : règle ta dette pour parier de nouveau.`,
+          );
+        }
         await repositories.stakes.save({ betId: bet.id, memberId: member.id, choiceId, amount }, now);
         return requireView(repositories, bet.id);
       });
+    },
+
+    /** An officer declares the winning choice: gains for the winners, the organisation's share for the cash. */
+    declareResult(officer: Member, betId: string, winningChoiceId: string, reason: string): Promise<void> {
+      return end(officer, betId, winningChoiceId, reason);
+    },
+
+    /** An officer cancels the bet: every stake is given back. */
+    cancel(officer: Member, betId: string, reason: string): Promise<void> {
+      return end(officer, betId, undefined, reason);
     },
 
     /** The member takes their stake back, while the bet is open and the stake not paid. */

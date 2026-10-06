@@ -219,6 +219,32 @@ describe("initial schema", () => {
     });
   });
 
+  describe("guild cash", () => {
+    const record = (memberId: string, kind: string, amount: number) =>
+      database.query(
+        `insert into cash_movements (occurred_at, kind, amount, label, reason, recorded_by)
+         values (now(), $2::cash_movement_kind, $3, 'Mouvement', 'Motif', $1)`,
+        [memberId, kind, amount],
+      );
+
+    it("takes donations in and sends expenses out, never the other way", async () => {
+      const treasurer = await insertMember(database, "1");
+      await record(treasurer, "donation", 500);
+      await record(treasurer, "expense", -120);
+      await expect(record(treasurer, "donation", -5)).rejects.toThrow(/cash_movements_sign/);
+      await expect(record(treasurer, "expense", 5)).rejects.toThrow(/cash_movements_sign/);
+    });
+
+    it.each([
+      ["update", "update cash_movements set amount = 1"],
+      ["delete", "delete from cash_movements"],
+      ["truncate", "truncate cash_movements"],
+    ])("rejects %s", async (_operation, sql) => {
+      await record(await insertMember(database, "1"), "donation", 500);
+      await expect(database.exec(sql)).rejects.toThrow(/cash_movements is append-only/);
+    });
+  });
+
   describe("journal", () => {
     async function insertEntry(reason: string): Promise<void> {
       const actorId = await insertMember(database, "officer");

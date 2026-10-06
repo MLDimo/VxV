@@ -1,5 +1,6 @@
 import type {
   BetCreationRecord,
+  BetEndRecord,
   EventCreationRecord,
   ExclusionRecord,
   JournalAction,
@@ -9,7 +10,7 @@ import type {
   RaidLogImportRecord,
   SoftReserveOverrideRecord,
 } from "./journal.ts";
-import { count, formatDateTime, LOOT_METHOD_LABELS, raidTitle, softReserveCount } from "./labels.ts";
+import { count, formatDateTime, formatGold, LOOT_METHOD_LABELS, raidTitle, softReserveCount } from "./labels.ts";
 import type { RosterImportSummary } from "./roster.ts";
 
 export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
@@ -22,6 +23,8 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "loot.council": "Objet attribué au loot council",
   "loot.correct": "Loot corrigé par un officier",
   "bet.create": "Ouverture d'un pari",
+  "bet.result": "Résultat d'un pari",
+  "bet.cancel": "Pari annulé",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -88,6 +91,16 @@ function describeBetCreation(record: BetCreationRecord): string {
   return `« ${record.title} » : ${record.choices.join(", ")} ; fermeture le ${formatDateTime(new Date(record.closesAt))}`;
 }
 
+function describeBetEnd(record: BetEndRecord): string {
+  if (record.winner === undefined) {
+    return `« ${record.title} » : cagnotte de ${formatGold(record.pool)} rendue aux parieurs`;
+  }
+  return (
+    `« ${record.title} » : « ${record.winner} » gagne ; cagnotte de ${formatGold(record.pool)}, ` +
+    `${count(record.winners, "gagnant")}, ${formatGold(record.organisation)} pour la caisse`
+  );
+}
+
 /** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -110,5 +123,8 @@ export function describeJournalEntry(entry: JournalEntry): string {
       return describeLootCorrection(entry.after as LootCorrectionRecord);
     case "bet.create":
       return describeBetCreation(entry.after as BetCreationRecord);
+    case "bet.result":
+    case "bet.cancel":
+      return describeBetEnd(entry.after as BetEndRecord);
   }
 }

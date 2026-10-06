@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { wallClockToInstant } from "./dateTime.ts";
+import { startOfMonth, wallClockToInstant } from "./dateTime.ts";
 
 describe("wallClockToInstant", () => {
   it.each([
@@ -14,5 +14,12 @@ describe("wallClockToInstant", () => {
 
   it.each(["", "2026-12-10", "10/12/2026 21:00", "2026-12-10T21:00:00"])("gives an invalid date for %j", (input) => {
     expect(Number.isNaN(wallClockToInstant(input).getTime())).toBe(true);
+  });
+});
+
+describe("startOfMonth", () => {
+  it("starts the month at midnight in Paris, even on the last evening of the previous month in UTC", () => {
+    expect(startOfMonth(new Date("2026-10-06T20:00:00Z")).toISOString()).toBe("2026-09-30T22:00:00.000Z");
+    expect(startOfMonth(new Date("2026-11-30T23:30:00Z")).toISOString()).toBe("2026-11-30T23:00:00.000Z");
   });
 });

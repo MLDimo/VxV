@@ -10,7 +10,9 @@ export type JournalAction =
   | "raid.import"
   | "loot.council"
   | "loot.correct"
-  | "bet.create";
+  | "bet.create"
+  | "bet.result"
+  | "bet.cancel";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -78,6 +80,16 @@ export interface BetCreationRecord {
   title: string;
   choices: string[];
   closesAt: string;
+}
+
+/** What the journal keeps about the end of a bet: its winning choice (none when cancelled) and its gold. */
+export interface BetEndRecord {
+  title: string;
+  winner: string | undefined;
+  pool: number;
+  winners: number;
+  /** What went to the guild's cash. */
+  organisation: number;
 }
 
 /** What the journal keeps about an officer's correction of a player's soft reserves. */

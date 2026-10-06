@@ -28,7 +28,7 @@ const BET = {
 };
 
 /** French typography keeps numbers and units together with no-break spaces. */
-const plain = (text: string | undefined) => text?.replace(/\s/gu, " ");
+const plain = (text: string | undefined) => text?.replace(/[\u00a0\u202f]/gu, " ");
 
 function contentOf(response: APIInteractionResponse): string | undefined {
   return "data" in response && response.data !== undefined && "content" in response.data
@@ -138,6 +138,22 @@ describe("bets on Discord", () => {
     );
     expect(contentOf(response)).toBe("Mise retirée.");
     expect(embed()?.fields?.[0]?.value).toBe("Aucune mise");
+  });
+
+  it("shows the result once an officer declared it, or the cancellation", async () => {
+    await open();
+    await stake(MEMBER, "Un tank", "50");
+    await stake(OFFICER, "Un heal", "150");
+    const officer = await app.auth.identify({ discordId: OFFICER.userId, discordName: OFFICER.name }, [
+      TEST_ROLES.officer,
+    ]);
+    await app.bets.declareResult(officer, await betId(), await choiceId("Un tank"), "Résultat");
+    await app.betAnnouncements.announce(await betId());
+    expect(plain(embed()?.description)).toBe(
+      "🏆 Résultat : « Un tank » · 1 gagnant, 20 po pour la caisse. Gains à récupérer auprès du trésorier.\n" +
+        "💰 Cagnotte 200 po · 2 parieurs · 10 % pour la caisse de la guilde",
+    );
+    expect(discord.messages()[0]?.body.components).toEqual([]);
   });
 
   it("drops the buttons and shows the bet closed once the closing time is past", async () => {
