@@ -18,7 +18,7 @@ local frame
 
 local function create()
     local body
-    frame, body = Dialog.Create(FRAME_NAME, WIDTH, HEIGHT, "VXV", "DIALOG")
+    frame, body = Dialog.Create(FRAME_NAME, WIDTH, HEIGHT, "VXV")
     local field = CreateFrame("Frame", nil, body)
     field:SetPoint("TOPLEFT")
     field:SetSize(body:GetWidth(), body:GetHeight() - BUTTON_HEIGHT - GAP)
