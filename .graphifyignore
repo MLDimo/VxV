@@ -1,0 +1,18 @@
+# What Graphify leaves out of the project's graph (on top of .gitignore): files that are not code nor reference.
+package-lock.json
+# Generated from packages/design (npm run generate): the source is tokens.ts.
+packages/design/src/tokens.css
+addon/VXV_Core/UI/Tokens.lua
+# Probe logs from the game (phase 0): measurements, read in docs/phase-0/rapport-faisabilite.md.
+docs/phase-0/sessions/
+# Images, fonts and other binary media of the website, the addon and the design reference.
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.ttf
+*.ico
+*.icns
+*.pdf
+# The addons' table of contents: not code (graphify reads them as such, with errors).
+*.toc
