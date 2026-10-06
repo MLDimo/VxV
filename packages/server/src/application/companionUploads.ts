@@ -22,6 +22,8 @@ export interface CompanionUpload {
   changes: readonly GameChange[];
   /** Game counters the addon read (P12.4): the player's own, and for an officer those relayed. */
   counters: readonly GameCounterReading[];
+  /** Each bundle's texts for the website, by kind ("metiers": a character's professions as VXV-METIERS text). */
+  texts: Readonly<Record<string, readonly string[]>>;
 }
 
 /** What the website made of it, in French, for the companion's window. */
@@ -34,9 +36,13 @@ export interface CompanionUploadReport {
   changes: string | undefined;
   /** How many counter readings were new, if any were sent. */
   counters: string | undefined;
+  /** What became of each bundle's texts (the professions…), shown as they come by any companion since 1.3. */
+  texts: string[];
 }
 
 const OFFICERS_ONLY = "Réservé aux officiers.";
+/** The kind of text the artisans' professions come as (addon/VXV_Artisans). */
+export const PROFESSIONS_KIND = "metiers";
 
 /** The use cases an upload goes through, each checking the member's rights. */
 export interface CompanionUploadDependencies {
@@ -52,6 +58,7 @@ export interface CompanionUploadDependencies {
   };
   /** The running missions' messages on Discord follow their ranking. */
   missionAnnouncements: { announceQuietly(missionId: string): Promise<boolean> };
+  artisans: { recordFromGame(sender: Member, texts: readonly string[]): Promise<number> };
 }
 
 /** "3 changements faits en jeu : 2 acceptés, 1 refusé." */
@@ -99,6 +106,7 @@ export function createCompanionUploads({
   gameChanges,
   missions,
   missionAnnouncements,
+  artisans,
 }: CompanionUploadDependencies) {
   /** Keeps the new readings; the running missions' rankings on Discord follow them. */
   async function recordCounters(member: Member, readings: readonly GameCounterReading[]): Promise<string> {
@@ -128,7 +136,17 @@ export function createCompanionUploads({
         changes:
           upload.changes.length === 0 ? undefined : describeChanges(await gameChanges.receive(member, upload.changes)),
         counters: upload.counters.length === 0 ? undefined : await recordCounters(member, upload.counters),
+        texts: [],
       };
+      const professions = upload.texts[PROFESSIONS_KIND] ?? [];
+      if (professions.length > 0) {
+        report.texts.push(
+          await described(async () => {
+            const changed = await artisans.recordFromGame(member, professions);
+            return changed > 0 ? `Métiers : ${count(changed, "mis à jour", "mis à jour")}.` : "Métiers à jour.";
+          }),
+        );
+      }
       const sentRoster = upload.roster;
       if (sentRoster !== undefined) {
         report.roster = officer

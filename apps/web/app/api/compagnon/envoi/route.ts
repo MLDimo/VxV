@@ -12,6 +12,10 @@ const MAX_CHANGES = 200;
 const MAX_SOFT_RESERVES = 20;
 /** Five counters for each character of an account, and the relays of an officer. */
 const MAX_COUNTERS = 500;
+/** Each bundle's texts (addon/VXV_Sync/Outbox.lua): a few kinds, a text per character or game. */
+const MAX_TEXT_KINDS = 10;
+const MAX_TEXTS = 200;
+const MAX_KIND = 30;
 
 const changeBase = {
   id: z.string().min(1).max(160),
@@ -84,6 +88,12 @@ const uploadSchema = z.object({
     )
     .max(MAX_COUNTERS)
     .default([]),
+  // Since the companion 1.3: each bundle's texts by kind, then by key.
+  texts: z
+    .record(z.string().max(MAX_KIND), z.record(z.string().max(MAX_KIND * 4), z.string().max(MAX_TEXT)))
+    .refine((kinds) => Object.keys(kinds).length <= MAX_TEXT_KINDS)
+    .refine((kinds) => Object.values(kinds).every((texts) => Object.keys(texts).length <= MAX_TEXTS))
+    .default({}),
 });
 
 /** The companion sends what the addon saved for the website, after a /reload or a logout (P7.4). */
@@ -93,7 +103,7 @@ export async function POST(request: Request): Promise<Response> {
     if (!upload.success) {
       return errorResponse("Envoi illisible : mets le compagnon à jour.");
     }
-    const { roster, raidLogs, characters, changes, counters } = upload.data;
+    const { roster, raidLogs, characters, changes, counters, texts } = upload.data;
     const report = await getApplication().companionUploads.receive(member, {
       roster: roster && { text: roster.text, capturedAt: new Date(roster.capturedAt * MS_PER_SECOND) },
       raidLogs,
@@ -107,6 +117,7 @@ export async function POST(request: Request): Promise<Response> {
         return [{ ...made, madeAt: at === undefined ? undefined : new Date(at * MS_PER_SECOND) }];
       }),
       counters: counters.map((reading) => ({ ...reading, at: new Date(reading.at * MS_PER_SECOND) })),
+      texts: Object.fromEntries(Object.entries(texts).map(([kind, byKey]) => [kind, Object.values(byKey)])),
     });
     return Response.json(report);
   });

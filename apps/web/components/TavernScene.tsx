@@ -3,6 +3,7 @@
 import { PLACES, TAVERN, type Place, type PlaqueAnchor } from "@vxv/design";
 import Link from "next/link";
 import { useRef, type CSSProperties, type MouseEvent } from "react";
+import { sectionHref } from "./sections";
 
 /** Where the plaque sits, relative to its place's zone (§4.2). */
 const PLAQUE_POSITIONS: Record<PlaqueAnchor, string> = {
@@ -25,37 +26,30 @@ function box([left, top, width, height]: readonly number[]): CSSProperties {
   return { left: percent(left ?? 0), top: percent(top ?? 0), width: percent(width ?? 0), height: percent(height ?? 0) };
 }
 
-/** A place of the tavern: hovering it, only its plaque changes, whether it opens a section or says "Bientôt". */
-function PlaceSpot({ place, href }: { place: Place; href: string | undefined }) {
-  const plaque = (
-    <span
-      className={`plaque absolute left-1/2 -translate-x-1/2 transition-transform group-hover:-translate-y-1 group-hover:bg-plum group-focus-visible:-translate-y-1 group-focus-visible:bg-plum ${PLAQUE_POSITIONS[place.plaque]}`}
-    >
-      {place.name}
-      <small className="block font-sans text-[11px] font-bold text-old-paper">
-        {href ? place.subtitle : "Bientôt"}
-      </small>
-    </span>
-  );
-  if (href === undefined) {
-    return (
-      <span className="group absolute" style={box(place.spot)} title={`${place.name} : bientôt`}>
-        {plaque}
-      </span>
-    );
-  }
+/** A place of the tavern, opening its section: hovering it, only its plaque changes. */
+function PlaceSpot({ place }: { place: Place }) {
   return (
-    <Link href={href} className="group absolute outline-none" style={box(place.spot)} aria-label={place.name}>
-      {plaque}
+    <Link
+      href={sectionHref(place)}
+      className="group absolute outline-none"
+      style={box(place.spot)}
+      aria-label={place.name}
+    >
+      <span
+        className={`plaque absolute left-1/2 -translate-x-1/2 transition-transform group-hover:-translate-y-1 group-hover:bg-plum group-focus-visible:-translate-y-1 group-focus-visible:bg-plum ${PLAQUE_POSITIONS[place.plaque]}`}
+      >
+        {place.name}
+        <small className="block font-sans text-[11px] font-bold text-old-paper">{place.subtitle}</small>
+      </span>
     </Link>
   );
 }
 
 /**
- * The tavern (§4): the picture, its lights, and one zone per place; the built places open their section, the
- * others say "Bientôt". The picture follows the mouse a little (parallax), except with reduced motion.
+ * The tavern (§4): the picture, its lights, and one zone per place opening its section. The picture follows the mouse
+ * a little (parallax), except with reduced motion.
  */
-export function TavernScene({ hrefs }: { hrefs: Partial<Record<Place["id"], string>> }) {
+export function TavernScene() {
   const picture = useRef<HTMLImageElement>(null);
   const move = (event: MouseEvent<HTMLDivElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -92,7 +86,7 @@ export function TavernScene({ hrefs }: { hrefs: Partial<Record<Place["id"], stri
       ))}
       <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(130%_100%_at_50%_45%,transparent_60%,rgba(13,9,18,0.6)_100%)]" />
       {PLACES.map((place) => (
-        <PlaceSpot key={place.id} place={place} href={hrefs[place.id]} />
+        <PlaceSpot key={place.id} place={place} />
       ))}
     </div>
   );

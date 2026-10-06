@@ -11,7 +11,6 @@ import { count, formatGold, formatRemaining, formatShortEventDate, raidTitle } f
 import Link from "next/link";
 import { HomeCard } from "@/components/HomeCard";
 import { PlaceTiles } from "@/components/PlaceTiles";
-import { sectionHrefs } from "@/components/sections";
 import { TavernScene } from "@/components/TavernScene";
 import { getApplication } from "@/server/application";
 
@@ -116,11 +115,10 @@ export default async function TavernPage() {
   const quest = (await missions.list()).find((view) => view.status === "running");
   const now = new Date();
   const counts = next && composition(await signups.listForEvent(next.id));
-  const hrefs = sectionHrefs();
   return (
     <>
       <div className="hidden md:block">
-        <TavernScene hrefs={hrefs} />
+        <TavernScene />
       </div>
       <div className="md:hidden">
         {/* A phone shows the tavern as a strip to slide (§5.2), then one tile per place. */}
@@ -131,7 +129,7 @@ export default async function TavernPage() {
             Glisse pour explorer →
           </span>
         </div>
-        <PlaceTiles hrefs={hrefs} />
+        <PlaceTiles />
       </div>
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-3 md:px-16">
         {TAVERN_CARDS.map((card) =>

@@ -48,6 +48,8 @@ export interface Upload {
   changes: { id: string }[];
   /** Game counters read by the addon (P12.4): the player's, and those an officer relays. */
   counters: { name: string; type: string; value: number; at: number }[];
+  /** Each bundle's texts by kind then key (since 1.3): the website checks what it takes. */
+  texts: Record<string, Record<string, string>>;
 }
 
 export interface UploadReport {
@@ -58,6 +60,8 @@ export interface UploadReport {
   counters?: string;
   /** What became of the changes made in game, if any were sent. */
   changes?: string;
+  /** What became of each bundle's texts. */
+  texts?: string[];
 }
 
 /** Listens on this computer only, for the browser coming back from the website's link page. */

@@ -17,6 +17,7 @@ import { createSignups } from "./signups.ts";
 import { createSoftReserves } from "./softReserves.ts";
 import { createBets } from "./bets.ts";
 import { createMissions } from "./missions.ts";
+import { createArtisans } from "./artisans.ts";
 
 const ROSTER = "VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nThom;Leboss;PRIEST";
 const CAPTURED_AT = new Date("2026-12-10T23:30:00Z");
@@ -58,6 +59,7 @@ describe("companion uploads", () => {
       }),
       missions: createMissions({ unitOfWork, clock }),
       missionAnnouncements: { announceQuietly: async () => true },
+      artisans: createArtisans({ unitOfWork }),
     });
     officer = await createMember(sql, "officer", "Officier");
     await createRaidWithLoot(sql);
@@ -74,6 +76,7 @@ describe("companion uploads", () => {
     characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
     changes: [],
     counters: [],
+    texts: {},
     ...changes,
   });
 
@@ -91,6 +94,7 @@ describe("companion uploads", () => {
       raidLogs: ["Journal du raid à jour."],
       characters: 1,
       changes: undefined,
+      texts: [],
     });
   });
 
@@ -101,6 +105,7 @@ describe("companion uploads", () => {
       raidLogs: ["Réservé aux officiers."],
       characters: 0,
       changes: undefined,
+      texts: [],
     });
   });
 
@@ -114,6 +119,28 @@ describe("companion uploads", () => {
       raidLogs: ["Ligne 2 illisible : recopiez le journal depuis l'addon.", "Cet événement n'existe pas."],
       characters: 0,
       changes: undefined,
+      texts: [],
     });
+  });
+
+  it("keeps the professions of a member's own characters and those an officer relays, once each", async () => {
+    await uploads.receive(officer, upload({}));
+    const member = await createMember(sql, "member", "Membre");
+    const characters = await characterRepository(sql).listAll();
+    const idOf = (firstName: string) => characters.find((character) => character.firstName === firstName)?.id ?? "";
+    await characterRepository(sql).link(idOf("Ðéjà"), officer.id);
+    await characterRepository(sql).link(idOf("Thom"), member.id);
+    const professions = (name: string) =>
+      ["VXV-METIERS-1", `C;${name}`, "P;129;Secourisme;22;75;1796904000;1796904060", "R;129;3275;Bandage en lin"].join(
+        "\n",
+      );
+    const only = (texts: string[]) =>
+      upload({ roster: undefined, raidLogs: [], characters: [], texts: { metiers: texts } });
+    // A member's own character counts, another member's does not.
+    const sent = await uploads.receive(member, only([professions("Thom Leboss"), professions("Ðéjà Vu")]));
+    expect(sent.texts).toEqual(["Métiers : 1 mis à jour."]);
+    expect((await uploads.receive(officer, only([professions("Thom Leboss")]))).texts).toEqual(["Métiers à jour."]);
+    expect((await uploads.receive(officer, only([professions("Ðéjà Vu")]))).texts).toEqual(["Métiers : 1 mis à jour."]);
+    expect((await uploads.receive(member, only(["VXV-METIERS-1\nP;x"]))).texts).toEqual(["Ligne 2 illisible."]);
   });
 });

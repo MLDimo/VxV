@@ -20,8 +20,8 @@ indispensable aux officiers. Code : `apps/companion` ; versions publiées : http
      en jeu, `/reload` les charge (depuis la version 1.2, il apporte aussi les données de tout nouveau lieu sans mise
      à jour) ;
    - après chaque `/reload` ou déconnexion, il envoie au site ce que l'addon a enregistré (inscription, SR et mises
-     faites en jeu, compteurs du jeu pour les missions, et pour un officier : exclusions, événements créés, liste de
-     guilde, journaux de raid). La modification la plus récente gagne : un changement fait en jeu avant une
+     faites en jeu, compteurs du jeu pour les missions, métiers des personnages, et pour un officier : exclusions,
+     événements créés, liste de guilde, journaux de raid). La modification la plus récente gagne : un changement fait en jeu avant une
      modification sur le site n'est pas appliqué.
 
 Mises à jour : automatiques sous Windows (installées à la fermeture du compagnon, ou tout de suite avec « Redémarrer ») ;

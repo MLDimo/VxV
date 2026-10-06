@@ -1,6 +1,6 @@
 import { readLuaData } from "@vxv/lua";
 import { describe, expect, it } from "vitest";
-import { mergeOutboxes, readOutbox } from "./outbox.ts";
+import { mergeOutboxes, readOutbox, textDigest } from "./outbox.ts";
 
 /** The file the game writes for VXV_Sync's saved data, as WoW formats it. */
 const SAVED = `
@@ -46,6 +46,13 @@ VXV_SyncDB = {
 			["at"] = 1796904200,
 		},
 	},
+	["texts"] = {
+		["metiers"] = {
+			["Ðéjà Vu"] = "VXV-METIERS-1\\nC;Ðéjà Vu",
+			["Ignoré"] = 3,
+		},
+		["autre"] = 1,
+	},
 }
 `;
 
@@ -71,6 +78,7 @@ describe("outbox of the addon", () => {
           { id: "Ðéjà Vu#1796904100#7", kind: "reserves", itemIds: [] },
         ],
         counters: [{ name: "Ðéjà Vu", type: "fishing", value: 412, at: 1796904200 }],
+        texts: { metiers: { "Ðéjà Vu": "VXV-METIERS-1\nC;Ðéjà Vu" } },
       },
     });
   });
@@ -78,7 +86,7 @@ describe("outbox of the addon", () => {
   it("leaves aside what it does not know, and tells a newer format or no data", () => {
     expect(read('VXV_SyncDB = { version = 1, raidLogs = { e1 = 3 }, characters = { X = "y" } }')).toEqual({
       kind: "read",
-      outbox: { roster: undefined, raidLogs: [], characters: [], changes: [], counters: [] },
+      outbox: { roster: undefined, raidLogs: [], characters: [], changes: [], counters: [], texts: {} },
     });
     expect(read("VXV_SyncDB = { version = 2 }")).toEqual({ kind: "newer" });
     expect(read("VXV_Other = 1")).toEqual({ kind: "none" });
@@ -92,6 +100,7 @@ describe("outbox of the addon", () => {
         characters: [{ name: "A B", race: "Orc", sex: 2 }],
         changes: [{ id: "A B#1#1" }],
         counters: [{ name: "A B", type: "fishing", value: 12, at: 1 }],
+        texts: { metiers: { "A B": "A" } },
       },
       {
         roster: { text: "new", capturedAt: 2 },
@@ -99,6 +108,7 @@ describe("outbox of the addon", () => {
         characters: [],
         changes: [],
         counters: [{ name: "C D", type: "fishing", value: 3, at: 2 }],
+        texts: { metiers: { "C D": "C" } },
       },
     ]);
     expect(merged).toEqual({
@@ -110,6 +120,13 @@ describe("outbox of the addon", () => {
         { name: "A B", type: "fishing", value: 12, at: 1 },
         { name: "C D", type: "fishing", value: 3, at: 2 },
       ],
+      texts: { metiers: { "A B": "A", "C D": "C" } },
     });
+  });
+
+  it("fingerprints a text, accents included, to send it once", () => {
+    expect(textDigest("VXV-METIERS-1\nC;Ðéjà Vu")).toBe(textDigest("VXV-METIERS-1\nC;Ðéjà Vu"));
+    expect(textDigest("VXV-METIERS-1\nC;Ðéjà Vu")).not.toBe(textDigest("VXV-METIERS-1\nC;Deja Vu"));
+    expect(textDigest("")).toBe("811c9dc5");
   });
 });
