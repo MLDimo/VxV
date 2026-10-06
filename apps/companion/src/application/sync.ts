@@ -105,8 +105,8 @@ export async function synchronize(
       ...(report.counters === undefined ? [] : [report.counters]),
     );
   }
-  const { raid, paris } = await site.download(token);
-  const inbox = renderInbox({ raid: raid?.text, paris: paris?.text, writtenAt: now });
+  const { raid, paris, quetes } = await site.download(token);
+  const inbox = renderInbox({ raid: raid?.text, paris: paris?.text, quetes: quetes?.text, writtenAt: now });
   const outdated: string[] = [];
   for (const installation of installations) {
     if (!(await gameFiles.writeInbox(installation, inbox))) {

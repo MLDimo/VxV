@@ -1,0 +1,20 @@
+## Interface: 16001
+## Title: VXV Missions
+## Notes: Les Quêtes de VXV : missions de la guilde comptées par les compteurs du jeu, classement et hall of fame.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The missions as the website exports them (VXV-QUETES), how they travel in the guild, and the game's counters.
+Counters.lua
+QuestsData.lua
+Quests.lua
+Readings.lua
+Companion.lua
+
+# Interface: the Quêtes screen and card, the reduced mode.
+UI\QuestsView.lua
+UI\QuestsTab.lua
+UI\QuestsCompact.lua
+
+Bootstrap.lua

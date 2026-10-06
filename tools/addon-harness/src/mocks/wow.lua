@@ -338,6 +338,12 @@ function FromHex(hex)
 end
 
 -- The player of this client: an undead woman ("Scourge", sex 3) unless a test says otherwise.
+--- The game's counters (T8): the honorable kills, and the Statistics tab's values by id (a string, as the game
+--- shows them; "--" for a counter never moved).
+Counters = { honorableKills = 0, statistics = {} }
+function GetPVPLifetimeStats() return Counters.honorableKills, 0, 0 end
+function GetStatistic(id) return Counters.statistics[id] or "--" end
+
 Player = { name = "Ðéjà Vu", inGuild = true, race = "Scourge", sex = 3 }
 function UnitRace(unit)
     if unit == "player" then

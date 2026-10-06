@@ -35,6 +35,9 @@ local ALIASES = {
     GetMinimapShape = { "GetMinimapShape" }, -- optional: defined by minimap addons only
     -- Sound (measured on 6 October, build 70235).
     PlaySound = { "PlaySound" },
+    -- The game's counters (phase 0, T8): the Statistics tab, readable out of combat, and the honorable kills.
+    GetStatistic = { "GetStatistic" },
+    GetPVPLifetimeStats = { "GetPVPLifetimeStats" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

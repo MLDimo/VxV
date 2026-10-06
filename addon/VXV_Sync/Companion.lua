@@ -4,7 +4,7 @@ local _, ns = ...
 --- to the other bundles once their modules started, as "sync.inbox" (inbox). Nothing happens without it.
 --- Contract with the companion (apps/companion/src/domain/inbox.ts):
 --- { version = 1, writtenAt = Unix seconds, raid = the next event as VXV-RAID text, or nil, paris = the bets as
---- VXV-PARIS text (P11.8), or nil }.
+--- VXV-PARIS text (P11.8), or nil, quetes = the missions as VXV-QUETES text (P12.8), or nil }.
 local Companion = {}
 ns.Companion = Companion
 

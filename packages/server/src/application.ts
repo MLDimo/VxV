@@ -1,5 +1,6 @@
 import { createAddonBets } from "./application/addonBets.ts";
 import { createAddonExport } from "./application/addonExport.ts";
+import { createAddonMissions } from "./application/addonMissions.ts";
 import { createAuth } from "./application/auth.ts";
 import { createBetAnnouncements } from "./application/betAnnouncements.ts";
 import { createBets } from "./application/bets.ts";
@@ -108,6 +109,7 @@ export function createApplication({
     ranking: createRanking({ unitOfWork, clock }),
     missions,
     missionAnnouncements,
+    addonMissions: createAddonMissions({ unitOfWork, clock, missions }),
   };
 }
 

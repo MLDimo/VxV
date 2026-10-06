@@ -80,13 +80,17 @@ et `docs/plan/decisions-2026-10-06.md` (règles de calcul des paris).
     données et les changements faits en jeu sont passés dans le socle (`VXV.ShareData`, `VXV.PendingChanges`).
   Validation en attente : un pari réel mené jusqu'au versement des gains ; publier le compagnon 1.1 (données des
   paris).
-- **P12 Tableau de missions** : en cours.
+- **P12 Tableau de missions** : code terminé, sauf les identifiants des statistiques de récolte.
   - 12.1, 12.2, 12.4 à 12.7 : missions, relevés des compteurs par personnage et récompenses en base ; publication par
     un officier (site `/quetes`, `/vxv_mission`, message Discord avec le classement), relevés envoyés par le
     compagnon (et relayés par un officier), classement en direct sur le site, validation du résultat par un officier,
     récompenses 70 / 20 / 10 % versées par le trésorier depuis la caisse, hall of fame.
-  - Reste 12.3 et 12.8 : le bundle `VXV_Missions` (lecture des compteurs en jeu, onglet Quêtes), qui attend les
-    identifiants des statistiques du jeu sur Forever (`/vxvtest counters list`).
+  - 12.3, 12.5 et 12.8 en jeu : bundle `VXV_Missions` (onglet Quêtes, carte de la Taverne, mode réduit ; compteurs
+    lus à la connexion puis chaque minute hors combat, gardés pour le compagnon, relayés par un officier ; score en
+    direct dans la guilde). Données `VXV-QUETES-1` apportées par le compagnon et relayées par les officiers.
+  En attente : les identifiants des statistiques de récolte et de pêche sur Forever (`/vxvtest counters list`), à
+  renseigner dans `addon/VXV_Missions/Counters.lua` (seules les victoires honorables sont lues en jeu d'ici là) ;
+  publier le compagnon 1.1 ; une mission d'une semaine menée jusqu'au classement.
 - P13 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
@@ -144,6 +148,9 @@ La table complète est dans le README. Règles :
   (export, officiers, personnages des membres, paris et leurs choix, mises, caisse, classement, réponses aux mises
   faites en jeu), écrites par `packages/server/src/domain/addonBets.ts` et lues par `addon/VXV_Paris/BetsData.lua`.
   Même règle de version.
+- Missions (contrat du site vers l'addon, P12.8) : première ligne `VXV-QUETES-1`, puis une ligne par enregistrement
+  (export, officiers, personnages des membres, missions, classements, récompenses, hall of fame), écrites par
+  `packages/server/src/domain/addonMissions.ts` et lues par `addon/VXV_Missions/QuestsData.lua`. Même règle de version.
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-1`, puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
