@@ -1,6 +1,6 @@
 import { TAVERN_CARDS } from "@vxv/design";
-import { composition, type Composition, type RaidEvent } from "@vxv/server";
-import { formatShortEventDate, raidTitle } from "@vxv/server/domain/labels";
+import { composition, type BetView, type Composition, type RaidEvent } from "@vxv/server";
+import { count, formatGold, formatShortEventDate, raidTitle } from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { HomeCard } from "@/components/HomeCard";
 import { PlaceTiles } from "@/components/PlaceTiles";
@@ -45,10 +45,36 @@ function NextRaid({
   );
 }
 
+/** Le Dé Pipé's card: the bet closing soonest, or how bets come. */
+function NextBet({ kicker, view }: { kicker: string; view: BetView | undefined }) {
+  if (view === undefined) {
+    return (
+      <HomeCard kicker={kicker} title="Aucun pari ouvert">
+        <p>Les officiers lancent les paris sur le site et sur Discord.</p>
+        <Link href="/paris" className="button-pixel">
+          Entrer
+        </Link>
+      </HomeCard>
+    );
+  }
+  return (
+    <HomeCard kicker={kicker} title={view.bet.title}>
+      <p>
+        Ferme {formatShortEventDate(view.bet.closesAt)} · {count(view.book.bettors, "parieur")}
+      </p>
+      <p className="font-pixel text-lg text-gold">Cagnotte {formatGold(view.book.pool)}</p>
+      <Link href={`/paris/${view.bet.id}`} className="button-pixel">
+        Entrer
+      </Link>
+    </HomeCard>
+  );
+}
+
 /** The tavern (§4, §5): the scene with its places, then the cards of the moment. */
 export default async function TavernPage() {
-  const { events, signups } = getApplication();
+  const { events, signups, bets } = getApplication();
   const [next] = await events.listUpcoming();
+  const nextBet = (await bets.list()).find((view) => view.open);
   const counts = next && composition(await signups.listForEvent(next.id));
   const hrefs = sectionHrefs();
   return (
@@ -71,6 +97,8 @@ export default async function TavernPage() {
         {TAVERN_CARDS.map((card) =>
           card.place === "raid" ? (
             <NextRaid key={card.place} kicker={card.kicker} event={next} counts={counts} />
+          ) : card.place === "dice" ? (
+            <NextBet key={card.place} kicker={card.kicker} view={nextBet} />
           ) : (
             <HomeCard key={card.place} kicker={card.kicker} title="Bientôt">
               <p>{card.soon}</p>

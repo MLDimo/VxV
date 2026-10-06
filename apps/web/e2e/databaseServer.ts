@@ -3,7 +3,7 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { renderSeedSql } from "@vxv/data-generator/seedSql";
 import { createMigratedPGlite } from "@vxv/database/testing";
 import { loadRaids } from "@vxv/raid-data";
-import { createDiscordRaidAnnouncer } from "@vxv/bot";
+import { createDiscordBetAnnouncer, createDiscordRaidAnnouncer } from "@vxv/bot";
 import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
 import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, WEB_ENVIRONMENT, type E2ESeed } from "./environment";
@@ -24,6 +24,11 @@ const app = createApplication({
   announcer: createDiscordRaidAnnouncer({
     ...rest,
     channelId: WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID,
+    siteUrl: WEB_ENVIRONMENT.SITE_URL,
+  }),
+  betAnnouncer: createDiscordBetAnnouncer({
+    ...rest,
+    channelId: WEB_ENVIRONMENT.DISCORD_BETS_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
 });

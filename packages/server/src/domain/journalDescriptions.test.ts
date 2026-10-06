@@ -35,6 +35,23 @@ describe("describeJournalEntry", () => {
     expect(describeJournalEntry(entry)).toBe("Mont Hyjal + Onyxia, le 10/12/2026 21:00, 2 SR par joueur");
   });
 
+  it("summarizes a bet opening: its title, its choices and its closing time in the guild time zone", () => {
+    const entry: JournalEntry = {
+      id: "9",
+      occurredAt: new Date(),
+      actorName: "Officier",
+      action: "bet.create",
+      entity: "bet",
+      entityId: "b",
+      before: null,
+      after: { title: "Qui meurt en premier ?", choices: ["Un tank", "Un heal"], closesAt: "2026-12-10T20:00:00.000Z" },
+      reason: "Pour le raid",
+    };
+    expect(describeJournalEntry(entry)).toBe(
+      "« Qui meurt en premier ? » : Un tank, Un heal ; fermeture le 10/12/2026 21:00",
+    );
+  });
+
   it("names the excluded item, its event and the removed reserves", () => {
     const entry: JournalEntry = {
       id: "3",

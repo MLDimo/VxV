@@ -3,6 +3,7 @@ import { PLACES, type Place } from "@vxv/design";
 /** The website's address of each place of the tavern that exists already; the others come with their phase. */
 const SECTION_HREFS: Partial<Record<Place["id"], string>> = {
   raid: "/raid",
+  dice: "/paris",
   journal: "/journal",
 };
 

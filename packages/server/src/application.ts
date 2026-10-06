@@ -1,5 +1,7 @@
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAuth } from "./application/auth.ts";
+import { createBetAnnouncements } from "./application/betAnnouncements.ts";
+import { createBets } from "./application/bets.ts";
 import { createCharacters } from "./application/characters.ts";
 import { createCompanion } from "./application/companion.ts";
 import { createCompanionUploads } from "./application/companionUploads.ts";
@@ -15,7 +17,7 @@ import { createRaidReminders } from "./application/raidReminders.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
-import type { Clock, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
+import type { BetAnnouncer, Clock, GuildGateway, RaidAnnouncer } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "./infrastructure/sql.ts";
@@ -27,6 +29,8 @@ export interface ApplicationConfig {
   guild: GuildGateway;
   /** The raid channel, where each event has its sign-up message. */
   announcer: RaidAnnouncer;
+  /** The bets' channel, where each bet has its message. */
+  betAnnouncer: BetAnnouncer;
   clock?: Clock;
 }
 
@@ -36,6 +40,7 @@ export function createApplication({
   discordRoles,
   guild,
   announcer,
+  betAnnouncer,
   clock = () => new Date(),
 }: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
@@ -73,6 +78,8 @@ export function createApplication({
     journal: createJournal({ unitOfWork }),
     addonExport: createAddonExport({ unitOfWork, clock }),
     raidLogs,
+    bets: createBets({ unitOfWork, clock }),
+    betAnnouncements: createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock }),
   };
 }
 

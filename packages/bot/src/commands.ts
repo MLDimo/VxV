@@ -15,6 +15,8 @@ export interface BotContext {
   linkChannelId: string;
   /** Channel where each event has its sign-up message. */
   raidChannelId: string;
+  /** Channel where each bet has its message. */
+  betsChannelId: string;
 }
 
 export interface SlashCommand {

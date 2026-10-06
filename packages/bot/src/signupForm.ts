@@ -8,12 +8,12 @@ import {
   type APIInteractionResponse,
   type APIMessageComponentGuildInteraction,
   type APIModalInteractionResponseCallbackData,
-  type APIModalSubmissionComponent,
   type APIModalSubmitGuildInteraction,
   type APISelectMenuOption,
 } from "discord-api-types/v10";
 import type { BotContext } from "./commands.ts";
 import { actingMember } from "./members.ts";
+import { submittedValues } from "./modalValues.ts";
 import { ephemeral } from "./responses.ts";
 
 /** The sign-up form of an event, read back when the member sends it. */
@@ -118,27 +118,6 @@ export function signupForm(
       },
     ],
   };
-}
-
-/** The values the member sent, by field. */
-function submittedValues(components: readonly APIModalSubmissionComponent[]): Map<string, string> {
-  const values = new Map<string, string>();
-  for (const container of components) {
-    const inner =
-      container.type === ComponentType.Label
-        ? [container.component]
-        : container.type === ComponentType.ActionRow
-          ? container.components
-          : [];
-    for (const field of inner) {
-      if ("values" in field) {
-        values.set(field.custom_id, field.values[0] ?? "");
-      } else if ("value" in field && typeof field.value === "string") {
-        values.set(field.custom_id, field.value);
-      }
-    }
-  }
-  return values;
 }
 
 /** The "S'inscrire" button: opens the form, or explains how to link a character first (P3.7). */

@@ -231,6 +231,16 @@
   color: var(--color-ink-brown);
 }
 
+/* The gaming table of Le Dé Pipé (§7.2): felt lit from the top, a thin gold line inside its frame. */
+@utility felt {
+  background: radial-gradient(120% 90% at 50% 0%, var(--color-felt), var(--color-felt-mid) 55%, var(--color-felt-edge));
+  padding: 18px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 35%, transparent),
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-beam);
+}
+
 /* The leather cover of the accounts book. */
 @utility leather {
   background: linear-gradient(180deg, var(--color-leather), var(--color-leather-shade));

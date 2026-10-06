@@ -14,6 +14,7 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "raid.import": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
   "loot.council": { label: "LOOT", className: "border-stamp-loot text-stamp-loot" },
   "loot.correct": { label: "LOOT", className: "border-stamp-loot text-stamp-loot" },
+  "bet.create": { label: "PARI", className: "border-stamp-bet text-stamp-bet" },
 };
 
 /** The accounts book (§7.7): the guild's cash on the left (to come), the officers' journal on the right. */

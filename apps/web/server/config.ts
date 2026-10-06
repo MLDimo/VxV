@@ -18,6 +18,8 @@ const environmentSchema = z.object({
   DISCORD_GUILD_ID: discordId,
   DISCORD_LINK_CHANNEL_ID: discordId,
   DISCORD_RAID_CHANNEL_ID: discordId,
+  // Optional: without a channel of their own, the bets are published in the raid channel.
+  DISCORD_BETS_CHANNEL_ID: discordId.optional(),
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -41,6 +43,8 @@ export interface WebConfig {
     linkChannelId: string;
     /** Channel where each event has its sign-up message. */
     raidChannelId: string;
+    /** Channel where each bet has its message. */
+    betsChannelId: string;
     roles: DiscordRoleMapping;
   };
 }
@@ -66,6 +70,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       guildId: env.DISCORD_GUILD_ID,
       linkChannelId: env.DISCORD_LINK_CHANNEL_ID,
       raidChannelId: env.DISCORD_RAID_CHANNEL_ID,
+      betsChannelId: env.DISCORD_BETS_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       roles: {
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,
