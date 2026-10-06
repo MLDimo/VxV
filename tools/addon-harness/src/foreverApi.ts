@@ -90,4 +90,4 @@ export function foreverApi(): Set<string> {
 }
 
 /** Compat wrappers for functions that other addons define, absent from a client without them. */
-export const OPTIONAL_API = new Set(["GetMinimapShape"]);
+export const OPTIONAL_API = new Set(["GetMinimapShape", "PlaySound"]);

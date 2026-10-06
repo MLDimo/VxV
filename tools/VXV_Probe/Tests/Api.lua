@@ -25,6 +25,8 @@ local FUNCTIONS = {
     "GetProfessions", "GetNumSkillLines", "C_TradeSkillUI", "GetNumTradeSkills",
     -- Misc
     "C_Timer.After", "C_Timer.NewTicker", "hooksecurefunc",
+    -- Alert of the next boss (P8.3)
+    "PlaySound", "SOUNDKIT",
 }
 
 local EVENTS = {
@@ -38,6 +40,8 @@ local EVENTS = {
     "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST", "RESURRECT_REQUEST",
     "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER", "CHAT_MSG_RAID_WARNING",
     "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_UPDATE",
+    -- Entering an instance (P8.1)
+    "PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA",
 }
 
 local function checkBuild()

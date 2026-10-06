@@ -39,12 +39,17 @@ function Raids.Progress(raid, kills)
     return nextBoss, fallen
 end
 
+--- The raid of this id, as its data pack registers it, or nil without the pack.
+function Raids.ById(raidId)
+    return (VXV_RaidData or {})[raidId]
+end
+
 --- The loot of these raids (their data packs), boss by boss: { itemId, name, boss }, each item once. A raid
 --- without its pack brings nothing.
 function Raids.Loot(raidIds)
     local loot, seen = {}, {}
     for _, raidId in ipairs(raidIds or {}) do
-        local raid = (VXV_RaidData or {})[raidId]
+        local raid = Raids.ById(raidId)
         for _, boss in ipairs(raid and raid.bosses or {}) do
             for _, item in ipairs(boss.loot) do
                 if not seen[item.itemId] then

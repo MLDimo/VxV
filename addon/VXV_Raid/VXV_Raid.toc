@@ -24,6 +24,12 @@ Distribution.lua
 RaidLog.lua
 Raids.lua
 
+# The next boss (P8): where the raid stands, the kills told to a late player, the alert and its message on screen.
+NextBoss.lua
+KillSharing.lua
+UI\AlertFrame.lua
+BossAlert.lua
+
 # Interface: the Raid and Journal screens, the reduced mode, the loot panel and the import and export of the data.
 UI\RowList.lua
 UI\RaidView.lua

@@ -38,6 +38,15 @@ function Group.Names()
     return names
 end
 
+--- The group's leader, "Prénom Nom", or nil outside a group.
+function Group.Leader()
+    for _, member in ipairs(Group.Members()) do
+        if UnitIsGroupLeader(member.unit) then
+            return member.name
+        end
+    end
+end
+
 --- The addon channel of the group: the raid's, or the party's.
 function Group.Channel()
     return IsInRaid() and "RAID" or "PARTY"

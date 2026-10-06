@@ -52,7 +52,13 @@ avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` 
   - 7.5 modifications en jeu : inscription, SR et exclusions depuis l'écran Raid, en attente puis confirmées ou refusées (lignes `C` de `VXV-RAID-2`), relayées par un officier équipé pour les membres sans compagnon ;
   - 7.6 robustesse : droits vérifiés par le site, dédoublonnage (journaux, liste plus ancienne ou incomplète, changements par identifiant).
   En attente : le jeton `COMPANION_RELEASES_TOKEN` (voir le guide) pour publier la première version, puis un essai réel (liaison, `/reload`, envoi) avant la fin de la bêta.
-- P8 à P15 : pas commencées.
+- **P8 Prochain boss** : code terminé (bundle `VXV_Raid`) :
+  - 8.1 prochain boss : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du pack) ; ailleurs, le premier boss debout des raids de l'événement, dans leur ordre ; un joueur qui rejoint le raid en retard apprend du maître du butin (ou du chef) les boss déjà tués ;
+  - 8.2 panneau : en tête de « SR du raid » sur l'écran Raid (son butin et qui l'a réservé), et dans le mode réduit ;
+  - 8.3 alerte : message au milieu de l'écran et son de l'avertissement de raid, une fois par boss où le joueur a une SR ; désactivable (`/vxv alerte` ou le bouton « Alerte » de l'écran Raid).
+  L'entrée dans une instance n'a pas d'événement mesuré sur Forever : la position est relue toutes les 5 s. `PlaySound` passe par Compat tant qu'il n'est pas mesuré (ajouté à l'inventaire de la sonde, avec `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA`).
+  Validation en attente : l'alerte sur un raid enchaînant deux instances (raids ouverts le 9 décembre ; en bêta, « La salle des Thanes » seule).
+- P9 à P15 : pas commencées.
 
 ## Design (charte « La Taverne »)
 

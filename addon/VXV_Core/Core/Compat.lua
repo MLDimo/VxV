@@ -33,6 +33,8 @@ local ALIASES = {
     -- Interface
     GetCursorPosition = { "GetCursorPosition" },
     GetMinimapShape = { "GetMinimapShape" }, -- optional: defined by minimap addons only
+    -- Sound: optional until measured on Forever (the probe's inventory lists it); silent when absent.
+    PlaySound = { "PlaySound" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

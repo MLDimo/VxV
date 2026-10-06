@@ -5,7 +5,8 @@ local _, ns = ...
 local RaidTab = {}
 ns.RaidTab = RaidTab
 
-local Choices, EventData, Import, Invitations = ns.Choices, ns.EventData, ns.Import, ns.Invitations
+local BossAlert, Choices, EventData, Import = ns.BossAlert, ns.Choices, ns.EventData, ns.Import
+local Invitations = ns.Invitations
 local LogExport, RaidData, RaidLog, RaidView = ns.LogExport, ns.RaidData, ns.RaidLog, ns.RaidView
 local RowList, SignupDialog = ns.RowList, ns.SignupDialog
 
@@ -86,6 +87,7 @@ local function updateButtons()
     buttons.signup:SetText(EventData.SignupOf(event, player) and "Changer" or "M'inscrire")
     buttons.reserves:SetShown(Choices.CanReserve(event, player))
     buttons.exclusions:SetShown(isOfficer)
+    buttons.alert:SetText(BossAlert.IsOn() and "Alerte : oui" or "Alerte : non")
     -- Anybody may load the first data: refused unless the website names them officer.
     officerPanel:SetShown(RaidData.Current() == nil or isOfficer)
     buttons.open:SetShown(isOfficer and (leader == nil or leader == player))
@@ -107,7 +109,15 @@ local function render()
     renderHeader()
     lists.me.SetRows(RaidView.Me(event, player))
     lists.composition.SetRows(RaidView.Composition(event))
-    lists.raidReserves.SetRows(RaidView.RaidReserves(event))
+    -- The next boss first (P8.2), then the whole raid's reserves.
+    local raidRows = RaidView.NextBoss(event, player)
+    if #raidRows > 0 then
+        raidRows[#raidRows + 1] = { kind = "header", text = "Tout le raid" }
+    end
+    for _, extra in ipairs(RaidView.RaidReserves(event)) do
+        raidRows[#raidRows + 1] = extra
+    end
+    lists.raidReserves.SetRows(raidRows)
     lists.myReserves.SetRows(RaidView.MyReserves(event, player))
     lists.loots.SetRows(RaidView.LastLoots(RaidLog.Current()))
     local requests = RaidView.Requests(Invitations.Requests())
@@ -186,8 +196,10 @@ function RaidTab.Build(frame)
     local compositionHeight, reservesHeight = split(COMPOSITION_SHARE)
     local _, compositionBody = addPanel(x2, GRID_TOP, center, compositionHeight, "Composition")
     lists.composition = RowList.Create(compositionBody)
-    local _, reservesBody = addPanel(x2, GRID_TOP + compositionHeight + GAP, center, reservesHeight, "SR du raid")
+    local reservesPanel, reservesBody = addPanel(x2, GRID_TOP + compositionHeight + GAP, center, reservesHeight,
+        "SR du raid")
     lists.raidReserves = RowList.Create(reservesBody)
+    buttons.alert = titleButton(reservesPanel, "Alerte : oui", BossAlert.Toggle)
 
     local myHeight, lootsHeight = split(SMALL_SHARE)
     local myPanel, myBody = addPanel(x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
@@ -210,3 +222,5 @@ VXV.On("raid.updated", refresh)
 VXV.On("raid.invitations", refresh)
 VXV.On("raid.log", refresh)
 VXV.On("raid.changes", refresh)
+VXV.On("raid.alert", refresh)
+VXV.On("raid.place", refresh)

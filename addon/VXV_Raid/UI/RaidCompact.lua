@@ -5,8 +5,8 @@ local _, ns = ...
 local RaidCompact = {}
 ns.RaidCompact = RaidCompact
 
-local CompactView, Group, RaidData, RaidLog = ns.CompactView, ns.Group, ns.RaidData, ns.RaidLog
-local Raids, RowList = ns.Raids, ns.RowList
+local CompactView, Group, NextBoss, RaidData = ns.CompactView, ns.Group, ns.NextBoss, ns.RaidData
+local RaidLog, Raids, RowList = ns.RaidLog, ns.Raids, ns.RowList
 
 local Theme = VXV.Theme
 
@@ -25,7 +25,7 @@ local function render()
     if raid ~= nil then
         boss, fallen = Raids.Progress(raid, log and log.kills or {})
     end
-    local warning = CompactView.Alert(event, player, boss)
+    local warning = NextBoss.Warning(event, player, boss)
     alert:SetShown(warning ~= nil)
     if warning ~= nil then
         alert.title:SetText(warning.title)
@@ -97,4 +97,5 @@ end
 
 VXV.On("raid.updated", refresh)
 VXV.On("raid.log", refresh)
+VXV.On("raid.place", refresh)
 VXV.OnEvent("GROUP_ROSTER_UPDATE", refresh)
