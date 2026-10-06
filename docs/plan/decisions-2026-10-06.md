@@ -135,4 +135,12 @@ restent ouverts à sa relecture.
   (après la partie : le compagnon la remonte au /reload ou à la déconnexion).
 - Classement (15.7) : gain net, parties jouées, plus grosse victoire ; depuis toujours, ce mois, la saison. Titres
   « Il cheat c'est sûr » (plus gros gain net de la saison) et « Loser » (plus grosse perte nette).
+- En jeu : le défi se chuchote à un membre connecté avec VXV et dure une minute ; le défié l'accepte ou le refuse
+  dans une fenêtre (refus automatique s'il a une dette). L'acceptation lance la partie chez toute la guilde
+  connectée et l'écrit dans le canal de guilde ; les paris restent ouverts une minute, puis le défié roll. Chaque
+  roll est le /roll du jeu, tiré par le serveur et visible dans le chat ; l'addon du joueur lit son résultat et le
+  dit à la guilde, qui n'accepte que le roll attendu (bon joueur, bonne plage). Pas de forfait : une partie
+  abandonnée reste en cours dans l'addon jusqu'au /reload, sans dette.
+- Le Dé Pipé porte deux sous-onglets, « Paris » et « Deathroll » : le socle accepte désormais plusieurs modules par
+  lieu, sans que les bundles dépendent l'un de l'autre.
 

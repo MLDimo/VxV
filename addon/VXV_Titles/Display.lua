@@ -63,6 +63,13 @@ end
 local Display = {}
 ns.Display = Display
 
+-- Another bundle asks for a player's titles (the deathroll's window): ("Prénom Nom", reply(titles)).
+VXV.On("titles.request", function(name, reply)
+    if type(reply) == "function" then
+        reply(Titles.Of(name))
+    end
+end)
+
 --- Hooks the three displays once the module started.
 function Display.Start()
     Compat.AddTooltipPostCall(Enum.TooltipDataType.Unit, decorateTooltip)

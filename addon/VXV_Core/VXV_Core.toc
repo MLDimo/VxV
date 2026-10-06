@@ -24,6 +24,7 @@ Core\Serializer.lua
 Core\SendQueue.lua
 Core\Comm.lua
 Core\GroupChat.lua
+Core\Rolls.lua
 Core\Presence.lua
 Core\SharedData.lua
 Core\SiteData.lua

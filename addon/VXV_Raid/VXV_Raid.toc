@@ -12,7 +12,6 @@ RaidData.lua
 Group.lua
 Reserves.lua
 Attribution.lua
-Rolls.lua
 Sharing.lua
 Companion.lua
 Changes.lua

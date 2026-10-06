@@ -185,8 +185,8 @@ end
 --- Each card shows its place's news, or what the place will bring.
 local function renderCards()
     for _, frame in ipairs(cards) do
-        local module = Modules.ForPlace(frame.card.place)
-        local view = module ~= nil and module.tab.Card ~= nil and module.tab.Card()
+        local module = Modules.ForPlace(frame.card.place, "Card")
+        local view = module ~= nil and module.tab.Card()
             or { title = "Bientôt", lines = { frame.card.soon or NOT_YET } }
         frame.title:SetText(view.title)
         frame.text:SetText(table.concat(view.lines, "\n"))

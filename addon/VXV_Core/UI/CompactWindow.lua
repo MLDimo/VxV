@@ -43,8 +43,8 @@ local function buildContent(tab)
     tab.content = CreateFrame("Frame", nil, frame)
     tab.content:SetPoint("TOPLEFT", BORDER, -top)
     tab.content:SetSize(WIDTH - 2 * BORDER, HEIGHT - BORDER - top)
-    local module = Modules.ForPlace(tab.place.id)
-    if module ~= nil and module.tab.Compact ~= nil then
+    local module = Modules.ForPlace(tab.place.id, "Compact")
+    if module ~= nil then
         module.tab.Compact(tab.content)
         return
     end

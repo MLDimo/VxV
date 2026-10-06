@@ -24,6 +24,8 @@ local TAVERN = { id = "tavern", name = "Taverne" }
 local PERCENT = 100
 -- Under everything the screen draws in its background layer.
 local BACKDROP_LEVEL = -8
+-- The tabs of a place several modules share, above their sections' frames.
+local SECTION_TABS_LEVEL = 20
 
 local frame, selected
 local tabs = {}
@@ -70,6 +72,37 @@ local function buildComingSoon(content, place)
     soon:SetText("Bientôt : ce lieu ouvre avec sa phase.")
 end
 
+--- A place several modules share: one section per module, and tabs above them to choose one.
+local function buildSections(content, modules)
+    local sections, buttons = {}, {}
+    local function select(chosen)
+        for index, section in ipairs(sections) do
+            section:SetShown(index == chosen)
+            buttons[index]:SetSelected(index == chosen)
+        end
+    end
+    local width = 0
+    for index, module in ipairs(modules) do
+        local section = CreateFrame("Frame", nil, content)
+        section:SetPoint("TOPLEFT")
+        section:SetSize(content:GetWidth(), content:GetHeight())
+        module.tab.Build(section)
+        sections[index] = section
+        buttons[index] = Theme.Tab(content, module.tab.name or module.name)
+        buttons[index]:SetFrameLevel(section:GetFrameLevel() + SECTION_TABS_LEVEL)
+        buttons[index]:SetScript("OnClick", function()
+            select(index)
+        end)
+        width = width + buttons[index]:GetWidth() + (index > 1 and TAB_GAP or 0)
+    end
+    local left = -width / 2
+    for _, button in ipairs(buttons) do
+        button:SetPoint("TOPLEFT", content, "TOP", left, -SCREEN_PADDING)
+        left = left + button:GetWidth() + TAB_GAP
+    end
+    select(1)
+end
+
 local function buildContent(tab)
     tab.content = CreateFrame("Frame", nil, frame)
     tab.content:SetPoint("TOPLEFT", BORDER, -(BORDER + HEADER_HEIGHT))
@@ -77,11 +110,13 @@ local function buildContent(tab)
     if tab.place.backdrop ~= nil then
         addBackdrop(tab.content, tab.place.backdrop)
     end
-    local module = Modules.ForPlace(tab.place.id)
-    if module ~= nil then
-        module.tab.Build(tab.content)
-    else
+    local modules = Modules.Of(tab.place.id)
+    if #modules == 0 then
         buildComingSoon(tab.content, tab.place)
+    elseif #modules == 1 then
+        modules[1].tab.Build(tab.content)
+    else
+        buildSections(tab.content, modules)
     end
 end
 

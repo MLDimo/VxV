@@ -1,10 +1,12 @@
 local _, ns = ...
 
 --- Feature modules plug into the core: { id, name, Enable(data), tab }, data being the module's saved data
---- and tab an optional { place, Build(content), Card(), Compact(content) }: the screen of a place of the tavern
---- ("raid", "journal"…, see UI/Tokens.lua), shown in the window under the place's name; the place's card under
+--- and tab an optional { place, Build(content), Card(), Compact(content), name, order }: the screen of a place of the
+--- tavern ("raid", "journal"…, see UI/Tokens.lua), shown in the window under the place's name; the place's card under
 --- the tavern when it has one, Card() giving { title, lines, action } (the module emits "tavern.changed" when it
---- changes); and its compact screen in the reduced mode.
+--- changes); and its compact screen in the reduced mode. Several modules may share a place (Le Dé Pipé: Paris and
+--- Deathroll): its screen then shows one tab per module, named by tab.name (the module's name otherwise), in the
+--- order of tab.order.
 --- Modules registered after login (bundles loaded on demand) are enabled at once.
 local Modules = {}
 ns.Modules = Modules
@@ -36,10 +38,31 @@ function Modules.All()
     return ordered
 end
 
---- The module showing this place's screen, if any.
-function Modules.ForPlace(placeId)
-    for _, module in ipairs(ordered) do
+--- The modules of a place, by their tab's order, then their registration.
+function Modules.Of(placeId)
+    local list = {}
+    for index, module in ipairs(ordered) do
         if module.tab ~= nil and module.tab.place == placeId then
+            list[#list + 1] = { module = module, index = index }
+        end
+    end
+    table.sort(list, function(left, right)
+        local leftOrder, rightOrder = left.module.tab.order or 0, right.module.tab.order or 0
+        if leftOrder ~= rightOrder then
+            return leftOrder < rightOrder
+        end
+        return left.index < right.index
+    end)
+    for index, entry in ipairs(list) do
+        list[index] = entry.module
+    end
+    return list
+end
+
+--- The first module of the place providing this part of its tab ("Build" by default, "Card", "Compact"), if any.
+function Modules.ForPlace(placeId, part)
+    for _, module in ipairs(Modules.Of(placeId)) do
+        if module.tab[part or "Build"] ~= nil then
             return module
         end
     end
