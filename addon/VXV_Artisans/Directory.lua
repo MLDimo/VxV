@@ -139,6 +139,17 @@ function Directory.Search(search)
     return list
 end
 
+--- Every recipe a character of the guild knows: { [recipe id] = name }.
+function Directory.Recipes()
+    local recipes = {}
+    for _, entry in pairs(all()) do
+        for id, name in pairs(entry.recipes or {}) do
+            recipes[id] = name
+        end
+    end
+    return recipes
+end
+
 --- A character's professions, by id.
 function Directory.Of(character)
     local entries = {}

@@ -8,6 +8,7 @@ VXV.RegisterModule({
         ns.Directory.Restore(data)
         ns.Professions.Start()
         ns.Sharing.Start()
+        ns.RecipeItems.Start()
     end,
     tab = {
         place = "artisans",
