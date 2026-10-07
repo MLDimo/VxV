@@ -252,6 +252,15 @@ function GameTooltip:SetHyperlink(link) self.link = link end
 --- Where the cursor is, in screen pixels; tests move it.
 Cursor = { x = 0, y = 0 }
 function GetCursorPosition() return Cursor.x, Cursor.y end
+--- The game's combat log (phase 0, T11) and the game's settings (CVars) the addon changed.
+CombatLogging = false
+function LoggingCombat(on)
+    if on ~= nil then CombatLogging = on end
+    return CombatLogging
+end
+CVars = {}
+C_CVar = { SetCVar = function(name, value) CVars[name] = value return true end }
+
 --- Where the player is: GetInstanceInfo's name, type and instance id (outside any instance: the open world).
 Instance = { name = "Kalimdor", type = "none", id = 1 }
 function GetInstanceInfo()

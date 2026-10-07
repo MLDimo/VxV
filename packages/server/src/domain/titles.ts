@@ -4,8 +4,7 @@
  * without any update of the addon.
  */
 
-/** The titles computed from the season's data. */
-const COMPUTED_TITLES = [
+export const TITLES = [
   { id: "gamblingKing", name: "Roi du gambling", rule: "Plus gros gain net aux paris sur la saison." },
   { id: "debtKing", name: "Roi de la dette", rule: "Plus grosse perte nette aux paris sur la saison." },
   { id: "numberOne", name: "Numéro UNO", rule: "Vainqueur de la dernière mission de guilde terminée." },
@@ -25,24 +24,20 @@ const COMPUTED_TITLES = [
   { id: "sugarDaddy", name: "Sugar Daddy", rule: "Le plus gros donateur à la caisse de la guilde sur la saison." },
   { id: "cheater", name: "Il cheat c'est sûr", rule: "Plus gros gain net au deathroll sur la saison." },
   { id: "loser", name: "Loser", rule: "Plus grosse perte nette au deathroll sur la saison." },
-] as const;
-
-/**
- * The titles the game does not measure (owner's decision of 7 October): an officer gives them for the week. Like the
- * others, they go to nobody at each Wednesday's reassignment.
- */
-export const OFFICER_TITLES = [
   {
     id: "princess",
     name: "Princesse",
-    rule: "Le plus de soins reçus en raid : donné par un officier pour la semaine.",
+    rule: "Le plus de soins reçus sur les boss tués en raid VXV sur la saison (journal de combat).",
   },
 ] as const;
 
-export const TITLES = [...COMPUTED_TITLES, ...OFFICER_TITLES] as const;
-
 export type TitleId = (typeof TITLES)[number]["id"];
-type ComputedTitleId = (typeof COMPUTED_TITLES)[number]["id"];
+
+/**
+ * The titles an officer may give for the week, in place of the computed holder (owner's decisions of 7 October):
+ * those whose measure may miss data. Given again by the reassignment each Wednesday, like the others.
+ */
+export const OFFICER_TITLES = TITLES.filter((title) => title.id === "princess");
 
 /** A member's score on a title's rule, and when they reached it. */
 export interface TitleScore {
@@ -67,6 +62,8 @@ export interface TitleFacts {
   /** The game's damage meter over the bosses killed in VXV raids during the season, by member and raid. */
   damage: Tally;
   healing: Tally;
+  /** The healing received on the bosses killed in VXV raids during the season, by member and raid (combat logs). */
+  healingReceived: Tally;
   /** The resurrections accepted in VXV raids during the season, by member and raid. */
   raised: Tally;
   /** The donations to the guild's cash during the season. */
@@ -97,7 +94,7 @@ export function ahead(scores: readonly TitleScore[]): TitleScore | undefined {
 }
 
 /** The scores of each title's rule. */
-function scoresByTitle(facts: TitleFacts): Record<ComputedTitleId, TitleScore[]> {
+function scoresByTitle(facts: TitleFacts): Record<TitleId, TitleScore[]> {
   const nets = totals(
     facts.bets.map((bet) => ({ memberId: bet.memberId, amount: bet.gain - bet.amount, at: bet.endedAt })),
   );
@@ -122,6 +119,7 @@ function scoresByTitle(facts: TitleFacts): Record<ComputedTitleId, TitleScore[]>
     sugarDaddy: totals(facts.donations),
     cheater: deathrolls,
     loser: deathrolls.map((net) => ({ ...net, score: -net.score })),
+    princess: totals(facts.healingReceived),
   };
 }
 
@@ -131,10 +129,10 @@ export interface TitleAward {
   score: number;
 }
 
-/** This week's holder of each computed title; a title nobody scored on goes to nobody, an officer's title too. */
+/** This week's holder of each title; a title nobody scored on goes to nobody. */
 export function awardTitles(facts: TitleFacts): TitleAward[] {
   const scores = scoresByTitle(facts);
-  return COMPUTED_TITLES.flatMap((title) => {
+  return TITLES.flatMap((title) => {
     const holder = ahead(scores[title.id]);
     return holder === undefined ? [] : [{ titleId: title.id, memberId: holder.memberId, score: holder.score }];
   });

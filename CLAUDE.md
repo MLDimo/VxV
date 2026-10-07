@@ -97,9 +97,16 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     raid, dons à la caisse ; `packages/server/src/domain/titles.ts`), réattribués chaque mercredi à 5 h UTC (tâche
     Vercel), historique en base, catégorie « Titres » du Ranking (`/ranking/titres`), rôles Discord « ◆ <titre> » et
     annonce de la semaine.
-  - Titres donnés par un officier (7 octobre) : ce que le jeu ne mesure pas (Princesse, `OFFICER_TITLES`) se donne sur
-    Ranking › Titres pour la semaine affichée, avec motif au journal (`title.give`) et rôle Discord aussitôt ; le
-    mercredi, ces titres ne vont à personne, comme les autres. Pas de score (`title_awards.score` vide).
+  - Titres donnés par un officier (7 octobre) : un titre dont la mesure peut manquer des données (Princesse,
+    `OFFICER_TITLES`) se donne sur Ranking › Titres pour la semaine affichée, avec motif au journal (`title.give`) et
+    rôle Discord aussitôt ; le mercredi, la réattribution le recalcule comme les autres. Pas de score
+    (`title_awards.score` vide).
+  - Princesse (7 octobre, après la mesure T11) : soins reçus sur les boss tués en raid VXV sur la saison, lus dans le
+    journal de combat. L'addon l'allume avec son mode avancé dans l'instance d'un raid des packs et l'éteint en sortant
+    s'il l'a allumé (`VXV_Raid/CombatLogging.lua`, sur l'événement `raid.place` de `Place.lua`) ; le compagnon 1.4 le
+    lit au fil de l'eau (`apps/companion/src/domain/combatLog.ts`) et envoie chaque boss tué au site (texte
+    `VXV-COMBAT-1`, type `combat`), qui garde le relevé le plus complet de chaque combat (`boss_fights`) et retrouve
+    les joueurs par prénom parmi les présents du journal du raid (`domain/bossFights.ts`).
   - Titres de raid : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans le compteur du jeu après chaque
     boss tué, une fois hors combat (`VXV_Raid/Meter.lua`, session notée à la mort du boss) ; Lève toi copaing
     (résurrections acceptées : le joueur relevé le dit au groupe, `Raised.lua`). Journal `VXV-LOG-2`.
@@ -108,7 +115,9 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     liste de guilde, mesurés en phase 0, T9). Données `VXV-TITRES-1` (noms et règles compris : un nouveau titre ne
     demande pas de mise à jour de l'addon) apportées par le compagnon et relayées par les officiers.
   Validation en attente : une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu
-  par un membre sans compagnon ; le compteur de dégâts lu par identifiant (`/vxvtest meter read` après un combat).
+  par un membre sans compagnon ; le compteur de dégâts lu par identifiant (`/vxvtest meter read` après un combat) ; un
+  boss tué avec le journal de combat allumé (lignes `ENCOUNTER_START` et `ENCOUNTER_END` pas encore vues sur Forever),
+  envoyé par le compagnon 1.4.
 - **P14 Annuaire des artisans** : code terminé.
   - 14.2 et 14.3 sur le site : métiers des personnages et recettes connues en base (`professions`, `recipes`,
     `known_recipes`), la lecture la plus récente gagnante ; envoyés par le compagnon (un membre pour ses personnages,
@@ -225,6 +234,10 @@ La table complète est dans le README. Règles :
   guilde, `Y` paiement confirmé), lue par `packages/server/src/domain/deathrolls.ts` ; du site vers l'addon,
   `VXV-DEATHROLLS-1` (`X` membres bloqués par une dette, `D` parties à payer, `K` classement, `H` dernières parties),
   écrit par `domain/addonDeathrolls.ts`. Même règle de version.
+- Boss tués lus dans le journal de combat (contrat du compagnon vers le site, depuis la 1.4) : première ligne
+  `VXV-COMBAT-1`, puis `F` (boss, nom, difficulté, taille du groupe, début et fin en secondes Unix) et une ligne `H`
+  par joueur soigné (GUID, prénom, soins reçus effectifs), écrites par `apps/companion/src/domain/combatLog.ts` et lues
+  par `packages/server/src/domain/bossFights.ts`. Même règle de version.
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-2` (depuis la P13 ; le site lit encore `VXV-LOG-1`), puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts, dégâts et soins du compteur du jeu sur les boss tués, résurrections acceptées), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.

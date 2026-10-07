@@ -23,6 +23,9 @@ indispensable aux officiers. Code : `apps/companion` ; versions publiées : http
      faites en jeu, compteurs du jeu pour les missions, métiers des personnages, et pour un officier : exclusions,
      événements créés, liste de guilde, journaux de raid). La modification la plus récente gagne : un changement fait en jeu avant une
      modification sur le site n'est pas appliqué.
+   - pendant les raids, sans `/reload` (depuis la version 1.4) : l'addon allume le journal de combat du jeu dans les
+     raids de la guilde, et le compagnon le lit au fil de l'eau ; chaque boss tué part au site avec les soins reçus
+     par chacun (le titre Princesse).
 
 Mises à jour : automatiques sous Windows (installées à la fermeture du compagnon, ou tout de suite avec « Redémarrer ») ;
 sur Mac, le compagnon annonce la nouvelle version et ouvre la page de téléchargement.

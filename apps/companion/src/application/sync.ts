@@ -1,4 +1,5 @@
 import { readLuaData, LuaDataError } from "@vxv/lua";
+import { BOSS_FIGHT_KIND } from "../domain/combatLog.ts";
 import { bundleTexts, renderInbox } from "../domain/inbox.ts";
 import { mergeOutboxes, readOutbox, textDigest, type Outbox } from "../domain/outbox.ts";
 import { SiteError } from "./errors.ts";
@@ -28,6 +29,8 @@ interface SyncContext {
   now: Date;
   /** What the website already received, kept between synchronisations: each item is sent once. */
   sent: Set<string>;
+  /** The bosses killed read in the game's combat logs, as VXV-COMBAT texts by key. */
+  fights: Readonly<Record<string, string>>;
 }
 
 const NEWER_ADDON = "L'addon VXV est plus récent que le compagnon : mets le compagnon à jour.";
@@ -90,14 +93,17 @@ function unsent(outbox: Outbox, officer: boolean, sent: ReadonlySet<string>): { 
 }
 
 /**
- * Takes to the website what the addon saved since the last time (P7.4), then brings the website's data to every
+ * Takes to the website what the addon saved since the last time (P7.4) and the bosses killed in the combat logs, then
+ * brings the website's data to every
  * version of the game where VXV is installed (P7.3): the addon reads them at the next /reload or launch.
  */
 export async function synchronize(
   { site, gameFiles }: SyncDependencies,
-  { token, installations, officer, now, sent }: SyncContext,
+  { token, installations, officer, now, sent, fights }: SyncContext,
 ): Promise<SyncReport> {
-  const { upload, keys } = unsent(await collect(gameFiles, installations), officer, sent);
+  const outbox = await collect(gameFiles, installations);
+  const texts = { ...outbox.texts, [BOSS_FIGHT_KIND]: { ...outbox.texts[BOSS_FIGHT_KIND], ...fights } };
+  const { upload, keys } = unsent({ ...outbox, texts }, officer, sent);
   const messages: string[] = [];
   if (keys.length > 0) {
     const report = await site.upload(token, upload);

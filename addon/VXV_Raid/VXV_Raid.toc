@@ -23,6 +23,10 @@ Meter.lua
 Raised.lua
 Raids.lua
 
+# Where the player stands (P8), and the game's combat log switched on in the raids (T11).
+Place.lua
+CombatLogging.lua
+
 # The next boss (P8): where the raid stands, the kills told to a late player, the alert and its message on screen.
 NextBoss.lua
 KillSharing.lua

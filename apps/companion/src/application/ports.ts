@@ -98,6 +98,11 @@ export interface SavedFile {
   modifiedAt: number;
 }
 
+/** A log the game writes while it runs: its size, and when it last grew. */
+export interface LogFile extends SavedFile {
+  size: number;
+}
+
 /** The game's files the companion reads and writes, in one version of the game. */
 export interface GameFiles {
   /** Writes the inbox of VXV_Sync; false when the addon has no VXV_Sync yet (an older version). */
@@ -105,6 +110,10 @@ export interface GameFiles {
   /** VXV_Sync's saved data of every account of this version of the game. */
   savedFiles(installation: string): Promise<SavedFile[]>;
   read(path: string): Promise<Uint8Array>;
+  /** The combat logs of this version of the game (Logs/WoWCombatLog-*.txt). */
+  combatLogs(installation: string): Promise<LogFile[]>;
+  /** Up to length bytes of the file, from start. */
+  readRange(path: string, start: number, length: number): Promise<Uint8Array>;
 }
 
 /** A newer version of the companion: downloaded and ready to install (Windows), or to download (Mac). */

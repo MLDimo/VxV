@@ -11,11 +11,15 @@ import type {
   TokenStore,
   UpdateNotice,
 } from "./ports.ts";
+import { createCombatLogs } from "./combatLogs.ts";
 import { synchronize, type SyncReport } from "./sync.ts";
 
 /** The companion synchronises this often while it runs, and at once after a link or a new folder. */
 export const SYNC_EVERY_MS = 5 * 60 * 1000;
-/** And this often, it looks whether the game saved its data again (a /reload, a logout): they go at once. */
+/**
+ * And this often, it looks whether the game saved its data again (a /reload, a logout) or killed a boss in its combat
+ * log: they go at once.
+ */
 export const WATCH_EVERY_MS = 15 * 1000;
 
 const OFFICER_ROLES = new Set(["officer", "gm"]);
@@ -69,6 +73,9 @@ export function createCompanion(dependencies: CompanionDependencies) {
   const sent = new Set<string>();
   /** When the game last saved each file of saved data, as last seen. */
   let savedSeen = new Map<string, number>();
+  const combatLogs = createCombatLogs(gameFiles);
+  /** The bosses killed read in the combat logs, until the website received them. */
+  let fights: Record<string, string> = {};
   /** Asked again while a synchronisation was running. */
   let again = false;
   let state: CompanionState = {
@@ -119,6 +126,13 @@ export function createCompanion(dependencies: CompanionDependencies) {
     update({ settings });
   }
 
+  /** True when the combat logs hold bosses killed since last read. */
+  async function newFights(): Promise<boolean> {
+    const found = await combatLogs.newFights(state.installations, clock());
+    fights = { ...fights, ...found };
+    return Object.keys(found).length > 0;
+  }
+
   /** True when the game saved its data again since last seen. */
   async function savedDataChanged(): Promise<boolean> {
     const files = (
@@ -144,12 +158,15 @@ export function createCompanion(dependencies: CompanionDependencies) {
     update({ syncing: true });
     try {
       await savedDataChanged();
+      await newFights();
       const account = state.account ?? (await site.me(token));
       const officer = account.roles.some((role) => OFFICER_ROLES.has(role));
+      const sending = fights;
       const lastSync = await synchronize(
         { site, gameFiles },
-        { token, installations: state.installations, officer, now: clock(), sent },
+        { token, installations: state.installations, officer, now: clock(), sent, fights: sending },
       );
+      fights = Object.fromEntries(Object.entries(fights).filter(([key]) => !(key in sending)));
       const lastUpload = lastSync.sent.length > 0 ? { at: lastSync.at, messages: lastSync.sent } : state.lastUpload;
       update({ account, lastSync, lastUpload, notice: undefined });
     } catch (error) {
@@ -184,7 +201,9 @@ export function createCompanion(dependencies: CompanionDependencies) {
       await syncNow();
       timer ??= setInterval(() => void syncNow(), SYNC_EVERY_MS);
       watcher ??= setInterval(() => {
-        void savedDataChanged().then((changed) => (changed ? syncNow() : undefined));
+        void Promise.all([savedDataChanged(), newFights()]).then(([saved, killed]) =>
+          saved || killed ? syncNow() : undefined,
+        );
       }, WATCH_EVERY_MS);
     },
 

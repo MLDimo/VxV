@@ -2,6 +2,7 @@ import { createAddonBets } from "./application/addonBets.ts";
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAddonArtisans } from "./application/addonArtisans.ts";
 import { createArtisans } from "./application/artisans.ts";
+import { createBossFights } from "./application/bossFights.ts";
 import { createAddonDeathrolls } from "./application/addonDeathrolls.ts";
 import { createDeathrolls } from "./application/deathrolls.ts";
 import { createAddonMissions } from "./application/addonMissions.ts";
@@ -112,6 +113,7 @@ export function createApplication({
       missionAnnouncements,
       artisans,
       deathrolls,
+      bossFights: createBossFights({ unitOfWork, clock }),
     }),
     roster,
     characters,
