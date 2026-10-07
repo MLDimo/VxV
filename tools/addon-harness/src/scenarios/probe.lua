@@ -8,6 +8,7 @@ for _, command in ipairs({
     "group status", "group invite Eole Hermes", "group invite", "group raid", "later group invite Eole Hermes",
     "rolls roll", "rolls button", "rolls button", "chat send", "chat send guild",
     "meter list", "meter read", "counters list", "counters list tuées", "professions list", "professions recipes",
+    "journaux send", "journaux start", "journaux send", "journaux state", "journaux stop",
     "log 3", "report", "verbose", "clear",
 }) do
     run(command)

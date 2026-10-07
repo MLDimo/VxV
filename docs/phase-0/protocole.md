@@ -134,6 +134,22 @@ Pour chaque action ci-dessous, faire la commande directe, puis la même précéd
 4. Donner un autre objet par l'addon : `/vxvtest loot give <emplacement> <n° du candidat>`, puis la même chose avec `later`.
    Vérifier que l'objet part bien chez le joueur choisi.
 
+## Complément du 7 octobre (T11) : vers le compagnon sans `/reload`
+
+Le jeu n'écrit ses données sauvegardées qu'au `/reload` ou à la déconnexion. Deux fichiers qu'il écrit pendant la partie
+pourraient porter les données au compagnon : le journal de combat (`Logs/WoWCombatLog*.txt`, ce que lit Warcraft Logs)
+et le journal du chat (`Logs/WoWChatLog.txt`). Sonde 0.4.0 (`tools/install-probe.sh`, puis `/reload`). Les fichiers sont
+lus sur le disque pendant que le jeu tourne : prévenir avant de se déconnecter.
+
+| Étape | Commandes | À vérifier |
+| --- | --- | --- |
+| Inventaire | `/vxvtest api find logging`, `/vxvtest api find channel` | Les fonctions des journaux et des canaux présentes sur Forever |
+| Activation sans clic | `/vxvtest later journaux start` | L'addon allume seul les deux journaux et rejoint le canal privé `VxvSonde` (sinon « action bloquée ») |
+| Combat | Combattre un monstre en recevant des soins (d'un autre joueur si possible, sinon une potion ou un bandage) | Le journal de combat s'écrit pendant la partie, avec les soins reçus |
+| Messages sans clic | `/vxvtest later journaux send` | Ce que le journal du chat contient : affichage de l'addon, message d'addon, chuchotement à soi, canal (caché ou non, 255 octets, rafale de 10) ; refus éventuels |
+| Activation au clavier | Si l'étape sans clic est refusée : `/vxvtest journaux start` puis `/vxvtest journaux send` | Les mêmes, depuis une commande tapée |
+| Fin | `/vxvtest journaux stop`, puis `/reload` | Journal de la sonde dans `VXV_Probe.lua` |
+
 ## 0.7 Rapport
 
 Remplir `docs/phase-0/rapport-faisabilite.md` à partir des rapports de session.
