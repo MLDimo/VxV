@@ -79,6 +79,55 @@ describe("Le Dé Pipé in game (P11.8)", () => {
     expect(errors()).toEqual([]);
   });
 
+  it("lets an officer open a bet in game: waiting for the website, then settled by its answer", () => {
+    const { client, paris, errors } = startParis();
+    client(OPEN_TAB("Le Dé Pipé"));
+    client('FindButton(VXV_Window, "Ouvrir un pari"):Run("OnClick")');
+    expect(client("return VXV_BetDialog.shown")).toBe(true);
+    // Without its choices, the bet waits.
+    client('FindButton(VXV_BetDialog, "Ouvrir le pari"):Run("OnClick")');
+    expect(outbox(client)).toEqual([]);
+    client(`
+      local boxes = {}
+      FindWidget(VXV_BetDialog, function(w) if w.kind == "EditBox" then boxes[#boxes + 1] = w end end)
+      boxes[1]:SetText("Qui meurt en premier ?")
+      boxes[2]:SetText("Un tank ; Un heal ;")
+      boxes[3]:SetText("15/12")
+      boxes[4]:SetText("21:00")
+      boxes[5]:SetText("Pour le raid")
+      FindButton(VXV_BetDialog, "Ouvrir le pari"):Run("OnClick")
+    `);
+    expect(outbox(client)).toEqual([
+      expect.objectContaining({
+        kind: "bet",
+        title: "Qui meurt en premier ?",
+        choices: ["Un tank", "Un heal"],
+        date: "15/12",
+        time: "21:00",
+        reason: "Pour le raid",
+        author: "Ðéjà Vu",
+      }),
+    ]);
+    expect(plain(client(ROWS()))).toContain("En attente du site : pari « Qui meurt en premier ? »");
+    const id = client(PENDING_ID) as string;
+    const message = "Pari « Qui meurt en premier ? » ouvert et annoncé sur Discord.";
+    const answered = parisText({
+      ...TAVERN_BETS,
+      exportedAt: new Date("2026-12-10T07:40:00Z"),
+      changes: [{ id, eventId: undefined, betId: "b2", author: "Ðéjà Vu", accepted: true, message }],
+    });
+    paris.run(`local _, ns = ... ns.BetsData.FromCompanion(${JSON.stringify(answered)})`);
+    expect(outbox(client)).toEqual([]);
+    expect(client("return Printed")).toContain(`${PREFIX}Site VXV : ${message}`);
+    expect(errors()).toEqual([]);
+  });
+
+  it("shows the bet's opening to the officers only", () => {
+    const { client } = startParis({ playerName: "Thom Leboss" });
+    client(OPEN_TAB("Le Dé Pipé"));
+    expect(client('return IsVisible(FindButton(VXV_Window, "Ouvrir un pari"))')).toBe(false);
+  });
+
   it("asks for a whole number of gold pieces and a choice", () => {
     const { client } = startParis({ playerName: "Thom Leboss" });
     client(OPEN_TAB("Le Dé Pipé"));

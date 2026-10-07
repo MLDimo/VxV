@@ -144,6 +144,31 @@ test("an officer creates an event in game: the website creates it and announces 
   await expect(page.getByText("Raid créé en jeu")).toBeVisible();
 });
 
+test("an officer opens a bet in game: the website opens it and announces it", async ({ page, context, request }) => {
+  const token = await linkCompanion(page, context, request, "officer");
+  const opening = {
+    id: "Ciel Gris#1796900600#4",
+    eventId: "",
+    author: "Ciel Gris",
+    at: Math.floor(Date.now() / 1000),
+    kind: "bet",
+    title: "Qui tombe le premier ?",
+    choices: ["Le tank", "Le soigneur"],
+    date: "20/06/2031",
+    time: "21:00",
+    reason: "Pari ouvert en jeu",
+  };
+  const response = await request.post("/api/compagnon/envoi", {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { changes: [opening] },
+  });
+  expect(((await response.json()) as { changes: string }).changes).toBe(
+    "1 changement fait en jeu : 1 accepté, 0 refusés.",
+  );
+  await page.goto("/paris");
+  await expect(page.getByText("Qui tombe le premier ?").first()).toBeVisible();
+});
+
 test("the recap of the raids over is published every day", async ({ request }) => {
   expect((await request.get("/api/cron/recaps")).status()).toBe(401);
   const authorization = { authorization: `Bearer ${WEB_ENVIRONMENT.CRON_SECRET}` };

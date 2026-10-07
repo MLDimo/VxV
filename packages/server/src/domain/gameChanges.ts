@@ -1,7 +1,7 @@
 /** What every change made in game carries: its id (unique, made by the author's addon), event and author. */
 interface GameChangeBase {
   id: string;
-  /** The event it is about; empty for an event created in game and for a stake. */
+  /** The event it is about; empty for an event or a bet created in game, and for a stake. */
   eventId: string;
   /** The character who made it, as "Prénom Nom". */
   author: string;
@@ -12,7 +12,8 @@ interface GameChangeBase {
 /**
  * A change made in game (P7.5, P9.2, P11.8), as the author's addon recorded it: a sign-up or soft reserves for the
  * author's member, an officer's exclusion of an item, an event an officer creates (date and time as typed on
- * Discord's /vxv_raid), or the member's stake on a bet, placed, moved or taken back.
+ * Discord's /vxv_raid), the member's stake on a bet, placed, moved or taken back, or a bet an officer opens
+ * (closing date and time as typed on Discord's /vxv_pari, owner's decision of 7 October).
  */
 export type GameChange = GameChangeBase &
   (
@@ -22,6 +23,7 @@ export type GameChange = GameChangeBase &
     | { kind: "event"; date: string; time: string; raidIds: string[]; softReserves: number; reason: string }
     | { kind: "stake"; betId: string; choiceId: string; amount: number }
     | { kind: "withdraw"; betId: string }
+    | { kind: "bet"; title: string; choices: string[]; date: string; time: string; reason: string }
   );
 
 /** The changes about a bet rather than an event. */
@@ -34,7 +36,7 @@ export interface GameChangeOutcome {
   id: string;
   /** None for an event created in game (its answer goes with every event's data for a while), and for a stake. */
   eventId: string | undefined;
-  /** The bet of a stake: its answer goes with the bets' data. */
+  /** The bet of a stake, or the bet opened: its answer goes with the bets' data. */
   betId: string | undefined;
   author: string;
   accepted: boolean;

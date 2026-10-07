@@ -19,7 +19,6 @@ local SMALL_SHARE, COMPOSITION_SHARE = 0.4, 0.6
 local PANEL_PADDING = Theme.PANEL_PADDING
 local BUTTON_HEIGHT, BUTTON_GAP, JOIN_HEIGHT = 24, 6, 30
 -- The small button on the right of a panel's title (§7.1: « Changer »).
-local TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT, TITLE_BUTTON_TOP = 104, 22, 9
 
 local content, header
 local lists, buttons, badges = {}, {}, nil
@@ -107,14 +106,6 @@ local function addOfficerPanel(x, y, height)
     lists.requests = RowList.Create(body, #OFFICER_ACTIONS * (BUTTON_HEIGHT + BUTTON_GAP))
 end
 
---- A small wood button on the right of the panel's title.
-local function titleButton(panel, text, run)
-    local button = Theme.Button(panel, "wood", text, TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT)
-    button:SetPoint("TOPRIGHT", -PANEL_PADDING, -TITLE_BUTTON_TOP)
-    button:SetScript("OnClick", run)
-    return button
-end
-
 function RaidTab.Build(frame)
     content = frame
     header = Screen.Head(content, "", "sakura", "")
@@ -134,7 +125,7 @@ function RaidTab.Build(frame)
     buttons.join = Theme.Button(mePanel, "pixel", "Rejoindre le raid", LEFT - 2 * PANEL_PADDING, JOIN_HEIGHT)
     buttons.join:SetPoint("BOTTOM", 0, PANEL_PADDING)
     buttons.join:SetScript("OnClick", Invitations.Join)
-    buttons.signup = titleButton(mePanel, "M'inscrire", SignupDialog.Open)
+    buttons.signup = Theme.TitleButton(mePanel, "M'inscrire", SignupDialog.Open)
     addOfficerPanel(PADDING, GRID_TOP + meHeight + GAP, officerHeight)
 
     local compositionHeight, reservesHeight = split(COMPOSITION_SHARE)
@@ -143,12 +134,12 @@ function RaidTab.Build(frame)
     local reservesPanel, reservesBody = Theme.TitledPanel(content, x2, GRID_TOP + compositionHeight + GAP, center,
         reservesHeight, "SR du raid")
     lists.raidReserves = RowList.Create(reservesBody)
-    buttons.alert = titleButton(reservesPanel, "Alerte : oui", BossAlert.Toggle)
+    buttons.alert = Theme.TitleButton(reservesPanel, "Alerte : oui", BossAlert.Toggle)
 
     local myHeight, lootsHeight = split(SMALL_SHARE)
     local myPanel, myBody = Theme.TitledPanel(content, x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
     lists.myReserves = RowList.Create(myBody)
-    buttons.reserves = titleButton(myPanel, "Choisir", Choices.Reserves)
+    buttons.reserves = Theme.TitleButton(myPanel, "Choisir", Choices.Reserves)
     local _, lootsBody = Theme.TitledPanel(content, x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight, "Derniers loots")
     lists.loots = RowList.Create(lootsBody)
     -- What depends on the time (the lock, the start) is up to date each time the screen shows.

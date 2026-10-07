@@ -272,6 +272,47 @@ describe("changes made in game", () => {
     });
   });
 
+  describe("bets opened in game (owner's decision of 7 October)", () => {
+    const opening = (id: string, author: string, changes: Partial<Record<string, unknown>> = {}): GameChange =>
+      ({
+        id,
+        eventId: "",
+        author,
+        kind: "bet",
+        title: "Qui meurt en premier ?",
+        choices: ["Un tank", "Un heal"],
+        date: "15/12",
+        time: "21:00",
+        reason: "Pour le raid",
+        ...changes,
+      }) as GameChange;
+
+    it("opens the officer's bet, announces it on Discord, and answers with the bets' data", async () => {
+      const [outcome] = await changes.receive(officer, [opening("Ðéjà Vu#5#1", "Ðéjà Vu")]);
+      expect(outcome).toMatchObject({
+        accepted: true,
+        message: "Pari « Qui meurt en premier ? » ouvert et annoncé sur Discord.",
+      });
+      const [created] = await sql.query<{ id: string; closes_at: Date }>("select id, closes_at from bets");
+      expect(outcome?.betId).toBe(created?.id);
+      expect(created?.closes_at).toEqual(new Date("2026-12-15T20:00:00Z"));
+      expect(announced).toEqual([created?.id]);
+      const bets = await createAddonBets({ unitOfWork: createUnitOfWork(sql), clock: () => NOW }).exportBets();
+      expect(bets.split("\n")).toContain(
+        "C;Ðéjà Vu#5#1;1;Pari « Qui meurt en premier ? » ouvert et annoncé sur Discord.",
+      );
+    });
+
+    it("refuses a member, and a closing the website cannot read", async () => {
+      expect(await changes.receive(member, [opening("Thom Leboss#5#1", "Thom Leboss")])).toEqual([
+        expect.objectContaining({ accepted: false, message: "Cette action est réservée aux officiers." }),
+      ]);
+      expect(await changes.receive(officer, [opening("Ðéjà Vu#5#2", "Ðéjà Vu", { time: "25:00" })])).toEqual([
+        expect.objectContaining({ accepted: false, message: expect.stringContaining("15/10") }),
+      ]);
+    });
+  });
+
   describe("conflicts with the website (P9.4)", () => {
     const minutes = (count: number) => new Date(NOW.getTime() + count * 60 * 1000);
     const reserves = (id: string, itemIds: number[], madeAt: Date): GameChange => ({
