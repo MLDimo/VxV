@@ -82,9 +82,9 @@ titres d'officier et Princesse, journal de combat, Ranking).
   - Ouverture d'un pari en jeu (7 octobre) : bouton « Ouvrir un pari » des officiers sur la table de jeu
     (`VXV_Paris/UI/BetDialog.lua` : question, choix séparés par « ; », fermeture comme `/vxv_pari`, motif), changement
     `bet` en attente puis confirmé (`VXV_Paris/Changes.lua`, qui porte aussi les mises) ; le site l'ouvre comme sur le
-    site, avec journal et message Discord, et la réponse revient avec les données du pari ouvert.
-  Validation en attente : un pari réel mené jusqu'au versement des gains ; publier le compagnon 1.1 (données des
-  paris).
+    site, avec journal et message Discord, et la réponse revient avec les données du pari ouvert. Validée en jeu le
+    7 octobre : pari ouvert en jeu, annoncé dans le salon des paris.
+  Validation en attente : un pari réel mené jusqu'au versement des gains.
 - **P12 Tableau de missions** : code terminé.
   - 12.1, 12.2, 12.4 à 12.7 : missions, relevés des compteurs par personnage et récompenses en base ; publication par
     un officier (site `/quetes`, `/vxv_mission`, message Discord avec le classement), relevés envoyés par le
@@ -172,7 +172,7 @@ titres d'officier et Princesse, journal de combat, Ranking).
     premiers de chaque tableau) apportées par le compagnon et relayées par les officiers ; fanion en images
     (`Media/banner.png` teint à la couleur de classe, voile `cloth.png`), portraits copiés du site par
     `npm run generate`. Le jeu ne fait pas tourner les cadres : pas de balancement des fanions.
-  Validation en attente : l'écran en jeu.
+  Validé en jeu le 7 octobre.
 
 ## Design (charte « La Taverne »)
 
