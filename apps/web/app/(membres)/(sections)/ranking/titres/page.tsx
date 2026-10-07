@@ -1,27 +1,24 @@
-import { TITLES, titleRole } from "@vxv/server";
+import { canManageRaids, TITLES, titleRole } from "@vxv/server";
+import { formatTitleWeek } from "@vxv/server/domain/labels";
 import { MemberName } from "@/components/MemberName";
-import { RankingHeader } from "@/components/RankingHeader";
-import { getApplication } from "@/server/application";
-import { requireMember } from "@/server/session";
 import { Panel } from "@/components/Panel";
-
-const WEEK = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
-
-/** "semaine du 7 octobre". */
-function weekLabel(week: string): string {
-  return `semaine du ${WEEK.format(new Date(`${week}T00:00:00Z`))}`;
-}
+import { RankingHeader } from "@/components/RankingHeader";
+import { TitleGiveForm } from "@/components/TitleGiveForm";
+import { getApplication } from "@/server/application";
+import { guildMembers } from "@/server/guildMembers";
+import { requireMember } from "@/server/session";
 
 /** Ranking · Titres (P13): the week's holders, each title's rule, and the former weeks. */
 export default async function TitlesPage() {
-  await requireMember();
+  const member = await requireMember();
   const [current, ...former] = await getApplication().titles.weeks();
   return (
     <>
       <RankingHeader category="/ranking/titres" />
       <p className="mt-6 max-w-3xl text-lavender">
         Chaque mercredi au reset, chaque titre va au membre en tête sur la saison ; à égalité, au premier à atteindre le
-        score. Chaque titre est aussi un rôle Discord.
+        score. Ce que le jeu ne mesure pas (Princesse) est donné par un officier pour la semaine. Chaque titre est aussi
+        un rôle Discord.
       </p>
       <section aria-label="Titres de la semaine" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TITLES.map((title) => {
@@ -49,7 +46,7 @@ export default async function TitlesPage() {
           <ul className="mt-3 space-y-2 text-sm">
             {former.map((week) => (
               <li key={week.week}>
-                <span className="font-bold">{weekLabel(week.week)}</span> :{" "}
+                <span className="font-bold">{formatTitleWeek(week.week)}</span> :{" "}
                 {week.holders.map((holder, index) => (
                   <span key={holder.titleId}>
                     {index > 0 && " · "}
@@ -60,6 +57,14 @@ export default async function TitlesPage() {
               </li>
             ))}
           </ul>
+        </Panel>
+      )}
+      {canManageRaids(member.roles) && (
+        <Panel title="Officiers · titres à donner" officer className="mt-8">
+          <p className="mt-2 text-sm text-lavender">
+            Pour la semaine en cours, à la place du détenteur actuel ; mercredi au reset, le titre ne va à personne.
+          </p>
+          <TitleGiveForm members={await guildMembers()} />
         </Panel>
       )}
     </>

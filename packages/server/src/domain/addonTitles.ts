@@ -11,7 +11,8 @@ export interface AddonTitlesFacts extends AddonReaders {
     memberId: string;
     memberName: string;
     memberClass: string | undefined;
-    score: number;
+    /** None for a title an officer gave: 0 in the line. */
+    score: number | undefined;
   }[];
 }
 

@@ -383,11 +383,14 @@ export interface TitleHolder {
   memberName: string;
   memberClass: string | undefined;
   discordId: string;
-  score: number;
+  /** None for a title an officer gave. */
+  score: number | undefined;
 }
 
 export interface TitleRepository {
   saveWeek(week: string, awards: readonly TitleAward[], awardedAt: Date): Promise<void>;
+  /** An officer gives the title to the member for the week, in place of its holder if any. */
+  give(week: string, titleId: string, memberId: string, givenAt: Date): Promise<void>;
   /** The holders of the latest weeks, the latest week first. */
   listLatestWeeks(weeks: number): Promise<TitleHolder[]>;
 }

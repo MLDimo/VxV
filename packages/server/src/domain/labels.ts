@@ -50,6 +50,13 @@ export function formatEventDate(date: Date): string {
   return EVENT_DATE.format(date);
 }
 
+const TITLE_WEEK = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
+
+/** The week of the titles, from its Wednesday "2026-10-07": "semaine du 7 octobre". */
+export function formatTitleWeek(week: string): string {
+  return `semaine du ${TITLE_WEEK.format(new Date(`${week}T00:00:00Z`))}`;
+}
+
 const MS_PER_MINUTE = 60 * 1000;
 const MINUTES_PER_HOUR = 60;
 

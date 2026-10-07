@@ -1,9 +1,10 @@
 import { formatDateTime } from "@vxv/server/domain/labels";
-import { canManageTreasury, fullName, type JournalAction } from "@vxv/server";
+import { canManageTreasury, type JournalAction } from "@vxv/server";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "@vxv/server/domain/journalDescriptions";
 import { CashPage } from "@/components/CashPage";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
+import { guildMembers } from "@/server/guildMembers";
 import { requireMember } from "@/server/session";
 
 /** The stamp of each officer action (§7.7): its category, in its ink. */
@@ -22,22 +23,14 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "season.start": { label: "GUILDE", className: "border-ink-brown text-ink-brown" },
   "mission.create": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
   "mission.close": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
+  "title.give": { label: "TITRE", className: "border-ink-brown text-ink-brown" },
 };
 
 /** The accounts book (§7.7): the guild's cash on the left, the officers' journal on the right. */
 export default async function JournalPage() {
   const member = await requireMember();
-  const { journal, cash, characters } = getApplication();
-  const [entries, overview, guild] = await Promise.all([
-    journal.listRecent(),
-    cash.overview(),
-    characters.listInGuild(),
-  ]);
-  const givers = guild.flatMap((character) =>
-    character.isMain && character.memberId !== undefined
-      ? [{ memberId: character.memberId, name: fullName(character) }]
-      : [],
-  );
+  const { journal, cash } = getApplication();
+  const [entries, overview, givers] = await Promise.all([journal.listRecent(), cash.overview(), guildMembers()]);
   return (
     <>
       <ScreenHeader title="Journal" />

@@ -97,6 +97,9 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     raid, dons à la caisse ; `packages/server/src/domain/titles.ts`), réattribués chaque mercredi à 5 h UTC (tâche
     Vercel), historique en base, catégorie « Titres » du Ranking (`/ranking/titres`), rôles Discord « ◆ <titre> » et
     annonce de la semaine.
+  - Titres donnés par un officier (7 octobre) : ce que le jeu ne mesure pas (Princesse, `OFFICER_TITLES`) se donne sur
+    Ranking › Titres pour la semaine affichée, avec motif au journal (`title.give`) et rôle Discord aussitôt ; le
+    mercredi, ces titres ne vont à personne, comme les autres. Pas de score (`title_awards.score` vide).
   - Titres de raid : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans le compteur du jeu après chaque
     boss tué, une fois hors combat (`VXV_Raid/Meter.lua`, session notée à la mort du boss) ; Lève toi copaing
     (résurrections acceptées : le joueur relevé le dit au groupe, `Raised.lua`). Journal `VXV-LOG-2`.
