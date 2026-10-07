@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { open, readdir, readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { GameFiles } from "../application/ports.ts";
@@ -8,6 +8,8 @@ import type { Computer, FolderReader } from "../domain/installations.ts";
 import { exists, writeAtomically } from "./files.ts";
 
 const DRIVE_LETTERS = "CDEFGHIJKLMNOPQRSTUVWXYZ";
+const LOGS_FOLDER = "Logs";
+const COMBAT_LOG = /^WoWCombatLog.*\.txt$/;
 const MAC_VOLUMES = "/Volumes";
 
 /** The real disk; folders that cannot be read count as empty. */
@@ -60,5 +62,29 @@ export const diskGameFiles: GameFiles = {
 
   async read(path) {
     return new Uint8Array(await readFile(path));
+  },
+
+  async combatLogs(installation) {
+    const folder = join(installation, LOGS_FOLDER);
+    const names = (await readdir(folder).catch(() => [])).filter((name) => COMBAT_LOG.test(name));
+    const logs = await Promise.all(
+      names.map(async (name) => {
+        const path = join(folder, name);
+        const log = await stat(path).catch(() => undefined);
+        return log?.isFile() ? [{ path, size: log.size, modifiedAt: log.mtimeMs }] : [];
+      }),
+    );
+    return logs.flat();
+  },
+
+  async readRange(path, start, length) {
+    const file = await open(path, "r");
+    try {
+      const buffer = new Uint8Array(length);
+      const { bytesRead } = await file.read(buffer, 0, length, start);
+      return buffer.subarray(0, bytesRead);
+    } finally {
+      await file.close();
+    }
   },
 };

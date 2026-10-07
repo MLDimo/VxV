@@ -1,6 +1,7 @@
 import type { Repositories, UnitOfWork } from "../../application/ports.ts";
 import type { SqlClient } from "../sql.ts";
 import { betRepository, stakeRepository } from "./bets.ts";
+import { bossFightRepository } from "./bossFights.ts";
 import { bossLootRepository } from "./bossLoot.ts";
 import { cashRepository } from "./cash.ts";
 import { characterRepository } from "./characters.ts";
@@ -52,6 +53,7 @@ function createRepositories(sql: SqlClient): Repositories {
     professions: professionRepository(sql),
     deathrolls: deathrollRepository(sql),
     titles: titleRepository(sql),
+    bossFights: bossFightRepository(sql),
   };
 }
 

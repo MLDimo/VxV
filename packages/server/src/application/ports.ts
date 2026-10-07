@@ -426,6 +426,32 @@ export interface CashRepository {
   listAll(): Promise<CashMovement[]>;
 }
 
+/** A companion's record of a boss killed, as kept (VXV-COMBAT text). */
+export interface StoredBossFight {
+  id: string;
+  encounterId: number;
+  endedAt: Date;
+  content: string;
+  totalHealing: number;
+}
+
+export interface BossFightRepository {
+  /** The records of this boss that ended between the instants. */
+  listEndedBetween(encounterId: number, from: Date, to: Date): Promise<StoredBossFight[]>;
+  /** The records that ended since the instant (all without one), the oldest first. */
+  listEndedSince(since: Date | undefined): Promise<StoredBossFight[]>;
+  /** Keeps a record, in place of a less complete one of the same fight when replacing names it. */
+  save(fight: {
+    encounterId: number;
+    endedAt: Date;
+    content: string;
+    totalHealing: number;
+    sentBy: string;
+    receivedAt: Date;
+    replacing: string | undefined;
+  }): Promise<void>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
@@ -453,6 +479,7 @@ export interface Repositories {
   professions: ProfessionRepository;
   deathrolls: DeathrollRepository;
   titles: TitleRepository;
+  bossFights: BossFightRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

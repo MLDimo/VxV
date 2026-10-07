@@ -17,8 +17,8 @@ export default async function TitlesPage() {
       <RankingHeader category="/ranking/titres" />
       <p className="mt-6 max-w-3xl text-lavender">
         Chaque mercredi au reset, chaque titre va au membre en tête sur la saison ; à égalité, au premier à atteindre le
-        score. Ce que le jeu ne mesure pas (Princesse) est donné par un officier pour la semaine. Chaque titre est aussi
-        un rôle Discord.
+        score. Princesse se lit dans le journal de combat des raids ; un officier peut la donner pour la semaine si le
+        journal a manqué des soins. Chaque titre est aussi un rôle Discord.
       </p>
       <section aria-label="Titres de la semaine" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TITLES.map((title) => {
@@ -62,7 +62,8 @@ export default async function TitlesPage() {
       {canManageRaids(member.roles) && (
         <Panel title="Officiers · titres à donner" officer className="mt-8">
           <p className="mt-2 text-sm text-lavender">
-            Pour la semaine en cours, à la place du détenteur actuel ; mercredi au reset, le titre ne va à personne.
+            Pour la semaine en cours, à la place du détenteur actuel ; mercredi au reset, le titre revient au membre en
+            tête sur sa règle.
           </p>
           <TitleGiveForm members={await guildMembers()} />
         </Panel>

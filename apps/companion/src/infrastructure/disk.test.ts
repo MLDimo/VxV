@@ -28,6 +28,19 @@ describe("game files on the disk", () => {
     await expect(readFile(join(game, "Interface", "AddOns", "VXV_Sync", "External", "Inbox.lua"))).rejects.toThrow();
   });
 
+  it("finds the combat logs of the game and reads them from where the last reading stopped", async () => {
+    const logs = join(game, "Logs");
+    await mkdir(logs, { recursive: true });
+    await writeFile(join(logs, "WoWCombatLog-100726_210000.txt"), "ligne 1\nligne 2\n");
+    await writeFile(join(logs, "Client.log"), "autre journal");
+    expect(await diskGameFiles.combatLogs(game)).toEqual([
+      { path: join(logs, "WoWCombatLog-100726_210000.txt"), size: 16, modifiedAt: expect.any(Number) },
+    ]);
+    const bytes = await diskGameFiles.readRange(join(logs, "WoWCombatLog-100726_210000.txt"), 8, 100);
+    expect(new TextDecoder().decode(bytes)).toBe("ligne 2\n");
+    expect(await diskGameFiles.combatLogs(join(game, "ailleurs"))).toEqual([]);
+  });
+
   it("finds VXV_Sync's saved data of every account, and reads them", async () => {
     const saved = join(game, "WTF", "Account", "124804161#1", "SavedVariables");
     await mkdir(saved, { recursive: true });

@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Member } from "../domain/members.ts";
 import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
 import { createDiscordGuild } from "../infrastructure/discord/guild.ts";
+import { bossFightRepository } from "../infrastructure/postgres/bossFights.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { raidLogRepository } from "../infrastructure/postgres/raidLogs.ts";
 import { raidRecordRepository } from "../infrastructure/postgres/raidRecords.ts";
@@ -91,6 +92,9 @@ describe("titles", () => {
       [
         "VXV-LOG-2",
         `R;${eventId};1791144000;1791151200`,
+        "K;1084;1791147600",
+        "P;Vorn Cendrelune",
+        "P;Morgane Nuitsombre",
         "D;Vorn Cendrelune;3",
         "M;Vorn Cendrelune;182000;0",
         "M;Morgane Nuitsombre;96000;240000",
@@ -98,6 +102,21 @@ describe("titles", () => {
       ].join("\n"),
       new Date("2026-10-04T23:00:00Z"),
     );
+    // The raiders' companions read the boss in the combat log: Morgane received the most healing.
+    await bossFightRepository(sql).save({
+      encounterId: 1084,
+      endedAt: new Date(1791147630 * 1000),
+      content: [
+        "VXV-COMBAT-1",
+        "F;1084;Onyxia;9;40;1791147400;1791147630",
+        "H;P-1;Morgane;52000",
+        "H;P-2;Vorn;31000",
+      ].join("\n"),
+      totalHealing: 83000,
+      sentBy: vorn.id,
+      receivedAt: new Date("2026-10-04T23:00:00Z"),
+      replacing: undefined,
+    });
     // Vorn gives to the guild's cash.
     const treasurer = await createMember(sql, "treasurer", "Trésorier");
     await createCash({ unitOfWork, clock }).record(
@@ -121,6 +140,7 @@ describe("titles", () => {
       ["floorTaster", "Vorn Cendrelune", 3],
       ["gamblingKing", "Vorn Cendrelune", 125],
       ["mostRaised", "Vorn Cendrelune", 2],
+      ["princess", "Morgane Nuitsombre", 52000],
       ["sugarDaddy", "Vorn Cendrelune", 500],
       ["topDamage", "Vorn Cendrelune", 182000],
       ["topHealing", "Morgane Nuitsombre", 240000],
@@ -130,7 +150,7 @@ describe("titles", () => {
       ["Goûteur de sol", "Roi du gambling", "Lève toi copaing", "Sugar Daddy", "Chibrax au max"].map(titleRole).sort(),
     );
     expect(discord.roleNamesOf(morgane.discordId).sort()).toEqual(
-      ["Bien gras", "Roi de la dette", "Remboursé par la Sécu"].map(titleRole).sort(),
+      ["Bien gras", "Roi de la dette", "Remboursé par la Sécu", "Princesse"].map(titleRole).sort(),
     );
     expect(announced[0]?.holders.find((holder) => holder.title === "Numéro UNO")).toMatchObject({ holder: undefined });
     // Once a week only.
@@ -154,34 +174,34 @@ describe("titles", () => {
     expect((await titles.weeks()).map((week) => week.week)).toEqual(["2026-10-14", "2026-10-07"]);
   });
 
-  it("lets an officer give Princesse for the week, with the role and the journal; nobody holds it the next week", async () => {
+  it("lets an officer give Princesse for the week, with the role and the journal, until the next Wednesday", async () => {
     await titles.reassign();
-    await expect(titles.give(vorn, "princess", morgane.id, "Soins")).rejects.toBeInstanceOf(ForbiddenError);
-    await expect(titles.give(officer, "princess", morgane.id, " ")).rejects.toBeInstanceOf(ValidationError);
+    await expect(titles.give(vorn, "princess", vorn.id, "Soins")).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(titles.give(officer, "princess", vorn.id, " ")).rejects.toBeInstanceOf(ValidationError);
     await expect(titles.give(officer, "gamblingKing", morgane.id, "Soins")).rejects.toThrow(/se calcule/);
-    await titles.give(officer, "princess", vorn.id, "Tous les soins du raid");
-    await titles.give(officer, "princess", morgane.id, "Erreur : c'était Morgane");
-    await expect(titles.give(officer, "princess", morgane.id, "Encore")).rejects.toThrow(/détient déjà/);
+    await expect(titles.give(officer, "princess", morgane.id, "Soins")).rejects.toThrow(/détient déjà/);
+    // The combat log missed Vorn's heals: an officer gives him the title.
+    await titles.give(officer, "princess", vorn.id, "Le journal de combat a manqué ses soins");
     const [week] = await titles.weeks();
     expect(week?.holders.find((holder) => holder.titleId === "princess")).toMatchObject({
       week: "2026-10-07",
-      memberName: "Morgane Nuitsombre",
+      memberName: "Vorn Cendrelune",
       score: undefined,
     });
-    expect(discord.roleNamesOf(morgane.discordId)).toContain(titleRole("Princesse"));
-    expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Princesse"));
+    expect(discord.roleNamesOf(vorn.discordId)).toContain(titleRole("Princesse"));
+    expect(discord.roleNamesOf(morgane.discordId)).not.toContain(titleRole("Princesse"));
     const [latest] = await journalRepository(sql).listRecent(1);
     expect(latest).toMatchObject({
       action: "title.give",
-      before: { holder: "Vorn Cendrelune" },
-      after: { title: "Princesse", week: "2026-10-07", holder: "Morgane Nuitsombre" },
-      reason: "Erreur : c'était Morgane",
+      before: { holder: "Morgane Nuitsombre" },
+      after: { title: "Princesse", week: "2026-10-07", holder: "Vorn Cendrelune" },
+      reason: "Le journal de combat a manqué ses soins",
     });
-    // Wednesday's reset: like the others, the title goes to nobody until an officer gives it again.
+    // Wednesday's reassignment: like the others, the title goes again to the member ahead on its rule.
     now = new Date(WEDNESDAY.getTime() + WEEK_MS);
     await titles.reassign();
     const [next] = await titles.weeks();
-    expect(next?.holders.map((holder) => holder.titleId)).not.toContain("princess");
-    expect(discord.roleNamesOf(morgane.discordId)).not.toContain(titleRole("Princesse"));
+    expect(next?.holders.find((holder) => holder.titleId === "princess")?.memberName).toBe("Morgane Nuitsombre");
+    expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Princesse"));
   });
 });

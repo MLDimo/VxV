@@ -65,6 +65,9 @@ const USED_IN_GAME = [
   "C_TradeSkillUI.GetRecipeInfo",
   // The player's class (design measurement, 5 October: docs/design/mesure-en-jeu-2026-10-05.md).
   "UnitClass",
+  // The game's combat log and its advanced mode, switched on without a click (phase 0, T11, 7 October).
+  "LoggingCombat",
+  "C_CVar.SetCVar",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

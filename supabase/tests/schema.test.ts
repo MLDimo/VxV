@@ -313,6 +313,21 @@ describe("initial schema", () => {
     });
   });
 
+  describe("boss fights", () => {
+    it("keeps a boss killed with a known encounter and a healing total that is not negative", async () => {
+      const sender = await insertMember(database, "1");
+      const fight = (encounterId: number, totalHealing: number) =>
+        database.query(
+          `insert into boss_fights (encounter_id, ended_at, content, total_healing, sent_by, received_at)
+           values ($1, now(), 'VXV-COMBAT-1', $2, $3, now())`,
+          [encounterId, totalHealing, sender],
+        );
+      await fight(1084, 0);
+      await expect(fight(0, 10)).rejects.toThrow(/boss_fights_encounter_id_check/);
+      await expect(fight(1084, -1)).rejects.toThrow(/boss_fights_total_healing_check/);
+    });
+  });
+
   describe("journal", () => {
     async function insertEntry(reason: string): Promise<void> {
       const actorId = await insertMember(database, "officer");

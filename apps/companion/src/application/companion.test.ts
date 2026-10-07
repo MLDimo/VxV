@@ -53,6 +53,8 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
   const inboxes = new Map<string, string>();
   /** VXV_Sync's saved data, by file: its Lua text, and when the game wrote it. */
   const savedData = new Map<string, { text: string; modifiedAt: number }>();
+  /** The game's combat logs, by file. */
+  const combatLogs = new Map<string, Uint8Array>();
   const site: SitePort = {
     linkPage: ({ state }) => `https://vxv.example/compagnon/relier?etat=${state}`,
     exchange: vi.fn(async () => ({ token: "new-token", member })),
@@ -91,6 +93,10 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
       },
       savedFiles: async () => [...savedData].map(([path, { modifiedAt }]) => ({ path, modifiedAt })),
       read: async (path) => new TextEncoder().encode(savedData.get(path)?.text ?? ""),
+      combatLogs: async () =>
+        [...combatLogs].map(([path, text]) => ({ path, size: text.length, modifiedAt: NOW.getTime() })),
+      readRange: async (path, start, length) =>
+        (combatLogs.get(path) ?? new Uint8Array()).subarray(start, start + length),
     },
     clock: () => NOW,
     computer: async () => ({ platform: "darwin", home: "/Users/martin", roots: [] }),
@@ -103,7 +109,7 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
   };
   const companion = createCompanion(dependencies);
   started.push(companion);
-  return { companion, dependencies, site, inboxes, savedData, token: () => token, saved: () => saved };
+  return { companion, dependencies, site, inboxes, savedData, combatLogs, token: () => token, saved: () => saved };
 }
 
 afterEach(() => {
@@ -307,6 +313,33 @@ describe("companion", () => {
       expect(vi.mocked(site.upload).mock.calls[1]?.[1].texts).toEqual({
         metiers: { "Thom Leboss": "VXV-METIERS-1\nP;129;Secourisme;23" },
       });
+    });
+
+    it("sends each boss killed in the combat log once, as the game writes it, without a /reload", async () => {
+      vi.useFakeTimers();
+      const { companion, site, combatLogs } = setUp({}, "saved-token");
+      vi.mocked(site.me).mockResolvedValue({ name: "Thom", roles: ["member"] });
+      const log = "/Applications/World of Warcraft/_classic_/Logs/WoWCombatLog-100726_210000.txt";
+      const lines = [
+        "10/7/2026 21:00:00.0000  COMBAT_LOG_VERSION,22,ADVANCED_LOG_ENABLED,1,BUILD_VERSION,1.60.1,PROJECT_ID,18",
+        '10/7/2026 21:00:05.0000  ENCOUNTER_START,1084,"Onyxia",9,40,249',
+      ];
+      const write = (more: string[]) => {
+        lines.push(...more);
+        combatLogs.set(log, new TextEncoder().encode(`${lines.join("\n")}\n`));
+      };
+      write([]);
+      await companion.start();
+      expect(vi.mocked(site.upload)).not.toHaveBeenCalled();
+      // The boss falls: the next look at the log sends it, and only once.
+      write(['10/7/2026 21:04:05.0000  ENCOUNTER_END,1084,"Onyxia",9,40,1,240000']);
+      await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
+      const ended = Math.floor(new Date(2026, 9, 7, 21, 4, 5).getTime() / 1000);
+      expect(Object.keys(vi.mocked(site.upload).mock.calls[0]?.[1].texts.combat ?? {})).toEqual([
+        `1084-${String(ended)}`,
+      ]);
+      await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
+      expect(site.upload).toHaveBeenCalledTimes(1);
     });
 
     it("sends only the characters for a member", async () => {

@@ -103,6 +103,10 @@ restent ouverts à sa relecture.
   titres que le jeu ne mesure pas (`OFFICER_TITLES` de `domain/titles.ts`) se donnent sur Ranking › Titres, pour la
   semaine affichée, avec un motif inscrit au journal ; le rôle Discord suit aussitôt. Comme les autres, ils ne vont à
   personne à la réattribution du mercredi.
+- Mise à jour du même jour, après la mesure T11 (le journal de combat porte les soins reçus) : Princesse se calcule
+  comme les autres titres (soins reçus sur les boss tués en raid VXV sur la saison, lus par les compagnons dans le
+  journal de combat), et un officier peut toujours la donner pour la semaine quand le journal a manqué des soins ;
+  le mercredi, elle revient au membre en tête sur sa règle.
 
 ## P14 : artisans
 

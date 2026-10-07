@@ -8,16 +8,12 @@ ns.BossAlert = BossAlert
 
 local AlertFrame, NextBoss, RaidData, RaidLog = ns.AlertFrame, ns.NextBoss, ns.RaidData, ns.RaidLog
 
--- Entering an instance fires no event measured on Forever: where the player stands is read this often.
-local CHECK_EVERY_SECONDS = 5
 -- The game's raid warning (SOUNDKIT.RAID_WARNING).
 local RAID_WARNING_SOUND = 8959
 local ON = "Alerte du prochain boss activée : un message et un son quand tu as une SR sur le prochain boss."
 local OFF = "Alerte du prochain boss désactivée (/vxv alerte pour la remettre)."
 
 local saved = { alerted = {} }
--- The raid whose instance the player stands in, as last seen: the screens follow its changes ("raid.place").
-local place
 
 --- Takes the module's saved data at start-up: whether the alert is off, and the bosses already announced.
 function BossAlert.Restore(data)
@@ -44,12 +40,7 @@ local function check()
     end
     local log = RaidLog.Current()
     local found = NextBoss.Find(event, log and log.kills or {})
-    local here = found ~= nil and found.here and found.raid or nil
-    if here ~= place then
-        place = here
-        VXV.Emit("raid.place")
-    end
-    if here == nil or found.boss == nil then
+    if found == nil or not found.here or found.boss == nil then
         return
     end
     local warning = NextBoss.Warning(event, VXV.PlayerName(), found.boss)
@@ -63,16 +54,8 @@ local function check()
     VXV.Compat.PlaySound(RAID_WARNING_SOUND)
 end
 
-local function checkAgain()
-    check()
-    C_Timer.After(CHECK_EVERY_SECONDS, checkAgain)
-end
-
---- From login on: now, then every few seconds and at each kill.
-function BossAlert.Start()
-    checkAgain()
-end
-
+-- When the player enters the raid's instance, at each kill and with the event's new data.
+VXV.On("raid.place", check)
 VXV.On("raid.log", check)
 VXV.On("raid.updated", check)
 VXV.RegisterCommand("alerte", "activer ou désactiver l'alerte du prochain boss", BossAlert.Toggle)

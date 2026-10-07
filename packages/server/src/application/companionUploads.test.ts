@@ -1,6 +1,7 @@
 import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Member } from "../domain/members.ts";
+import { bossFightRepository } from "../infrastructure/postgres/bossFights.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
@@ -16,6 +17,7 @@ import { createRoster } from "./roster.ts";
 import { createSignups } from "./signups.ts";
 import { createSoftReserves } from "./softReserves.ts";
 import { createBets } from "./bets.ts";
+import { createBossFights } from "./bossFights.ts";
 import { createMissions } from "./missions.ts";
 import { createArtisans } from "./artisans.ts";
 import { createDeathrolls } from "./deathrolls.ts";
@@ -62,6 +64,7 @@ describe("companion uploads", () => {
       missionAnnouncements: { announceQuietly: async () => true },
       artisans: createArtisans({ unitOfWork }),
       deathrolls: createDeathrolls({ unitOfWork, clock, announcer: { announce: async () => {} } }),
+      bossFights: createBossFights({ unitOfWork, clock }),
     });
     officer = await createMember(sql, "officer", "Officier");
     await createRaidWithLoot(sql);
@@ -144,5 +147,28 @@ describe("companion uploads", () => {
     expect((await uploads.receive(officer, only([professions("Thom Leboss")]))).texts).toEqual(["Métiers à jour."]);
     expect((await uploads.receive(officer, only([professions("Ðéjà Vu")]))).texts).toEqual(["Métiers : 1 mis à jour."]);
     expect((await uploads.receive(member, only(["VXV-METIERS-1\nP;x"]))).texts).toEqual(["Ligne 2 illisible."]);
+  });
+
+  it("keeps each boss killed once, the most complete record of the companions who sent it", async () => {
+    const fight = (healing: number, endedAt: number) =>
+      [
+        "VXV-COMBAT-1",
+        `F;1084;Onyxia;9;40;${String(endedAt - 240)};${String(endedAt)}`,
+        `H;Player-1;Ðéjà;${String(healing)}`,
+      ].join("\n");
+    const only = (texts: string[]) =>
+      upload({ roster: undefined, raidLogs: [], characters: [], texts: { combat: texts } });
+    const member = await createMember(sql, "member", "Membre");
+    expect((await uploads.receive(member, only([fight(500, 1796940000)]))).texts).toEqual([
+      "Combats de boss : 1 nouveau.",
+    ]);
+    // Another raider's companion, its clock a minute off, saw less of it, then more.
+    expect((await uploads.receive(officer, only([fight(300, 1796940060)]))).texts).toEqual(["Combats de boss à jour."]);
+    expect((await uploads.receive(officer, only([fight(800, 1796940060)]))).texts).toEqual([
+      "Combats de boss : 1 nouveau.",
+    ]);
+    const kept = await bossFightRepository(sql).listEndedSince(undefined);
+    expect(kept.map(({ totalHealing }) => totalHealing)).toEqual([800]);
+    expect((await uploads.receive(member, only(["VXV-COMBAT-1\nH;x"]))).texts).toEqual(["Ligne 2 illisible."]);
   });
 });

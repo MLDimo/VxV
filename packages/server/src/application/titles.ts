@@ -1,3 +1,4 @@
+import { healingReceivedInRaid, parseBossFight } from "../domain/bossFights.ts";
 import { fullName } from "../domain/characters.ts";
 import type { TitleGiveRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
@@ -45,6 +46,8 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
     at: startsAt,
     log: parseRaidLog(content),
   }));
+  // The bosses killed the companions read in the combat logs: the healing received (Princesse).
+  const fights = (await repositories.bossFights.listEndedSince(since)).map((stored) => parseBossFight(stored.content));
   const tally = (lines: (log: RaidLog) => readonly { name: string; amount: number }[]): Tally =>
     logs.flatMap(({ at, log }) =>
       lines(log).flatMap(({ name, amount }) => {
@@ -65,6 +68,7 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
     deaths: tally((log) => log.deaths.map(({ name, count }) => ({ name, amount: count }))),
     damage: tally((log) => log.meter.map(({ name, damage }) => ({ name, amount: damage }))),
     healing: tally((log) => log.meter.map(({ name, healing }) => ({ name, amount: healing }))),
+    healingReceived: tally((log) => healingReceivedInRaid(log, fights)),
     raised: tally((log) => log.raised.map(({ name, count }) => ({ name, amount: count }))),
     deathrolls: (await repositories.deathrolls.listAll()).flatMap((game) => {
       const winner = winnerOf(game).memberId;

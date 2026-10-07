@@ -9,6 +9,7 @@ const NOTHING: TitleFacts = {
   deaths: [],
   damage: [],
   healing: [],
+  healingReceived: [],
   raised: [],
   donations: [],
   deathrolls: [],
@@ -43,6 +44,11 @@ describe("titles", () => {
         { memberId: "sira", amount: 240000, at: at(2) },
         { memberId: "ulric", amount: 0, at: at(2) },
       ],
+      healingReceived: [
+        { memberId: "ulric", amount: 90000, at: at(2) },
+        { memberId: "vorn", amount: 60000, at: at(2) },
+        { memberId: "vorn", amount: 45000, at: at(9) },
+      ],
       raised: [{ memberId: "vorn", amount: 2, at: at(9) }],
       donations: [
         { memberId: "vorn", amount: 500, at: at(6) },
@@ -65,6 +71,7 @@ describe("titles", () => {
       { titleId: "sugarDaddy", memberId: "vorn", score: 500 },
       { titleId: "cheater", memberId: "ulric", score: 600 },
       { titleId: "loser", memberId: "brann", score: 600 },
+      { titleId: "princess", memberId: "vorn", score: 105000 },
     ]);
   });
 
