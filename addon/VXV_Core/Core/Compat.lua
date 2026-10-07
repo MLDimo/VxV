@@ -29,7 +29,6 @@ local ALIASES = {
     IsMasterLooter = { "IsMasterLooter" },
     GetMasterLootCandidate = { "GetMasterLootCandidate" },
     GiveMasterLoot = { "GiveMasterLoot" },
-    GetSortedInfoForDrop = { "C_LootHistory.GetSortedInfoForDrop" },
     -- Interface
     GetCursorPosition = { "GetCursorPosition" },
     GetMinimapShape = { "GetMinimapShape" }, -- optional: defined by minimap addons only

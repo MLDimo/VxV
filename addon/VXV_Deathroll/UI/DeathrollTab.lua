@@ -5,12 +5,11 @@ local _, ns = ...
 local DeathrollTab = {}
 ns.DeathrollTab = DeathrollTab
 
-local DeathrollData, Duels, DuelWindow, Games = ns.DeathrollData, ns.Duels, ns.DuelWindow, ns.Games
+local DeathrollData, Debts, Duels, DuelWindow, Games = ns.DeathrollData, ns.Debts, ns.Duels, ns.DuelWindow, ns.Games
 
-local Gold, RowList, Theme = VXV.Gold, VXV.RowList, VXV.Theme
+local Gold, RowList, Screen, Theme = VXV.Gold, VXV.RowList, VXV.Screen, VXV.Theme
 
-local PADDING, GAP = 22, 16
-local GRID_TOP = 96
+local PADDING, GAP, GRID_TOP = Screen.PADDING, Screen.GAP, Screen.GRID_TOP
 local LEFT = 340
 local FIELD_WIDTH, FIELD_LETTERS = 110, 7
 local BUTTON_HEIGHT = 30
@@ -18,22 +17,21 @@ local BUTTON_HEIGHT = 30
 local FORM_HEIGHT = 112
 local TOP_SHARE = 0.5
 
-local content, lists, form = nil, {}, {}
+local content
+local lists, form = {}, {}
 local target
 
-local function row(kind, text, onClick)
-    return { kind = kind, text = text, onClick = onClick }
-end
+local row = VXV.RowList.Row
 
 --- The members connected with VXV the player may challenge, the one chosen marked.
 local function members()
     local rows, me = {}, VXV.PlayerName()
     for _, name in ipairs(VXV.Online()) do
         if name ~= me then
-            rows[#rows + 1] = row("line", (name == target and "▸ " or "") .. name, function()
+            rows[#rows + 1] = row("line", (name == target and "▸ " or "") .. name, { onClick = function()
                 target = name
                 lists.members.SetRows(members())
-            end)
+            end })
         end
     end
     return #rows > 0 and rows or { row("line", "Aucun autre membre connecté avec VXV.") }
@@ -43,23 +41,23 @@ local function live()
     local rows = {}
     for _, game in ipairs(Games.Live()) do
         rows[#rows + 1] = row("line", ("%s contre %s · %s"):format(game.challenged, game.challenger,
-            Gold.Format(game.stake)), function()
+            Gold.Format(game.stake)), { onClick = function()
             DuelWindow.Show(game.id)
-        end)
+        end })
     end
     return #rows > 0 and rows or { row("line", "Aucune partie en cours.") }
 end
 
 local function debts()
     local rows, me = {}, VXV.PlayerName()
-    for _, game in ipairs(Games.Unpaid()) do
+    for _, game in ipairs(Debts.Unpaid()) do
         if game.loser == me then
             rows[#rows + 1] = row("line", ("Tu dois %s à %s."):format(Gold.Format(game.stake), game.winner))
         elseif game.winner == me then
             rows[#rows + 1] = row("line", ("%s te doit %s : clique une fois payé."):format(game.loser,
-                Gold.Format(game.stake)), function()
+                Gold.Format(game.stake)), { onClick = function()
                 Duels.ConfirmPaid(game.id)
-            end)
+            end })
         end
     end
     return #rows > 0 and rows or { row("line", "Aucune dette de deathroll.") }
@@ -90,19 +88,14 @@ end
 --- The challenge's panel: the members to choose from, then the stake, the starting number and the button.
 local function addChallenge(height)
     local _, body = Theme.TitledPanel(content, PADDING, GRID_TOP, LEFT, height, "Défier un membre")
-    local list = CreateFrame("Frame", nil, body)
-    list:SetPoint("TOPLEFT")
-    list:SetSize(body:GetWidth(), body:GetHeight() - FORM_HEIGHT)
-    lists.members = RowList.Create(list)
-    local stakeLabel = Theme.Text(body, "text", 12, "lavender")
+    lists.members = RowList.Create(body, 0, nil, FORM_HEIGHT)
+    local stakeLabel = Theme.Heading(body, "Mise (po)")
     stakeLabel:SetPoint("BOTTOMLEFT", 0, FORM_HEIGHT - 20)
-    stakeLabel:SetText("Mise (po)")
     local stakeHolder
     stakeHolder, form.stake = Theme.Field(body, FIELD_WIDTH, FIELD_LETTERS)
     stakeHolder:SetPoint("TOPLEFT", stakeLabel, "BOTTOMLEFT", 0, -4)
-    local startLabel = Theme.Text(body, "text", 12, "lavender")
+    local startLabel = Theme.Heading(body, "Départ")
     startLabel:SetPoint("LEFT", stakeLabel, "LEFT", FIELD_WIDTH + GAP, 0)
-    startLabel:SetText("Départ")
     local startHolder
     startHolder, form.start = Theme.Field(body, FIELD_WIDTH, FIELD_LETTERS)
     startHolder:SetPoint("TOPLEFT", startLabel, "BOTTOMLEFT", 0, -4)
@@ -116,11 +109,8 @@ end
 
 function DeathrollTab.Build(frame)
     content = frame
-    local kicker, title = Theme.ScreenHeader(content, "La salle de jeu", "neon", "Deathroll")
-    kicker:SetPoint("TOPLEFT", PADDING, -PADDING)
-    local subtitle = Theme.Text(content, "text", 13, "muted")
-    subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -6)
-    subtitle:SetText("Le défié roll le premier, puis chacun de 1 au résultat précédent : qui fait 1 perd la mise.")
+    Screen.Head(content, "La salle de jeu", "neon", "Deathroll").subtitle:SetText(
+        "Le défié roll le premier, puis chacun de 1 au résultat précédent : qui fait 1 perd la mise.")
     local height = content:GetHeight() - GRID_TOP - PADDING
     local topHeight = math.floor(height * TOP_SHARE)
     addChallenge(topHeight)
@@ -130,15 +120,5 @@ function DeathrollTab.Build(frame)
     lists.live = RowList.Panel(content, x, GRID_TOP, width, topHeight, "Parties en cours")
     lists.ranking = RowList.Panel(content, x, GRID_TOP + topHeight + GAP, width, height - topHeight - GAP,
         "Classement")
-    content:SetScript("OnShow", render)
-    render()
+    Screen.Follow(content, render, { "deathroll.updated", "presence.changed" })
 end
-
-local function refresh()
-    if content ~= nil then
-        render()
-    end
-end
-
-VXV.On("deathroll.updated", refresh)
-VXV.On("presence.changed", refresh)

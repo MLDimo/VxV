@@ -5,7 +5,7 @@ local _, ns = ...
 local DuelView = {}
 ns.DuelView = DuelView
 
-local Games = ns.Games
+local Rules = ns.Rules
 
 local Gold, Theme = VXV.Gold, VXV.Theme
 
@@ -13,7 +13,7 @@ local COOL, HOT = "amethyst", "loss"
 
 --- Between 0 (the start) and 1 (a high of 1), on a log scale: each halving of the high brings as much red.
 function DuelView.Heat(game)
-    local _, high = Games.Turn(game)
+    local _, high = Rules.Turn(game)
     if high == nil or game.start <= 1 then
         return 1
     end
@@ -35,11 +35,11 @@ end
 
 --- Under the number: the minute of bets, whose turn it is, or how the game ended.
 function DuelView.Status(game)
-    local roller, high = Games.Turn(game)
+    local roller, high = Rules.Turn(game)
     if roller == nil then
-        return ("%s a fait 1 : %s gagne %s."):format(Games.Loser(game), Games.Winner(game), Gold.Format(game.stake))
+        return ("%s a fait 1 : %s gagne %s."):format(Rules.Loser(game), Rules.Winner(game), Gold.Format(game.stake))
     end
-    if Games.Betting(game) then
+    if Rules.Betting(game) then
         return ("Paris ouverts encore %d s, puis %s roll de 1 à %d."):format(math.ceil(game.closesAt - GetTime()),
             roller, high)
     end

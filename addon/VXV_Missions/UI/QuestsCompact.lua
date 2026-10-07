@@ -6,10 +6,8 @@ ns.QuestsCompact = QuestsCompact
 
 local QuestsData, QuestsView = ns.QuestsData, ns.QuestsView
 
-local PADDING = 10
-
 function QuestsCompact.Build(frame)
-    VXV.RowList.Fill(frame, PADDING, function()
+    VXV.Screen.Compact(frame, function()
         return QuestsView.Board(QuestsData.Current(), time())
     end, { "quetes.updated", "quetes.live" })
 end

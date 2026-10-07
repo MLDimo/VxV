@@ -4,7 +4,7 @@ local _, ns = ...
 local Import = {}
 ns.Import = Import
 
-local RaidData, Sharing = ns.RaidData, ns.Sharing
+local RaidData = ns.RaidData
 
 local PROMPT = "Colle les données copiées depuis la page de l'événement sur le site (Ctrl+V), puis clique sur Charger."
 
@@ -14,7 +14,6 @@ function Import.Open()
         local ok, message = RaidData.Import(text)
         VXV.Print(message)
         if ok then
-            Sharing.Send()
             VXV.Print("Données envoyées aux membres de la guilde connectés avec VXV.")
         end
         return ok

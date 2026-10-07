@@ -11,7 +11,7 @@ local Changes = ns.Changes
 local Theme = VXV.Theme
 
 local WIDTH, HEIGHT = 480, 420
-local HEADING_TOP, FIELD_TOP, SECTION = 0, 20, 64
+local FIELD_TOP, SECTION = 20, 64
 local FIELD_PADDING, SHORT_FIELD = 6, 120
 local TOGGLE_GAP, BUTTON_WIDTH, BUTTON_HEIGHT, STEP_SIZE = 6, 160, 30, 26
 -- The website's bounds of the soft reserves per player.
@@ -23,17 +23,13 @@ local frame, body, problem, countText
 local boxes, toggles = {}, {}
 local chosen, softReserves = {}, DEFAULT_SOFT_RESERVES
 
-local function heading(top, text)
-    local label = Theme.Text(body, "textBold", 13, "lavender")
-    label:SetPoint("TOPLEFT", 0, -(top + HEADING_TOP))
-    label:SetText(text)
+local function heading(top, text, x)
+    Theme.Heading(body, text):SetPoint("TOPLEFT", x or 0, -top)
 end
 
 --- A text field under its heading, at x from the left.
 local function addField(key, x, top, width, title)
-    local label = Theme.Text(body, "textBold", 13, "lavender")
-    label:SetPoint("TOPLEFT", x, -top)
-    label:SetText(title)
+    heading(top, title, x)
     local holder, box = Theme.Field(body, width, MAX_LETTERS[key])
     holder:SetPoint("TOPLEFT", x, -(top + FIELD_TOP))
     boxes[key] = box

@@ -34,7 +34,7 @@ VXV.RegisterModule({
         name = "Paris",
         order = 1,
         Build = function(frame)
-            VXV.RowList.Screen(frame, {
+            VXV.Screen.List(frame, {
                 place = "ranking",
                 heading = "Classement des parieurs",
                 subtitle = function()

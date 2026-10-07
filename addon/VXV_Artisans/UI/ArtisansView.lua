@@ -16,9 +16,7 @@ local NOTHING = "Aucune recette connue de la guilde ne correspond."
 local NO_PROFESSION = "Aucun métier relevé : ils le sont à la connexion, sur chaque personnage."
 local NO_RECIPE = "ouvre la fenêtre du métier pour relever ses recettes"
 
-local function row(kind, text)
-    return { kind = kind, text = text }
-end
+local row = VXV.RowList.Row
 
 local function recipesCount(entry)
     local count = 0

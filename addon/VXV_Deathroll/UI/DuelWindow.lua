@@ -7,7 +7,7 @@ local _, ns = ...
 local DuelWindow = {}
 ns.DuelWindow = DuelWindow
 
-local Duels, DuelView, Games = ns.Duels, ns.DuelView, ns.Games
+local Duels, DuelView, Games, Rules = ns.Duels, ns.DuelView, ns.Games, ns.Rules
 
 local Theme = VXV.Theme
 
@@ -69,11 +69,11 @@ local function render()
     end
     widgets.status:SetText(DuelView.Status(game))
     widgets.history:SetText(DuelView.History(game) .. "\n" .. DuelView.Bets(game))
-    drawnBetting = Games.Betting(game)
-    local roller, high = Games.Turn(game)
-    widgets.roll:SetShown(roller == me and not Games.Betting(game) and animation == nil)
+    drawnBetting = Rules.Betting(game)
+    local roller, high = Rules.Turn(game)
+    widgets.roll:SetShown(roller == me and not Rules.Betting(game) and animation == nil)
     widgets.roll.label:SetText(("Roll (1-%d)"):format(high or 1))
-    local betting = Games.Betting(game) and me ~= game.challenger and me ~= game.challenged
+    local betting = Rules.Betting(game) and me ~= game.challenger and me ~= game.challenged
     for _, widget in ipairs({ widgets.amountHolder, widgets.betLeft, widgets.betRight }) do
         widget:SetShown(betting)
     end
@@ -92,7 +92,7 @@ local function animate()
         animation = nil
         render()
         local game = Games.Find(shownId)
-        local loser = game and Games.Loser(game)
+        local loser = game and Rules.Loser(game)
         if loser ~= nil then
             playSound(loser == VXV.PlayerName() and "defeat" or "victory")
         end
@@ -159,7 +159,7 @@ local function create()
         if game == nil then
             return
         end
-        if Games.Betting(game) ~= drawnBetting then
+        if Rules.Betting(game) ~= drawnBetting then
             render()
         elseif drawnBetting then
             widgets.status:SetText(DuelView.Status(game))

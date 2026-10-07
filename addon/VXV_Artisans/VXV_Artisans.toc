@@ -7,7 +7,9 @@
 
 # The professions read in game, the directory the website exports (VXV-ARTISANS), and how they travel in the guild.
 Text.lua
+ArtisansData.lua
 Directory.lua
+Website.lua
 Professions.lua
 Sharing.lua
 

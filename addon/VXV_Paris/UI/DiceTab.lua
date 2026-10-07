@@ -6,51 +6,25 @@ local DiceTab = {}
 ns.DiceTab = DiceTab
 
 local Bets, BetsData, DiceView, StakeDialog = ns.Bets, ns.BetsData, ns.DiceView, ns.StakeDialog
-local RowList = VXV.RowList
+local RowList, Screen = VXV.RowList, VXV.Screen
 
-local Theme = VXV.Theme
-
-local PADDING, GAP = 22, 16
-local GRID_TOP = 96
+local PADDING, GAP, GRID_TOP = Screen.PADDING, Screen.GAP, Screen.GRID_TOP
 local RIGHT = 340
 -- The right column's panels, by their share of its height.
 local MINE_SHARE, RANKING_SHARE = 0.34, 0.33
-local BADGE_HEIGHT, BADGE_PADDING, BADGE_GAP, BADGE_ALPHA = 24, 16, 6, 0.14
 
-local content, header
-local lists, badges = {}, {}
-
-local function addBadge(index)
-    local badge = CreateFrame("Frame", nil, content)
-    badge:SetHeight(BADGE_HEIGHT)
-    badge.background = badge:CreateTexture(nil, "BACKGROUND")
-    badge.background:SetAllPoints()
-    badge.label = Theme.Text(badge, "textHeavy", 12, "gain")
-    badge.label:SetPoint("CENTER")
-    badges[index] = badge
-    return badge
-end
+local content, header, badges
+local lists = {}
 
 local function renderHeader(data, memberId)
     local view = DiceView.Header(data, memberId)
     header.subtitle:SetText(view.subtitle)
-    local right = -PADDING
-    for index, item in ipairs(view.badges) do
-        local badge = badges[index] or addBadge(index)
-        local r, g, b = Theme.Color(item.color)
-        badge.background:SetColorTexture(r, g, b, BADGE_ALPHA)
-        badge.label:SetTextColor(r, g, b, 1)
-        badge.label:SetText(item.text)
-        badge:SetWidth(badge.label:GetStringWidth() + BADGE_PADDING)
-        badge:ClearAllPoints()
-        badge:SetPoint("TOPRIGHT", right, -PADDING)
-        right = right - badge:GetWidth() - BADGE_GAP
-    end
+    badges.Set(view.badges)
 end
 
 local function render()
     local data = BetsData.Current()
-    local memberId = Bets.MemberId(data)
+    local memberId = VXV.MemberOf(data)
     renderHeader(data, memberId)
     lists.table.SetRows(DiceView.Table(data, memberId, time(), StakeDialog.Open))
     lists.mine.SetRows(DiceView.MyStakes(data, memberId))
@@ -60,11 +34,8 @@ end
 
 function DiceTab.Build(frame)
     content = frame
-    header = {}
-    header.kicker, header.title = Theme.ScreenHeader(content, "La salle de jeu", "neon", "Le Dé Pipé")
-    header.kicker:SetPoint("TOPLEFT", PADDING, -PADDING)
-    header.subtitle = Theme.Text(content, "text", 13, "muted")
-    header.subtitle:SetPoint("TOPLEFT", header.title, "BOTTOMLEFT", 0, -6)
+    header = Screen.Head(content, "La salle de jeu", "neon", "Le Dé Pipé")
+    badges = Screen.Badges(content)
 
     local width, height = content:GetWidth(), content:GetHeight() - GRID_TOP - PADDING
     local tableWidth = width - 2 * PADDING - RIGHT - GAP
@@ -78,15 +49,5 @@ function DiceTab.Build(frame)
     local cashTop = GRID_TOP + mineHeight + rankingHeight + 2 * GAP
     lists.cash = RowList.Panel(content, x, cashTop, RIGHT, cashHeight, "La caisse")
     -- What depends on the time (the closing of the bets) is up to date each time the screen shows.
-    content:SetScript("OnShow", render)
-    render()
+    Screen.Follow(content, render, { "paris.updated", "paris.changes" })
 end
-
-local function refresh()
-    if content ~= nil then
-        render()
-    end
-end
-
-VXV.On("paris.updated", refresh)
-VXV.On("paris.changes", refresh)

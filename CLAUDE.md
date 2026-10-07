@@ -77,7 +77,7 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
   - 11.8 : bundle `VXV_Paris` (Le Dé Pipé en jeu : paris ouverts et cotes, mises en attente puis confirmées, mes
     paris, classement, caisse, carte de la Taverne, onglet « Paris » du mode réduit ; caisse aussi sur la page gauche
     du Journal). Données `VXV-PARIS-1` apportées par le compagnon et relayées par les officiers ; le partage des
-    données et les changements faits en jeu sont passés dans le socle (`VXV.ShareData`, `VXV.PendingChanges`).
+    données et les changements faits en jeu sont passés dans le socle (`VXV.SiteData`, `VXV.PendingChanges`).
   Validation en attente : un pari réel mené jusqu'au versement des gains ; publier le compagnon 1.1 (données des
   paris).
 - **P12 Tableau de missions** : code terminé.
@@ -151,7 +151,7 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
-- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll ; Ranking : Paris (`VXV_Paris`), Deathroll (`VXV_Deathroll`), Titres (`VXV_Titles`), comme sur le site.
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll ; Ranking : Paris (`VXV_Paris`), Deathroll (`VXV_Deathroll`), Titres (`VXV_Titles`), comme sur le site.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus (vu sur le Journal le 5 octobre).
 
@@ -203,9 +203,11 @@ La table complète est dans le README. Règles :
 - Titres (contrat du site vers l'addon, P13.3) : première ligne `VXV-TITRES-1`, puis les lignes communes et une ligne
   `T` par titre (nom, règle, détenteur), écrites par `packages/server/src/domain/addonTitles.ts` et lues par
   `addon/VXV_Titles/TitlesData.lua`. Même règle de version.
-- Données du site pour un bundle (paris, missions, titres) : `VXV.SiteData` (`VXV_Core/Core/SiteData.lua`) les lit,
-  les garde, les prend du compagnon et des officiers ; chaque format commence par les mêmes lignes `P` (export),
-  `O` (officiers) et `M` (personnages des membres), écrites par `addonHead` (`packages/server/src/domain/addonText.ts`).
+- Données du site pour un bundle (événement, paris, missions, titres, artisans, deathroll) : `VXV.SiteData`
+  (`VXV_Core/Core/SiteData.lua`) les lit, les garde, les prend du compagnon, du collage d'un officier (`Import`) et
+  du relais des officiers (`Core/SharedData.lua`) ; chaque format commence par les mêmes lignes `P` (export), `O`
+  (officiers) et `M` (personnages des membres, lus par `VXV.MemberOf`), écrites par `addonHead`
+  (`packages/server/src/domain/addonText.ts`).
 - Métiers d'un personnage (contrat de l'addon vers le site, P14) : première ligne `VXV-METIERS-1`, puis `C`
   (personnage), `P` (métier, niveau, lectures) et `R` (recettes connues), lues par
   `packages/server/src/domain/artisans.ts`. Annuaire (du site vers l'addon) : `VXV-ARTISANS-1`, écrit par
@@ -223,7 +225,7 @@ La table complète est dans le README. Règles :
 - Nommage : `PascalCase` pour modules et fonctions publiques, `camelCase` pour locales, `UPPER_SNAKE_CASE` pour constantes. Pas de nombre magique.
 - Indentation 4 espaces, 120 caractères max, lint via `.luacheckrc`.
 - Tout appel à une API Blizzard dont le nom varie passe par `Compat` (contrat `ok, ...` façon `pcall`).
-- Toute valeur venant du client peut être « secrète » : passer par `Util.Safe` / `Util.IsSecret` avant de comparer, concaténer ou stocker.
+- Toute valeur venant du client peut être « secrète » : passer par `VXV.IsSecret` (`Util.IsSecret`) avant de comparer, concaténer ou stocker.
 - SavedVariables lues uniquement dans `ADDON_LOADED` de l'addon, jamais au chargement du fichier.
 - `ReloadUI()` est protégée sur Forever : demander au joueur de taper `/reload`.
 - Ordre de chargement dans le `.toc` : `Core` (outillage générique) puis modules métier puis `Bootstrap.lua` en dernier.
@@ -237,7 +239,7 @@ Chaque famille d'erreur courante des addons doit être couverte par un test auto
 | API absente du client (anciennes globales, fonctions renommées) | Couche Compat uniquement | Toute globale lue par l'addon figure dans la liste des API mesurées sur Forever (inventaire de la sonde, base d'API capturée) |
 | Événement inconnu ou interdit (`COMBAT_LOG_EVENT_UNFILTERED`) | Liste fermée d'événements | Chaque événement enregistré figure dans la liste validée en P0 |
 | SavedVariables lues trop tôt ou absentes au premier lancement | Lecture dans `ADDON_LOADED`, valeurs par défaut, migrations versionnées | Scénarios « première installation » et « mise à jour depuis la version précédente » |
-| Valeurs secrètes comparées ou concaténées | `Util.Safe` / `Util.IsSecret` | Simulateur renvoyant des noms secrets en combat |
+| Valeurs secrètes comparées ou concaténées | `Util.IsSecret` | Simulateur renvoyant des noms secrets en combat |
 | Action protégée en combat (cadres sécurisés, bouton minimap, `ReloadUI`) | Aucune action protégée, report après le combat | Simulateur avec `InCombatLockdown()` vrai, aucun `ADDON_ACTION_BLOCKED` |
 | Bouton minimap : base de position nulle, forme de minimap inconnue, doublon avec le compartiment d'addons | Création après `ADDON_LOADED`, valeurs par défaut | Scénario sans données sauvegardées, et minimap sans `GetMinimapShape` |
 | Objet pas encore en cache (`C_Item.GetItemInfo` renvoie nil) | Attente de `ITEM_DATA_LOAD_RESULT` | Simulateur renvoyant nil au premier appel |

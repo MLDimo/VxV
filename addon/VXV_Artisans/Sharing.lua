@@ -6,10 +6,9 @@ local _, ns = ...
 local Sharing = {}
 ns.Sharing = Sharing
 
-local Directory = ns.Directory
+local ArtisansData, Directory, Website = ns.ArtisansData, ns.Directory, ns.Website
 
 local PROFESSION, INDEX, ASK = "artisans.profession", "artisans.index", "artisans.ask"
-local KIND = "metiers"
 
 local function payloadOf(entry)
     return { c = entry.character, k = entry.class, p = entry.id, n = entry.name, l = entry.level, m = entry.max,
@@ -72,8 +71,8 @@ VXV.OnMessage(PROFESSION, function(payload, sender)
     if entry == nil or sender == me or not Directory.Hear(entry) then
         return
     end
-    if VXV.CompanionSeen() and Directory.IsOfficer(me) then
-        VXV.Emit("sync.put", KIND, entry.character, Directory.Text(entry.character))
+    if VXV.CompanionSeen() and ArtisansData.IsOfficer(me) then
+        Website.Send(entry.character)
     end
 end)
 

@@ -6,9 +6,7 @@ local DiceCompact = {}
 ns.DiceCompact = DiceCompact
 
 local Bets, BetsData, DiceView, StakeDialog = ns.Bets, ns.BetsData, ns.DiceView, ns.StakeDialog
-local RowList = VXV.RowList
-
-local Theme = VXV.Theme
+local RowList, Screen, Theme = VXV.RowList, VXV.Screen, VXV.Theme
 
 local PADDING = 10
 local BUTTON_HEIGHT = 30
@@ -21,7 +19,7 @@ local function render()
     local bet = Bets.Open(data, time())[1]
     shownBet = bet and bet.id
     list.SetRows(bet == nil and DiceView.Table(data, nil, time(), StakeDialog.Open)
-        or DiceView.Bet(bet, Bets.MemberId(data)))
+        or DiceView.Bet(bet, VXV.MemberOf(data)))
     button:SetShown(bet ~= nil)
 end
 
@@ -36,15 +34,5 @@ function DiceCompact.Build(frame)
     button:SetScript("OnClick", function()
         StakeDialog.Open(shownBet)
     end)
-    content:SetScript("OnShow", render)
-    render()
+    Screen.Follow(content, render, { "paris.updated", "paris.changes" })
 end
-
-local function refresh()
-    if content ~= nil then
-        render()
-    end
-end
-
-VXV.On("paris.updated", refresh)
-VXV.On("paris.changes", refresh)

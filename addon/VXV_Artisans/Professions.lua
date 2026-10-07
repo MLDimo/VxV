@@ -6,11 +6,10 @@ local _, ns = ...
 local Professions = {}
 ns.Professions = Professions
 
-local Directory = ns.Directory
+local Directory, Website = ns.Directory, ns.Website
 
 local Compat = VXV.Compat
 
-local KIND = "metiers"
 -- GetProfessions returns five slots, nil when empty: two main professions, archaeology, fishing, cooking.
 local PROFESSION_SLOTS = 5
 -- A profession window's recipes are ready a moment after it opens (measured on 3 October).
@@ -51,7 +50,7 @@ local function keep(entries)
     end
     local character = VXV.PlayerName()
     if #entries > 0 and character ~= nil then
-        VXV.Emit("sync.put", KIND, character, Directory.Text(character))
+        Website.Send(character)
     end
 end
 

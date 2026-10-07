@@ -38,9 +38,3 @@ local DeathrollData = VXV.SiteData({
     },
 })
 ns.DeathrollData = DeathrollData
-
---- The website's id of the member playing this character, or nil.
-function DeathrollData.MemberOf(name)
-    local data = DeathrollData.Current()
-    return data ~= nil and name ~= nil and data.members[name] or nil
-end
