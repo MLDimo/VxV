@@ -184,6 +184,9 @@ describe("events created in game (P9.2)", () => {
     expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain("Choisis un rôle avec les flèches.");
     client(click("VXV_EventDialog", "Créer"));
     expect(client(PENDING)).toEqual({});
+    expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain(
+      "Il manque : la date, l'heure, un raid, qui peut s'inscrire (flèches), le motif.",
+    );
     client(`
       local boxes = {}
       local function walk(frame)
@@ -200,6 +203,7 @@ describe("events created in game (P9.2)", () => {
     // Who may sign up is chosen, never assumed.
     client(click("VXV_EventDialog", "Créer"));
     expect(client(PENDING)).toEqual({});
+    expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain("Il manque : qui peut s'inscrire (flèches).");
     client(click("VXV_EventDialog", "<"));
     expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain("Raideur R1");
     client(click("VXV_EventDialog", ">"));
