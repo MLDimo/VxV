@@ -181,6 +181,28 @@ describe("the artisans in game (P14)", () => {
     const { bundles } = startCore({ written: companionFiles({ artisans: text }), bundles: BUNDLES });
     expect(bundles.VXV_Artisans?.run(SEARCH("chemise"))).toEqual(["Chemise en lin brun : Sira Ventargent 150"]);
   });
+
+  it("says in a recipe's tooltip whether the guild knows it, in green or in red (owner's request of 7 October)", () => {
+    const { client, errors } = startArtisans();
+    client(`
+      ItemInfo[2455] = { name = "Recette : Potion de soins mineure", classID = 9, subclassID = 6 }
+      ItemInfo[6454] = { name = "Manuel : Bandage épais en lin", classID = 9, subclassID = 7 }
+      ItemInfo[118] = { name = "Potion de soins mineure", classID = 0, subclassID = 1 }
+      ItemInfo[4500] = { name = "Livre : Secourisme expert", classID = 9, subclassID = 0 }
+    `);
+    const tooltip = (itemId: number) => client(`return ItemTooltip(${String(itemId)})`);
+    const unknown = { text: "Recette non possédée par VXV", r: 0.945, g: 0.604, b: 0.604 };
+    expect(tooltip(2455)).toEqual([unknown]);
+    // Thom opens his first aid's window: the guild knows the potion now, not the thick bandage he has not learned.
+    client(OPEN(1));
+    expect(tooltip(2455)).toEqual([{ text: "Recette possédée par VXV", r: 0.494, g: 0.886, b: 0.627 }]);
+    expect(tooltip(6454)).toEqual([unknown]);
+    // Neither an item made by a recipe, nor a book, nor an item not in the client's cache yet.
+    for (const itemId of [118, 4500, 9999]) {
+      expect(tooltip(itemId)).toEqual({});
+    }
+    expect(errors()).toEqual([]);
+  });
 });
 
 function startArtisans() {

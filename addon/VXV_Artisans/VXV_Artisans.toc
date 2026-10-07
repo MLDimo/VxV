@@ -9,11 +9,12 @@
 Text.lua
 ArtisansData.lua
 Directory.lua
+RecipeItems.lua
 Website.lua
 Professions.lua
 Sharing.lua
 
-# Interface: the Artisans screen.
+# Interface: the Artisans screen; the recipes' tooltips are in RecipeItems.lua.
 UI\ArtisansView.lua
 UI\ArtisansTab.lua
 

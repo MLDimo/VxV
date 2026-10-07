@@ -289,7 +289,7 @@ function AdvanceTime(seconds)
 end
 
 -- Addon messages: what this client sent, for the tests to deliver to the other players' clients.
-Enum = { SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3 }, TooltipDataType = { Unit = 2 } }
+Enum = { SendAddonMessageResult = { Success = 0, AddonMessageThrottle = 3 }, TooltipDataType = { Item = 0, Unit = 2 } }
 SentAddonMessages = {}
 --- Messages longer than the 255 bytes the server carries (it would cut them silently).
 OversizedMessages = {}
@@ -362,7 +362,7 @@ function GetStatistic(id) return Counters.statistics[id] or "--" end
 ItemInfo = {}
 C_Item = {
     GetItemInfo = function(link)
-        local info = ItemInfo[tonumber(tostring(link):match("item:(%d+)"))]
+        local info = ItemInfo[tonumber(link) or tonumber(tostring(link):match("item:(%d+)"))]
         if info == nil then
             return nil
         end
@@ -540,6 +540,19 @@ function UnitTooltip(unit)
     for _, postCall in ipairs(tooltipPostCalls) do
         if postCall.dataType == Enum.TooltipDataType.Unit then
             postCall.callback(tooltip)
+        end
+    end
+    return lines
+end
+--- ItemTooltip(item id) shows the item's tooltip and returns the lines the post-calls added: { text, r, g, b }.
+function ItemTooltip(itemId)
+    local lines = {}
+    local tooltip = {
+        AddLine = function(_, text, r, g, b) lines[#lines + 1] = { text = text, r = r, g = g, b = b } end,
+    }
+    for _, postCall in ipairs(tooltipPostCalls) do
+        if postCall.dataType == Enum.TooltipDataType.Item then
+            postCall.callback(tooltip, { id = itemId })
         end
     end
     return lines

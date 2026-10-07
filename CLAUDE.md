@@ -119,7 +119,13 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     a ; un addon à qui il en manque les demande en chuchotement. Un officier équipé du compagnon envoie au site ce
     qu'il entend. L'annuaire du site (`VXV-ARTISANS-1`) n'arrive que par le compagnon (`VXV.SiteData` avec
     `shared = false` : trop gros pour le relais des officiers).
-  Validation en attente : une recette apprise qui apparaît chez un autre membre après la synchro.
+  - Infobulle des recettes (demande du propriétaire du 7 octobre, `VXV_Artisans/RecipeItems.lua`) : un objet de
+    recette, au butin ou dans les sacs, dit « Recette possédée par VXV » en vert (`gain`) ou « Recette non possédée
+    par VXV » en rouge (`loss`). Le nom de l'objet après « : » (« Recette : », « Patron : »…) est comparé, sans
+    accents ni casse, aux recettes de l'annuaire ; une recette reste « non possédée » tant que son artisan n'a pas
+    ouvert la fenêtre de son métier avec VXV. Les livres (sous-classe 0) n'ont pas de ligne.
+  Validation en attente : une recette apprise qui apparaît chez un autre membre après la synchro ; l'infobulle d'une
+  recette en jeu (le nom de l'objet suit-il bien « Type : nom de la recette » ?).
 - **P15 Deathroll** : code terminé.
   - Site : parties jouées en jeu, reçues par le compagnon (texte `VXV-DEATHROLL-1` par partie, envoyé par un joueur
     ou relayé par un officier) et vérifiées (le défié roll le premier, chacun ensuite de 1 au résultat précédent, fin
