@@ -2,14 +2,14 @@
 
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { runFormAction } from "@/server/formActions";
+import { formText, runFormAction } from "@/server/formActions";
 import { requireOfficer } from "@/server/session";
 
 export async function changeExclusion(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  const eventId = String(form.get("eventId") ?? "");
-  const itemId = String(form.get("itemId") ?? "");
-  const reason = String(form.get("reason") ?? "");
+  const eventId = formText(form, "eventId");
+  const itemId = formText(form, "itemId");
+  const reason = formText(form, "reason");
   return runFormAction(async () => {
     if (form.get("intent") === "include") {
       await getApplication().exclusions.include(officer, eventId, itemId, reason);

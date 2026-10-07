@@ -1,4 +1,4 @@
-import { ForbiddenError, RaidLogFormatError, RosterFormatError, ValidationError } from "@vxv/server";
+import { ForbiddenError, TextFormatError, ValidationError } from "@vxv/server";
 import { describe, expect, it, vi } from "vitest";
 import { runFormAction, toErrorState } from "./formActions";
 
@@ -18,8 +18,8 @@ describe("toErrorState", () => {
   });
 
   it("lists every problem of a malformed roster", () => {
-    expect(toErrorState(new RosterFormatError(["Ligne 2", "Ligne 3"])).messages).toEqual(["Ligne 2", "Ligne 3"]);
-    expect(toErrorState(new RaidLogFormatError(["Ligne 4"])).messages).toEqual(["Ligne 4"]);
+    expect(toErrorState(new TextFormatError(["Ligne 2", "Ligne 3"])).messages).toEqual(["Ligne 2", "Ligne 3"]);
+    expect(toErrorState(new TextFormatError(["Ligne 4"])).messages).toEqual(["Ligne 4"]);
   });
 
   it("lets unexpected errors propagate", () => {

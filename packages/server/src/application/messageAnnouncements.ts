@@ -1,8 +1,8 @@
 import type { DiscordMessage } from "../domain/bets.ts";
-import type { MessageAnnouncer } from "./ports.ts";
+import type { MessageAnnouncer } from "./discordPorts.ts";
 
 /** How an item is found, with its message on Discord, and how its new message is kept. */
-export interface AnnouncementStore<Item> {
+interface AnnouncementStore<Item> {
   load(id: string): Promise<{ item: Item; message: DiscordMessage | undefined } | undefined>;
   save(id: string, message: DiscordMessage): Promise<void>;
 }

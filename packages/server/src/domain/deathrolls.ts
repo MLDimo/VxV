@@ -1,4 +1,4 @@
-import { TextFormatError } from "./textFormat.ts";
+import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.ts";
 
 /**
  * Deathrolls (P15): one against one, the challenged rolling first from the starting number, each next roll from 1 to
@@ -14,9 +14,6 @@ export const BIG_STAKE = 1000;
 
 /** How long the guild bets on a game, between its acceptance and its first roll (P15.2). */
 export const DEATHROLL_BETTING_MS = 60_000;
-
-const MS_PER_SECOND = 1000;
-const FIELD_SEPARATOR = ";";
 
 export interface DeathrollRoll {
   /** "Prénom Nom". */
@@ -41,18 +38,6 @@ export interface DeathrollGame {
   paid: { by: string; at: Date } | undefined;
 }
 
-export class DeathrollFormatError extends TextFormatError {}
-
-function wholeNumber(value: string | undefined): number | undefined {
-  const number = Number(value);
-  return value !== undefined && value !== "" && Number.isInteger(number) && number >= 0 ? number : undefined;
-}
-
-function instant(value: string | undefined): Date | undefined {
-  const seconds = wholeNumber(value);
-  return seconds === undefined || seconds === 0 ? undefined : new Date(seconds * MS_PER_SECOND);
-}
-
 /**
  * Reads a game, one record per line:
  * G;id;challenger;challenged;stake;starting number;accepted (Unix seconds);ended (Unix seconds)
@@ -62,90 +47,70 @@ function instant(value: string | undefined): Date | undefined {
  * Lines of an unknown kind are skipped.
  */
 export function parseDeathroll(text: string): DeathrollGame {
-  const [header, ...rows] = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line !== "");
-  if (header !== DEATHROLL_HEADER) {
-    throw new DeathrollFormatError([`Une partie doit commencer par la ligne ${DEATHROLL_HEADER}.`]);
-  }
-  let game: DeathrollGame | undefined;
+  let game: Omit<DeathrollGame, "rolls" | "bets" | "paid"> | undefined;
   const rolls: DeathrollRoll[] = [];
   const bets: DeathrollGame["bets"] = [];
   let paid: DeathrollGame["paid"];
-  const problems: string[] = [];
-  const readers: Record<string, (fields: string[]) => boolean> = {
-    G: ([, id, challenger, challenged, stake, start, acceptedAt, endedAt]) => {
-      const values = {
-        stake: wholeNumber(stake),
-        start: wholeNumber(start),
-        acceptedAt: instant(acceptedAt),
-        endedAt: instant(endedAt),
-      };
-      if (
-        !id ||
-        !challenger ||
-        !challenged ||
-        values.stake === undefined ||
-        values.start === undefined ||
-        values.acceptedAt === undefined ||
-        values.endedAt === undefined
-      ) {
-        return false;
-      }
-      game = {
-        id,
-        challenger,
-        challenged,
-        stake: values.stake,
-        start: values.start,
-        acceptedAt: values.acceptedAt,
-        endedAt: values.endedAt,
-        rolls,
-        bets,
-        paid: undefined,
-      };
-      return true;
+  readRecords(text, {
+    headers: [DEATHROLL_HEADER],
+    wrongHeader: `Une partie doit commencer par la ligne ${DEATHROLL_HEADER}.`,
+    readers: {
+      G: ([id, challenger, challenged, stake, start, acceptedAt, endedAt]) => {
+        const values = {
+          stake: wholeNumber(stake),
+          start: wholeNumber(start),
+          acceptedAt: instant(acceptedAt),
+          endedAt: instant(endedAt),
+        };
+        if (
+          !id ||
+          !challenger ||
+          !challenged ||
+          values.stake === undefined ||
+          values.start === undefined ||
+          values.acceptedAt === undefined ||
+          values.endedAt === undefined
+        ) {
+          return false;
+        }
+        game = {
+          id,
+          challenger,
+          challenged,
+          stake: values.stake,
+          start: values.start,
+          acceptedAt: values.acceptedAt,
+          endedAt: values.endedAt,
+        };
+        return true;
+      },
+      R: ([character, high, result]) => {
+        const values = { high: wholeNumber(high), result: wholeNumber(result) };
+        if (!character || values.high === undefined || values.result === undefined) {
+          return false;
+        }
+        rolls.push({ character, high: values.high, result: values.result });
+        return true;
+      },
+      B: ([bettor, choice, amount]) => {
+        const value = wholeNumber(amount);
+        if (!bettor || !choice || value === undefined) {
+          return false;
+        }
+        bets.push({ bettor, choice, amount: value });
+        return true;
+      },
+      Y: ([by, at]) => {
+        const when = instant(at);
+        if (!by || when === undefined) {
+          return false;
+        }
+        paid = { by, at: when };
+        return true;
+      },
     },
-    R: ([, character, high, result]) => {
-      const values = { high: wholeNumber(high), result: wholeNumber(result) };
-      if (!character || values.high === undefined || values.result === undefined) {
-        return false;
-      }
-      rolls.push({ character, high: values.high, result: values.result });
-      return true;
-    },
-    B: ([, bettor, choice, amount]) => {
-      const value = wholeNumber(amount);
-      if (!bettor || !choice || value === undefined) {
-        return false;
-      }
-      bets.push({ bettor, choice, amount: value });
-      return true;
-    },
-    Y: ([, by, at]) => {
-      const when = instant(at);
-      if (!by || when === undefined) {
-        return false;
-      }
-      paid = { by, at: when };
-      return true;
-    },
-  };
-  rows.forEach((row, index) => {
-    const fields = row.split(FIELD_SEPARATOR).map((field) => field.trim());
-    const read = readers[fields[0] ?? ""];
-    if (read !== undefined && !read(fields)) {
-      problems.push(`Ligne ${String(index + 2)} illisible.`);
-    }
   });
-  if (problems.length === 0 && game === undefined) {
-    problems.push("La partie ne dit pas qui a joué (ligne G manquante).");
-  }
-  if (problems.length > 0 || game === undefined) {
-    throw new DeathrollFormatError(problems);
-  }
-  return { ...game, paid };
+  return { ...requireRecord(game, "La partie ne dit pas qui a joué (ligne G manquante)."), rolls, bets, paid };
 }
 
 /** Who lost: the player who rolled 1, the last roll. */

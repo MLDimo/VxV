@@ -1,11 +1,13 @@
 import type { DeathrollView } from "@vxv/server";
 import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
 import { CharacterName } from "@/components/CharacterName";
-import { DeathrollPayment } from "@/components/DeathrollPayment";
+import { confirmDeathrollPayment } from "@/app/actions/deathrolls";
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { DiceNav } from "@/components/DiceNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 /** « Thom Leboss bat Vorn Cendrelune · 500 po ». */
 function Duel({ view }: { view: DeathrollView }) {
@@ -34,8 +36,7 @@ export default async function DeathrollPage() {
         et les deathrolls.
       </p>
       {(owed.length > 0 || toConfirm.length > 0) && (
-        <section className="panel mt-6" aria-label="Mes dettes de deathroll">
-          <h2 className="font-pixel text-xl text-ivory">Mes dettes</h2>
+        <Panel title="Mes dettes" label="Mes dettes de deathroll" className="mt-6">
           <ul className="mt-3 space-y-2">
             {owed.map((view) => (
               <li key={view.game.id} className="text-loss">
@@ -49,11 +50,15 @@ export default async function DeathrollPage() {
                   <CharacterName name={view.loser.name} characterClass={view.loser.characterClass} /> te doit{" "}
                   {formatGold(view.game.stake)}.
                 </span>
-                <DeathrollPayment deathrollId={view.game.id} />
+                <ConfirmButton
+                  action={confirmDeathrollPayment}
+                  fields={{ deathrollId: view.game.id }}
+                  label="Paiement reçu"
+                />
               </li>
             ))}
           </ul>
-        </section>
+        </Panel>
       )}
       <section className="mt-8" aria-label="Dernières parties">
         <h2 className="font-pixel text-xl text-ivory">Dernières parties</h2>

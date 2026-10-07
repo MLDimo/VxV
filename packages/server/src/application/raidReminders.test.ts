@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { RaidReminder } from "../domain/reminders.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
@@ -7,7 +7,7 @@ import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
-import type { RaidAnnouncer } from "./ports.ts";
+import type { RaidAnnouncer } from "./discordPorts.ts";
 import { createRaidReminders } from "./raidReminders.ts";
 import { createSignups } from "./signups.ts";
 

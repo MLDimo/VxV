@@ -1,4 +1,4 @@
-import type { GuildGateway } from "../../application/ports.ts";
+import type { GuildGateway } from "../../application/discordPorts.ts";
 import { createDiscordRest, DiscordApiError, type DiscordRestOptions } from "./rest.ts";
 
 const HTTP_FORBIDDEN = 403;

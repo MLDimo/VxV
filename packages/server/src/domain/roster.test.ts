@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Character } from "./characters.ts";
-import { parseRoster, planRosterImport, ROSTER_HEADER, RosterFormatError, summarizeRosterImport } from "./roster.ts";
+import { parseRoster, planRosterImport, ROSTER_HEADER, summarizeRosterImport } from "./roster.ts";
+import { TextFormatError } from "./textFormat.ts";
 
 function problemsOf(text: string): readonly string[] {
   try {
     parseRoster(text);
   } catch (error) {
-    if (error instanceof RosterFormatError) {
+    if (error instanceof TextFormatError) {
       return error.problems;
     }
     throw error;

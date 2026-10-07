@@ -1,15 +1,17 @@
 import type { RaidEvent } from "../domain/events.ts";
-import type { ExclusionRecord } from "../domain/journal.ts";
+import type { ExclusionRecord, NewJournalEntry } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import type { LootItem } from "../domain/softReserves.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Repositories, UnitOfWork } from "./ports.ts";
 
+/** The event's item an officer changes, checked to be excluded (or not) before the change. */
 async function findEventItem(
   repositories: Repositories,
   eventId: string,
   rawItemId: string,
+  excluded: boolean,
 ): Promise<{ event: RaidEvent; item: LootItem }> {
   const event = await repositories.events.findById(eventId);
   if (event === undefined) {
@@ -20,15 +22,33 @@ async function findEventItem(
   if (item === undefined) {
     throw new ValidationError("Cet objet ne tombe pas dans les raids de cet événement.");
   }
+  if ((await repositories.exclusions.listByEvent(event.id)).has(item.itemId) !== excluded) {
+    throw new ValidationError(excluded ? "Cet objet n'est pas exclu." : "Cet objet est déjà exclu.");
+  }
   return { event, item };
 }
 
-function record(event: RaidEvent, item: LootItem, removedSoftReserves: string[]): ExclusionRecord {
-  return {
+function journalEntry(
+  officer: Member,
+  action: "exclusion.add" | "exclusion.remove",
+  { event, item }: { event: RaidEvent; item: LootItem },
+  removedSoftReserves: string[],
+  reason: string,
+): NewJournalEntry {
+  const after: ExclusionRecord = {
     itemName: item.name,
     raids: event.raids.map((raid) => raid.name),
     eventStartsAt: event.startsAt.toISOString(),
     removedSoftReserves,
+  };
+  return {
+    actorId: officer.id,
+    action,
+    entity: "item",
+    entityId: `${event.id}/${item.itemId}`,
+    before: null,
+    after,
+    reason,
   };
 }
 
@@ -38,24 +58,14 @@ export function createExclusions({ unitOfWork }: { unitOfWork: UnitOfWork }) {
     async exclude(officer: Member, eventId: string, itemId: string, reason: string): Promise<void> {
       const motive = checkOfficerAction(officer, reason);
       await unitOfWork.run(async (repositories) => {
-        const { event, item } = await findEventItem(repositories, eventId, itemId);
-        if ((await repositories.exclusions.listByEvent(event.id)).has(item.itemId)) {
-          throw new ValidationError("Cet objet est déjà exclu.");
-        }
+        const found = await findEventItem(repositories, eventId, itemId, false);
+        const { event, item } = found;
         const removed = (await repositories.softReserves.listByEvent(event.id))
           .filter((reserve) => reserve.itemId === item.itemId)
           .map((reserve) => reserve.characterName);
         await repositories.softReserves.deleteForItem(event.id, item.itemId);
         await repositories.exclusions.add(event.id, item.itemId);
-        await repositories.journal.record({
-          actorId: officer.id,
-          action: "exclusion.add",
-          entity: "item",
-          entityId: `${event.id}/${item.itemId}`,
-          before: null,
-          after: record(event, item, removed),
-          reason: motive,
-        });
+        await repositories.journal.record(journalEntry(officer, "exclusion.add", found, removed, motive));
       });
     },
 
@@ -63,20 +73,9 @@ export function createExclusions({ unitOfWork }: { unitOfWork: UnitOfWork }) {
     async include(officer: Member, eventId: string, itemId: string, reason: string): Promise<void> {
       const motive = checkOfficerAction(officer, reason);
       await unitOfWork.run(async (repositories) => {
-        const { event, item } = await findEventItem(repositories, eventId, itemId);
-        if (!(await repositories.exclusions.listByEvent(event.id)).has(item.itemId)) {
-          throw new ValidationError("Cet objet n'est pas exclu.");
-        }
-        await repositories.exclusions.remove(event.id, item.itemId);
-        await repositories.journal.record({
-          actorId: officer.id,
-          action: "exclusion.remove",
-          entity: "item",
-          entityId: `${event.id}/${item.itemId}`,
-          before: null,
-          after: record(event, item, []),
-          reason: motive,
-        });
+        const found = await findEventItem(repositories, eventId, itemId, true);
+        await repositories.exclusions.remove(found.event.id, found.item.itemId);
+        await repositories.journal.record(journalEntry(officer, "exclusion.remove", found, [], motive));
       });
     },
   };

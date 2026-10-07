@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { PGlite } from "@electric-sql/pglite";
+import { PGlite } from "@vxv/database/testing";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { createPgSqlClient, type PgSqlClient } from "./sql.ts";

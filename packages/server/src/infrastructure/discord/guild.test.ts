@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { GuildGateway } from "../../application/ports.ts";
+import type { GuildGateway } from "../../application/discordPorts.ts";
 import { createFakeDiscord, type FakeDiscord } from "./fakeDiscord.ts";
 import { createDiscordGuild } from "./guild.ts";
 import { DiscordApiError } from "./rest.ts";

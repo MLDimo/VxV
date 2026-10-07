@@ -1,7 +1,7 @@
 import type { JournalEntry } from "../domain/journal.ts";
 import type { UnitOfWork } from "./ports.ts";
 
-export const JOURNAL_PAGE_SIZE = 100;
+const JOURNAL_PAGE_SIZE = 100;
 
 export function createJournal({ unitOfWork }: { unitOfWork: UnitOfWork }) {
   return {

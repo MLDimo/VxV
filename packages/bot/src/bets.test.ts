@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import type { Application } from "@vxv/server";
 import type { FakeDiscord } from "@vxv/server/testing";
 import {

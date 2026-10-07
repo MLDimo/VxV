@@ -254,8 +254,8 @@ Outil : le banc d'essai `tools/addon-harness` (fengari + client simulé, tests V
 ## Architecture du serveur (`@vxv/server`)
 
 Partagé par le site et le bot. Trois couches, vérifiées par ESLint :
-- `domain/` : règles pures, aucune dépendance.
-- `application/` : cas d'usage ; ne connaissent que les interfaces de `ports.ts` (dépôts, unité de travail, horloge).
+- `domain/` : règles pures, aucune dépendance. Les textes venus de l'addon (liste, journal, métiers, deathroll) se lisent avec `domain/textFormat.ts` (lignes numérotées, un lecteur par type de ligne, `TextFormatError`).
+- `application/` : cas d'usage ; ne connaissent que les interfaces de `ports.ts` (dépôts, unité de travail, horloge) et de `discordPorts.ts` (serveur de la guilde, annonces du bot).
 - `infrastructure/` : SQL brut sur PostgreSQL (`SqlClient` : pg en production, PGlite dans les tests).
 Dans une transaction, une requête après l'autre : le client d'une transaction n'en exécute qu'une à la fois (pg
 déprécie la file d'attente), donc pas de `Promise.all` dans `application/` ni `infrastructure/` (règle ESLint).

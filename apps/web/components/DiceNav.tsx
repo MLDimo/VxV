@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SubNav } from "./SubNav";
 
 const LINKS = [
   { href: "/paris", name: "Paris" },
@@ -6,20 +6,7 @@ const LINKS = [
   { href: "/paris/tresorerie", name: "Trésorerie" },
 ] as const;
 
-/** Le Dé Pipé's sub-menu (§7.2: same style as the tabs). */
+/** Le Dé Pipé's sub-menu. */
 export function DiceNav({ current }: { current?: (typeof LINKS)[number]["href"] }) {
-  return (
-    <nav aria-label="Le Dé Pipé" className="mt-6 flex gap-3">
-      {LINKS.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          className="tab"
-          aria-current={link.href === current ? "page" : undefined}
-        >
-          {link.name}
-        </Link>
-      ))}
-    </nav>
-  );
+  return <SubNav label="Le Dé Pipé" links={LINKS} current={current} className="mt-6" />;
 }

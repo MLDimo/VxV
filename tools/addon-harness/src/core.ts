@@ -4,7 +4,7 @@ import { trackNewGlobals } from "./conventions.ts";
 export const CORE_DIR = new URL("../../../addon/VXV_Core", import.meta.url).pathname;
 
 /** Folder of a bundle of addon/, such as VXV_Raid. */
-export function bundleDir(name: string): string {
+function bundleDir(name: string): string {
   return new URL(`../../../addon/${name}`, import.meta.url).pathname;
 }
 
@@ -67,4 +67,13 @@ export function startCore({
     },
     registeredEvents: () => Object.keys(client("return RegisteredEvents") as Record<string, boolean>).sort(),
   };
+}
+
+/** A bundle the client loaded, to run test code in its namespace. */
+export function loadedBundle(started: ReturnType<typeof startCore>, name: string) {
+  const bundle = started.bundles[name];
+  if (bundle === undefined) {
+    throw new Error(`${name} was not loaded`);
+  }
+  return bundle;
 }

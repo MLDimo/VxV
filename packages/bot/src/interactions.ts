@@ -25,7 +25,7 @@ export interface SignedRequest {
   timestamp: string | null;
 }
 
-export interface InteractionReply {
+interface InteractionReply {
   status: number;
   body: APIInteractionResponse | { error: string };
 }

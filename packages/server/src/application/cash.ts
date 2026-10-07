@@ -51,5 +51,3 @@ export function createCash({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
     },
   };
 }
-
-export type Cash = ReturnType<typeof createCash>;

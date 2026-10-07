@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Character } from "../domain/characters.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";

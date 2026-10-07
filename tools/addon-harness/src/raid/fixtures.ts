@@ -1,7 +1,7 @@
 import { formatAddonEvent, type AddonEventFacts } from "@vxv/server/domain/addonExport";
 import type { Signup } from "@vxv/server/domain/signups";
 import type { BoardItem } from "@vxv/server/domain/softReserves";
-import { startCore, type CoreStart } from "../core.ts";
+import { loadedBundle, startCore, type CoreStart } from "../core.ts";
 
 function signup(characterId: string, characterName: string, characterClass: string, extra: Partial<Signup>): Signup {
   return {
@@ -118,13 +118,9 @@ export function importText(client: (code: string) => unknown, text: string): voi
 export function startRaid(options: CoreStart = {}) {
   const bundles = options.written === undefined ? ["VXV_Raid"] : ["VXV_Raid", "VXV_Sync"];
   const started = startCore({ ...options, bundles });
-  const raid = started.bundles.VXV_Raid;
-  if (raid === undefined) {
-    throw new Error("VXV_Raid was not loaded");
-  }
   return {
     ...started,
-    raid,
+    raid: loadedBundle(started, "VXV_Raid"),
     importText: (text: string) => {
       importText(started.client, text);
     },

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Character } from "./characters.ts";
-import { parseRaidLog, planRaidLogImport, RAID_LOG_HEADER, RaidLogFormatError } from "./raidLog.ts";
+import { parseRaidLog, planRaidLogImport, RAID_LOG_HEADER } from "./raidLog.ts";
+import { TextFormatError } from "./textFormat.ts";
 import { buildRaidRecap } from "./raidRecap.ts";
 
 const LOG = [
@@ -58,11 +59,11 @@ describe("parseRaidLog", () => {
     const broken = [RAID_LOG_HEADER, "R;e1;;", "L;1084;20;Thom Leboss;cadeau;1", "K;boss;1", "M;Thom Leboss;-5;0"].join(
       "\n",
     );
-    expect(() => parseRaidLog(broken)).toThrow(RaidLogFormatError);
+    expect(() => parseRaidLog(broken)).toThrow(TextFormatError);
     try {
       parseRaidLog(broken);
     } catch (error) {
-      expect((error as RaidLogFormatError).problems).toEqual([
+      expect((error as TextFormatError).problems).toEqual([
         "Ligne 3 illisible : recopiez le journal depuis l'addon.",
         "Ligne 4 illisible : recopiez le journal depuis l'addon.",
         "Ligne 5 illisible : recopiez le journal depuis l'addon.",

@@ -15,7 +15,7 @@ import { checkOfficerAction } from "./officerActions.ts";
 import type { Repositories, UnitOfWork } from "./ports.ts";
 
 /** Journal reason of the rosters the officers' companions send. */
-export const COMPANION_ROSTER_REASON = "Liste de guilde envoyée par le compagnon";
+const COMPANION_ROSTER_REASON = "Liste de guilde envoyée par le compagnon";
 const ROSTER_MARK = "roster";
 
 /** What became of a roster sent by a companion. */

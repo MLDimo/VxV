@@ -1,6 +1,7 @@
 import { rolesFromDiscordRoles, type DiscordRoleMapping, type Member } from "../domain/members.ts";
 import { ValidationError } from "./errors.ts";
-import type { Clock, GuildGateway, UnitOfWork } from "./ports.ts";
+import type { Clock, UnitOfWork } from "./ports.ts";
+import type { GuildGateway } from "./discordPorts.ts";
 import { generateSecretToken, hashSecret, verifierMatches } from "./secretTokens.ts";
 
 /** A link code is exchanged as soon as the browser hands it to the companion. */
@@ -16,12 +17,12 @@ const CHALLENGE = /^[A-Za-z0-9_-]{43}$/;
 const INVALID_LINK = "Ce lien de liaison n'est pas valide : relance la liaison depuis le compagnon.";
 const LINK_FAILED = "La liaison a échoué ou a expiré : relance-la depuis le compagnon.";
 
-export interface CompanionLink {
+interface CompanionLink {
   token: string;
   member: Member;
 }
 
-export interface CompanionDependencies {
+interface CompanionDependencies {
   unitOfWork: UnitOfWork;
   clock: Clock;
   discordRoles: DiscordRoleMapping;

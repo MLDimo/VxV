@@ -1,6 +1,6 @@
 import type { BoardItem } from "@vxv/server";
 
-export interface BossGroup {
+interface BossGroup {
   raidName: string;
   bossName: string;
   items: BoardItem[];

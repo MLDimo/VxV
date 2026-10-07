@@ -3,17 +3,17 @@ import { formatDateTime, formatGold, formatShare, formatSignedGold } from "@vxv/
 import { Avatar } from "@/components/Avatar";
 import { Badge } from "@/components/Badge";
 import { MemberName } from "@/components/MemberName";
-import { PeriodNav, periodOf } from "@/components/PeriodNav";
+import { periodOf } from "@/components/PeriodNav";
 import { Podium } from "@/components/Podium";
-import { RankingNav } from "@/components/RankingNav";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { RankingHeader, rankingRowClass } from "@/components/RankingHeader";
 import { SeasonForm } from "@/components/SeasonForm";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 function Row({ rank, mine, widest }: { rank: BettorRank; mine: boolean; widest: number }) {
   return (
-    <tr className={mine ? "bg-amethyst/16 shadow-[inset_0_0_0_2px_var(--color-amethyst)]" : "odd:bg-amethyst/6"}>
+    <tr className={rankingRowClass(mine)}>
       <td className="py-1 pr-2 font-pixel text-lg">{rank.rank}</td>
       <td className="py-1 pr-2">
         <Avatar characterClass={rank.memberClass} race={rank.memberRace} sex={rank.memberSex} size={32} />
@@ -51,17 +51,13 @@ export default async function RankingPage({
   const mine = bettors.find((rank) => rank.memberId === member.id);
   return (
     <>
-      <ScreenHeader kicker="Au-dessus de la cheminée" kickerClassName="text-gold" title="Ranking">
+      <RankingHeader category="/ranking" period={period}>
         <Badge tone="gold">
           {season === undefined
             ? "Aucune saison lancée"
             : `Saison ${String(season.number)} · lancée le ${formatDateTime(season.startedAt)}`}
         </Badge>
-      </ScreenHeader>
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <RankingNav current="/ranking" />
-        <PeriodNav base="/ranking" current={period} />
-      </div>
+      </RankingHeader>
       {bettors.length === 0 ? (
         <p className="mt-8 text-lavender">
           {period === "season" && season === undefined
@@ -71,8 +67,7 @@ export default async function RankingPage({
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-[auto_1fr]">
           <Podium ranks={bettors.slice(0, 3)} />
-          <section className="panel" aria-label="Classement des parieurs">
-            <h2 className="font-pixel text-xl text-ivory">Classement des parieurs</h2>
+          <Panel title="Classement des parieurs">
             <table className="mt-3 w-full text-sm">
               <thead className="text-left text-xs text-muted uppercase">
                 <tr>
@@ -102,17 +97,16 @@ export default async function RankingPage({
                 </tfoot>
               )}
             </table>
-          </section>
+          </Panel>
         </div>
       )}
       {canManageRaids(member.roles) && (
-        <section className="panel-officer mt-10">
-          <h2 className="font-pixel text-xl text-gold">Officiers · saisons</h2>
+        <Panel title="Officiers · saisons" officer className="mt-10">
           <p className="mt-2 text-sm text-lavender">
             Une nouvelle saison remet à zéro les classements « Saison » ; les autres périodes ne changent pas.
           </p>
           <SeasonForm />
-        </section>
+        </Panel>
       )}
     </>
   );

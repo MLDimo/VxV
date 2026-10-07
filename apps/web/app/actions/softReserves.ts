@@ -2,14 +2,14 @@
 
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { runFormAction } from "@/server/formActions";
+import { formText, runFormAction } from "@/server/formActions";
 import { requireMember, requireOfficer } from "@/server/session";
 
 const itemIdsOf = (form: FormData) => form.getAll("itemIds").map(String);
 
 export async function setMySoftReserves(_previous: ActionState, form: FormData): Promise<ActionState> {
   const member = await requireMember();
-  const eventId = String(form.get("eventId") ?? "");
+  const eventId = formText(form, "eventId");
   return runFormAction(async () => {
     await getApplication().softReserves.setMine(member, eventId, itemIdsOf(form));
     return "SR enregistrées.";
@@ -18,14 +18,14 @@ export async function setMySoftReserves(_previous: ActionState, form: FormData):
 
 export async function overrideSoftReserves(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  const eventId = String(form.get("eventId") ?? "");
+  const eventId = formText(form, "eventId");
   return runFormAction(async () => {
     await getApplication().softReserves.override(
       officer,
       eventId,
-      String(form.get("characterId") ?? ""),
+      formText(form, "characterId"),
       itemIdsOf(form),
-      String(form.get("reason") ?? ""),
+      formText(form, "reason"),
     );
     return "SR du joueur corrigées.";
   }, [`/evenements/${eventId}`, "/journal"]);

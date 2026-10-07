@@ -2,7 +2,7 @@
 
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { runFormAction } from "@/server/formActions";
+import { formText, runFormAction } from "@/server/formActions";
 import { requireOfficer } from "@/server/session";
 
 export async function correctLoot(_previous: ActionState, form: FormData): Promise<ActionState> {
@@ -10,9 +10,9 @@ export async function correctLoot(_previous: ActionState, form: FormData): Promi
   return runFormAction(async () => {
     await getApplication().history.correctLoot(
       officer,
-      String(form.get("lootId") ?? ""),
-      { characterId: String(form.get("characterId") ?? ""), method: String(form.get("method") ?? "") },
-      String(form.get("reason") ?? ""),
+      formText(form, "lootId"),
+      { characterId: formText(form, "characterId"), method: formText(form, "method") },
+      formText(form, "reason"),
     );
     return "Loot corrigé.";
   }, ["/historique", "/journal"]);

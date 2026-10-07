@@ -6,7 +6,7 @@ import { actingMember } from "./members.ts";
 import { ephemeral } from "./responses.ts";
 
 /** The choices are typed in one option, separated by this. */
-export const CHOICE_SEPARATOR = ";";
+const CHOICE_SEPARATOR = ";";
 const INVALID_DATE = "Date ou heure de fermeture invalide : écris par exemple 12/12/2026 (ou 12/12) et 21:00.";
 
 /** /vxv_pari: an officer opens a bet from Discord; its message is published in the bets channel. */

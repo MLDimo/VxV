@@ -7,7 +7,8 @@ import { isMoreComplete, parseRaidLog, planRaidLogImport, type RaidLog } from ".
 import { buildRaidRecap, type RaidRecap } from "../domain/raidRecap.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
-import type { Clock, RaidAnnouncer, Repositories, UnitOfWork } from "./ports.ts";
+import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
+import type { RaidAnnouncer } from "./discordPorts.ts";
 
 export type RaidLogImportSummary = Omit<RaidLogImportRecord, "raids" | "eventStartsAt">;
 

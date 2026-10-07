@@ -6,7 +6,7 @@ import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { UnitOfWork } from "./ports.ts";
 
-export const HISTORY_SIZE = 200;
+const HISTORY_SIZE = 200;
 
 function isLootMethod(value: string): value is LootMethod {
   return (LOOT_METHODS as readonly string[]).includes(value);

@@ -1,7 +1,7 @@
+import { formatDateTime } from "@vxv/server/domain/labels";
 import { canManageTreasury, fullName, type JournalAction } from "@vxv/server";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "@vxv/server/domain/journalDescriptions";
 import { CashPage } from "@/components/CashPage";
-import { formatDateTime } from "@/components/format";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";

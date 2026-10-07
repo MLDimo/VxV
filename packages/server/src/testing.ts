@@ -1,5 +1,4 @@
-import type { PGliteInterface, Transaction } from "@electric-sql/pglite";
-import { createMigratedDatabase } from "@vxv/database/testing";
+import { createMigratedDatabase, type PGliteInterface, type Transaction } from "@vxv/database/testing";
 import type { SqlClient } from "./infrastructure/sql.ts";
 
 function sqlClientFromTransaction(transaction: Transaction): SqlClient {

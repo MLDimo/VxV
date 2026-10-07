@@ -27,7 +27,7 @@ const environmentSchema = z.object({
   DISCORD_ROLE_GM: discordId,
 });
 
-export interface WebConfig {
+interface WebConfig {
   databaseUrl: string;
   /** Public address of the website, for the links in the bot's messages. */
   siteUrl: string;

@@ -1,6 +1,9 @@
 import { readdir, readFile } from "node:fs/promises";
 import { PGlite, type PGliteInterface } from "@electric-sql/pglite";
 
+/** The in-process PostgreSQL, for the tests of the other packages: they depend on this package only. */
+export { PGlite, type PGliteInterface, type Transaction } from "@electric-sql/pglite";
+
 const MIGRATIONS_DIR = new URL("../migrations/", import.meta.url);
 
 let migratedTemplate: Promise<PGlite> | undefined;

@@ -1,14 +1,8 @@
 import { formatAddonMissions, type AddonMissionsFacts } from "@vxv/server/domain/addonMissions";
-import type { Character } from "@vxv/server/domain/characters";
 import type { Mission } from "@vxv/server/domain/missions";
-import { startCore, type CoreStart } from "../core.ts";
+import { loadedBundle, startCore, type CoreStart } from "../core.ts";
+import { EXPORTED, GUILD_READERS } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
-
-const EXPORTED = new Date("2026-12-10T07:30:00Z");
-
-function character(firstName: string, lastName: string, memberId: string): Character {
-  return { id: `c-${firstName}`, firstName, lastName, characterClass: "ROGUE", memberId, isMain: true, inGuild: true };
-}
 
 /** A mission of the week, running at the mocked client's time (10 December, morning). */
 export function mission(id: string, type: Mission["type"], title: string, extra: Partial<Mission> = {}): Mission {
@@ -43,12 +37,7 @@ export const GUILD_QUESTS: AddonMissionsFacts = {
       rewards: [],
     },
   ],
-  officers: [character("Ðéjà", "Vu", "m-deja")],
-  characters: [
-    character("Ðéjà", "Vu", "m-deja"),
-    character("Thom", "Leboss", "m-thom"),
-    character("Ciel", "Gris", "m-ciel"),
-  ],
+  ...GUILD_READERS,
   hallOfFame: [
     {
       memberId: "m-thom",
@@ -74,9 +63,5 @@ export function startQuests(options: CoreStart & { facts?: AddonMissionsFacts } 
     ...core,
     bundles: ["VXV_Missions", "VXV_Sync"],
   });
-  const quests = started.bundles.VXV_Missions;
-  if (quests === undefined) {
-    throw new Error("VXV_Missions was not loaded");
-  }
-  return { ...started, quests };
+  return { ...started, quests: loadedBundle(started, "VXV_Missions") };
 }

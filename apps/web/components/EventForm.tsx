@@ -5,8 +5,7 @@ import { useActionState } from "react";
 import { createEvent } from "@/app/actions/events";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
-
-const FIELD = "field";
+import { Field, ReasonField } from "./Field";
 
 export function EventForm({
   raids,
@@ -20,10 +19,9 @@ export function EventForm({
   const [state, action, pending] = useActionState(createEvent, IDLE);
   return (
     <form action={action} className="mt-6 max-w-lg space-y-5">
-      <label className="block">
-        <span className="text-sm text-lavender">Date et heure (heure de Paris)</span>
-        <input type="datetime-local" name="startsAt" required className={FIELD} />
-      </label>
+      <Field label="Date et heure (heure de Paris)">
+        <input type="datetime-local" name="startsAt" required className="field" />
+      </Field>
       <fieldset>
         <legend className="text-sm text-lavender">Raids de la soirée</legend>
         <div className="mt-2 space-y-2">
@@ -35,8 +33,7 @@ export function EventForm({
           ))}
         </div>
       </fieldset>
-      <label className="block">
-        <span className="text-sm text-lavender">SR par joueur</span>
+      <Field label="SR par joueur">
         <input
           type="number"
           name="softReservesPerPlayer"
@@ -44,13 +41,10 @@ export function EventForm({
           max={maxSoftReserves}
           defaultValue={defaultSoftReserves}
           required
-          className={FIELD}
+          className="field"
         />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Motif (visible dans le journal)</span>
-        <input name="reason" required placeholder="Raid de la semaine" className={FIELD} />
-      </label>
+      </Field>
+      <ReasonField placeholder="Raid de la semaine" />
       <button type="submit" disabled={pending} className="button-pixel">
         {pending ? "Création…" : "Créer l'événement"}
       </button>

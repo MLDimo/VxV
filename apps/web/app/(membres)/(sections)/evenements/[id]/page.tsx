@@ -1,3 +1,4 @@
+import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@vxv/server/domain/labels";
 import { canManageRaids, fullName, MAX_SPEC_LENGTH } from "@vxv/server";
 import { isComing } from "@vxv/server/domain/signups";
 import Link from "next/link";
@@ -9,7 +10,6 @@ import { ExclusionForm } from "@/components/ExclusionForm";
 import { RaidLogImportForm } from "@/components/RaidLogImportForm";
 import { RaidNav } from "@/components/RaidNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@/components/format";
 import { SignupForm } from "@/components/SignupForm";
 import { SoftReserveBoardForm } from "@/components/SoftReserveBoardForm";
 import { SoftReserveOverrideForm } from "@/components/SoftReserveOverrideForm";

@@ -26,7 +26,7 @@ export type {
   JournalEntry,
   SoftReserveOverrideRecord,
 } from "./domain/journal.ts";
-export { ROSTER_HEADER, RosterFormatError, type RosterImportSummary } from "./domain/roster.ts";
+export { ROSTER_HEADER, type RosterImportSummary } from "./domain/roster.ts";
 export { TextFormatError } from "./domain/textFormat.ts";
 export {
   composition,
@@ -50,6 +50,7 @@ export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastru
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
+export type { DeathrollPlayer, TitleHolder } from "./application/ports.ts";
 export type {
   AnnouncedBet,
   AnnouncedMission,
@@ -63,9 +64,7 @@ export type {
   TitleAnnouncer,
   AnnouncedDeathroll,
   DeathrollAnnouncer,
-  DeathrollPlayer,
-  TitleHolder,
-} from "./application/ports.ts";
+} from "./application/discordPorts.ts";
 export type { BetView } from "./application/bets.ts";
 export type { CashOverview } from "./application/cash.ts";
 export type { Season } from "./application/ports.ts";
@@ -111,7 +110,6 @@ export {
   type StakeOutcome,
   type StakeStanding,
 } from "./domain/bets.ts";
-export { RaidLogFormatError } from "./domain/raidLog.ts";
 export type { RaidRecap } from "./domain/raidRecap.ts";
 export type { RaidReminder } from "./domain/reminders.ts";
 export {

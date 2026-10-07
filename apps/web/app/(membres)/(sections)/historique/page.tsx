@@ -11,8 +11,7 @@ import { CharacterName } from "@/components/CharacterName";
 import { LootCorrectionForm } from "@/components/LootCorrectionForm";
 import { RaidNav } from "@/components/RaidNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { formatDateTime, formatEventDate, raidTitle } from "@/components/format";
-import { LOOT_METHOD_LABELS } from "@vxv/server/domain/labels";
+import { formatDateTime, formatEventDate, LOOT_METHOD_LABELS, raidTitle } from "@vxv/server/domain/labels";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 

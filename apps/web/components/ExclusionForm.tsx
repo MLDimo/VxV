@@ -5,8 +5,7 @@ import { useActionState, useId } from "react";
 import { changeExclusion } from "@/app/actions/exclusions";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
-
-const FIELD = "field";
+import { Options, ReasonField } from "./Field";
 
 /** Officers exclude an item from the soft reserves of this event, or allow it again, with a reason. */
 export function ExclusionForm({ eventId, items }: { eventId: string; items: BoardItem[] }) {
@@ -20,18 +19,13 @@ export function ExclusionForm({ eventId, items }: { eventId: string; items: Boar
         <label htmlFor={itemFieldId} className="text-sm text-lavender">
           Objet
         </label>
-        <select id={itemFieldId} name="itemId" className={FIELD}>
-          {items.map((item) => (
-            <option key={item.itemId} value={item.itemId}>
-              {item.excluded ? `${item.name} (exclu)` : item.name}
-            </option>
-          ))}
+        <select id={itemFieldId} name="itemId" className="field">
+          <Options
+            options={items.map((item) => [item.itemId, item.excluded ? `${item.name} (exclu)` : item.name] as const)}
+          />
         </select>
       </div>
-      <label className="block">
-        <span className="text-sm text-lavender">Motif de l&apos;exclusion (visible dans le journal)</span>
-        <input name="reason" required className={FIELD} />
-      </label>
+      <ReasonField label="Motif de l'exclusion" />
       <div className="flex gap-3 sm:col-span-2">
         <button type="submit" name="intent" value="exclude" disabled={pending} className="button-wood text-gold">
           Exclure

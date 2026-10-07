@@ -1,5 +1,6 @@
 import { raidReminder, REMINDER_WINDOW_MS } from "../domain/reminders.ts";
-import type { RaidAnnouncer, UnitOfWork } from "./ports.ts";
+import type { UnitOfWork } from "./ports.ts";
+import type { RaidAnnouncer } from "./discordPorts.ts";
 
 export function createRaidReminders({ unitOfWork, announcer }: { unitOfWork: UnitOfWork; announcer: RaidAnnouncer }) {
   return {

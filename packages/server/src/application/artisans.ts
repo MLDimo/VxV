@@ -5,7 +5,7 @@ import { canManageRaids } from "../domain/permissions.ts";
 import type { ArtisanProfession, UnitOfWork } from "./ports.ts";
 
 /** How many recipes a search shows at most: a word too short would list the whole directory. */
-export const SEARCH_RESULTS = 30;
+const SEARCH_RESULTS = 30;
 
 /** A recipe found, with the characters who know it, by their profession. */
 export interface RecipeFound {
@@ -67,5 +67,3 @@ export function createArtisans({ unitOfWork }: { unitOfWork: UnitOfWork }) {
     },
   };
 }
-
-export type Artisans = ReturnType<typeof createArtisans>;

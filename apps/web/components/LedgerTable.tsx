@@ -2,9 +2,11 @@ import type { LedgerStake } from "@vxv/server";
 import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { MemberName } from "./MemberName";
-import { StakeValidation } from "./StakeValidation";
+import { validateStake } from "@/app/actions/treasury";
+import { ConfirmButton } from "./ConfirmButton";
+import { Panel } from "./Panel";
 
-export interface LedgerLine {
+interface LedgerLine {
   stake: LedgerStake;
   amount: number;
 }
@@ -23,8 +25,7 @@ export function LedgerTable({
   intent: "paid" | "collected" | undefined;
 }) {
   return (
-    <section className="panel mt-6" aria-label={title}>
-      <h2 className="font-pixel text-xl text-ivory">{title}</h2>
+    <Panel title={title} className="mt-6">
       {lines.length === 0 ? (
         <p className="mt-3 text-lavender">{empty}</p>
       ) : (
@@ -55,7 +56,12 @@ export function LedgerTable({
                 <td className="py-1 pr-3">{formatDateTime(stake.placedAt)}</td>
                 {intent !== undefined && (
                   <td className="py-1">
-                    <StakeValidation stakeId={stake.id} intent={intent} />
+                    <ConfirmButton
+                      action={validateStake}
+                      fields={{ stakeId: stake.id }}
+                      intent={intent}
+                      label={intent === "paid" ? "Reçue" : "Versé"}
+                    />
                   </td>
                 )}
               </tr>
@@ -63,6 +69,6 @@ export function LedgerTable({
           </tbody>
         </table>
       )}
-    </section>
+    </Panel>
   );
 }

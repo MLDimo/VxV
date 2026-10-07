@@ -4,6 +4,7 @@ import { CharacterName } from "@/components/CharacterName";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 /** A crafter: the character in their class color, their level and when the game last told it. */
 function Crafter({ entry }: { entry: ArtisanProfession }) {
@@ -54,8 +55,7 @@ export default async function ArtisansPage({
         </button>
       </form>
       {found !== undefined && (
-        <section className="panel mt-6" aria-label="Résultats">
-          <h2 className="font-pixel text-xl text-ivory">Qui peut fabriquer « {search} » ?</h2>
+        <Panel title={<>Qui peut fabriquer « {search} » ?</>} label="Résultats" className="mt-6">
           {found.length === 0 && <p className="mt-3 text-muted">Aucune recette connue de la guilde ne correspond.</p>}
           <ul className="mt-3 space-y-4">
             {found.map(({ recipe, crafters }) => (
@@ -73,7 +73,7 @@ export default async function ArtisansPage({
               </li>
             ))}
           </ul>
-        </section>
+        </Panel>
       )}
       <section className="mt-8 grid gap-4 md:grid-cols-2" aria-label="Annuaire">
         {professions.length === 0 && (

@@ -58,7 +58,7 @@ function readSpec(value: string): { characterClass: string; spec: string } {
 }
 
 /** One modal holds the whole sign-up: character, role, status and specialisation, filled with the current one. */
-export function signupForm(
+function signupForm(
   event: RaidEvent,
   characters: readonly Character[],
   current: Signup | undefined,

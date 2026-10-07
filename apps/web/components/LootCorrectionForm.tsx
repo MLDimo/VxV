@@ -6,15 +6,14 @@ import { useActionState } from "react";
 import { correctLoot } from "@/app/actions/history";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Field, Options, ReasonField } from "./Field";
 
-const FIELD = "field";
-
-export interface CorrectableLoot {
+interface CorrectableLoot {
   id: string;
   label: string;
 }
 
-export interface GuildCharacter {
+interface GuildCharacter {
   id: string;
   name: string;
 }
@@ -24,40 +23,26 @@ export function LootCorrectionForm({ loots, characters }: { loots: CorrectableLo
   const [state, action, pending] = useActionState(correctLoot, IDLE);
   return (
     <form action={action} className="mt-4 grid gap-4 sm:grid-cols-2">
-      <label className="block sm:col-span-2">
-        <span className="text-sm text-lavender">Loot à corriger</span>
-        <select name="lootId" required className={FIELD}>
-          {loots.map((loot) => (
-            <option key={loot.id} value={loot.id}>
-              {loot.label}
-            </option>
-          ))}
+      <Field label="Loot à corriger" className="sm:col-span-2">
+        <select name="lootId" required className="field">
+          <Options options={loots.map((loot) => [loot.id, loot.label] as const)} />
         </select>
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Reçu par</span>
-        <select name="characterId" required className={FIELD}>
-          {characters.map((character) => (
-            <option key={character.id} value={character.id}>
-              {character.name}
-            </option>
-          ))}
+      </Field>
+      <Field label="Reçu par">
+        <select name="characterId" required className="field">
+          <Options options={characters.map((character) => [character.id, character.name] as const)} />
         </select>
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Attribué par</span>
-        <select name="method" required className={FIELD}>
-          {LOOT_METHODS.map((method) => (
-            <option key={method} value={method}>
-              {LOOT_METHOD_LABELS[method]}
-            </option>
-          ))}
+      </Field>
+      <Field label="Attribué par">
+        <select name="method" required className="field">
+          <Options options={LOOT_METHODS.map((method) => [method, LOOT_METHOD_LABELS[method]] as const)} />
         </select>
-      </label>
-      <label className="block sm:col-span-2">
-        <span className="text-sm text-lavender">Motif de la correction (visible dans le journal)</span>
-        <input name="reason" required className={FIELD} placeholder="Erreur de clic du maître du butin" />
-      </label>
+      </Field>
+      <ReasonField
+        label="Motif de la correction"
+        placeholder="Erreur de clic du maître du butin"
+        className="sm:col-span-2"
+      />
       <div className="sm:col-span-2">
         <button type="submit" disabled={pending} className="button-pixel">
           {pending ? "Correction…" : "Corriger"}
