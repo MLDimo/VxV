@@ -1,23 +1,19 @@
 import { fullName, type Character } from "../domain/characters.ts";
-import { startOfMonth } from "../domain/dateTime.ts";
 import {
   BIG_STAKE,
   DEATHROLL_BETTING_MS,
   deathrollBets,
   deathrollLoser,
-  deathrollRanking,
   deathrollRefusal,
   parseDeathroll,
   type DeathrollGame,
-  type DeathrollRank,
 } from "../domain/deathrolls.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
-import type { RankingPeriod } from "../domain/ranking.ts";
 import { settleBet } from "./bets.ts";
 import { loserOf, memberDebt, winnerOf } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
-import type { Clock, DeathrollPlayer, Repositories, Season, StoredDeathroll, UnitOfWork } from "./ports.ts";
+import type { Clock, DeathrollPlayer, Repositories, StoredDeathroll, UnitOfWork } from "./ports.ts";
 import type { DeathrollAnnouncer } from "./discordPorts.ts";
 
 /** How many games the website lists. */
@@ -36,31 +32,8 @@ export interface DeathrollView {
   loser: DeathrollPlayer;
 }
 
-/** A row of the deathroll's ranking, with the member as shown. */
-export interface DeathrollRankRow extends DeathrollRank {
-  memberName: string;
-  memberClass: string | undefined;
-}
-
 export function view(game: StoredDeathroll): DeathrollView {
   return { game, winner: winnerOf(game), loser: loserOf(game) };
-}
-
-/** The players of the games ended since the instant, ranked, each shown as their member. */
-export function rankDeathrolls(views: readonly DeathrollView[], since: Date | undefined): DeathrollRankRow[] {
-  const members = new Map(
-    views.flatMap(({ winner, loser }) => [winner, loser]).map((player) => [player.memberId, player]),
-  );
-  const ranked = views.flatMap(({ game, winner, loser }) =>
-    winner.memberId === undefined || loser.memberId === undefined
-      ? []
-      : [{ winnerId: winner.memberId, loserId: loser.memberId, stake: game.stake, endedAt: game.endedAt }],
-  );
-  return deathrollRanking(ranked, since).map((row) => ({
-    ...row,
-    memberName: members.get(row.memberId)?.memberName ?? "",
-    memberClass: members.get(row.memberId)?.memberClass,
-  }));
 }
 
 /** The guild's stake on a player of the game, from a member who is neither player nor in debt. */
@@ -245,18 +218,6 @@ export function createDeathrolls({
           owed: unpaid.filter((game) => game.loser.memberId === member.id),
           toConfirm: unpaid.filter((game) => game.winner.memberId === member.id),
         };
-      });
-    },
-
-    /** The players of the games ended in the period (P15.7); "season" counts from the current season's start. */
-    async ranking(period: RankingPeriod): Promise<{ season: Season | undefined; rows: DeathrollRankRow[] }> {
-      return unitOfWork.run(async ({ deathrolls, seasons }) => {
-        const season = await seasons.current();
-        if (period === "season" && season === undefined) {
-          return { season, rows: [] };
-        }
-        const since = period === "month" ? startOfMonth(clock()) : period === "season" ? season?.startedAt : undefined;
-        return { season, rows: rankDeathrolls((await deathrolls.listAll()).map(view), since) };
       });
     },
   };

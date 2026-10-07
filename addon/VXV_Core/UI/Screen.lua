@@ -2,8 +2,7 @@ local _, ns = ...
 
 --- A place's screen in the windows (§2.5, §6), as every bundle builds it (VXV.Screen): its head (kicker in the
 --- place's color, title, subtitle, badges on the right), its grid's margins, and how it follows its data (drawn
---- again each time it shows and after each of its bus events). Also the screens made of one list: a Ranking's tab,
---- a tab of the reduced mode.
+--- again each time it shows and after each of its bus events). Also the simple tabs of the reduced mode, one list.
 local Screen = {}
 ns.Screen = Screen
 
@@ -88,19 +87,6 @@ function Screen.Place(placeId)
             return place
         end
     end
-end
-
---- A place's screen of one titled list (the Ranking's tabs): the place's head, a subtitle and the list of rows().
---- Options: { place, heading, rows(), subtitle(), events }.
-function Screen.List(frame, options)
-    local place = Screen.Place(options.place) or {}
-    local head = Screen.Head(frame, place.subtitle, place.kicker, place.name)
-    local list = RowList.Panel(frame, Screen.PADDING, Screen.GRID_TOP, frame:GetWidth() - 2 * Screen.PADDING,
-        frame:GetHeight() - Screen.GRID_TOP - Screen.PADDING, options.heading)
-    Screen.Follow(frame, function()
-        head.subtitle:SetText(options.subtitle and options.subtitle() or "")
-        list.SetRows(options.rows())
-    end, options.events)
 end
 
 --- A simple tab of the reduced mode: the frame filled with a list of rows(). Returns the list.

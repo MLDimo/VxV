@@ -21,6 +21,15 @@ export function titleRepository(sql: SqlClient): TitleRepository {
       );
     },
 
+    async listHeld(sinceWeek) {
+      const rows = await sql.query<{ week: string; title: string; member_id: string }>(
+        `select to_char(week, 'YYYY-MM-DD') as week, title, member_id from title_awards
+         where $1::date is null or week >= $1::date order by week`,
+        [sinceWeek ?? null],
+      );
+      return rows.map((row) => ({ week: row.week, titleId: row.title, memberId: row.member_id }));
+    },
+
     async listLatestWeeks(weeks) {
       // A member is shown by their main character, else by their Discord name.
       const rows = await sql.query<{

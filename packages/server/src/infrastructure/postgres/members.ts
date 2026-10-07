@@ -40,6 +40,28 @@ export function memberRepository(sql: SqlClient): MemberRepository {
       return (await sql.query<MemberRow>(`select ${COLUMNS} from members order by discord_name`)).map(toMember);
     },
 
+    async listLooks() {
+      const rows = await sql.query<{
+        member_id: string;
+        name: string;
+        class: string | null;
+        race: string | null;
+        sex: string | null;
+      }>(
+        `select members.id as member_id, coalesce(main.first_name || ' ' || main.last_name, members.discord_name) as name,
+                main.class, main.race, main.sex
+         from members
+         left join characters main on main.member_id = members.id and main.is_main`,
+      );
+      return rows.map((row) => ({
+        memberId: row.member_id,
+        name: row.name,
+        characterClass: row.class ?? undefined,
+        race: row.race ?? undefined,
+        sex: row.sex === "male" || row.sex === "female" ? row.sex : undefined,
+      }));
+    },
+
     async setRoles(memberId, roles) {
       await sql.query("update members set roles = $2::text[]::member_role[] where id = $1", [memberId, roles]);
     },

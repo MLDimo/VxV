@@ -145,7 +145,6 @@ describe("the deathroll in game (P15)", () => {
       characters: [vorn],
       barred: ["m-vorn"],
       games: [],
-      ranking: [{ rank: 1, memberName: "Thom Leboss", memberClass: "PRIEST", net: 500, games: 1, biggestWin: 500 }],
       exportedAt: new Date("2026-12-10T07:00:00Z"),
     });
     const { bundles, errors } = startCore({ written: companionFiles({ deathroll: text }), bundles: BUNDLES });

@@ -6,16 +6,26 @@ ns.Gold = Gold
 
 local MINUS = "−"
 
---- "1 000 po".
-function Gold.Format(amount)
+--- "1 000", "−120": a whole number with its thousands separated.
+function Gold.Number(amount)
     local digits = tostring(math.floor(math.abs(amount)))
     local grouped = digits:reverse():gsub("(%d%d%d)", "%1 "):reverse():gsub("^ ", "")
-    return (amount < 0 and MINUS or "") .. grouped .. " po"
+    return (amount < 0 and MINUS or "") .. grouped
+end
+
+--- "1 000 po".
+function Gold.Format(amount)
+    return Gold.Number(amount) .. " po"
+end
+
+--- "+500", "−120": a number with its sign, as the Ranking's places write gold.
+function Gold.SignedNumber(amount)
+    return (amount > 0 and "+" or "") .. Gold.Number(amount)
 end
 
 --- "+500 po", "−120 po".
 function Gold.Signed(amount)
-    return (amount > 0 and "+" or "") .. Gold.Format(amount)
+    return Gold.SignedNumber(amount) .. " po"
 end
 
 --- What one po brings back: "× 4,50"; a dash while nobody staked on the choice.

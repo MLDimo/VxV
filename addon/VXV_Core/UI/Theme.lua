@@ -44,6 +44,13 @@ end
 
 local CHANNEL = 255
 
+--- Red, green and blue of a class color, between 0 and 1: a banner's cloth (§7.5), a portrait's frame (§8).
+function Theme.ClassColor(token)
+    local hex = Theme.ClassHex(token)
+    return tonumber(hex:sub(1, 2), 16) / CHANNEL, tonumber(hex:sub(3, 4), 16) / CHANNEL,
+        tonumber(hex:sub(5, 6), 16) / CHANNEL
+end
+
 --- RRGGBB of a token, for the |cff…|r codes of a font string.
 function Theme.Hex(name)
     local r, g, b = Theme.Color(name)
@@ -206,7 +213,7 @@ local PANEL_PADDING, PANEL_TITLE, PANEL_HEADING_TOP = 14, 40, 12
 Theme.PANEL_PADDING = PANEL_PADDING
 
 --- A panel of a screen's grid with its title, at x, y of the parent; its style is nil, "officer" (§3, gold edge)
---- or "parchment" (§7.4, the quest of the week). Returns the panel and the frame under its title.
+--- or "parchment" (§7.4, the quest of the week). Returns the panel, the frame under its title, and the title.
 function Theme.TitledPanel(parent, x, y, width, height, title, style)
     local panel = Theme.Panel(parent, style == "officer")
     panel:SetPoint("TOPLEFT", x, -y)
@@ -220,7 +227,7 @@ function Theme.TitledPanel(parent, x, y, width, height, title, style)
     local body = CreateFrame("Frame", nil, panel)
     body:SetPoint("TOPLEFT", PANEL_PADDING, -PANEL_TITLE)
     body:SetSize(width - 2 * PANEL_PADDING, height - PANEL_TITLE - PANEL_PADDING)
-    return panel, body
+    return panel, body, heading
 end
 
 -- Bevelled buttons (§3): background, light and dark edges inside, ink ring outside; hover in plum, gold ring.

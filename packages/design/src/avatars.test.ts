@@ -1,5 +1,7 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { avatarName } from "./avatars.ts";
+import { AVATARS, avatarName } from "./avatars.ts";
+import { ADDON_AVATARS, SITE_AVATARS } from "./files.ts";
 
 describe("avatars", () => {
   it("takes the character's own portrait, else borrows the nearest one (§8)", () => {
@@ -12,5 +14,13 @@ describe("avatars", () => {
     // Same race, unknown class.
     expect(avatarName("DEATHKNIGHT", "Tauren", "male")).toBe("tauren_chasseur_f");
     expect(avatarName("DEATHKNIGHT")).toBeUndefined();
+  });
+
+  it("are the website's in the addon (npm run generate)", () => {
+    for (const avatar of AVATARS) {
+      expect(readFileSync(new URL(`${avatar}.png`, ADDON_AVATARS))).toEqual(
+        readFileSync(new URL(`${avatar}.png`, SITE_AVATARS)),
+      );
+    }
   });
 });

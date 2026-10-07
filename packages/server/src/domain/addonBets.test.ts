@@ -42,7 +42,7 @@ const character = (firstName: string, lastName: string, memberId: string | undef
 });
 
 describe("bets for the addon", () => {
-  it("writes the bets, their stakes, the guild's cash, the ranking and the answers, one record per line", () => {
+  it("writes the bets, their stakes, the guild's cash and the answers, one record per line", () => {
     const text = formatAddonBets({
       bets: [{ bet: BET, stakes: [STAKE] }],
       officers: [character("Aube", "Claire", "officer")],
@@ -65,21 +65,6 @@ describe("bets for the addon", () => {
           },
         ],
       },
-      ranking: [
-        {
-          rank: 1,
-          memberId: "member",
-          memberName: "Ðéjà Vu",
-          memberClass: "ROGUE",
-          memberRace: undefined,
-          memberSex: undefined,
-          net: 30,
-          won: 180,
-          bets: 2,
-          successRate: 0.5,
-          debt: 0,
-        },
-      ],
       changes: [
         {
           id: "Ðéjà Vu#1#2",
@@ -103,7 +88,6 @@ describe("bets for the addon", () => {
       "S;bet;member;Ðéjà Vu;ROGUE;tank;50;toPay;0",
       "T;380;500;-120",
       "K;1791316800;-120;Flacons",
-      "R;1;Ðéjà Vu;ROGUE;30;2",
       "C;Ðéjà Vu#1#2;1;Mise enregistrée.",
     ]);
   });

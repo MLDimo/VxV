@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Member } from "../domain/members.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createMember } from "../test/fixtures.ts";
+import { characterRepository } from "../infrastructure/postgres/characters.ts";
+import { titleRepository } from "../infrastructure/postgres/titles.ts";
+import { createGuildCharacters, createMember } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createBets, type Bets } from "./bets.ts";
 import { ForbiddenError } from "./errors.ts";
@@ -61,14 +63,14 @@ describe("ranking", () => {
     now = new Date("2026-10-06T20:00:00Z");
     await playOne("Octobre");
     const names = async (period: "always" | "month" | "season") =>
-      (await ranking.bettors(period)).bettors.map(({ memberName, net, bets: played }) => [memberName, net, played]);
+      (await ranking.board("paris", period)).lines.map(({ name, value }) => [name, value]);
     expect(await names("always")).toEqual([
-      ["Vorn", 160, 2],
-      ["Thessa", -200, 2],
+      ["Vorn", 160],
+      ["Thessa", -200],
     ]);
     expect(await names("month")).toEqual([
-      ["Vorn", 80, 1],
-      ["Thessa", -100, 1],
+      ["Vorn", 80],
+      ["Thessa", -100],
     ]);
     // Without a season, the season's ranking is empty until an officer starts one.
     expect(await names("season")).toEqual([]);
@@ -79,10 +81,37 @@ describe("ranking", () => {
     now = new Date("2026-10-07T20:00:00Z");
     await playOne("Saison 1");
     expect(await names("season")).toEqual([
-      ["Vorn", 80, 1],
-      ["Thessa", -100, 1],
+      ["Vorn", 80],
+      ["Thessa", -100],
     ]);
     expect((await ranking.startSeason(officer, "Saison suivante")).number).toBe(2);
     expect((await journal.listRecent())[0]).toMatchObject({ action: "season.start", after: { number: 2 } });
+  });
+
+  it("shows each member of a board by their main character, with their title of the week, and the records", async () => {
+    await playOne("Septembre");
+    const [main] = await createGuildCharacters(sql, "Vorn Cendrelune");
+    await characterRepository(sql).link(main?.id ?? "", vorn.id);
+    await characterRepository(sql).setMain(vorn.id, main?.id ?? "");
+    await characterRepository(sql).setAppearance(main?.id ?? "", { race: "Orc", sex: "male" });
+    await titleRepository(sql).saveWeek("2026-09-16", [{ titleId: "gamblingKing", memberId: vorn.id, score: 80 }], now);
+    const board = await ranking.board("paris", "always");
+    expect(board).toMatchObject({ category: "paris", metric: "gain net", unit: "gold" });
+    expect(board.lines[0]).toMatchObject({
+      rank: 1,
+      name: "Vorn Cendrelune",
+      characterClass: "ROGUE",
+      race: "Orc",
+      sex: "male",
+      value: 80,
+      title: "Roi du gambling",
+    });
+    expect(board.records.map(({ label, member }) => [label, member.name])).toEqual([
+      ["Plus gros gain", "Vorn Cendrelune"],
+      ["Plus grosse perte", "Thessa"],
+      ["Paris joués", "Thessa"],
+    ]);
+    const titles = await ranking.board("titres", "always");
+    expect(titles.lines.map(({ name, value }) => [name, value])).toEqual([["Vorn Cendrelune", 1]]);
   });
 });

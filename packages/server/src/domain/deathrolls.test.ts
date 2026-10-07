@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   DEATHROLL_HEADER,
   deathrollLoser,
-  deathrollRanking,
   deathrollBets,
   deathrollRefusal,
   parseDeathroll,
@@ -90,25 +89,5 @@ describe("the deathroll's rules", () => {
       { bettor: "Brume Noire", choice: "Ðéjà Vu", amount: 0 },
     ];
     expect(deathrollBets({ ...game, bets })).toEqual([{ bettor: "Ciel Gris", choice: "Thom Leboss", amount: 100 }]);
-  });
-});
-
-describe("the deathroll's ranking", () => {
-  it("adds up each member's won and lost stakes over the period, the best net gain first", () => {
-    const games = [
-      { winnerId: "thom", loserId: "deja", stake: 500, endedAt: at(100) },
-      { winnerId: "deja", loserId: "thom", stake: 200, endedAt: at(200) },
-      { winnerId: "ciel", loserId: "deja", stake: 50, endedAt: at(300) },
-    ];
-    expect(deathrollRanking(games, undefined)).toEqual([
-      { rank: 1, memberId: "thom", net: 300, games: 2, biggestWin: 500 },
-      { rank: 2, memberId: "ciel", net: 50, games: 1, biggestWin: 50 },
-      { rank: 3, memberId: "deja", net: -350, games: 3, biggestWin: 200 },
-    ]);
-    expect(deathrollRanking(games, at(150)).map((row) => [row.memberId, row.net])).toEqual([
-      ["deja", 150],
-      ["ciel", 50],
-      ["thom", -200],
-    ]);
   });
 });

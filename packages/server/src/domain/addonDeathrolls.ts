@@ -1,9 +1,9 @@
-import { addonHead, line, seconds, text, type AddonReaders } from "./addonText.ts";
+import { addonHead, line, seconds, type AddonReaders } from "./addonText.ts";
 
 /** First line of the deathrolls' data for the addon (contract with VXV_Deathroll); the number is its version. */
 export const ADDON_DEATHROLLS_HEADER = "VXV-DEATHROLLS-1";
 
-/** How many players of the ranking, and of the latest games, the addon shows. */
+/** How many of the latest games the addon shows. */
 export const ADDON_DEATHROLLS_SHOWN = 10;
 
 interface Player {
@@ -16,14 +16,6 @@ export interface AddonDeathrollsFacts extends AddonReaders {
   barred: readonly string[];
   /** The games over, the latest first, with their winner and loser. */
   games: readonly { id: string; winner: Player; loser: Player; stake: number; endedAt: Date; paid: boolean }[];
-  ranking: readonly {
-    rank: number;
-    memberName: string;
-    memberClass: string | undefined;
-    net: number;
-    games: number;
-    biggestWin: number;
-  }[];
 }
 
 /**
@@ -31,7 +23,6 @@ export interface AddonDeathrollsFacts extends AddonReaders {
  * data (addonHead: P, O and M):
  * X;member id (in debt: barred from deathrolls and bets)
  * D;game id;loser's member id;loser;winner's member id;winner;stake;ended (Unix seconds) (the games not paid yet)
- * K;rank;member;class token, empty without main;net gain;games;biggest win (the ranking since always)
  * H;game id;winner;loser;stake;ended (Unix seconds) (the latest games)
  */
 export function formatAddonDeathrolls(facts: AddonDeathrollsFacts): string {
@@ -51,11 +42,6 @@ export function formatAddonDeathrolls(facts: AddonDeathrollsFacts): string {
           game.stake,
           seconds(game.endedAt),
         ),
-      ),
-    ...facts.ranking
-      .slice(0, ADDON_DEATHROLLS_SHOWN)
-      .map((row) =>
-        line("K", row.rank, text(row.memberName), row.memberClass ?? "", row.net, row.games, row.biggestWin),
       ),
     ...facts.games
       .slice(0, ADDON_DEATHROLLS_SHOWN)

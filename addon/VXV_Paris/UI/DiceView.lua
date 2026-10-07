@@ -1,7 +1,7 @@
 local _, ns = ...
 
 --- What Le Dé Pipé shows (§7.2), as rows for the core's lists: the open bets on the table with their odds and the
---- player's stake, the player's bets, the bettors' ranking and the guild's cash. Built from the data alone.
+--- player's stake, the player's bets and the guild's cash. Built from the data alone.
 local DiceView = {}
 ns.DiceView = DiceView
 
@@ -119,19 +119,6 @@ function DiceView.MyStakes(data, memberId)
     end
     if #rows == 0 then
         rows[1] = row("line", "Aucune mise pour l'instant.")
-    end
-    return rows
-end
-
---- The bettors since always, the best net gain first (P11.7).
-function DiceView.Ranking(data)
-    local rows = {}
-    for _, rank in ipairs(data ~= nil and data.ranking or {}) do
-        rows[#rows + 1] = row("line", ("%d. %s · %s · %s"):format(rank.rank, VXV.ClassColored(rank.name, rank.class),
-            Gold.Signed(rank.net), VXV.Count(rank.bets, "pari")))
-    end
-    if #rows == 0 then
-        rows[1] = row("line", "Aucun pari terminé pour l'instant.")
     end
     return rows
 end

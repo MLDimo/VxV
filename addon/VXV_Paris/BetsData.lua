@@ -12,7 +12,7 @@ ns.BetsData = VXV.SiteData({
     name = "paris",
     header = "VXV-PARIS-1",
     New = function()
-        return { bets = {}, byId = {}, ranking = {}, results = {},
+        return { bets = {}, byId = {}, results = {},
             cash = { balance = 0, entries = 0, exits = 0, movements = {} } }
     end,
     lines = {
@@ -50,12 +50,6 @@ ns.BetsData = VXV.SiteData({
             local at, amount = tonumber(f[1]), tonumber(f[2])
             data.cash.movements[#data.cash.movements + 1] = { at = at, amount = amount, label = f[3] }
             return at ~= nil and amount ~= nil
-        end },
-        R = { 5, function(data, f)
-            local rank, net, bets = tonumber(f[1]), tonumber(f[4]), tonumber(f[5])
-            data.ranking[#data.ranking + 1] = { rank = rank, name = f[2], class = f[3] ~= "" and f[3] or nil,
-                net = net, bets = bets }
-            return rank ~= nil and net ~= nil and bets ~= nil
         end },
         C = { 3, function(data, f)
             data.results[f[1]] = { accepted = f[2] == "1", message = f[3] }

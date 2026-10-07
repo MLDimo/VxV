@@ -53,7 +53,6 @@ test("a deathroll played in game: Discord tells it, the loser owes the stake unt
 
   await page.goto("/ranking");
   await page.getByRole("link", { name: "Deathroll" }).click();
-  const ranking = page.getByRole("region", { name: "Classement du deathroll" });
-  await expect(ranking.getByRole("row").nth(1)).toContainText("Ciel Gris");
-  await expect(ranking.getByRole("row").nth(1)).toContainText(/\+1\s500\spo/);
+  const first = page.getByRole("list", { name: "Podium" }).getByRole("listitem").filter({ hasText: "Ciel" });
+  await expect(first).toContainText(/\+1\s500\spo/);
 });

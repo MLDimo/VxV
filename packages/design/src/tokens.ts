@@ -57,9 +57,11 @@ export const COLORS = {
   "stamp-raid": "#3A5AA0",
   "ink-gain": "#2E7A44",
   "ink-loss": "#8A1F2C",
-  // Ranking (§7.5): the podium's metals, and the ground behind the portraits (§8)
+  // Ranking (§7.5): the podium's metals, the banners' ink and titles, and the ground behind the portraits (§8)
   silver: "#D9DBE6",
   bronze: "#D08A5A",
+  "banner-ink": "#120A1C",
+  "banner-title": "#5A0F3A",
   "avatar-ground": "#141828",
 } as const;
 

@@ -50,7 +50,6 @@ describe("Le Dé Pipé in game (P11.8)", () => {
     expect(rows).toContain(`${TITLE} : 50 po sur « Un tank » · à payer`);
     expect(rows).toContain("Solde : 380 po");
     expect(rows).toContain("Ce mois : +500 po, −120 po");
-    expect(rows.some((row) => row.startsWith("1. ") && row.endsWith(" · +30 po · 2 paris"))).toBe(true);
     expect(errors()).toEqual([]);
   });
 

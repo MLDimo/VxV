@@ -64,21 +64,6 @@ export const TAVERN_BETS: AddonBetsFacts = {
       },
     ],
   },
-  ranking: [
-    {
-      rank: 1,
-      memberId: "m-thom",
-      memberName: "Thom Leboss",
-      memberClass: "PRIEST",
-      memberRace: undefined,
-      memberSex: undefined,
-      net: 30,
-      won: 180,
-      bets: 2,
-      successRate: 0.5,
-      debt: 0,
-    },
-  ],
   changes: [],
   exportedAt: EXPORTED,
 };
