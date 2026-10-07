@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { foldText, matchesSearch, parseProfessions, PROFESSIONS_HEADER, ProfessionsFormatError } from "./artisans.ts";
+import { foldText, matchesSearch, parseProfessions, PROFESSIONS_HEADER } from "./artisans.ts";
+import { TextFormatError } from "./textFormat.ts";
 
 const TEXT = [
   PROFESSIONS_HEADER,
@@ -43,11 +44,11 @@ describe("a character's professions from the addon", () => {
 
   it("lists every problem with its line, and refuses another format", () => {
     const broken = [PROFESSIONS_HEADER, "C;Ðéjà Vu", "P;129;Secourisme;x;75;1;0", "R;182;3275;Bandage en lin"];
-    expect(() => parseProfessions(broken.join("\n"))).toThrow(ProfessionsFormatError);
+    expect(() => parseProfessions(broken.join("\n"))).toThrow(TextFormatError);
     try {
       parseProfessions(broken.join("\n"));
     } catch (error) {
-      expect((error as ProfessionsFormatError).problems).toEqual(["Ligne 3 illisible.", "Ligne 4 illisible."]);
+      expect((error as TextFormatError).problems).toEqual(["Ligne 3 illisible.", "Ligne 4 illisible."]);
     }
     expect(() => parseProfessions("VXV-LOG-2")).toThrow(/VXV-METIERS-1/);
     expect(() => parseProfessions(PROFESSIONS_HEADER)).toThrow(/ligne C manquante/);

@@ -7,7 +7,7 @@ import { checkTreasurerAction } from "./officerActions.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
 
 /** How many validations the treasurer's history shows. */
-export const TREASURY_HISTORY_SIZE = 100;
+const TREASURY_HISTORY_SIZE = 100;
 
 async function requireStake({ stakes }: Repositories, stakeId: string): Promise<Stake> {
   const stake = await stakes.findById(stakeId);
@@ -56,5 +56,3 @@ export function createTreasury({ unitOfWork, clock }: { unitOfWork: UnitOfWork; 
     },
   };
 }
-
-export type Treasury = ReturnType<typeof createTreasury>;

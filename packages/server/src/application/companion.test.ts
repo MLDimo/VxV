@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DiscordRoleMapping, Member } from "../domain/members.ts";
 import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";

@@ -1,6 +1,6 @@
+import { formatEventDate, raidTitle, softReserveCount } from "@vxv/server/domain/labels";
 import type { RaidEvent } from "@vxv/server";
 import Link from "next/link";
-import { formatEventDate, raidTitle, softReserveCount } from "./format";
 
 export function UpcomingEvents({ events }: { events: RaidEvent[] }) {
   if (events.length === 0) {

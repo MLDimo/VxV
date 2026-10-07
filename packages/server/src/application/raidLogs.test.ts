@@ -1,7 +1,7 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Member } from "../domain/members.ts";
-import { RaidLogFormatError } from "../domain/raidLog.ts";
+import { TextFormatError } from "../domain/textFormat.ts";
 import type { RaidRecap } from "../domain/raidRecap.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
@@ -10,7 +10,7 @@ import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createHistory } from "./history.ts";
 import { createJournal } from "./journal.ts";
-import type { RaidAnnouncer } from "./ports.ts";
+import type { RaidAnnouncer } from "./discordPorts.ts";
 import { COMPANION_LOG_REASON, createRaidLogs } from "./raidLogs.ts";
 
 const NOW = new Date("2026-12-11T09:00:00Z");
@@ -126,7 +126,7 @@ describe("raid logs", () => {
     const member = await createMember(sql, "member", "Membre");
     await expect(raidLogs.importLog(member, eventId, logOf(eventId), "Essai")).rejects.toThrow(ForbiddenError);
     await expect(raidLogs.importLog(officer, eventId, logOf("autre"), "Essai")).rejects.toThrow(ValidationError);
-    await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-1\nK;x;y", "Essai")).rejects.toThrow(RaidLogFormatError);
+    await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-1\nK;x;y", "Essai")).rejects.toThrow(TextFormatError);
   });
 
   describe("from the officers' companions", () => {

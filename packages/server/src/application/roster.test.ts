@@ -1,6 +1,7 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ROSTER_HEADER, RosterFormatError } from "../domain/roster.ts";
+import { ROSTER_HEADER } from "../domain/roster.ts";
+import { TextFormatError } from "../domain/textFormat.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createMember } from "../test/fixtures.ts";
@@ -87,7 +88,7 @@ describe("roster import", () => {
 
   it("changes nothing when the roster is malformed", async () => {
     const officer = await createMember(sql, "officer");
-    await expect(importRoster(officer, "not a roster", "Motif")).rejects.toBeInstanceOf(RosterFormatError);
+    await expect(importRoster(officer, "not a roster", "Motif")).rejects.toBeInstanceOf(TextFormatError);
     expect(await characters()).toEqual([]);
     expect(await listJournal()).toEqual([]);
   });

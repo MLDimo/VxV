@@ -7,7 +7,7 @@ import { IDLE } from "./actionState";
 import { CharacterName } from "./CharacterName";
 import type { SearchableCharacter } from "@vxv/server/domain/characterSearch";
 
-export interface OwnCharacter extends SearchableCharacter {
+interface OwnCharacter extends SearchableCharacter {
   isMain: boolean;
   inGuild: boolean;
 }

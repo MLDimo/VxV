@@ -7,7 +7,9 @@
 
 # The website's deathroll data (VXV-DEATHROLLS), the games and how they travel in the guild.
 DeathrollData.lua
+Rules.lua
 Games.lua
+Debts.lua
 Duels.lua
 
 # Interface: the duel's window, Le Dé Pipé's Deathroll tab.

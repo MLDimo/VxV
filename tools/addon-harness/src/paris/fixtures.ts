@@ -1,15 +1,10 @@
 import { formatAddonBets, type AddonBetsFacts } from "@vxv/server/domain/addonBets";
 import type { Bet, Stake } from "@vxv/server/domain/bets";
-import type { Character } from "@vxv/server/domain/characters";
-import { startCore, type CoreStart } from "../core.ts";
+import { loadedBundle, startCore, type CoreStart } from "../core.ts";
+import { EXPORTED, GUILD_READERS } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
 export const TITLE = "Qui meurt en premier sur le boss 10 ?";
-const EXPORTED = new Date("2026-12-10T07:30:00Z");
-
-function character(firstName: string, lastName: string, memberId: string): Character {
-  return { id: `c-${firstName}`, firstName, lastName, characterClass: "ROGUE", memberId, isMain: true, inGuild: true };
-}
 
 export function stake(memberId: string, memberName: string, choiceId: string, amount: number): Stake {
   return {
@@ -50,12 +45,7 @@ export const TAVERN_BETS: AddonBetsFacts = {
       stakes: [stake("m-deja", "Ðéjà Vu", "tank", 50), stake("m-thom", "Thom Leboss", "heal", 150)],
     },
   ],
-  officers: [character("Ðéjà", "Vu", "m-deja")],
-  characters: [
-    character("Ðéjà", "Vu", "m-deja"),
-    character("Thom", "Leboss", "m-thom"),
-    character("Ciel", "Gris", "m-ciel"),
-  ],
+  ...GUILD_READERS,
   cash: {
     balance: 380,
     entries: 500,
@@ -106,9 +96,5 @@ export function startParis(options: CoreStart & { facts?: AddonBetsFacts; withRa
     ...core,
     bundles: withRaid ? ["VXV_Raid", "VXV_Paris", "VXV_Sync"] : ["VXV_Paris", "VXV_Sync"],
   });
-  const paris = started.bundles.VXV_Paris;
-  if (paris === undefined) {
-    throw new Error("VXV_Paris was not loaded");
-  }
-  return { ...started, paris };
+  return { ...started, paris: loadedBundle(started, "VXV_Paris") };
 }

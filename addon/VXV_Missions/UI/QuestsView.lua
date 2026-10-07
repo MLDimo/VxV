@@ -23,9 +23,7 @@ local STATUS = {
     closed = "Résultat validé",
 }
 
-local function row(kind, text)
-    return { kind = kind, text = text }
-end
+local row = VXV.RowList.Row
 
 --- "1er", "2e", "3e".
 local function place(rank)
@@ -53,7 +51,7 @@ local function progress(mission, data, ranking)
         return NOT_MEASURED
     end
     local score = Readings.Score(mission, data)
-    local memberId = Quests.MemberId(data)
+    local memberId = VXV.MemberOf(data)
     for index, entry in ipairs(ranking) do
         if entry.memberId == memberId then
             return ("%d %s · %s"):format(entry.score, labels.counts, place(index))

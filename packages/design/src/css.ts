@@ -9,7 +9,7 @@ export function fontFile(file: string, weight: number): string {
 }
 
 /** The @font-face rules of the charter's fonts, served from this address. */
-export function fontFaces(fontUrl: string): string[] {
+function fontFaces(fontUrl: string): string[] {
   return Object.values(FONTS).flatMap((font) =>
     font.weights.map((weight) =>
       [
@@ -26,7 +26,7 @@ export function fontFaces(fontUrl: string): string[] {
 }
 
 /** The fonts and colors as CSS variables (--font-pixel, --color-amethyst, --color-class-warrior…). */
-export function themeVariables(): string[] {
+function themeVariables(): string[] {
   return [
     `  --font-pixel: "${FONTS.pixel.family}", ${FONTS.pixel.fallback};`,
     `  --font-sans: "${FONTS.text.family}", ${FONTS.text.fallback};`,

@@ -8,7 +8,7 @@ ns.RaidCompact = RaidCompact
 local CompactView, Group, NextBoss, RaidData = ns.CompactView, ns.Group, ns.NextBoss, ns.RaidData
 local RaidLog, Raids, RowList = ns.RaidLog, ns.Raids, VXV.RowList
 
-local Theme = VXV.Theme
+local Screen, Theme = VXV.Screen, VXV.Theme
 
 local PADDING = 10
 local ALERT_HEIGHT, ALERT_RING = 62, 2
@@ -85,17 +85,6 @@ function RaidCompact.Build(frame)
         content:GetHeight() - 3 * PADDING - ALERT_HEIGHT - KICKER_HEIGHT - FOOTER_HEIGHT - PADDING)
     list = RowList.Create(body)
     -- Entering the raid's instance changes the next boss: it is read again each time the tab shows.
-    content:SetScript("OnShow", render)
-    render()
+    Screen.Follow(content, render, { "raid.updated", "raid.log", "raid.place" })
+    VXV.OnEvent("GROUP_ROSTER_UPDATE", render)
 end
-
-local function refresh()
-    if content ~= nil then
-        render()
-    end
-end
-
-VXV.On("raid.updated", refresh)
-VXV.On("raid.log", refresh)
-VXV.On("raid.place", refresh)
-VXV.OnEvent("GROUP_ROSTER_UPDATE", refresh)

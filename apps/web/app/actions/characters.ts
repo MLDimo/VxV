@@ -3,7 +3,7 @@
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
 import { syncDiscordProfile } from "@/server/discordProfile";
-import { runFormAction } from "@/server/formActions";
+import { formText, runFormAction } from "@/server/formActions";
 import { requireMember } from "@/server/session";
 
 const PAGES = ["/personnages"];
@@ -12,7 +12,7 @@ export async function linkCharacter(_previous: ActionState, form: FormData): Pro
   const member = await requireMember();
   const asMain = form.get("as") === "main";
   return runFormAction(async () => {
-    await getApplication().characters.link(member, String(form.get("characterId") ?? ""), asMain);
+    await getApplication().characters.link(member, formText(form, "characterId"), asMain);
     return asMain
       ? `Personnage ajouté comme main. ${await syncDiscordProfile(member)}`
       : "Personnage ajouté comme reroll.";
@@ -21,7 +21,7 @@ export async function linkCharacter(_previous: ActionState, form: FormData): Pro
 
 export async function changeCharacter(_previous: ActionState, form: FormData): Promise<ActionState> {
   const member = await requireMember();
-  const characterId = String(form.get("characterId") ?? "");
+  const characterId = formText(form, "characterId");
   return runFormAction(async () => {
     if (form.get("intent") === "main") {
       await getApplication().characters.setMain(member, characterId);

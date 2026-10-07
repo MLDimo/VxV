@@ -1,12 +1,10 @@
-import { ADDON_BETS_HEADER, formatAddonBets } from "../domain/addonBets.ts";
+import { formatAddonBets } from "../domain/addonBets.ts";
 import { cashSummary } from "../domain/cash.ts";
 import { startOfMonth } from "../domain/dateTime.ts";
 import { bettorsRanking } from "../domain/ranking.ts";
 import { addonReaders } from "./addonReaders.ts";
 import { BETS_LISTED } from "./bets.ts";
 import type { Clock, UnitOfWork } from "./ports.ts";
-
-export { ADDON_BETS_HEADER };
 
 /** The bets as the companion hands them to the addon (P11.8): what Le Dé Pipé shows in game. */
 export function createAddonBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {

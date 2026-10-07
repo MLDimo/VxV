@@ -12,8 +12,6 @@ RaidData.lua
 Group.lua
 Reserves.lua
 Attribution.lua
-Sharing.lua
-Companion.lua
 Changes.lua
 Notices.lua
 Freshness.lua

@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DiscordMessage } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
@@ -12,7 +12,7 @@ import { createBets, type Bets } from "./bets.ts";
 import { createCash } from "./cash.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createJournal } from "./journal.ts";
-import type { AnnouncedBet, BetAnnouncer } from "./ports.ts";
+import type { AnnouncedBet, BetAnnouncer } from "./discordPorts.ts";
 import { createTreasury } from "./treasury.ts";
 
 const HOUR_MS = 60 * 60 * 1000;

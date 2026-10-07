@@ -6,7 +6,7 @@ local _, ns = ...
 local Duels = {}
 ns.Duels = Duels
 
-local Games = ns.Games
+local Debts, Games, Rules = ns.Debts, ns.Games, ns.Rules
 
 local CHALLENGE, ANSWER, START = "deathroll.challenge", "deathroll.answer", "deathroll.start"
 local BET, ROLL, PAID = "deathroll.bet", "deathroll.roll", "deathroll.paid"
@@ -33,10 +33,10 @@ function Duels.Challenge(target, stake, start)
     if stake == nil or start == nil or start < 2 then
         return "Mise d'au moins 1 po et nombre de départ d'au moins 2."
     end
-    if Games.Barred(me) then
+    if Debts.Barred(me) then
         return "Tu as une dette (paris ou deathroll) : règle-la pour jouer de nouveau."
     end
-    if Games.Barred(target) then
+    if Debts.Barred(target) then
         return target .. " a une dette : pas de deathroll avant qu'elle soit réglée."
     end
     sent = sent + 1
@@ -55,7 +55,7 @@ VXV.OnMessage(CHALLENGE, function(payload, sender)
         return
     end
     local challenge = { id = payload.id, from = sender, stake = payload.stake, start = payload.start }
-    if Games.Barred(VXV.PlayerName()) then
+    if Debts.Barred(VXV.PlayerName()) then
         Duels.Answer(challenge, false)
         VXV.Print(sender .. " te défie au deathroll, mais ta dette t'en empêche : règle-la d'abord.")
         return
@@ -92,7 +92,7 @@ VXV.OnMessage(START, function(payload, sender)
         return
     end
     Games.Start({ id = payload.id, challenger = payload.a, challenged = payload.b, stake = payload.stake,
-        start = payload.start, acceptedAt = payload.at, closesAt = GetTime() + Games.BETTING_SECONDS, rolls = {},
+        start = payload.start, acceptedAt = payload.at, closesAt = GetTime() + Rules.BETTING_SECONDS, rolls = {},
         bets = {} })
     VXV.Emit("deathroll.started", payload.id)
 end)
@@ -100,13 +100,13 @@ end)
 --- Stakes on a player of the game during its minute of bets; returns why not, or nil.
 function Duels.Bet(id, choice, amount)
     local game, me = Games.Find(id), VXV.PlayerName()
-    if game == nil or not Games.Betting(game) then
+    if game == nil or not Rules.Betting(game) then
         return "Les paris de cette partie sont fermés."
     end
     if me == game.challenger or me == game.challenged then
         return "Les joueurs ne parient pas sur leur partie."
     end
-    if Games.Barred(me) then
+    if Debts.Barred(me) then
         return "Tu as une dette (paris ou deathroll) : règle-la pour parier de nouveau."
     end
     if wholeNumber(amount) == nil then
@@ -117,7 +117,7 @@ function Duels.Bet(id, choice, amount)
 end
 
 VXV.OnMessage(BET, function(payload, sender)
-    if type(payload) == "table" and not Games.Barred(sender) then
+    if type(payload) == "table" and not Debts.Barred(sender) then
         Games.AddBet(payload.id, sender, payload.choice, payload.amount)
     end
 end)
@@ -128,8 +128,8 @@ function Duels.Roll(id)
     if game == nil then
         return
     end
-    local roller, high = Games.Turn(game)
-    if roller ~= VXV.PlayerName() or Games.Betting(game) then
+    local roller, high = Rules.Turn(game)
+    if roller ~= VXV.PlayerName() or Rules.Betting(game) then
         return
     end
     VXV.Compat.RandomRoll(1, high)
@@ -142,8 +142,8 @@ VXV.On("roll", function(roll)
         return
     end
     for _, game in ipairs(Games.Live()) do
-        local roller, high = Games.Turn(game)
-        if roller == me and high == roll.high and not Games.Betting(game) then
+        local roller, high = Rules.Turn(game)
+        if roller == me and high == roll.high and not Rules.Betting(game) then
             VXV.Broadcast(ROLL, { id = game.id, high = roll.high, result = roll.roll })
             return
         end

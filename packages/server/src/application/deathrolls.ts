@@ -17,18 +17,11 @@ import type { RankingPeriod } from "../domain/ranking.ts";
 import { settleBet } from "./bets.ts";
 import { loserOf, memberDebt, winnerOf } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
-import type {
-  Clock,
-  DeathrollAnnouncer,
-  DeathrollPlayer,
-  Repositories,
-  Season,
-  StoredDeathroll,
-  UnitOfWork,
-} from "./ports.ts";
+import type { Clock, DeathrollPlayer, Repositories, Season, StoredDeathroll, UnitOfWork } from "./ports.ts";
+import type { DeathrollAnnouncer } from "./discordPorts.ts";
 
 /** How many games the website lists. */
-export const DEATHROLLS_LISTED = 30;
+const DEATHROLLS_LISTED = 30;
 
 const UNKNOWN_DEATHROLL = "Ce deathroll n'existe pas.";
 const KNOWN = "Deathroll déjà connu.";
@@ -268,5 +261,3 @@ export function createDeathrolls({
     },
   };
 }
-
-export type Deathrolls = ReturnType<typeof createDeathrolls>;

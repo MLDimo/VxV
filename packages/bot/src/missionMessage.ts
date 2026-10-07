@@ -9,7 +9,7 @@ const EMBED_COLOR = 0x7ee2a0;
 /** The first five of the ranking (§7.4). */
 const SHOWN_SCORES = 5;
 
-export function missionUrl(siteUrl: string, missionId: string): string {
+function missionUrl(siteUrl: string, missionId: string): string {
   return `${siteUrl}/quetes/${missionId}`;
 }
 

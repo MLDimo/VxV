@@ -1,14 +1,14 @@
 import type { HallOfFameEntry } from "@vxv/server";
 import { formatGold } from "@vxv/server/domain/labels";
 import { MemberName } from "./MemberName";
+import { Panel } from "./Panel";
 
 const POSITION = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
 
 /** The hall of fame (§7.4, P12.7): missions won, gold won, mean place where the member scored. */
 export function HallOfFame({ entries }: { entries: HallOfFameEntry[] }) {
   return (
-    <section className="panel-officer" aria-label="Hall of fame">
-      <h2 className="font-pixel text-xl text-gold">Hall of fame</h2>
+    <Panel title="Hall of fame" officer>
       {entries.length === 0 ? (
         <p className="mt-3 text-sm text-lavender">Aucune mission accomplie pour l&apos;instant.</p>
       ) : (
@@ -36,6 +36,6 @@ export function HallOfFame({ entries }: { entries: HallOfFameEntry[] }) {
         </table>
       )}
       <p className="mt-3 text-xs text-muted">Position moyenne sur les missions où le joueur a au moins un point.</p>
-    </section>
+    </Panel>
   );
 }

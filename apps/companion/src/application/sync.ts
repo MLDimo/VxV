@@ -15,12 +15,12 @@ export interface SyncReport {
   sent: string[];
 }
 
-export interface SyncDependencies {
+interface SyncDependencies {
   site: Pick<SitePort, "download" | "upload">;
   gameFiles: GameFiles;
 }
 
-export interface SyncContext {
+interface SyncContext {
   token: string;
   installations: readonly string[];
   /** The roster and the raids' records go to the website from an officer only. */

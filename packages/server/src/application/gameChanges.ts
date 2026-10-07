@@ -14,7 +14,7 @@ const UNKNOWN_AUTHOR = "Ce personnage n'est lié à aucun membre sur le site : l
 const UNREADABLE_START = "Date ou heure illisible : écris par exemple 15/10 et 21:00, comme sur Discord.";
 
 /** The use cases a change goes through: each checks the author's rights as on the website. */
-export interface GameChangeDependencies {
+interface GameChangeDependencies {
   unitOfWork: UnitOfWork;
   clock: Clock;
   signups: { signUp(member: Member, eventId: string, input: SignupInput, madeAt?: Date): Promise<void> };

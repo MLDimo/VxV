@@ -5,10 +5,12 @@ import { DebtBadge } from "@/components/DebtBadge";
 import { DiceNav } from "@/components/DiceNav";
 import { LedgerTable } from "@/components/LedgerTable";
 import { MemberName } from "@/components/MemberName";
-import { RewardPayment } from "@/components/RewardPayment";
+import { payReward } from "@/app/actions/missions";
+import { ConfirmButton } from "@/components/ConfirmButton";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 /** The treasurer's book (P11.6): what is awaited, owed and handed over, and every validation, for all to see. */
 export default async function TreasuryPage() {
@@ -48,8 +50,7 @@ export default async function TreasuryPage() {
         lines={book.toCollect}
         intent={treasurer ? "collected" : undefined}
       />
-      <section className="panel mt-6" aria-label="Récompenses de quêtes à verser">
-        <h2 className="font-pixel text-xl text-ivory">Récompenses de quêtes à verser</h2>
+      <Panel title="Récompenses de quêtes à verser" className="mt-6">
         {unpaidRewards.length === 0 ? (
           <p className="mt-3 text-lavender">Aucune récompense en attente.</p>
         ) : (
@@ -64,14 +65,19 @@ export default async function TreasuryPage() {
                   <MemberName name={reward.memberName} characterClass={reward.memberClass} /> ·{" "}
                   <span className="font-pixel text-gold">{formatGold(reward.amount)}</span>
                 </span>
-                {treasurer && <RewardPayment missionId={mission.id} rank={reward.rank} />}
+                {treasurer && (
+                  <ConfirmButton
+                    action={payReward}
+                    fields={{ missionId: mission.id, rank: reward.rank }}
+                    label="Versée"
+                  />
+                )}
               </li>
             ))}
           </ul>
         )}
-      </section>
-      <section className="panel mt-6" aria-label="Historique">
-        <h2 className="font-pixel text-xl text-ivory">Historique</h2>
+      </Panel>
+      <Panel title="Historique" className="mt-6">
         {book.history.length === 0 ? (
           <p className="mt-3 text-lavender">Aucune validation pour l&apos;instant.</p>
         ) : (
@@ -87,7 +93,7 @@ export default async function TreasuryPage() {
             ))}
           </ul>
         )}
-      </section>
+      </Panel>
     </>
   );
 }

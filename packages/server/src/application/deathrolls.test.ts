@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DEATHROLL_HEADER } from "../domain/deathrolls.ts";
 import type { Member } from "../domain/members.ts";
@@ -10,7 +10,7 @@ import { createTestDatabase } from "../testing.ts";
 import { createAddonDeathrolls } from "./addonDeathrolls.ts";
 import { createBets } from "./bets.ts";
 import { createDeathrolls } from "./deathrolls.ts";
-import type { AnnouncedDeathroll } from "./ports.ts";
+import type { AnnouncedDeathroll } from "./discordPorts.ts";
 import { createTreasury } from "./treasury.ts";
 
 const ACCEPTED = 1796904000;

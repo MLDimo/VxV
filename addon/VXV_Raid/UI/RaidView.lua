@@ -18,9 +18,7 @@ local ROLE_COUNTS = { tank = "tanks", healer = "heals", dps = "DPS" }
 local METHOD_TAGS = { soft_reserve = "epic", soft_reserve_plus = "gold", free_roll = "gain", loot_council = "sakura" }
 local LAST_LOOTS = 10
 
-local function row(kind, text, tooltip)
-    return { kind = kind, text = text, tooltip = tooltip }
-end
+local row = VXV.RowList.Row
 
 local function itemName(event, itemId)
     local item = event.items[itemId]
@@ -55,7 +53,7 @@ local function changeRows(kind, describe)
     local answer = Changes.Answer(kind)
     if answer ~= nil and not answer.accepted then
         return { row("line", Theme.Colored("Refusé : " .. answer.message, "loss"),
-            { title = "Refusé par le site", lines = { answer.message } }) }
+            { tooltip = { title = "Refusé par le site", lines = { answer.message } } }) }
     end
     return {}
 end
@@ -156,7 +154,8 @@ function RaidView.MyReserves(event, player)
     for _, reserve in ipairs(signup.reserves) do
         local item = event.items[reserve.itemId]
         rows[#rows + 1] = row("line", Theme.Colored(itemName(event, reserve.itemId), "epic") .. bonusTag(reserve.bonus),
-            { title = itemName(event, reserve.itemId), lines = { "Boss : " .. (item and item.boss or "?") } })
+            { tooltip = { title = itemName(event, reserve.itemId),
+                lines = { "Boss : " .. (item and item.boss or "?") } } })
     end
     if #signup.reserves == 0 then
         rows[1] = row("line", "Aucune SR.")
@@ -192,7 +191,7 @@ local function playerRow(signup)
     local name = Theme.ClassColored(signup.name, signup.class, late)
     local detail = not Labels.IsComing(signup.status) and Labels.Status(signup.status)
         or signup.spec .. (late and (" (" .. Labels.Status(signup.status) .. ")") or "")
-    return row("line", name .. " · " .. detail, { title = signup.name, lines = lines })
+    return row("line", name .. " · " .. detail, { tooltip = { title = signup.name, lines = lines } })
 end
 
 --- "Composition": per role, its expected players with a bar of its share, the late ones dimmed; then the others.
@@ -238,7 +237,8 @@ function RaidView.RaidReserves(event)
         local item, reservers = event.items[itemId], byItem[itemId]
         if item.excluded then
             rows[#rows + 1] = row("line", Theme.Colored(item.name, "epic") .. " · exclu des SR (loot council)",
-                { title = item.name, lines = { "Boss : " .. item.boss, "Attribué par les officiers (loot council)." } })
+                { tooltip = { title = item.name,
+                    lines = { "Boss : " .. item.boss, "Attribué par les officiers (loot council)." } } })
         elseif reservers ~= nil then
             local names, lines = {}, { "Boss : " .. item.boss }
             for _, reserver in ipairs(reservers) do
@@ -247,7 +247,7 @@ function RaidView.RaidReserves(event)
                 lines[#lines + 1] = signup.name .. (reserver.bonus > 0 and (" (SR+ +" .. reserver.bonus .. ")") or "")
             end
             rows[#rows + 1] = row("line", Theme.Colored(item.name, "epic") .. " : " .. table.concat(names, ", "),
-                { title = item.name, lines = lines })
+                { tooltip = { title = item.name, lines = lines } })
         end
     end
     if #rows == 0 then
@@ -319,7 +319,7 @@ function RaidView.Requests(requests)
     local rows = {}
     for _, request in ipairs(requests) do
         local requestRow = row("line", request.name .. " · " .. request.reason,
-            { title = request.name, lines = { request.reason, "Clic : inviter" } })
+            { tooltip = { title = request.name, lines = { request.reason, "Clic : inviter" } } })
         requestRow.invite = request.name
         rows[#rows + 1] = requestRow
     end

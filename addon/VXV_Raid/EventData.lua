@@ -1,22 +1,11 @@
 local _, ns = ...
 
 --- The event's data as the website exports it for the addon: contract VXV-RAID-2, described line by line in
---- packages/server/src/domain/addonExport.ts. Reading never raises a Lua error.
+--- packages/server/src/domain/addonExport.ts; read by the core's site data (RaidData.lua).
 local EventData = {}
 ns.EventData = EventData
 
-local HEADER = "VXV-RAID-2"
 local FLAG_ON = "1"
-local NOT_EVENT = "Ce texte n'est pas une donnée d'événement : copie-la depuis la page de l'événement sur le site."
-local UNREADABLE_LINE = "Ligne %d illisible : recopie les données depuis le site."
-
-local function fields(line)
-    local result = {}
-    for field in (line .. ";"):gmatch("([^;]*);") do
-        result[#result + 1] = field
-    end
-    return result
-end
 
 local function split(text)
     local list = {}
@@ -34,100 +23,55 @@ local function reserves(text)
     return list
 end
 
---- Each kind of line: its number of fields, and how it adds to the event (false when a value is wrong).
-local RECORDS = {
-    E = {
-        size = 7,
-        read = function(event, line)
-            event.id, event.title, event.raidIds = line[2], line[6], split(line[7])
-            event.startsAt, event.exportedAt = tonumber(line[3]), tonumber(line[4])
-            event.softReservesPerPlayer = tonumber(line[5])
+--- The format, for the core's site data (VXV.SiteData): the header, why another text is refused, the empty event,
+--- and each kind of line with its number of fields and how it adds to the event (the officers' O lines are the
+--- core's).
+EventData.FORMAT = {
+    header = "VXV-RAID-2",
+    wrong = "Ce texte n'est pas une donnée d'événement : copie-la depuis la page de l'événement sur le site.",
+    New = function()
+        return { items = {}, itemOrder = {}, signups = {}, journal = {}, results = {} }
+    end,
+    lines = {
+        -- E;id;start;export;soft reserves per player;title;raid ids
+        E = { 6, function(event, f)
+            event.id, event.title, event.raidIds = f[1], f[5], split(f[6])
+            event.startsAt, event.exportedAt = tonumber(f[2]), tonumber(f[3])
+            event.softReservesPerPlayer = tonumber(f[4])
             return event.startsAt ~= nil and event.exportedAt ~= nil and event.softReservesPerPlayer ~= nil
-        end,
-    },
-    O = {
-        size = 2,
-        read = function(event, line)
-            event.officers[line[2]] = true
-            return true
-        end,
-    },
-    I = {
-        size = 5,
-        read = function(event, line)
-            local id = tonumber(line[2])
+        end },
+        -- I;item id;name;boss;1 when excluded from soft reserves
+        I = { 4, function(event, f)
+            local id = tonumber(f[1])
             if id == nil then
                 return false
             end
-            event.items[id] = { id = id, name = line[3], boss = line[4], excluded = line[5] == FLAG_ON }
+            event.items[id] = { id = id, name = f[2], boss = f[3], excluded = f[4] == FLAG_ON }
             event.itemOrder[#event.itemOrder + 1] = id
             return true
-        end,
-    },
-    S = {
-        size = 8,
-        read = function(event, line)
-            event.signups[#event.signups + 1] = {
-                name = line[2],
-                class = line[3],
-                role = line[4],
-                status = line[5],
-                reroll = line[6] == FLAG_ON,
-                spec = line[7],
-                reserves = reserves(line[8]),
-            }
+        end },
+        -- S;character;class;role;status;1 for a reroll;spec;reserves
+        S = { 7, function(event, f)
+            event.signups[#event.signups + 1] = { name = f[1], class = f[2], role = f[3], status = f[4],
+                reroll = f[5] == FLAG_ON, spec = f[6], reserves = reserves(f[7]) }
             return true
-        end,
-    },
-    J = {
-        size = 5,
-        read = function(event, line)
-            local at = tonumber(line[2])
+        end },
+        -- J;time;actor;summary;reason
+        J = { 4, function(event, f)
+            local at = tonumber(f[1])
             if at == nil then
                 return false
             end
-            event.journal[#event.journal + 1] = { at = at, actor = line[3], summary = line[4], reason = line[5] }
+            event.journal[#event.journal + 1] = { at = at, actor = f[2], summary = f[3], reason = f[4] }
             return true
-        end,
-    },
-    C = {
-        size = 4,
-        read = function(event, line)
-            event.results[line[2]] = { accepted = line[3] == FLAG_ON, message = line[4] }
+        end },
+        -- C;change id;1 when done;message
+        C = { 3, function(event, f)
+            event.results[f[1]] = { accepted = f[2] == FLAG_ON, message = f[3] }
             return true
-        end,
+        end },
     },
 }
-
---- The event written in the text, or nil and why (in French) when the text is not readable VXV-RAID-2 data.
---- Lines of an unknown kind are skipped.
-function EventData.Parse(text)
-    if type(text) ~= "string" then
-        return nil, NOT_EVENT
-    end
-    local event = { officers = {}, items = {}, itemOrder = {}, signups = {}, journal = {}, results = {} }
-    local number, headerSeen = 0, false
-    for raw in (text .. "\n"):gmatch("([^\n]*)\n") do
-        number = number + 1
-        local line = raw:match("^%s*(.-)%s*$")
-        if line ~= "" and not headerSeen then
-            if line ~= HEADER then
-                return nil, NOT_EVENT
-            end
-            headerSeen = true
-        elseif line ~= "" then
-            local values = fields(line)
-            local record = RECORDS[values[1]]
-            if record ~= nil and (#values ~= record.size or not record.read(event, values)) then
-                return nil, UNREADABLE_LINE:format(number)
-            end
-        end
-    end
-    if event.id == nil then
-        return nil, NOT_EVENT
-    end
-    return event
-end
 
 --- The sign-up of the character named "Prénom Nom", or nil.
 function EventData.SignupOf(event, name)

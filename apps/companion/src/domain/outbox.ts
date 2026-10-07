@@ -6,7 +6,7 @@ export const OUTBOX_FILE = ["SavedVariables", "VXV_Sync.lua"];
 const OUTBOX_VARIABLE = "VXV_SyncDB";
 
 /** Format of the outbox written by addon/VXV_Sync/Outbox.lua: a newer one asks for the companion's update. */
-export const OUTBOX_VERSION = 1;
+const OUTBOX_VERSION = 1;
 
 /** A character of the player as the game draws it. */
 export interface CharacterLook {
@@ -40,7 +40,7 @@ export interface CounterReading {
   at: number;
 }
 
-export type OutboxReading = { kind: "read"; outbox: Outbox } | { kind: "newer" } | { kind: "none" };
+type OutboxReading = { kind: "read"; outbox: Outbox } | { kind: "newer" } | { kind: "none" };
 
 const EMPTY: Outbox = { roster: undefined, raidLogs: [], characters: [], changes: [], counters: [], texts: {} };
 

@@ -6,7 +6,7 @@ const STATE = /^[A-Za-z0-9_-]{16,128}$/;
 const MAX_CHALLENGE_LENGTH = 128;
 
 /** A companion asks to be linked: where it listens, its state, and its PKCE challenge (checked by the server). */
-export interface CompanionLinkRequest {
+interface CompanionLinkRequest {
   port: number;
   state: string;
   challenge: string;

@@ -3,7 +3,7 @@ import { SiteError } from "./errors.ts";
 import type { Account, LoopbackListener, SitePort } from "./ports.ts";
 
 /** Time left to the member to confirm on the website. */
-export const LINK_TIMEOUT_MS = 10 * 60 * 1000;
+const LINK_TIMEOUT_MS = 10 * 60 * 1000;
 
 const SECRET_BYTES = 32;
 const STATE_BYTES = 16;
@@ -11,7 +11,7 @@ const TIMED_OUT = "La liaison a expiré : relance-la et confirme-la sur le site.
 const CANCELLED = "Liaison annulée.";
 const FAILED = "La liaison n'a pas abouti : relance-la.";
 
-export interface LinkDependencies {
+interface LinkDependencies {
   api: Pick<SitePort, "linkPage" | "exchange">;
   listen(): Promise<LoopbackListener>;
   openBrowser(url: string): Promise<void>;

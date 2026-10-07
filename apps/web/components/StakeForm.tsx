@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { stakeOnBet } from "@/app/actions/bets";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Field } from "./Field";
 
 /** The member's stake on a bet: a choice and an amount, then "Miser"; or the stake taken back. */
 export function StakeForm({ bet, current }: { bet: Bet; current: Stake | undefined }) {
@@ -32,8 +33,7 @@ export function StakeForm({ bet, current }: { bet: Bet; current: Stake | undefin
         </div>
       </fieldset>
       <div className="flex flex-wrap items-end gap-3">
-        <label className="block">
-          <span className="text-sm text-lavender">Mise (po)</span>
+        <Field label="Mise (po)">
           <input
             type="number"
             name="amount"
@@ -44,7 +44,7 @@ export function StakeForm({ bet, current }: { bet: Bet; current: Stake | undefin
             defaultValue={current?.amount}
             className="field w-32"
           />
-        </label>
+        </Field>
         <button type="submit" name="intent" value="stake" disabled={pending || locked} className="button-gold">
           {current === undefined ? "Miser" : "Modifier ma mise"}
         </button>

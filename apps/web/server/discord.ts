@@ -10,7 +10,7 @@ const HTTP_NOT_FOUND = 404;
 /** identify: who the user is; guilds.members.read: their roles on the guild server. */
 export const DISCORD_SCOPES = ["identify", "guilds.members.read"];
 
-export const SIGN_IN_CALLBACK_PATH = "/connexion/discord/retour";
+const SIGN_IN_CALLBACK_PATH = "/connexion/discord/retour";
 
 export function createDiscordClient(origin: string): Discord {
   const { clientId, clientSecret } = getConfig().discord;

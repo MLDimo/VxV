@@ -1,17 +1,12 @@
 local _, ns = ...
 
---- The missions for this player: where each stands, its ranking (the website's, completed by the scores the
---- guild's addons tell live), and how the data travel between the guild's addons (the core's shared data).
+--- The missions for this player: where each stands, and its ranking (the website's, completed by the scores the
+--- guild's addons tell live).
 local Quests = {}
 ns.Quests = Quests
 
 -- Scores told live in the guild (P12.5), by mission then member: { name, class, score, reachedAt }.
 local live = {}
-
---- The website's id of the member playing this character (the player's by default), or nil.
-function Quests.MemberId(data, name)
-    return data ~= nil and data.members[name or VXV.PlayerName() or ""] or nil
-end
 
 --- "upcoming", "running", "ended" (waiting for an officer's validation) or "closed".
 function Quests.Status(mission, now)

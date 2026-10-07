@@ -5,6 +5,7 @@ import { useActionState, useId } from "react";
 import { endBet } from "@/app/actions/bets";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Options, ReasonField } from "./Field";
 
 /** Officers declare the winning choice, or cancel the bet (every stake given back), with a reason. */
 export function BetEndForm({ betId, choices }: { betId: string; choices: BetChoice[] }) {
@@ -18,17 +19,10 @@ export function BetEndForm({ betId, choices }: { betId: string; choices: BetChoi
           Choix gagnant
         </label>
         <select id={winnerFieldId} name="choiceId" className="field">
-          {choices.map((choice) => (
-            <option key={choice.id} value={choice.id}>
-              {choice.label}
-            </option>
-          ))}
+          <Options options={choices.map((choice) => [choice.id, choice.label] as const)} />
         </select>
       </div>
-      <label className="block">
-        <span className="text-sm text-lavender">Motif (visible dans le journal)</span>
-        <input name="reason" required className="field" placeholder="Le tank est tombé en premier" />
-      </label>
+      <ReasonField placeholder="Le tank est tombé en premier" />
       <div className="flex gap-3 sm:col-span-2">
         <button type="submit" name="intent" value="result" disabled={pending} className="button-wood text-gold">
           Déclarer le résultat

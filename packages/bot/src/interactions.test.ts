@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { InteractionResponseType, InteractionType } from "discord-api-types/v10";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createInteractionHandler, type InteractionHandler } from "./interactions.ts";

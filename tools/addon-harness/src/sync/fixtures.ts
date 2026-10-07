@@ -1,6 +1,6 @@
 import { toLuaLiteral, type LuaValue } from "@vxv/lua";
 
-export const INBOX_FILE = "VXV_Sync/External/Inbox.lua";
+const INBOX_FILE = "VXV_Sync/External/Inbox.lua";
 
 /**
  * The files the companion writes on the player's computer (apps/companion/src/domain/inbox.ts): its inbox for

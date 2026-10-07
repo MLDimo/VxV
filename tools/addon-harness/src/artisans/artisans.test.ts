@@ -2,7 +2,7 @@ import { formatAddonArtisans } from "@vxv/server/domain/addonArtisans";
 import { parseProfessions } from "@vxv/server/domain/artisans";
 import type { Character } from "@vxv/server/domain/characters";
 import { describe, expect, it } from "vitest";
-import { startCore } from "../core.ts";
+import { loadedBundle, startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
@@ -186,9 +186,5 @@ describe("the artisans in game (P14)", () => {
 function startArtisans() {
   const started = startCore({ playerName: "Thom Leboss", beforeLogin: true, bundles: BUNDLES });
   started.client(`${FIRST_AID} Fire("PLAYER_LOGIN")`);
-  const artisans = started.bundles.VXV_Artisans;
-  if (artisans === undefined) {
-    throw new Error("VXV_Artisans was not loaded");
-  }
-  return { ...started, artisans };
+  return { ...started, artisans: loadedBundle(started, "VXV_Artisans") };
 }

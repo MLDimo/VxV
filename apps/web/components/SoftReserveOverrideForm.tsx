@@ -5,10 +5,9 @@ import { useActionState, useId, useState } from "react";
 import { overrideSoftReserves } from "@/app/actions/softReserves";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Options, ReasonField } from "./Field";
 
-const FIELD = "field";
-
-export interface SignedUpCharacter {
+interface SignedUpCharacter {
   characterId: string;
   characterName: string;
 }
@@ -41,13 +40,9 @@ export function SoftReserveOverrideForm({
           name="characterId"
           value={characterId}
           onChange={(event) => setCharacterId(event.target.value)}
-          className={FIELD}
+          className="field"
         >
-          {players.map((player) => (
-            <option key={player.characterId} value={player.characterId}>
-              {player.characterName}
-            </option>
-          ))}
+          <Options options={players.map((player) => [player.characterId, player.characterName] as const)} />
         </select>
       </div>
       {/* Remounted per player, so that the boxes start from that player's current reserves. */}
@@ -67,10 +62,7 @@ export function SoftReserveOverrideForm({
           ))}
         </div>
       </fieldset>
-      <label className="block">
-        <span className="text-sm text-lavender">Motif de la correction (visible dans le journal)</span>
-        <input name="reason" required className={FIELD} />
-      </label>
+      <ReasonField label="Motif de la correction" />
       <button type="submit" disabled={pending} className="button-wood text-gold">
         Corriger ses SR
       </button>

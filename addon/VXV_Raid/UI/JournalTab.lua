@@ -87,9 +87,7 @@ end
 
 function JournalTab.Build(frame)
     content = frame
-    local _, title = Theme.ScreenHeader(content, nil, nil, "Journal")
-    title:ClearAllPoints()
-    title:SetPoint("TOPLEFT", PADDING, -PADDING)
+    VXV.Screen.Head(content, nil, nil, "Journal")
 
     local width = content:GetWidth() - 2 * PADDING
     local height = content:GetHeight() - BOOK_TOP - PADDING
@@ -117,17 +115,9 @@ function JournalTab.Build(frame)
     body:SetPoint("TOPLEFT", PAGE_PADDING, -lineTop(LIST_LINE))
     body:SetSize(rightWidth - 2 * PAGE_PADDING, (lines - LIST_LINE) * RULE)
     list = RowList.Create(body, 0, "parchment")
-    render()
+    VXV.Screen.Follow(content, render, { "raid.log", "raid.updated" })
 end
 
-local function refresh()
-    if content ~= nil then
-        render()
-    end
-end
-
-VXV.On("raid.log", refresh)
-VXV.On("raid.updated", refresh)
 VXV.On("cash.updated", function(texts)
     cashTexts = texts or {}
     if content ~= nil then

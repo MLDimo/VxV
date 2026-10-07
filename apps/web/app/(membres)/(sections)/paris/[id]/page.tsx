@@ -10,6 +10,7 @@ import { MemberName } from "@/components/MemberName";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 const OUTCOMES = { won: "Gagné", lost: "Perdu", refunded: "Remboursé" } as const;
 
@@ -34,8 +35,7 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
       <div className="mt-8">
         <BetTable view={view} member={member} />
       </div>
-      <section className="panel mt-8">
-        <h2 className="font-pixel text-xl text-ivory">Les mises</h2>
+      <Panel title="Les mises" className="mt-8">
         {stakes.length === 0 ? (
           <p className="mt-3 text-lavender">Aucune mise pour l&apos;instant.</p>
         ) : (
@@ -71,16 +71,15 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
             </tbody>
           </table>
         )}
-      </section>
+      </Panel>
       {!ended && canManageRaids(member.roles) && (
-        <section className="panel-officer mt-8">
-          <h2 className="font-pixel text-xl text-gold">Officiers · résultat du pari</h2>
+        <Panel title="Officiers · résultat du pari" officer className="mt-8">
           <p className="mt-2 text-sm text-lavender">
             Le résultat termine le pari : les gains sont calculés et la part de l&apos;organisation entre dans la
             caisse. Annuler rend chaque mise.
           </p>
           <BetEndForm betId={bet.id} choices={bet.choices} />
-        </section>
+        </Panel>
       )}
     </>
   );

@@ -165,6 +165,13 @@ function Theme.Recolor(edges, color)
 end
 
 -- A text field: its height, and the margin of its text.
+--- A section's heading in a form (§3): bold, lavender; placed by its caller.
+function Theme.Heading(parent, text)
+    local label = Theme.Text(parent, "textBold", 13, "lavender")
+    label:SetText(text)
+    return label
+end
+
 local FIELD_HEIGHT, FIELD_PADDING = 26, 6
 Theme.FIELD_HEIGHT = FIELD_HEIGHT
 
@@ -303,14 +310,4 @@ local ACCENTED_CAPITALS = { ["à"] = "À", ["â"] = "Â", ["ç"] = "Ç", ["é"] 
 --- The text in capitals, French accents included ("Forge & métiers" → "FORGE & MÉTIERS").
 function Theme.Upper(text)
     return (text:upper():gsub("\195[\128-\191]", ACCENTED_CAPITALS))
-end
-
---- The head of a screen (§2.5): kicker in the place's color, then the title.
-function Theme.ScreenHeader(parent, kicker, kickerColor, title)
-    local kickerText = Theme.Text(parent, "textHeavy", 11, kickerColor or "sakura")
-    kickerText:SetText(kicker and Theme.Upper(kicker) or "")
-    local titleText = Theme.Text(parent, "pixelBold", 30, "ivory")
-    titleText:SetPoint("TOPLEFT", kickerText, "BOTTOMLEFT", 0, -6)
-    titleText:SetText(title)
-    return kickerText, titleText
 end

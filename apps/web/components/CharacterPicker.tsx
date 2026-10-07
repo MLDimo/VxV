@@ -6,6 +6,7 @@ import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 import { CharacterName } from "./CharacterName";
 import { searchCharacters, type SearchableCharacter } from "@vxv/server/domain/characterSearch";
+import { Field } from "./Field";
 
 const MAX_SUGGESTIONS = 8;
 
@@ -21,8 +22,7 @@ export function CharacterPicker({ characters }: { characters: SearchableCharacte
 
   return (
     <form action={action} className="mt-4 space-y-3">
-      <label className="block">
-        <span className="text-sm text-lavender">Nom du personnage</span>
+      <Field label="Nom du personnage">
         <input
           role="combobox"
           aria-controls={listId}
@@ -37,7 +37,7 @@ export function CharacterPicker({ characters }: { characters: SearchableCharacte
           placeholder="Tapez quelques lettres"
           className="field"
         />
-      </label>
+      </Field>
       {suggestions.length > 0 && (
         <ul id={listId} role="listbox" className="divide-y divide-line bg-night ring-pixel">
           {suggestions.map((character) => (

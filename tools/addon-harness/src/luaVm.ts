@@ -6,7 +6,7 @@ const { lua, lauxlib, lualib, to_luastring } = fengari;
 export type LuaValue = undefined | boolean | number | string | LuaValue[] | { [key: string]: LuaValue };
 
 /** What a chunk receives as "...": a string, or a table kept by the VM (an addon's private namespace). */
-export type LuaArgument = string | { tableRef: number };
+type LuaArgument = string | { tableRef: number };
 
 function toJs(L: LuaState, index: number): LuaValue {
   switch (lua.lua_type(L, index)) {

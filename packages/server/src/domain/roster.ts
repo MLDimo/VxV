@@ -1,10 +1,9 @@
 import { fullName, type Character, type CharacterName } from "./characters.ts";
-import { TextFormatError } from "./textFormat.ts";
+import { TextFormatError, textLines } from "./textFormat.ts";
 
 /** First line of a roster exported by the officers' addon; the number is the format version. */
 export const ROSTER_HEADER = "VXV-ROSTER-1";
 
-const FIELD_SEPARATOR = ";";
 const FIELD_COUNT = 3;
 const CLASS_TOKEN = /^[A-Z]+$/;
 
@@ -12,38 +11,33 @@ export interface RosterEntry extends CharacterName {
   characterClass: string;
 }
 
-export class RosterFormatError extends TextFormatError {}
-
 function characterKey(character: CharacterName): string {
   return fullName(character);
 }
 
 /** Reads "Prénom;Nom;CLASSE" lines under the header, reporting every problem with its line number. */
 export function parseRoster(text: string): RosterEntry[] {
-  const lines = text.split(/\r?\n/).map((line, index) => ({ number: index + 1, content: line.trim() }));
-  const filled = lines.filter((line) => line.content.length > 0);
-  const [header, ...rows] = filled;
-  if (header?.content !== ROSTER_HEADER) {
-    throw new RosterFormatError([`La liste doit commencer par la ligne ${ROSTER_HEADER} : copiez-la depuis l'addon.`]);
+  const [header, ...rows] = textLines(text);
+  if (header?.fields.join(";") !== ROSTER_HEADER) {
+    throw new TextFormatError([`La liste doit commencer par la ligne ${ROSTER_HEADER} : copiez-la depuis l'addon.`]);
   }
 
   const problems: string[] = [];
   const entries: RosterEntry[] = [];
   const seen = new Set<string>();
-  for (const row of rows) {
-    const fields = row.content.split(FIELD_SEPARATOR).map((field) => field.trim());
+  for (const { number, fields } of rows) {
     const [firstName = "", lastName = "", characterClass = ""] = fields;
     if (fields.length !== FIELD_COUNT || !firstName || !lastName) {
-      problems.push(`Ligne ${row.number} : format attendu Prénom;Nom;CLASSE.`);
+      problems.push(`Ligne ${number} : format attendu Prénom;Nom;CLASSE.`);
       continue;
     }
     if (!CLASS_TOKEN.test(characterClass)) {
-      problems.push(`Ligne ${row.number} : classe inconnue « ${characterClass} ».`);
+      problems.push(`Ligne ${number} : classe inconnue « ${characterClass} ».`);
       continue;
     }
     const entry = { firstName, lastName, characterClass };
     if (seen.has(characterKey(entry))) {
-      problems.push(`Ligne ${row.number} : ${fullName(entry)} apparaît deux fois.`);
+      problems.push(`Ligne ${number} : ${fullName(entry)} apparaît deux fois.`);
       continue;
     }
     seen.add(characterKey(entry));
@@ -53,7 +47,7 @@ export function parseRoster(text: string): RosterEntry[] {
     problems.push("La liste ne contient aucun personnage.");
   }
   if (problems.length > 0) {
-    throw new RosterFormatError(problems);
+    throw new TextFormatError(problems);
   }
   return entries;
 }

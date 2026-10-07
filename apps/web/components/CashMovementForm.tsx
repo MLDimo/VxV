@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { recordCashMovement } from "@/app/actions/treasury";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Options } from "./Field";
 
 export interface Giver {
   memberId: string;
@@ -19,11 +20,7 @@ export function CashMovementForm({ givers }: { givers: Giver[] }) {
       <label className="block">
         <span className="text-sm">Mouvement</span>
         <select name="kind" required className="field">
-          {MANUAL_CASH_KINDS.map((kind) => (
-            <option key={kind} value={kind}>
-              {CASH_KIND_LABELS[kind]}
-            </option>
-          ))}
+          <Options options={MANUAL_CASH_KINDS.map((kind) => [kind, CASH_KIND_LABELS[kind]] as const)} />
         </select>
       </label>
       <label className="block">
@@ -44,11 +41,7 @@ export function CashMovementForm({ givers }: { givers: Giver[] }) {
         <span className="text-sm">Donateur (pour un don)</span>
         <select name="memberId" className="field">
           <option value="">—</option>
-          {givers.map((giver) => (
-            <option key={giver.memberId} value={giver.memberId}>
-              {giver.name}
-            </option>
-          ))}
+          <Options options={givers.map((giver) => [giver.memberId, giver.name] as const)} />
         </select>
       </label>
       <label className="block sm:col-span-2">

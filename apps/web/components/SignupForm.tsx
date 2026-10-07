@@ -7,14 +7,13 @@ import { signUp } from "@/app/actions/signups";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 import { ROLE_LABELS, SPEC_SUGGESTIONS, STATUS_LABELS } from "./signupLabels";
+import { Field, Options } from "./Field";
 
-export interface SignupCharacter {
+interface SignupCharacter {
   id: string;
   name: string;
   characterClass: string;
 }
-
-const FIELD = "field";
 
 export function SignupForm({
   eventId,
@@ -35,57 +34,41 @@ export function SignupForm({
   return (
     <form action={action} className="mt-4 grid gap-4">
       <input type="hidden" name="eventId" value={eventId} />
-      <label className="block">
-        <span className="text-sm text-lavender">Personnage</span>
+      <Field label="Personnage">
         <select
           name="characterId"
           value={characterId}
           onChange={(event) => setCharacterId(event.target.value)}
-          className={FIELD}
+          className="field"
         >
-          {characters.map((character) => (
-            <option key={character.id} value={character.id}>
-              {character.name}
-            </option>
-          ))}
+          <Options options={characters.map((character) => [character.id, character.name] as const)} />
         </select>
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Rôle</span>
-        <select name="role" defaultValue={current?.role ?? "dps"} className={FIELD}>
-          {SIGNUP_ROLES.map((role) => (
-            <option key={role} value={role}>
-              {ROLE_LABELS[role].label}
-            </option>
-          ))}
+      </Field>
+      <Field label="Rôle">
+        <select name="role" defaultValue={current?.role ?? "dps"} className="field">
+          <Options options={SIGNUP_ROLES.map((role) => [role, ROLE_LABELS[role].label] as const)} />
         </select>
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Spécialisation</span>
+      </Field>
+      <Field label="Spécialisation">
         <input
           name="spec"
           list={specListId}
           defaultValue={current?.spec ?? ""}
           maxLength={maxSpecLength}
           required
-          className={FIELD}
+          className="field"
         />
         <datalist id={specListId}>
           {(SPEC_SUGGESTIONS[characterClass] ?? []).map((spec) => (
             <option key={spec} value={spec} />
           ))}
         </datalist>
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Statut</span>
-        <select name="status" defaultValue={current?.status ?? "present"} className={FIELD}>
-          {SIGNUP_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {STATUS_LABELS[status]}
-            </option>
-          ))}
+      </Field>
+      <Field label="Statut">
+        <select name="status" defaultValue={current?.status ?? "present"} className="field">
+          <Options options={SIGNUP_STATUSES.map((status) => [status, STATUS_LABELS[status]] as const)} />
         </select>
-      </label>
+      </Field>
       <div>
         <button type="submit" disabled={pending} className="button-pixel">
           {current ? "Mettre à jour mon inscription" : "M'inscrire"}

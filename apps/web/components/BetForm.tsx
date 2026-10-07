@@ -5,14 +5,14 @@ import { useActionState } from "react";
 import { createBet } from "@/app/actions/bets";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Field, ReasonField } from "./Field";
 
 /** An officer opens a bet: the question, its choices one per line, when it closes, and the reason. */
 export function BetForm() {
   const [state, action, pending] = useActionState(createBet, IDLE);
   return (
     <form action={action} className="mt-6 max-w-lg space-y-5">
-      <label className="block">
-        <span className="text-sm text-lavender">Question</span>
+      <Field label="Question">
         <input
           name="title"
           required
@@ -20,21 +20,14 @@ export function BetForm() {
           placeholder="Qui meurt en premier sur le boss 10 ?"
           className="field"
         />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">
-          Choix, un par ligne (de {MIN_CHOICES} à {MAX_CHOICES})
-        </span>
+      </Field>
+      <Field label={`Choix, un par ligne (de ${String(MIN_CHOICES)} à ${String(MAX_CHOICES)})`}>
         <textarea name="choices" required rows={4} placeholder={"Un tank\nUn heal\nUn DPS"} className="field" />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Fermeture des mises (heure de Paris)</span>
+      </Field>
+      <Field label="Fermeture des mises (heure de Paris)">
         <input type="datetime-local" name="closesAt" required className="field" />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Motif (visible dans le journal)</span>
-        <input name="reason" required placeholder="Pour le raid de jeudi" className="field" />
-      </label>
+      </Field>
+      <ReasonField placeholder="Pour le raid de jeudi" />
       <button type="submit" disabled={pending} className="button-pixel">
         {pending ? "Ouverture…" : "Ouvrir le pari"}
       </button>

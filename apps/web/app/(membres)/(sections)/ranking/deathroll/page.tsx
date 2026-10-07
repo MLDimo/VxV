@@ -1,10 +1,10 @@
 import { formatGold, formatSignedGold } from "@vxv/server/domain/labels";
 import { MemberName } from "@/components/MemberName";
-import { PeriodNav, periodOf } from "@/components/PeriodNav";
-import { RankingNav } from "@/components/RankingNav";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { periodOf } from "@/components/PeriodNav";
+import { RankingHeader, rankingRowClass } from "@/components/RankingHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 /** Ranking · Deathroll (P15.7): net gain, games played and biggest win, since always, this month or this season. */
 export default async function DeathrollRankingPage({
@@ -17,11 +17,7 @@ export default async function DeathrollRankingPage({
   const { season, rows } = await getApplication().deathrolls.ranking(period);
   return (
     <>
-      <ScreenHeader kicker="Au-dessus de la cheminée" kickerClassName="text-gold" title="Ranking" />
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <RankingNav current="/ranking/deathroll" />
-        <PeriodNav base="/ranking/deathroll" current={period} />
-      </div>
+      <RankingHeader category="/ranking/deathroll" period={period} />
       {rows.length === 0 ? (
         <p className="mt-8 text-lavender">
           {period === "season" && season === undefined
@@ -29,8 +25,7 @@ export default async function DeathrollRankingPage({
             : "Aucun deathroll terminé sur cette période."}
         </p>
       ) : (
-        <section className="panel mt-8" aria-label="Classement du deathroll">
-          <h2 className="font-pixel text-xl text-ivory">Classement du deathroll</h2>
+        <Panel title="Classement du deathroll" className="mt-8">
           <table className="mt-3 w-full text-sm">
             <thead className="text-left text-xs text-muted uppercase">
               <tr>
@@ -43,14 +38,7 @@ export default async function DeathrollRankingPage({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr
-                  key={row.memberId}
-                  className={
-                    row.memberId === member.id
-                      ? "bg-amethyst/16 shadow-[inset_0_0_0_2px_var(--color-amethyst)]"
-                      : "odd:bg-amethyst/6"
-                  }
-                >
+                <tr key={row.memberId} className={rankingRowClass(row.memberId === member.id)}>
                   <td className="py-1 pr-2 font-pixel text-lg">{row.rank}</td>
                   <th scope="row" className="py-1 pr-2 text-left font-normal">
                     <MemberName name={row.memberName} characterClass={row.memberClass} />
@@ -64,7 +52,7 @@ export default async function DeathrollRankingPage({
               ))}
             </tbody>
           </table>
-        </section>
+        </Panel>
       )}
     </>
   );

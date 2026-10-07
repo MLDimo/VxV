@@ -10,35 +10,22 @@ local EventDialog, Invitations = ns.EventDialog, ns.Invitations
 local LogExport, RaidData, RaidLog, RaidView = ns.LogExport, ns.RaidData, ns.RaidLog, ns.RaidView
 local RowList, SignupDialog = VXV.RowList, ns.SignupDialog
 
-local Theme = VXV.Theme
+local Screen, Theme = VXV.Screen, VXV.Theme
 
-local PADDING, GAP = 22, 16
-local GRID_TOP = 96
+local PADDING, GAP, GRID_TOP = Screen.PADDING, Screen.GAP, Screen.GRID_TOP
 -- Columns of 270 and 300 pixels around the composition (§7.1); in each, the share of its first panel.
 local LEFT, RIGHT = 270, 300
 local SMALL_SHARE, COMPOSITION_SHARE = 0.4, 0.6
 local PANEL_PADDING = Theme.PANEL_PADDING
 local BUTTON_HEIGHT, BUTTON_GAP, JOIN_HEIGHT = 24, 6, 30
-local BADGE_HEIGHT, BADGE_PADDING, BADGE_ALPHA = 24, 16, 0.14
 -- The small button on the right of a panel's title (§7.1: « Changer »).
 local TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT, TITLE_BUTTON_TOP = 104, 22, 9
 
 local content, header
-local lists, buttons, badges = {}, {}, {}
+local lists, buttons, badges = {}, {}, nil
 local officerPanel
 -- The officers' buttons, top to bottom.
 local OFFICER_ACTIONS = { "import", "open", "inviteAll", "exclusions", "create", "export" }
-
-local function addBadge(index)
-    local badge = CreateFrame("Frame", nil, content)
-    badge:SetHeight(BADGE_HEIGHT)
-    badge.background = badge:CreateTexture(nil, "BACKGROUND")
-    badge.background:SetAllPoints()
-    badge.label = Theme.Text(badge, "textHeavy", 12, "gain")
-    badge.label:SetPoint("CENTER")
-    badges[index] = badge
-    return badge
-end
 
 local function renderHeader()
     local _, sender = RaidData.Text()
@@ -46,22 +33,7 @@ local function renderHeader()
     header.kicker:SetText(Theme.Upper(view.kicker))
     header.title:SetText(view.title)
     header.subtitle:SetText(view.subtitle)
-    local right = -PADDING
-    for index = 1, math.max(#view.badges, #badges) do
-        local data = view.badges[index]
-        local badge = badges[index] or addBadge(index)
-        badge:SetShown(data ~= nil)
-        if data ~= nil then
-            local r, g, b = Theme.Color(data.color)
-            badge.background:SetColorTexture(r, g, b, BADGE_ALPHA)
-            badge.label:SetTextColor(r, g, b, 1)
-            badge.label:SetText(data.text)
-            badge:SetWidth(badge.label:GetStringWidth() + BADGE_PADDING)
-            badge:ClearAllPoints()
-            badge:SetPoint("TOPRIGHT", right, -PADDING)
-            right = right - badge:GetWidth() - BUTTON_GAP
-        end
-    end
+    badges.Set(view.badges)
 end
 
 --- Which buttons the player sees, and their texts; the officers' shown buttons stacked.
@@ -116,14 +88,6 @@ local function render()
     updateButtons()
 end
 
-local function addHeader()
-    header = {}
-    header.kicker, header.title = Theme.ScreenHeader(content, "", "sakura", "")
-    header.kicker:SetPoint("TOPLEFT", PADDING, -PADDING)
-    header.subtitle = Theme.Text(content, "text", 13, "muted")
-    header.subtitle:SetPoint("TOPLEFT", header.title, "BOTTOMLEFT", 0, -6)
-end
-
 local function addOfficerPanel(x, y, height)
     local body
     officerPanel, body = Theme.TitledPanel(content, x, y, LEFT, height, "Officier", "officer")
@@ -143,14 +107,6 @@ local function addOfficerPanel(x, y, height)
     lists.requests = RowList.Create(body, #OFFICER_ACTIONS * (BUTTON_HEIGHT + BUTTON_GAP))
 end
 
---- A list in the panel's body, above room left at its bottom.
-local function listAbove(body, room)
-    local area = CreateFrame("Frame", nil, body)
-    area:SetPoint("TOPLEFT")
-    area:SetSize(body:GetWidth(), body:GetHeight() - room)
-    return RowList.Create(area)
-end
-
 --- A small wood button on the right of the panel's title.
 local function titleButton(panel, text, run)
     local button = Theme.Button(panel, "wood", text, TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT)
@@ -161,7 +117,8 @@ end
 
 function RaidTab.Build(frame)
     content = frame
-    addHeader()
+    header = Screen.Head(content, "", "sakura", "")
+    badges = Screen.Badges(content)
     local width, height = content:GetWidth(), content:GetHeight() - GRID_TOP - PADDING
     local center = width - 2 * PADDING - LEFT - RIGHT - 2 * GAP
     local x2, x3 = PADDING + LEFT + GAP, PADDING + LEFT + GAP + center + GAP
@@ -173,7 +130,7 @@ function RaidTab.Build(frame)
 
     local meHeight, officerHeight = split(SMALL_SHARE)
     local mePanel, meBody = Theme.TitledPanel(content, PADDING, GRID_TOP, LEFT, meHeight, "Mon inscription")
-    lists.me = listAbove(meBody, JOIN_HEIGHT + BUTTON_GAP)
+    lists.me = RowList.Create(meBody, 0, nil, JOIN_HEIGHT + BUTTON_GAP)
     buttons.join = Theme.Button(mePanel, "pixel", "Rejoindre le raid", LEFT - 2 * PANEL_PADDING, JOIN_HEIGHT)
     buttons.join:SetPoint("BOTTOM", 0, PANEL_PADDING)
     buttons.join:SetScript("OnClick", Invitations.Join)
@@ -195,19 +152,6 @@ function RaidTab.Build(frame)
     local _, lootsBody = Theme.TitledPanel(content, x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight, "Derniers loots")
     lists.loots = RowList.Create(lootsBody)
     -- What depends on the time (the lock, the start) is up to date each time the screen shows.
-    content:SetScript("OnShow", render)
-    render()
+    Screen.Follow(content, render,
+        { "raid.updated", "raid.invitations", "raid.log", "raid.changes", "raid.alert", "raid.place" })
 end
-
-local function refresh()
-    if content ~= nil then
-        render()
-    end
-end
-
-VXV.On("raid.updated", refresh)
-VXV.On("raid.invitations", refresh)
-VXV.On("raid.log", refresh)
-VXV.On("raid.changes", refresh)
-VXV.On("raid.alert", refresh)
-VXV.On("raid.place", refresh)

@@ -1,14 +1,8 @@
 local _, ns = ...
 
---- The bets of the data for this player: the open ones, their stake on each and their debt; and how the data
---- travel between the guild's addons (the core's shared data).
+--- The bets of the data for this player: the open ones, their stake on each and their debt.
 local Bets = {}
 ns.Bets = Bets
-
---- The website's id of the player's member, found by the character played; nil when it is linked to nobody.
-function Bets.MemberId(data)
-    return data ~= nil and data.members[VXV.PlayerName() or ""] or nil
-end
 
 --- True while stakes are taken: before the closing time, unless an officer ended the bet.
 function Bets.IsOpen(bet, now)

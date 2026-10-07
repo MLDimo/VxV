@@ -1,6 +1,7 @@
 import { isOpen } from "../domain/bets.ts";
 import { createMessageAnnouncements } from "./messageAnnouncements.ts";
-import type { BetAnnouncer, Clock, UnitOfWork } from "./ports.ts";
+import type { Clock, UnitOfWork } from "./ports.ts";
+import type { BetAnnouncer } from "./discordPorts.ts";
 
 /** Each bet's message on Discord, with its pool and odds. */
 export function createBetAnnouncements({

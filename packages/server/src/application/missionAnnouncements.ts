@@ -1,6 +1,7 @@
 import { missionScores, missionStatus } from "../domain/missions.ts";
 import { createMessageAnnouncements } from "./messageAnnouncements.ts";
-import type { Clock, MissionAnnouncer, UnitOfWork } from "./ports.ts";
+import type { Clock, UnitOfWork } from "./ports.ts";
+import type { MissionAnnouncer } from "./discordPorts.ts";
 
 /** Each mission's message on Discord, with its ranking (P12.2, P12.5). */
 export function createMissionAnnouncements({

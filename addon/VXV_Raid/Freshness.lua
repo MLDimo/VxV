@@ -5,7 +5,7 @@ local _, ns = ...
 local Freshness = {}
 ns.Freshness = Freshness
 
-local Companion, Labels, RaidData = ns.Companion, ns.Labels, ns.RaidData
+local Labels, RaidData = ns.Labels, ns.RaidData
 
 local CHECK_EVERY_SECONDS = 60
 -- The website lists an event 6 hours after its start.
@@ -23,7 +23,7 @@ local function check()
         local lockAt, now = RaidData.LockAt(event), time()
         if event.exportedAt < lockAt and now >= lockAt and now < event.startsAt + LISTED_AFTER_START_SECONDS then
             remindedFor = event.exportedAt
-            local message = Companion.Seen() and STALE_WITH_COMPANION or STALE
+            local message = VXV.CompanionSeen() and STALE_WITH_COMPANION or STALE
             VXV.Print(message:format(Labels.DateTime(lockAt), Labels.DateTime(event.exportedAt)))
         end
     end

@@ -18,9 +18,7 @@ local STANDINGS = {
     settled = "réglée",
 }
 
-local function row(kind, text, tooltip)
-    return { kind = kind, text = text, tooltip = tooltip }
-end
+local row = VXV.RowList.Row
 
 --- The head of the screen: subtitle, and the badges of the player's debt and of the organisation's share.
 function DiceView.Header(data, memberId)
@@ -61,17 +59,17 @@ end
 function DiceView.Bet(bet, memberId)
     local book = Book.Of(bet)
     local rows = {
-        row("title", bet.title, { title = bet.title, lines = { "Clic : miser" } }),
+        row("title", bet.title, { tooltip = { title = bet.title, lines = { "Clic : miser" } } }),
         row("line", ("Ferme le %s · cagnotte %s · %s"):format(date(DATE, bet.closesAt), Gold.Format(book.pool),
             VXV.Count(book.bettors, "parieur"))),
     }
     for _, entry in ipairs(book.choices) do
         rows[#rows + 1] = row("line", ("%s · %s · %s · %s"):format(entry.choice.label, Gold.Share(entry.share),
-            Gold.Format(entry.total), Gold.Odds(entry.odds)), {
+            Gold.Format(entry.total), Gold.Odds(entry.odds)), { tooltip = {
             title = entry.choice.label,
             lines = { VXV.Count(entry.bettors, "parieur"), ("Gain pour %s : %s"):format(Gold.Format(EXAMPLE_STAKE),
                 Gold.Format(Book.Gain(book, entry.choice.id, EXAMPLE_STAKE))) },
-        })
+        } })
     end
     for _, extra in ipairs(myStake(bet, memberId, book)) do
         rows[#rows + 1] = extra

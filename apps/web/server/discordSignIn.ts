@@ -6,7 +6,7 @@ export interface DiscordGuildMember {
   roleIds: string[];
 }
 
-export interface DiscordSignInRequest {
+interface DiscordSignInRequest {
   code: string | null;
   state: string | null;
   /** State and PKCE verifier kept in short-lived cookies when the sign-in started. */
@@ -20,7 +20,7 @@ export interface DiscordSignInDependencies {
   signIn(identity: DiscordIdentity, roleIds: readonly string[]): Promise<SignedIn>;
 }
 
-export type DiscordSignInOutcome =
+type DiscordSignInOutcome =
   { kind: "signedIn"; session: SignedIn } | { kind: "notGuildMember" } | { kind: "invalidRequest" };
 
 /** Second half of the OAuth flow: checks the callback, then signs the guild member in. */

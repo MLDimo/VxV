@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { redirect } from "next/navigation";
+import { EmblemPage } from "@/components/EmblemPage";
 import { safeNextPath } from "@/server/nextPath";
 import { getCurrentMember } from "@/server/session";
 
@@ -22,26 +22,15 @@ export default async function SignInPage({
   if (await getCurrentMember()) {
     redirect(next);
   }
-  const error = erreur === undefined ? undefined : ERROR_MESSAGES[erreur];
   return (
-    <main className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center">
-      <Image
-        src="/images/emblem.jpg"
-        alt=""
-        width={120}
-        height={120}
-        priority
-        className="image-pixelated size-30 object-cover shadow-[0_0_0_2px_var(--color-ink),0_0_0_4px_var(--color-amethyst)]"
-      />
-      <h1 className="plaque mt-10 text-3xl">VXV</h1>
+    <EmblemPage title="VXV" error={erreur === undefined ? undefined : ERROR_MESSAGES[erreur]}>
       <p className="mt-6 text-lavender">La taverne est réservée aux membres de la guilde.</p>
-      {error && <p className="mt-6 bg-loss/14 px-4 py-3 text-loss">{error}</p>}
       <a
         href={next === "/" ? "/connexion/discord" : `/connexion/discord?suite=${encodeURIComponent(next)}`}
         className="button-pixel mt-8"
       >
         Connexion Discord
       </a>
-    </main>
+    </EmblemPage>
   );
 }

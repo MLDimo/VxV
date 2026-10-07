@@ -1,43 +1,30 @@
-import { createDiscordRest, DiscordApiError, type DiscordRestOptions, type RaidAnnouncer } from "@vxv/server";
+import type { DiscordRestOptions, RaidAnnouncer } from "@vxv/server";
+import { discordChannel } from "./discordChannel.ts";
 import { raidMessage } from "./raidMessage.ts";
 import { recapMessage } from "./recapMessage.ts";
 import { reminderMessage } from "./reminderMessage.ts";
 
-const HTTP_NOT_FOUND = 404;
-
 /** The guild's raid channel: the events' sign-up messages, the reminders and the end-of-raid recaps. */
 export function createDiscordRaidAnnouncer({
-  channelId,
   siteUrl,
   ...options
 }: DiscordRestOptions & { channelId: string; siteUrl: string }): RaidAnnouncer {
-  const request = createDiscordRest(options);
+  const channel = discordChannel(options);
   return {
     async publish(raid) {
-      const message = await request<{ id: string }>("POST", `/channels/${channelId}/messages`, {
-        body: raidMessage(raid, siteUrl),
-      });
-      return message.id;
+      return channel.post(raidMessage(raid, siteUrl));
     },
 
     async remind(reminder) {
-      await request("POST", `/channels/${channelId}/messages`, { body: reminderMessage(reminder, siteUrl) });
+      await channel.post(reminderMessage(reminder, siteUrl));
     },
 
     async recap(recap) {
-      await request("POST", `/channels/${channelId}/messages`, { body: recapMessage(recap, siteUrl) });
+      await channel.post(recapMessage(recap, siteUrl));
     },
 
     async update(messageId, raid) {
-      try {
-        await request("PATCH", `/channels/${channelId}/messages/${messageId}`, { body: raidMessage(raid, siteUrl) });
-        return true;
-      } catch (error) {
-        if (error instanceof DiscordApiError && error.status === HTTP_NOT_FOUND) {
-          return false;
-        }
-        throw error;
-      }
+      return channel.edit(messageId, raidMessage(raid, siteUrl));
     },
   };
 }

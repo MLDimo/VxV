@@ -1,7 +1,8 @@
 import { classLabel, CLASS_ROLE_NAMES } from "../domain/characterClasses.ts";
 import type { Member } from "../domain/members.ts";
 import { guildNickname } from "../domain/nicknames.ts";
-import type { GuildGateway, UnitOfWork } from "./ports.ts";
+import type { UnitOfWork } from "./ports.ts";
+import type { GuildGateway } from "./discordPorts.ts";
 
 /** "noMain": nothing to show yet; "nicknameRefused": Discord kept the nickname, the class role is set. */
 export type DiscordProfileSync = "updated" | "nicknameRefused" | "noMain";

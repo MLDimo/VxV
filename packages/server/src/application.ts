@@ -32,13 +32,13 @@ import { createTitles } from "./application/titles.ts";
 import { createTreasury } from "./application/treasury.ts";
 import type {
   BetAnnouncer,
-  Clock,
   DeathrollAnnouncer,
   GuildGateway,
   MissionAnnouncer,
   RaidAnnouncer,
   TitleAnnouncer,
-} from "./application/ports.ts";
+} from "./application/discordPorts.ts";
+import type { Clock } from "./application/ports.ts";
 import type { DiscordRoleMapping } from "./domain/members.ts";
 import { createUnitOfWork } from "./infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "./infrastructure/sql.ts";

@@ -8,7 +8,6 @@ VXV.RegisterModule({
         ns.RaidLog.Restore(data)
         ns.Changes.Restore(data)
         ns.BossAlert.Restore(data)
-        ns.Sharing.Start()
         ns.Freshness.Start()
         ns.KillSharing.Start()
         ns.BossAlert.Start()

@@ -1,4 +1,5 @@
-import type { RaidAnnouncer, UnitOfWork } from "./ports.ts";
+import type { UnitOfWork } from "./ports.ts";
+import type { RaidAnnouncer } from "./discordPorts.ts";
 
 export function createRaidAnnouncements({
   unitOfWork,

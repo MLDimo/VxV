@@ -5,7 +5,7 @@ import { generateSecretToken, hashSecret } from "./secretTokens.ts";
 /** Guild roles are read from Discord at sign-in, so a session is kept short to pick up role changes. */
 export const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
-export interface AuthDependencies {
+interface AuthDependencies {
   unitOfWork: UnitOfWork;
   clock: Clock;
   discordRoles: DiscordRoleMapping;

@@ -1,4 +1,4 @@
-import { TextFormatError } from "./textFormat.ts";
+import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.ts";
 
 /**
  * The artisans directory (P14): a character's professions as the addon reads them in game, the level at each login
@@ -7,9 +7,6 @@ import { TextFormatError } from "./textFormat.ts";
 
 /** First line of a character's professions sent by the addon (contract with VXV_Artisans); the version follows. */
 export const PROFESSIONS_HEADER = "VXV-METIERS-1";
-
-const MS_PER_SECOND = 1000;
-const FIELD_SEPARATOR = ";";
 
 export interface Recipe {
   id: number;
@@ -34,18 +31,6 @@ export interface CharacterProfessions {
   professions: ProfessionReading[];
 }
 
-export class ProfessionsFormatError extends TextFormatError {}
-
-function wholeNumber(value: string | undefined): number | undefined {
-  const number = Number(value);
-  return value !== undefined && value !== "" && Number.isInteger(number) && number >= 0 ? number : undefined;
-}
-
-function instant(value: string | undefined): Date | undefined {
-  const seconds = wholeNumber(value);
-  return seconds === undefined || seconds === 0 ? undefined : new Date(seconds * MS_PER_SECOND);
-}
-
 /**
  * Reads a character's professions, one record per line:
  * C;character
@@ -54,76 +39,63 @@ function instant(value: string | undefined): Date | undefined {
  * Lines of an unknown kind are skipped.
  */
 export function parseProfessions(text: string): CharacterProfessions {
-  const [header, ...rows] = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line !== "");
-  if (header !== PROFESSIONS_HEADER) {
-    throw new ProfessionsFormatError([`Les métiers doivent commencer par la ligne ${PROFESSIONS_HEADER}.`]);
-  }
-  const result: CharacterProfessions = { character: "", professions: [] };
+  let character: string | undefined;
+  const professions: ProfessionReading[] = [];
   const byId = new Map<number, ProfessionReading>();
-  const problems: string[] = [];
-  const readers: Record<string, (fields: string[]) => boolean> = {
-    C: ([, character]) => {
-      result.character = character ?? "";
-      return result.character !== "";
+  readRecords(text, {
+    headers: [PROFESSIONS_HEADER],
+    wrongHeader: `Les métiers doivent commencer par la ligne ${PROFESSIONS_HEADER}.`,
+    readers: {
+      C: ([name]) => {
+        character = name || undefined;
+        return character !== undefined;
+      },
+      P: ([id, name, level, maxLevel, readAt, recipesReadAt]) => {
+        const professionId = wholeNumber(id);
+        const reading = {
+          level: wholeNumber(level),
+          maxLevel: wholeNumber(maxLevel),
+          readAt: instant(readAt),
+          recipesReadAt: recipesReadAt === "0" ? null : instant(recipesReadAt),
+        };
+        if (
+          professionId === undefined ||
+          professionId === 0 ||
+          !name ||
+          reading.level === undefined ||
+          reading.maxLevel === undefined ||
+          reading.readAt === undefined ||
+          reading.recipesReadAt === undefined
+        ) {
+          return false;
+        }
+        const profession: ProfessionReading = {
+          professionId,
+          name,
+          level: reading.level,
+          maxLevel: reading.maxLevel,
+          readAt: reading.readAt,
+          recipes: reading.recipesReadAt === null ? undefined : { readAt: reading.recipesReadAt, list: [] },
+        };
+        professions.push(profession);
+        byId.set(professionId, profession);
+        return true;
+      },
+      R: ([professionId, recipeId, name]) => {
+        const recipes = byId.get(wholeNumber(professionId) ?? 0)?.recipes;
+        const id = wholeNumber(recipeId);
+        if (recipes === undefined || id === undefined || id === 0 || !name) {
+          return false;
+        }
+        recipes.list.push({ id, name });
+        return true;
+      },
     },
-    P: ([, id, name, level, maxLevel, readAt, recipesReadAt]) => {
-      const professionId = wholeNumber(id);
-      const reading = {
-        level: wholeNumber(level),
-        maxLevel: wholeNumber(maxLevel),
-        readAt: instant(readAt),
-        recipesReadAt: recipesReadAt === "0" ? null : instant(recipesReadAt),
-      };
-      if (
-        professionId === undefined ||
-        professionId === 0 ||
-        !name ||
-        reading.level === undefined ||
-        reading.maxLevel === undefined ||
-        reading.readAt === undefined ||
-        reading.recipesReadAt === undefined
-      ) {
-        return false;
-      }
-      const profession: ProfessionReading = {
-        professionId,
-        name,
-        level: reading.level,
-        maxLevel: reading.maxLevel,
-        readAt: reading.readAt,
-        recipes: reading.recipesReadAt === null ? undefined : { readAt: reading.recipesReadAt, list: [] },
-      };
-      result.professions.push(profession);
-      byId.set(professionId, profession);
-      return true;
-    },
-    R: ([, professionId, recipeId, name]) => {
-      const recipes = byId.get(wholeNumber(professionId) ?? 0)?.recipes;
-      const id = wholeNumber(recipeId);
-      if (recipes === undefined || id === undefined || id === 0 || !name) {
-        return false;
-      }
-      recipes.list.push({ id, name });
-      return true;
-    },
-  };
-  rows.forEach((row, index) => {
-    const fields = row.split(FIELD_SEPARATOR).map((field) => field.trim());
-    const read = readers[fields[0] ?? ""];
-    if (read !== undefined && !read(fields)) {
-      problems.push(`Ligne ${String(index + 2)} illisible.`);
-    }
   });
-  if (problems.length === 0 && result.character === "") {
-    problems.push("Les métiers ne disent pas de quel personnage il s'agit (ligne C manquante).");
-  }
-  if (problems.length > 0) {
-    throw new ProfessionsFormatError(problems);
-  }
-  return result;
+  return {
+    character: requireRecord(character, "Les métiers ne disent pas de quel personnage il s'agit (ligne C manquante)."),
+    professions,
+  };
 }
 
 /** A text as searched: lowercase, without accents nor extra spaces ("Œufs aux herbes" and "oeufs aux herbes" match). */

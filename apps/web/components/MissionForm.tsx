@@ -11,24 +11,23 @@ import { useActionState } from "react";
 import { createMission } from "@/app/actions/missions";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
+import { Field, Options, ReasonField } from "./Field";
 
 /** An officer publishes a mission: its type, title, reward, start and length, and the reason. */
 export function MissionForm() {
   const [state, action, pending] = useActionState(createMission, IDLE);
   return (
     <form action={action} className="mt-6 max-w-lg space-y-5">
-      <label className="block">
-        <span className="text-sm text-lavender">Type (compteur du jeu)</span>
+      <Field label="Type (compteur du jeu)">
         <select name="type" required className="field">
-          {MISSION_TYPES.map((type) => (
-            <option key={type} value={type}>
-              {MISSION_TYPE_LABELS[type].name} : {MISSION_TYPE_LABELS[type].counts}
-            </option>
-          ))}
+          <Options
+            options={MISSION_TYPES.map(
+              (type) => [type, `${MISSION_TYPE_LABELS[type].name} : ${MISSION_TYPE_LABELS[type].counts}`] as const,
+            )}
+          />
         </select>
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Titre</span>
+      </Field>
+      <Field label="Titre">
         <input
           name="title"
           required
@@ -36,17 +35,14 @@ export function MissionForm() {
           placeholder="Le Grand Pêcheur"
           className="field"
         />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Récompense (po), partagée 70 / 20 / 10 %</span>
+      </Field>
+      <Field label="Récompense (po), partagée 70 / 20 / 10 %">
         <input type="number" name="reward" min={1} step={1} required className="field" />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Début (heure de Paris)</span>
+      </Field>
+      <Field label="Début (heure de Paris)">
         <input type="datetime-local" name="startsAt" required className="field" />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Durée (jours)</span>
+      </Field>
+      <Field label="Durée (jours)">
         <input
           type="number"
           name="days"
@@ -56,11 +52,8 @@ export function MissionForm() {
           required
           className="field"
         />
-      </label>
-      <label className="block">
-        <span className="text-sm text-lavender">Motif (visible dans le journal)</span>
-        <input name="reason" required placeholder="Mission de la semaine" className="field" />
-      </label>
+      </Field>
+      <ReasonField placeholder="Mission de la semaine" />
       <button type="submit" disabled={pending} className="button-pixel">
         {pending ? "Publication…" : "Publier la mission"}
       </button>

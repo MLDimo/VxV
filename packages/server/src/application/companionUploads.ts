@@ -27,7 +27,7 @@ export interface CompanionUpload {
 }
 
 /** What the website made of it, in French, for the companion's window. */
-export interface CompanionUploadReport {
+interface CompanionUploadReport {
   roster: string | undefined;
   raidLogs: string[];
   /** Characters whose appearance was kept. */
@@ -42,12 +42,12 @@ export interface CompanionUploadReport {
 
 const OFFICERS_ONLY = "Réservé aux officiers.";
 /** The kind of text the artisans' professions come as (addon/VXV_Artisans). */
-export const PROFESSIONS_KIND = "metiers";
+const PROFESSIONS_KIND = "metiers";
 /** The kind of text the deathroll games come as (addon/VXV_Deathroll). */
-export const DEATHROLL_KIND = "deathroll";
+const DEATHROLL_KIND = "deathroll";
 
 /** The use cases an upload goes through, each checking the member's rights. */
-export interface CompanionUploadDependencies {
+interface CompanionUploadDependencies {
   roster: { importFromCompanion(officer: Member, text: string, capturedAt: Date): Promise<RosterUploadOutcome> };
   raidLogs: {
     receiveFromCompanion(officer: Member, text: string): Promise<{ summary: RaidLogImportSummary; news: number }>;

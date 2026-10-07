@@ -1,17 +1,13 @@
 import { formatAddonTitles, type AddonTitlesFacts } from "@vxv/server/domain/addonTitles";
-import type { Character } from "@vxv/server/domain/characters";
 import { TITLES } from "@vxv/server/domain/titles";
 import { describe, expect, it } from "vitest";
 import { startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
 import { parisText } from "../paris/fixtures.ts";
+import { character } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
 const BUNDLES = ["VXV_Titles", "VXV_Sync"];
-
-function character(firstName: string, lastName: string, memberId: string): Character {
-  return { id: `c-${firstName}`, firstName, lastName, characterClass: "PRIEST", memberId, isMain: true, inGuild: true };
-}
 
 /** The titles of the week: Thom Leboss (main and reroll) is Roi du gambling and Sugar Daddy, Bien gras goes to nobody. */
 const WEEK: AddonTitlesFacts = {

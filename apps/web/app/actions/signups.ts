@@ -2,19 +2,19 @@
 
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { runFormAction } from "@/server/formActions";
+import { formText, runFormAction } from "@/server/formActions";
 import { requireMember } from "@/server/session";
 
 export async function signUp(_previous: ActionState, form: FormData): Promise<ActionState> {
   const member = await requireMember();
-  const eventId = String(form.get("eventId") ?? "");
+  const eventId = formText(form, "eventId");
   return runFormAction(async () => {
     const application = getApplication();
     await application.signups.signUp(member, eventId, {
-      characterId: String(form.get("characterId") ?? ""),
-      role: String(form.get("role") ?? ""),
-      spec: String(form.get("spec") ?? ""),
-      status: String(form.get("status") ?? ""),
+      characterId: formText(form, "characterId"),
+      role: formText(form, "role"),
+      spec: formText(form, "spec"),
+      status: formText(form, "status"),
     });
     await application.raidAnnouncements.announceQuietly(eventId);
     return "Inscription enregistrée.";

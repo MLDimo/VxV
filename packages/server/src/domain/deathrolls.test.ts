@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   DEATHROLL_HEADER,
-  DeathrollFormatError,
   deathrollLoser,
   deathrollRanking,
   deathrollBets,
@@ -9,6 +8,7 @@ import {
   parseDeathroll,
   type DeathrollGame,
 } from "./deathrolls.ts";
+import { TextFormatError } from "./textFormat.ts";
 
 const at = (seconds: number) => new Date(seconds * 1000);
 const GAME = [
@@ -46,7 +46,7 @@ describe("a deathroll from the addon", () => {
 
   it("lists every problem with its line, and needs the game's line", () => {
     expect(() => parseDeathroll([DEATHROLL_HEADER, "G;x;A B;C D;cinq;1000;1;2", "R;A B;x;1"].join("\n"))).toThrow(
-      DeathrollFormatError,
+      TextFormatError,
     );
     expect(() => parseDeathroll(DEATHROLL_HEADER)).toThrow(/ligne G manquante/);
     expect(() => parseDeathroll("VXV-LOG-2")).toThrow(/VXV-DEATHROLL-1/);

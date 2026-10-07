@@ -65,10 +65,10 @@ end
 
 --- The player's member's score on the mission: the account's characters of that member, added up.
 function Readings.Score(mission, data)
-    local memberId = Quests.MemberId(data)
+    local memberId = VXV.MemberOf(data)
     local score, reachedAt = 0, nil
     for name, kinds in pairs(saved.history) do
-        if kinds[mission.kind] ~= nil and (name == VXV.PlayerName() or Quests.MemberId(data, name) == memberId) then
+        if kinds[mission.kind] ~= nil and (name == VXV.PlayerName() or VXV.MemberOf(data, name) == memberId) then
             local gained, at = characterScore(kinds[mission.kind], mission)
             score = score + gained
             if gained > 0 and (reachedAt == nil or at > reachedAt) then
@@ -82,7 +82,7 @@ end
 --- Tells the guild the player's score on each running mission, and keeps it in the live ranking.
 local function shareScores()
     local data, name = QuestsData.Current(), VXV.PlayerName()
-    local memberId = Quests.MemberId(data)
+    local memberId = VXV.MemberOf(data)
     if memberId == nil then
         return
     end
@@ -140,7 +140,7 @@ end)
 -- The guild's live scores (P12.5): each member tells their own.
 VXV.OnMessage(SCORE, function(payload, sender)
     local data = QuestsData.Current()
-    local memberId = Quests.MemberId(data, sender)
+    local memberId = VXV.MemberOf(data, sender)
     if memberId == nil or type(payload) ~= "table" or type(payload.missionId) ~= "string"
         or type(payload.score) ~= "number" or type(payload.reachedAt) ~= "number" then
         return

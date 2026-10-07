@@ -24,7 +24,7 @@ VXV.RegisterModule({
         name = "Deathroll",
         order = 2,
         Build = function(frame)
-            VXV.RowList.Screen(frame, {
+            VXV.Screen.List(frame, {
                 place = "ranking",
                 heading = "Classement du deathroll",
                 subtitle = function()

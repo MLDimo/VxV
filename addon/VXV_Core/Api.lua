@@ -28,14 +28,11 @@ VXV = {
     OnMessage = ns.Comm.On,
     --- (kind, payload, "Prénom Nom"): data of any size to one player connected with VXV.
     Whisper = ns.Comm.Whisper,
-    --- (name, source): data the guild's addons pass on to each other, from the officers; returns { Send, Start }.
-    --- See Core/SharedData.lua.
-    ShareData = ns.SharedData.Create,
-    --- (data, current, sender): whether data sent by an addon of the guild replace the current ones.
-    AcceptsSharedData = ns.SharedData.Accepts,
-    --- (options): the data the website exports for a bundle (VXV-PARIS, VXV-QUETES…), brought by the companion and
-    --- passed on by the officers. See Core/SiteData.lua.
+    --- (options): the data the website exports for a bundle (VXV-PARIS, VXV-QUETES…), brought by the companion,
+    --- pasted by an officer and passed on by the officers. See Core/SiteData.lua.
     SiteData = ns.SiteData.Create,
+    --- (data, name): the website's member id of a character (the player's by default) in a bundle's site data.
+    MemberOf = ns.SiteData.MemberOf,
     --- (options): changes made in game, waiting for the website, relayed by an officer with the companion; and
     --- (): whether the player's companion brought data at this launch. See Core/PendingChanges.lua.
     PendingChanges = ns.PendingChanges.Create,
@@ -68,9 +65,11 @@ VXV = {
     --- (name, width, height, title): a small window in the charter, closed by Escape; returns it and its body.
     CreateDialog = ns.Dialog.Create,
     --- Lists of text rows scrolled with the wheel: RowList.Create(parent, topOffset, palette), RowList.RULE; in a
-    --- titled panel of a screen, RowList.Panel; filling a tab of the reduced mode, RowList.Fill; a place's screen of
-    --- one list, RowList.Screen.
+    --- titled panel of a screen, RowList.Panel.
     RowList = ns.RowList,
+    --- A place's screen: its head, badges and margins, how it follows its data, the screens of one list and the
+    --- simple tabs of the reduced mode. See UI/Screen.lua.
+    Screen = ns.Screen,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

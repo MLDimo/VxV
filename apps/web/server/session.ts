@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { getApplication } from "./application";
 
-export const SESSION_COOKIE = "vxv_session";
+const SESSION_COOKIE = "vxv_session";
 
 export async function saveSessionCookie(session: SignedIn): Promise<void> {
   (await cookies()).set(SESSION_COOKIE, session.token, {

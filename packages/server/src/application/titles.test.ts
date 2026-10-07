@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Member } from "../domain/members.ts";
 import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
@@ -12,7 +12,7 @@ import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } 
 import { createTestDatabase } from "../testing.ts";
 import { createBets } from "./bets.ts";
 import { createCash } from "./cash.ts";
-import type { AnnouncedTitles } from "./ports.ts";
+import type { AnnouncedTitles } from "./discordPorts.ts";
 import { createTitles, titleRole, type Titles } from "./titles.ts";
 
 const WEDNESDAY = new Date("2026-10-07T05:00:00Z");

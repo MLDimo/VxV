@@ -1,5 +1,6 @@
 "use client";
 
+import { softReserveCount } from "@vxv/server/domain/labels";
 import type { BoardItem } from "@vxv/server";
 import { SOFT_RESERVE_BONUS_CAP, SOFT_RESERVE_BONUS_STEP } from "@vxv/server/domain/softReserves";
 import { useActionState, useState } from "react";
@@ -7,7 +8,6 @@ import { setMySoftReserves } from "@/app/actions/softReserves";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
 import { CharacterName } from "./CharacterName";
-import { softReserveCount } from "./format";
 import { groupByBoss } from "./softReserveGroups";
 
 /** The event's loot with everyone's reserves; signed-up members tick their own within the allowance. */

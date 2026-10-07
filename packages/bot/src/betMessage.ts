@@ -16,7 +16,7 @@ const EMBED_COLOR = 0xb0306e;
 export const BET_BUTTON_PREFIX = "bet:";
 export const BET_WITHDRAW_PREFIX = "bet-withdraw:";
 
-export function betUrl(siteUrl: string, betId: string): string {
+function betUrl(siteUrl: string, betId: string): string {
   return `${siteUrl}/paris/${betId}`;
 }
 

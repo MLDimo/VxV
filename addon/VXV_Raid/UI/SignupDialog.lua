@@ -28,9 +28,7 @@ local function show(field)
 end
 
 local function heading(top, text)
-    local label = Theme.Text(body, "textBold", 13, "lavender")
-    label:SetPoint("TOPLEFT", 0, -top)
-    label:SetText(text)
+    Theme.Heading(body, text):SetPoint("TOPLEFT", 0, -top)
 end
 
 --- A row of toggles under a heading: one value of the field is chosen.

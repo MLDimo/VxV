@@ -6,7 +6,7 @@ export const VERSION_PLACEHOLDER = "@project-version@";
 
 const STAMPED_EXTENSIONS = new Set([".toc", ".lua"]);
 
-export interface ReleaseOptions {
+interface ReleaseOptions {
   /** Directories whose sub-folders are addon bundles (each holding a .toc of the same name). */
   sources: readonly URL[];
   /** Release directory, emptied first; its content becomes the root of the archive. */

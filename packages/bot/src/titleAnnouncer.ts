@@ -1,16 +1,16 @@
-import { createDiscordRest, type DiscordRestOptions, type TitleAnnouncer } from "@vxv/server";
+import type { DiscordRestOptions, TitleAnnouncer } from "@vxv/server";
+import { discordChannel } from "./discordChannel.ts";
 import { titlesMessage } from "./titlesMessage.ts";
 
 /** The channel where each week's titles are announced. */
 export function createDiscordTitleAnnouncer({
-  channelId,
   siteUrl,
   ...options
 }: DiscordRestOptions & { channelId: string; siteUrl: string }): TitleAnnouncer {
-  const request = createDiscordRest(options);
+  const channel = discordChannel(options);
   return {
     async announce(titles) {
-      await request("POST", `/channels/${channelId}/messages`, { body: titlesMessage(titles, siteUrl) });
+      await channel.post(titlesMessage(titles, siteUrl));
     },
   };
 }

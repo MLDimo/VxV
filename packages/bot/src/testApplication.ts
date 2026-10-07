@@ -1,4 +1,4 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import type { PGliteInterface } from "@vxv/database/testing";
 import { createApplication, createDiscordGuild, type Application, type DiscordRoleMapping } from "@vxv/server";
 import type { BotContext } from "./commands.ts";
 import { createDiscordBetAnnouncer } from "./betAnnouncer.ts";

@@ -26,7 +26,7 @@ const UNKNOWN_BET = "Ce pari n'existe plus.";
 const LATE_MESSAGE = " Le message du pari sera mis à jour à la prochaine mise.";
 
 /** One modal holds the stake: the choice and the amount, filled with the member's current stake. */
-export function betForm(bet: Bet, current: Stake | undefined): APIModalInteractionResponseCallbackData {
+function betForm(bet: Bet, current: Stake | undefined): APIModalInteractionResponseCallbackData {
   return {
     custom_id: `${BET_FORM_PREFIX}${bet.id}`,
     title: `Miser · ${bet.title}`.slice(0, MAX_TITLE_LENGTH),

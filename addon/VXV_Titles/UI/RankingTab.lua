@@ -6,13 +6,12 @@ local RankingTab = {}
 ns.RankingTab = RankingTab
 
 local TitlesData, TitlesView = ns.TitlesData, ns.TitlesView
-local RowList = VXV.RowList
+local Screen = VXV.Screen
 
-local COMPACT_PADDING = 10
 local UPDATED = "titres.updated"
 
 function RankingTab.Build(frame)
-    RowList.Screen(frame, {
+    Screen.List(frame, {
         place = "ranking",
         heading = "Titres de la semaine",
         subtitle = function()
@@ -26,7 +25,7 @@ function RankingTab.Build(frame)
 end
 
 function RankingTab.Compact(frame)
-    RowList.Fill(frame, COMPACT_PADDING, function()
+    Screen.Compact(frame, function()
         return TitlesView.Week(TitlesData.Current())
     end, { UPDATED })
 end

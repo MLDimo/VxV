@@ -1,9 +1,9 @@
 import { TITLES, titleRole } from "@vxv/server";
 import { MemberName } from "@/components/MemberName";
-import { RankingNav } from "@/components/RankingNav";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { RankingHeader } from "@/components/RankingHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
+import { Panel } from "@/components/Panel";
 
 const WEEK = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
 
@@ -18,10 +18,7 @@ export default async function TitlesPage() {
   const [current, ...former] = await getApplication().titles.weeks();
   return (
     <>
-      <ScreenHeader kicker="Au-dessus de la cheminée" kickerClassName="text-gold" title="Ranking" />
-      <div className="mt-6">
-        <RankingNav current="/ranking/titres" />
-      </div>
+      <RankingHeader category="/ranking/titres" />
       <p className="mt-6 max-w-3xl text-lavender">
         Chaque mercredi au reset, chaque titre va au membre en tête sur la saison ; à égalité, au premier à atteindre le
         score. Chaque titre est aussi un rôle Discord.
@@ -48,8 +45,7 @@ export default async function TitlesPage() {
         <p className="mt-4 text-sm text-muted">Les premiers titres seront donnés mercredi matin.</p>
       )}
       {former.length > 0 && (
-        <section className="panel mt-8" aria-label="Semaines passées">
-          <h2 className="font-pixel text-xl text-ivory">Semaines passées</h2>
+        <Panel title="Semaines passées" className="mt-8">
           <ul className="mt-3 space-y-2 text-sm">
             {former.map((week) => (
               <li key={week.week}>
@@ -64,7 +60,7 @@ export default async function TitlesPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </Panel>
       )}
     </>
   );

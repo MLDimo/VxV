@@ -1,6 +1,5 @@
-import type { PGliteInterface } from "@electric-sql/pglite";
+import { createMigratedDatabase, type PGliteInterface } from "@vxv/database/testing";
 import type { Raid } from "@vxv/raid-data";
-import { createMigratedDatabase } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { renderSeedSql, SEED_SQL_PATH } from "./seedSql.ts";
 import { onyxia, salleDesThanes } from "./test/raids.ts";

@@ -26,12 +26,6 @@ local frame, body, title, choicesArea, amountHolder, amountBox, problem, withdra
 local toggles = {}
 local betId, chosen
 
-local function heading(parent, text)
-    local label = Theme.Text(parent, "textBold", 13, "lavender")
-    label:SetText(text)
-    return label
-end
-
 local function show()
     for _, toggle in ipairs(toggles) do
         toggle:SetSelected(toggle.choiceId == chosen)
@@ -95,12 +89,12 @@ local function build()
     title = Theme.Text(body, "pixelBold", 16, "ivory")
     title:SetPoint("TOPLEFT")
     title:SetPoint("RIGHT")
-    local choicesHeading = heading(body, "Mon choix")
+    local choicesHeading = Theme.Heading(body, "Mon choix")
     choicesHeading:SetPoint("TOPLEFT", 0, -TITLE_HEIGHT)
     choicesArea = CreateFrame("Frame", nil, body)
     choicesArea:SetPoint("TOPLEFT", 0, -(TITLE_HEIGHT + HEADING_GAP))
     choicesArea:SetSize(body:GetWidth(), 2 * TOGGLE_HEIGHT)
-    local amountHeading = heading(body, "Mise (po)")
+    local amountHeading = Theme.Heading(body, "Mise (po)")
     amountHeading:SetPoint("TOPLEFT", choicesArea, "BOTTOMLEFT", 0, -SECTION_GAP)
     amountHolder, amountBox = Theme.Field(body, AMOUNT_WIDTH, AMOUNT_LETTERS)
     amountHolder:SetPoint("TOPLEFT", amountHeading, "BOTTOMLEFT", 0, -TOGGLE_GAP)
@@ -123,7 +117,7 @@ function StakeDialog.Open(id)
         VXV.Print(CLOSED)
         return
     end
-    local memberId = Bets.MemberId(data)
+    local memberId = VXV.MemberOf(data)
     if memberId == nil then
         VXV.Print(UNLINKED)
         return

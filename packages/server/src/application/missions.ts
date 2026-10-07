@@ -23,7 +23,7 @@ import { checkOfficerAction, checkTreasurerAction } from "./officerActions.ts";
 import type { Clock, NewCounterReading, Repositories, UnitOfWork } from "./ports.ts";
 
 /** How many missions the website lists: the running and upcoming ones, then the latest ended. */
-export const MISSIONS_LISTED = 20;
+const MISSIONS_LISTED = 20;
 
 const UNKNOWN_MISSION = "Cette mission n'existe pas.";
 
