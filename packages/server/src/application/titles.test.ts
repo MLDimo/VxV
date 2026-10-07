@@ -6,11 +6,13 @@ import { createDiscordGuild } from "../infrastructure/discord/guild.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { raidLogRepository } from "../infrastructure/postgres/raidLogs.ts";
 import { raidRecordRepository } from "../infrastructure/postgres/raidRecords.ts";
+import { journalRepository } from "../infrastructure/postgres/journal.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createBets } from "./bets.ts";
+import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createCash } from "./cash.ts";
 import type { AnnouncedTitles } from "./discordPorts.ts";
 import { createTitles, titleRole, type Titles } from "./titles.ts";
@@ -150,5 +152,36 @@ describe("titles", () => {
     expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Sugar Daddy"));
     expect(discord.roleNamesOf(morgane.discordId)).toContain(titleRole("Sugar Daddy"));
     expect((await titles.weeks()).map((week) => week.week)).toEqual(["2026-10-14", "2026-10-07"]);
+  });
+
+  it("lets an officer give Princesse for the week, with the role and the journal; nobody holds it the next week", async () => {
+    await titles.reassign();
+    await expect(titles.give(vorn, "princess", morgane.id, "Soins")).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(titles.give(officer, "princess", morgane.id, " ")).rejects.toBeInstanceOf(ValidationError);
+    await expect(titles.give(officer, "gamblingKing", morgane.id, "Soins")).rejects.toThrow(/se calcule/);
+    await titles.give(officer, "princess", vorn.id, "Tous les soins du raid");
+    await titles.give(officer, "princess", morgane.id, "Erreur : c'était Morgane");
+    await expect(titles.give(officer, "princess", morgane.id, "Encore")).rejects.toThrow(/détient déjà/);
+    const [week] = await titles.weeks();
+    expect(week?.holders.find((holder) => holder.titleId === "princess")).toMatchObject({
+      week: "2026-10-07",
+      memberName: "Morgane Nuitsombre",
+      score: undefined,
+    });
+    expect(discord.roleNamesOf(morgane.discordId)).toContain(titleRole("Princesse"));
+    expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Princesse"));
+    const [latest] = await journalRepository(sql).listRecent(1);
+    expect(latest).toMatchObject({
+      action: "title.give",
+      before: { holder: "Vorn Cendrelune" },
+      after: { title: "Princesse", week: "2026-10-07", holder: "Morgane Nuitsombre" },
+      reason: "Erreur : c'était Morgane",
+    });
+    // Wednesday's reset: like the others, the title goes to nobody until an officer gives it again.
+    now = new Date(WEDNESDAY.getTime() + WEEK_MS);
+    await titles.reassign();
+    const [next] = await titles.weeks();
+    expect(next?.holders.map((holder) => holder.titleId)).not.toContain("princess");
+    expect(discord.roleNamesOf(morgane.discordId)).not.toContain(titleRole("Princesse"));
   });
 });

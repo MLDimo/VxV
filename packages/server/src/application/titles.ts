@@ -1,7 +1,11 @@
 import { fullName } from "../domain/characters.ts";
+import type { TitleGiveRecord } from "../domain/journal.ts";
+import type { Member } from "../domain/members.ts";
 import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
-import { awardTitles, TITLES, titleWeek, type Tally, type TitleFacts } from "../domain/titles.ts";
+import { awardTitles, OFFICER_TITLES, TITLES, titleWeek, type Tally, type TitleFacts } from "../domain/titles.ts";
 import { loserOf, winnerOf } from "./debts.ts";
+import { ValidationError } from "./errors.ts";
+import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, TitleHolder, UnitOfWork } from "./ports.ts";
 import type { GuildGateway, TitleAnnouncer } from "./discordPorts.ts";
 
@@ -158,6 +162,49 @@ export function createTitles({
         console.error("Discord titles announcement failed", error);
       }
       return true;
+    },
+
+    /**
+     * An officer gives a title the game does not measure (Princesse) to a member, for the week the titles show (the
+     * week to come before the first reassignment): like the others, it goes to nobody at the next Wednesday's. The
+     * Discord role follows at once.
+     */
+    async give(officer: Member, titleId: string, memberId: string, reason: string): Promise<void> {
+      const motive = checkOfficerAction(officer, reason);
+      const title = OFFICER_TITLES.find((candidate) => candidate.id === titleId);
+      if (title === undefined) {
+        throw new ValidationError("Ce titre se calcule chaque mercredi : seuls les titres des officiers se donnent.");
+      }
+      const now = clock();
+      const change = await unitOfWork.run(async (repositories) => {
+        if ((await repositories.members.findById(memberId)) === undefined) {
+          throw new ValidationError("Ce membre n'existe pas.");
+        }
+        const [latest] = byWeek(await repositories.titles.listLatestWeeks(1));
+        const week = latest?.week ?? titleWeek(now);
+        const before = latest?.holders.find((holder) => holder.titleId === title.id);
+        if (before?.memberId === memberId) {
+          throw new ValidationError(`${before.memberName} détient déjà ce titre cette semaine.`);
+        }
+        await repositories.titles.give(week, title.id, memberId, now);
+        const [current] = byWeek(await repositories.titles.listLatestWeeks(1));
+        const after = current?.holders.find((holder) => holder.titleId === title.id);
+        const record: TitleGiveRecord = { title: title.name, week, holder: after?.memberName ?? "" };
+        await repositories.journal.record({
+          actorId: officer.id,
+          action: "title.give",
+          entity: "title",
+          entityId: `${week}/${title.id}`,
+          before: before === undefined ? null : { holder: before.memberName },
+          after: record,
+          reason: motive,
+        });
+        return { before, after };
+      });
+      await updateRoles(
+        change.before === undefined ? [] : [change.before],
+        change.after === undefined ? [] : [change.after],
+      );
     },
 
     /** The latest weeks' holders, the latest first, for the website and the addon. */

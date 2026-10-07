@@ -12,6 +12,15 @@ export function titleRepository(sql: SqlClient): TitleRepository {
       }
     },
 
+    async give(week, titleId, memberId, givenAt) {
+      await sql.query(
+        `insert into title_awards (week, title, member_id, score, awarded_at) values ($1, $2, $3, null, $4)
+         on conflict (week, title) do update set member_id = excluded.member_id, score = null,
+           awarded_at = excluded.awarded_at`,
+        [week, titleId, memberId, givenAt],
+      );
+    },
+
     async listLatestWeeks(weeks) {
       // A member is shown by their main character, else by their Discord name.
       const rows = await sql.query<{
@@ -21,7 +30,7 @@ export function titleRepository(sql: SqlClient): TitleRepository {
         member_name: string;
         member_class: string | null;
         discord_id: string;
-        score: number;
+        score: number | null;
       }>(
         `select to_char(title_awards.week, 'YYYY-MM-DD') as week, title_awards.title, title_awards.member_id,
                 coalesce(main.first_name || ' ' || main.last_name, members.discord_name) as member_name,
@@ -40,7 +49,7 @@ export function titleRepository(sql: SqlClient): TitleRepository {
         memberName: row.member_name,
         memberClass: row.member_class ?? undefined,
         discordId: row.discord_id,
-        score: row.score,
+        score: row.score ?? undefined,
       }));
     },
   };

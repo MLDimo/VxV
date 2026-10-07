@@ -99,6 +99,10 @@ restent ouverts à sa relecture.
   personnages). Seuls les joueurs équipés de l'addon les voient.
 - Princesse (soins reçus) est abandonné : le compteur du jeu ne mesure pas les soins reçus sur Forever (11 types
   mesurés le 3 octobre, aucun pour les soins reçus). Il cheat c'est sûr et Loser attendent le deathroll (P15).
+- Mise à jour du 7 octobre (décision du propriétaire) : Princesse revient comme titre donné par un officier. Les
+  titres que le jeu ne mesure pas (`OFFICER_TITLES` de `domain/titles.ts`) se donnent sur Ranking › Titres, pour la
+  semaine affichée, avec un motif inscrit au journal ; le rôle Discord suit aussitôt. Comme les autres, ils ne vont à
+  personne à la réattribution du mercredi.
 
 ## P14 : artisans
 

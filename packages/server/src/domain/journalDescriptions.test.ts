@@ -96,4 +96,19 @@ describe("describeJournalEntry", () => {
       "SR de Ðéjà Vu (Onyxia, 10/12/2026 21:00) : avant « Tête d'Onyxia » ; après aucune",
     );
   });
+
+  it("shows the title an officer gave and its week", () => {
+    const entry: JournalEntry = {
+      id: "5",
+      occurredAt: new Date(),
+      actorName: "Officier",
+      action: "title.give",
+      entity: "title",
+      entityId: "2026-10-07/princess",
+      before: null,
+      after: { title: "Princesse", week: "2026-10-07", holder: "Morgane Nuitsombre" },
+      reason: "Tous les soins du raid",
+    };
+    expect(describeJournalEntry(entry)).toBe("Princesse : Morgane Nuitsombre, semaine du 7 octobre");
+  });
 });

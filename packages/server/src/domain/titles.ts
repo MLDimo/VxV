@@ -4,7 +4,8 @@
  * without any update of the addon.
  */
 
-export const TITLES = [
+/** The titles computed from the season's data. */
+const COMPUTED_TITLES = [
   { id: "gamblingKing", name: "Roi du gambling", rule: "Plus gros gain net aux paris sur la saison." },
   { id: "debtKing", name: "Roi de la dette", rule: "Plus grosse perte nette aux paris sur la saison." },
   { id: "numberOne", name: "Numéro UNO", rule: "Vainqueur de la dernière mission de guilde terminée." },
@@ -26,7 +27,22 @@ export const TITLES = [
   { id: "loser", name: "Loser", rule: "Plus grosse perte nette au deathroll sur la saison." },
 ] as const;
 
+/**
+ * The titles the game does not measure (owner's decision of 7 October): an officer gives them for the week. Like the
+ * others, they go to nobody at each Wednesday's reassignment.
+ */
+export const OFFICER_TITLES = [
+  {
+    id: "princess",
+    name: "Princesse",
+    rule: "Le plus de soins reçus en raid : donné par un officier pour la semaine.",
+  },
+] as const;
+
+export const TITLES = [...COMPUTED_TITLES, ...OFFICER_TITLES] as const;
+
 export type TitleId = (typeof TITLES)[number]["id"];
+type ComputedTitleId = (typeof COMPUTED_TITLES)[number]["id"];
 
 /** A member's score on a title's rule, and when they reached it. */
 export interface TitleScore {
@@ -81,7 +97,7 @@ export function ahead(scores: readonly TitleScore[]): TitleScore | undefined {
 }
 
 /** The scores of each title's rule. */
-function scoresByTitle(facts: TitleFacts): Record<TitleId, TitleScore[]> {
+function scoresByTitle(facts: TitleFacts): Record<ComputedTitleId, TitleScore[]> {
   const nets = totals(
     facts.bets.map((bet) => ({ memberId: bet.memberId, amount: bet.gain - bet.amount, at: bet.endedAt })),
   );
@@ -115,10 +131,10 @@ export interface TitleAward {
   score: number;
 }
 
-/** This week's holder of each title; a title nobody scored on goes to nobody. */
+/** This week's holder of each computed title; a title nobody scored on goes to nobody, an officer's title too. */
 export function awardTitles(facts: TitleFacts): TitleAward[] {
   const scores = scoresByTitle(facts);
-  return TITLES.flatMap((title) => {
+  return COMPUTED_TITLES.flatMap((title) => {
     const holder = ahead(scores[title.id]);
     return holder === undefined ? [] : [{ titleId: title.id, memberId: holder.memberId, score: holder.score }];
   });

@@ -12,12 +12,14 @@ import type {
   LootCouncilRecord,
   RaidLogImportRecord,
   SoftReserveOverrideRecord,
+  TitleGiveRecord,
 } from "./journal.ts";
 import {
   count,
   formatDateTime,
   formatGold,
   formatPlace,
+  formatTitleWeek,
   LOOT_METHOD_LABELS,
   raidTitle,
   softReserveCount,
@@ -39,6 +41,7 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "season.start": "Nouvelle saison",
   "mission.create": "Publication d'une mission",
   "mission.close": "Résultat d'une mission",
+  "title.give": "Titre donné par un officier",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -158,6 +161,10 @@ export function describeJournalEntry(entry: JournalEntry): string {
       return describeMissionCreation(entry.after as MissionCreationRecord);
     case "mission.close":
       return describeMissionClose(entry.after as MissionCloseRecord);
+    case "title.give": {
+      const record = entry.after as TitleGiveRecord;
+      return `${record.title} : ${record.holder}, ${formatTitleWeek(record.week)}`;
+    }
     case "season.start":
       return `Saison ${String((entry.after as SeasonStartRecord).number)} : les classements par saison repartent de zéro`;
   }

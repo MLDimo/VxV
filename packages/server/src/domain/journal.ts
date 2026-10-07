@@ -15,7 +15,8 @@ export type JournalAction =
   | "bet.cancel"
   | "season.start"
   | "mission.create"
-  | "mission.close";
+  | "mission.close"
+  | "title.give";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -109,6 +110,14 @@ export interface MissionCloseRecord {
   title: string;
   reward: number;
   winners: { rank: number; name: string; amount: number }[];
+}
+
+/** What the journal keeps about a title an officer gave for the week (the former holder is its "before"). */
+export interface TitleGiveRecord {
+  title: string;
+  /** The week's Wednesday, "2026-10-07". */
+  week: string;
+  holder: string;
 }
 
 /** What the journal keeps about a new season of the rankings. */
