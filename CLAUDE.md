@@ -312,6 +312,10 @@ déprécie la file d'attente), donc pas de `Promise.all` dans `application/` ni 
 - Affichage : infobulles via `TooltipDataProcessor`, canal de guilde via le filtre des messages, liste de guilde moderne (`CommunitiesFrame`) via `ScrollUtil.AddInitializedFrameCallback`.
 - Métiers : `GetProfessions` et `GetProfessionInfo` (nom, niveau, maximum, ligne de compétence) ; recettes connues via `C_TradeSkillUI` (`GetBaseProfessionInfo`, `GetAllRecipeIDs`, `GetRecipeInfo` avec `learned`), une seconde après `TRADE_SKILL_SHOW`, quand la fenêtre du métier est ouverte.
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
+- Journaux écrits par le jeu (T11, 7 octobre, build 70245) : l'addon allume sans clic `LoggingCombat(true)`,
+  `LoggingChat(true)` et le mode avancé (`advancedCombatLogging`). Le journal de combat (`Logs/WoWCombatLog-*.txt`)
+  s'écrit pendant la partie (soins reçus compris ; joueurs par prénom et GUID, sans nom de famille) ; le journal du chat
+  n'est écrit qu'à la fermeture du jeu. Canal de discussion privé : envois sans clic bloqués.
 - Build 70235 (6 octobre, `docs/phase-0/sessions/2026-10-06.txt`) : `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés ; anciennes globales absentes (`InviteUnit`, `ConvertToRaid`, `GetNumSkillLines`, `GetNumTradeSkills` : passer par `C_PartyInfo` et `C_TradeSkillUI`) ; événement `TRADE_SKILL_UPDATE` refusé (`TRADE_SKILL_LIST_UPDATE` accepté).
 - Habillage (mesuré le 5 octobre, `docs/design/mesure-en-jeu-2026-10-05.md`) : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.
 

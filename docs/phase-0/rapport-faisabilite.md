@@ -66,6 +66,22 @@ Seul point facultatif non observé : l'avertissement de raid (T4).
 | T9 | Peut-on afficher un titre dans l'infobulle, le canal de guilde et la liste de guilde ? | Infobulle : ligne ajoutée par `TooltipDataProcessor.AddTooltipPostCall`. Canal de guilde : message préfixé par le titre, grâce au filtre des messages. Liste de guilde : fenêtre moderne `CommunitiesFrame`, chargée dès la connexion. L'accroche par le mixin n'a rien donné. L'accroche sur les lignes de la liste (`ScrollUtil.AddInitializedFrameCallback`, qui passe le propriétaire avant la ligne) fonctionne : « titre ajouté à Агент Режима » (sonde 0.2.2). | ✅ | Affichage des titres (P13) |
 | T10 | Les métiers et recettes connues du joueur sont-ils lisibles ? | Oui. `GetProfessions` et `GetProfessionInfo` : 4 métiers avec niveau (Herboristerie 95/150, Dépeçage 104/150, Secourisme 22/75, Cuisine 6/75). À l'ouverture de chaque fenêtre de métier, `C_TradeSkillUI` donne les recettes connues avec identifiant et nom (3275 Bandage en lin, 2538 Viande de loup grillée…). Les métiers de récolte ont aussi des recettes (Herboristerie : Bougie d'encens). | ✅ | Annuaire des artisans (P14) |
 
+## Complément du 7 octobre (T11) : vers le compagnon sans `/reload`
+
+Session du 7 octobre, build 70245, sonde 0.4.0 (`docs/phase-0/sessions/2026-10-07.txt`), fichiers lus sur le disque
+pendant la partie.
+
+| Test | Question | Résultat | Statut | Conséquence |
+| --- | --- | --- | --- | --- |
+| T11 activation | L'addon peut-il allumer seul, sans clic, le journal de combat et le journal du chat ? | Oui : `LoggingCombat(true)`, `LoggingChat(true)` et `SetCVar("advancedCombatLogging", "1")` depuis un délai, sans action bloquée. Aussi présents : `C_ChatInfo.IsLoggingCombat`, `C_ChatInfo.IsLoggingChat`. | ✅ | — |
+| T11 journal de combat | Le journal de combat s'écrit-il pendant la partie, et que contient-il ? | Oui, au fil de l'eau (`Logs/WoWCombatLog-<date>.txt`, lignes vues quelques secondes après le combat), version 22, mode avancé. Soins donnés et reçus (`SPELL_HEAL`, `SPELL_PERIODIC_HEAL` avec la cible), dégâts, morts (`UNIT_DIED`), monstres tués (`PARTY_KILL`), et tous les joueurs proches, pas seulement le groupe. Les joueurs n'y figurent que par leur prénom et leur type de monde (`"Ðéjà-ClassicBetaPvP-"`, sans le nom de famille) et leur GUID (`Player-4619-00F6AB29`) : le nom complet se retrouve par le GUID, que l'addon connaît (`UnitGUID`). Rencontres de boss (`ENCOUNTER_START` / `ENCOUNTER_END`) pas encore vues (combat en extérieur). | ✅ | Le compagnon peut lire le combat en direct : morts, dégâts, soins reçus (Princesse mesurable), sans `/reload`. Rien d'autre que du combat. |
+| T11 journal du chat | Le journal du chat s'écrit-il pendant la partie ? | Non : `Logs/WoWChatLog.txt` reste vide (0 octet) pendant la partie, après `LoggingChat(false)` et après un `/reload` ; il est écrit en une fois à la fermeture du jeu. Il contient les chuchotements et les messages de canal, pas l'affichage de l'addon ni les messages d'addon. | ❌ | Pas mieux que les données sauvegardées, écrites à la déconnexion : abandonné. |
+| T11 envois sans clic | Quels messages l'addon peut-il envoyer sans clic ? | Chuchotement à soi-même (« Ðéjà Vu » comme « Ðéjà-Vu ») et messages d'addon (chuchotement à soi, guilde) : oui. Canal privé (`JoinChannelByName` accepté sans clic) : envois refusés (`ADDON_ACTION_BLOCKED` pour les 9 premiers), 3 des 4 suivants arrivés 11 s plus tard. | ⚠️ | Canal privé inutilisable sans clic. |
+
+Bilan : seul le journal de combat porte des données pendant la partie, et seulement du combat. Les SR, inscriptions,
+mises, deathrolls et changements faits en jeu restent portés par les données sauvegardées (`/reload` ou déconnexion).
+La sonde laisse le mode avancé du journal de combat allumé (`advancedCombatLogging` à 1, réglage du jeu).
+
 ## Hypothèses de départ (sources communautaires)
 
 | Hypothèse | Résultat |
