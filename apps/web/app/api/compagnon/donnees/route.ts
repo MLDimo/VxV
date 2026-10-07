@@ -3,13 +3,23 @@ import { asCompanion } from "@/server/companionApi";
 
 /**
  * What the companion brings to the addon (VXV_Sync), for any member: the next event, then each bundle's data as
- * { text } under its name (the field of the inbox the bundle reads).
+ * { text } under its name (the field of the inbox the bundle reads); for an officer, the roles an event may be
+ * reserved to.
  */
 export async function GET(request: Request): Promise<Response> {
-  return asCompanion(request, async () => {
-    const { addonExport, addonBets, addonMissions, addonTitles, addonArtisans, addonDeathrolls, addonRanking } =
-      getApplication();
+  return asCompanion(request, async (member) => {
+    const {
+      addonExport,
+      addonEventRoles,
+      addonBets,
+      addonMissions,
+      addonTitles,
+      addonArtisans,
+      addonDeathrolls,
+      addonRanking,
+    } = getApplication();
     const next = await addonExport.exportNextEvent();
+    const roles = await addonEventRoles.exportEventRoles(member);
     return Response.json({
       raid: next === undefined ? null : { text: next.text, title: next.title, startsAt: next.startsAt.toISOString() },
       paris: { text: await addonBets.exportBets() },
@@ -18,6 +28,7 @@ export async function GET(request: Request): Promise<Response> {
       artisans: { text: await addonArtisans.exportArtisans() },
       deathroll: { text: await addonDeathrolls.exportDeathrolls() },
       ranking: { text: await addonRanking.exportRanking() },
+      raidroles: roles === undefined ? null : { text: roles },
     });
   });
 }

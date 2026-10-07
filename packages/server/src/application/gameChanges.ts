@@ -84,7 +84,7 @@ export function createGameChanges({
         }
         const eventId = await events.createEvent(
           author.member,
-          { startsAt, raidIds: change.raidIds, softReservesPerPlayer: change.softReserves },
+          { startsAt, raidIds: change.raidIds, softReservesPerPlayer: change.softReserves, roleId: change.roleId },
           change.reason,
         );
         await announcements.announceQuietly(eventId);

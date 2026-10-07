@@ -16,6 +16,7 @@ export async function createEvent(_previous: ActionState, form: FormData): Promi
         startsAt: wallClockToInstant(formText(form, "startsAt")),
         raidIds: form.getAll("raidIds").map(String),
         softReservesPerPlayer: Number(form.get("softReservesPerPlayer")),
+        roleId: formText(form, "roleId"),
       },
       formText(form, "reason"),
     );

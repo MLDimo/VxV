@@ -1,10 +1,11 @@
 import type { PGliteInterface } from "@vxv/database/testing";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EVENT_LISTED_AFTER_START_MS, type NewRaidEvent } from "../domain/events.ts";
 import type { Member } from "../domain/members.ts";
+import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createMember, createRaids } from "../test/fixtures.ts";
+import { createMember, createRaids, TEST_GUILD_ID, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createEvents } from "./events.ts";
@@ -19,25 +20,32 @@ describe("events", () => {
   let journal: ReturnType<typeof createJournal>;
   let officer: Member;
   let now: Date;
+  let discord: FakeDiscord;
+  let raiders: string;
 
   const event = (hoursFromNow: number, overrides: Partial<NewRaidEvent> = {}): NewRaidEvent => ({
     startsAt: new Date(now.getTime() + hoursFromNow * HOUR),
     raidIds: ["onyxia"],
     softReservesPerPlayer: 1,
+    roleId: TEST_GUILD_ID,
     ...overrides,
   });
 
   beforeEach(async () => {
     ({ database, sql } = await createTestDatabase());
+    discord = createFakeDiscord();
+    vi.stubGlobal("fetch", discord.fetch);
+    raiders = discord.addRole("Raideur R1");
     now = new Date("2026-12-01T12:00:00Z");
     const unitOfWork = createUnitOfWork(sql);
-    events = createEvents({ unitOfWork, clock: () => now });
+    events = createEvents({ unitOfWork, clock: () => now, guild: testGuild });
     journal = createJournal({ unitOfWork });
     officer = await createMember(sql, "officer", "Officier");
     await createRaids(sql, { onyxia: "Onyxia", "mont-hyjal": "Mont Hyjal" });
   });
 
   afterEach(async () => {
+    vi.unstubAllGlobals();
     await database.close();
   });
 
@@ -48,8 +56,17 @@ describe("events", () => {
     ]);
   });
 
-  it("creates an event on several raids and records it in the journal", async () => {
-    const created = event(48, { raidIds: ["onyxia", "mont-hyjal"], softReservesPerPlayer: 2 });
+  it("offers everybody and the server's roles, except those Discord and VXV give", async () => {
+    discord.addRole("VXV", true);
+    discord.addRole("Démoniste");
+    expect(await events.listRoleChoices()).toEqual([
+      { id: TEST_GUILD_ID, name: "Tout le monde", everyone: true },
+      { id: raiders, name: "Raideur R1", everyone: false },
+    ]);
+  });
+
+  it("creates an event on several raids, reserved to a role, and records it in the journal", async () => {
+    const created = event(48, { raidIds: ["onyxia", "mont-hyjal"], softReservesPerPlayer: 2, roleId: raiders });
     const eventId = await events.createEvent(officer, created, "Raid de la semaine");
     expect(await events.getEvent(eventId)).toEqual({
       id: eventId,
@@ -59,15 +76,40 @@ describe("events", () => {
         { id: "mont-hyjal", name: "Mont Hyjal" },
         { id: "onyxia", name: "Onyxia" },
       ],
+      role: { id: raiders, name: "Raideur R1" },
     });
     expect(await journal.listRecent()).toEqual([
       expect.objectContaining({
         action: "event.create",
         entityId: eventId,
         reason: "Raid de la semaine",
-        after: { startsAt: created.startsAt.toISOString(), raids: ["Mont Hyjal", "Onyxia"], softReservesPerPlayer: 2 },
+        after: {
+          startsAt: created.startsAt.toISOString(),
+          raids: ["Mont Hyjal", "Onyxia"],
+          softReservesPerPlayer: 2,
+          audience: "Réservé à Raideur R1",
+        },
       }),
     ]);
+  });
+
+  it("opens an event to everybody with @everyone", async () => {
+    const eventId = await events.createEvent(officer, event(48), "Raid reroll");
+    expect((await events.getEvent(eventId))?.role).toBeUndefined();
+    expect(await journal.listRecent()).toEqual([
+      expect.objectContaining({ after: expect.objectContaining({ audience: "Ouvert à tous" }) }),
+    ]);
+  });
+
+  it("refuses an event reserved to a role not offered", async () => {
+    const classRole = discord.addRole("Démoniste");
+    await expect(events.createEvent(officer, event(48, { roleId: classRole }), "Motif")).rejects.toThrow(
+      /qui peut s'inscrire/,
+    );
+    await expect(events.createEvent(officer, event(48, { roleId: "" }), "Motif")).rejects.toThrow(
+      /qui peut s'inscrire/,
+    );
+    expect(await events.listUpcoming()).toEqual([]);
   });
 
   it("refuses an event to a member and an invalid event to an officer", async () => {

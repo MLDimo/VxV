@@ -1,3 +1,4 @@
+import { eventAudience } from "@vxv/server/domain/eventRoles";
 import { formatEventDate, raidTitle, softReserveCount } from "@vxv/server/domain/labels";
 import type { RaidEvent } from "@vxv/server";
 import Link from "next/link";
@@ -18,7 +19,8 @@ export function UpcomingEvents({ events }: { events: RaidEvent[] }) {
               {raidTitle(event.raids.map((raid) => raid.name))}
             </span>
             <span className="mt-1 block text-sm text-muted">
-              {formatEventDate(event.startsAt)} · {softReserveCount(event.softReservesPerPlayer)} par joueur
+              {formatEventDate(event.startsAt)} · {softReserveCount(event.softReservesPerPlayer)} par joueur ·{" "}
+              {eventAudience(event.role)}
             </span>
           </Link>
         </li>

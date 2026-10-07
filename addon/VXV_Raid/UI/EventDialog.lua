@@ -1,27 +1,32 @@
 local _, ns = ...
 
 --- « Créer un événement » in game (P9.2), for the officers: date and time as on Discord's /vxv_raid ("15/10",
---- "21:00"), the raids among the data packs, the soft reserves per player and the reason the journal keeps. Sent to
---- the website as a change: it creates the event and publishes its sign-up message on Discord.
+--- "21:00"), the raids among the data packs, the soft reserves per player, the Discord role whose members alone may
+--- sign up (among the ones the officer's companion brought) and the reason the journal keeps. Sent to the website as
+--- a change: it creates the event and publishes its sign-up message on Discord.
 local EventDialog = {}
 ns.EventDialog = EventDialog
 
-local Changes = ns.Changes
+local Changes, RoleChoices = ns.Changes, ns.RoleChoices
 
 local Theme = VXV.Theme
 
-local WIDTH, HEIGHT = 480, 420
+local WIDTH, HEIGHT = 480, 484
 local FIELD_TOP, SECTION = 20, 64
 local FIELD_PADDING, SHORT_FIELD = 6, 120
 local TOGGLE_GAP, BUTTON_WIDTH, BUTTON_HEIGHT, STEP_SIZE = 6, 160, 30, 26
 -- The website's bounds of the soft reserves per player.
 local MIN_SOFT_RESERVES, MAX_SOFT_RESERVES, DEFAULT_SOFT_RESERVES = 1, 10, 1
 local MAX_LETTERS = { date = 10, time = 5, reason = 200 }
-local MISSING = "Indique la date, l'heure, au moins un raid et le motif."
+local MISSING = "Indique la date, l'heure, au moins un raid, qui peut s'inscrire et le motif."
+local NO_ROLE = "Choisis un rôle avec les flèches."
+local NO_ROLES = "Rôles pas encore reçus : ton compagnon VXV les apporte au /reload."
 
-local frame, body, problem, countText
+local frame, body, problem, countText, roleText
 local boxes, toggles = {}, {}
 local chosen, softReserves = {}, DEFAULT_SOFT_RESERVES
+-- The roles offered when the form opened, and the one chosen (its index), none at first: the officer chooses.
+local roles, roleIndex = {}, nil
 
 local function heading(top, text, x)
     Theme.Heading(body, text):SetPoint("TOPLEFT", x or 0, -top)
@@ -80,6 +85,36 @@ local function addCount(top)
     end)
 end
 
+local function showRole()
+    local role = roles[roleIndex]
+    roleText:SetText(role and role.name or (#roles == 0 and NO_ROLES or NO_ROLE))
+end
+
+--- The previous (-1) or next (1) role, round the list; from none, the first or the last.
+local function stepRole(step)
+    if #roles == 0 then
+        return
+    end
+    roleIndex = roleIndex == nil and (step > 0 and 1 or #roles) or (roleIndex - 1 + step) % #roles + 1
+    showRole()
+end
+
+local function addRole(top)
+    heading(top, "Qui peut s'inscrire (rôle Discord)")
+    local previous = Theme.Button(body, "wood", "<", STEP_SIZE, STEP_SIZE)
+    previous:SetPoint("TOPLEFT", 0, -(top + FIELD_TOP))
+    local following = Theme.Button(body, "wood", ">", STEP_SIZE, STEP_SIZE)
+    following:SetPoint("LEFT", previous, "RIGHT", TOGGLE_GAP, 0)
+    roleText = Theme.Text(body, "text", 13, "ivory")
+    roleText:SetPoint("LEFT", following, "RIGHT", 2 * TOGGLE_GAP, 0)
+    previous:SetScript("OnClick", function()
+        stepRole(-1)
+    end)
+    following:SetScript("OnClick", function()
+        stepRole(1)
+    end)
+end
+
 local function trimmed(key)
     return (boxes[key]:GetText() or ""):match("^%s*(.-)%s*$")
 end
@@ -90,13 +125,13 @@ local function send()
         raidIds[#raidIds + 1] = raidId
     end
     table.sort(raidIds)
-    local date, at, reason = trimmed("date"), trimmed("time"), trimmed("reason")
-    if date == "" or at == "" or reason == "" or #raidIds == 0 then
+    local date, at, reason, role = trimmed("date"), trimmed("time"), trimmed("reason"), roles[roleIndex]
+    if date == "" or at == "" or reason == "" or #raidIds == 0 or role == nil then
         problem:SetText(MISSING)
         return
     end
     if Changes.Submit({ kind = "event", date = date, time = at, raidIds = raidIds, softReserves = softReserves,
-        reason = reason }) then
+        roleId = role.id, reason = reason }) then
         frame:Hide()
     end
 end
@@ -107,7 +142,8 @@ local function build()
     addField("time", SHORT_FIELD + 2 * TOGGLE_GAP, 0, SHORT_FIELD, "Heure (21:00)")
     addRaids(SECTION)
     addCount(2 * SECTION)
-    addField("reason", 0, 3 * SECTION, body:GetWidth(), "Motif (visible dans le journal)")
+    addRole(3 * SECTION)
+    addField("reason", 0, 4 * SECTION, body:GetWidth(), "Motif (visible dans le journal)")
     problem = Theme.Text(body, "text", 13, "loss")
     problem:SetPoint("BOTTOMLEFT", 0, BUTTON_HEIGHT + FIELD_PADDING)
     local button = Theme.Button(body, "pixel", "Créer", BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -120,7 +156,7 @@ function EventDialog.Open()
     if frame == nil then
         build()
     end
-    chosen, softReserves = {}, DEFAULT_SOFT_RESERVES
+    chosen, softReserves, roles, roleIndex = {}, DEFAULT_SOFT_RESERVES, RoleChoices.List(), nil
     for _, box in pairs(boxes) do
         box:SetText("")
     end
@@ -128,6 +164,7 @@ function EventDialog.Open()
         toggle:SetSelected(false)
     end
     showCount()
+    showRole()
     problem:SetText("")
     frame:Show()
 end

@@ -7,6 +7,7 @@ const valid: NewRaidEvent = {
   startsAt: new Date("2026-12-10T20:00:00Z"),
   raidIds: ["onyxia", "mont-hyjal"],
   softReservesPerPlayer: 1,
+  roleId: "raider-1",
 };
 
 describe("newEventRefusal", () => {

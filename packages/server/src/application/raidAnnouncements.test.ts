@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eventRepository } from "../infrastructure/postgres/events.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import type { AnnouncedRaid, RaidAnnouncer } from "./discordPorts.ts";
 import { createRaidAnnouncements } from "./raidAnnouncements.ts";
@@ -63,7 +63,11 @@ describe("raid announcements", () => {
     const me = await createMember(sql, "member", "Moi");
     const [deja] = await createGuildCharacters(sql, "Ðéjà Vu");
     await sql.query("update characters set member_id = $1 where id = $2", [me.id, deja.id]);
-    const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => new Date("2026-12-01T12:00:00Z") });
+    const signups = createSignups({
+      unitOfWork: createUnitOfWork(sql),
+      clock: () => new Date("2026-12-01T12:00:00Z"),
+      guild: testGuild,
+    });
     await signups.signUp(me, eventId, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
     await announcements.announce(eventId);
 

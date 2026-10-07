@@ -5,7 +5,7 @@ import type { Member } from "../domain/members.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createExclusions } from "./exclusions.ts";
@@ -36,7 +36,7 @@ describe("exclusions", () => {
     await characterRepository(sql).link(deja.id, member.id);
     await createRaidWithLoot(sql);
     eventId = await createEvent(sql, officer, new Date("2026-12-10T20:00:00Z"), ["onyxia"]);
-    const signups = createSignups({ unitOfWork, clock: () => new Date("2026-12-01T12:00:00Z") });
+    const signups = createSignups({ unitOfWork, clock: () => new Date("2026-12-01T12:00:00Z"), guild: testGuild });
     await signups.signUp(member, eventId, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
   });
 

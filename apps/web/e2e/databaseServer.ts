@@ -12,7 +12,15 @@ import {
 } from "@vxv/bot";
 import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
-import { DATABASE_PORT, DISCORD_ROLES, SEED_FILE, SEED_ROSTER, WEB_ENVIRONMENT, type E2ESeed } from "./environment";
+import {
+  DATABASE_PORT,
+  DISCORD_ROLES,
+  RAIDER_ROLE,
+  SEED_FILE,
+  SEED_ROSTER,
+  WEB_ENVIRONMENT,
+  type E2ESeed,
+} from "./environment";
 
 /**
  * PostgreSQL for the end-to-end tests: a migrated PGlite reachable over the network, holding the real raid data.
@@ -23,10 +31,11 @@ const MAX_CONNECTIONS = 10;
 const database = await createMigratedPGlite();
 await database.exec(renderSeedSql(await loadRaids()).content);
 const rest = { token: WEB_ENVIRONMENT.DISCORD_BOT_TOKEN, apiUrl: WEB_ENVIRONMENT.DISCORD_API_URL };
+const guild = createDiscordGuild({ ...rest, guildId: WEB_ENVIRONMENT.DISCORD_GUILD_ID });
 const app = createApplication({
   sql: sqlClientFromPGlite(database),
   discordRoles: DISCORD_ROLES,
-  guild: createDiscordGuild({ ...rest, guildId: WEB_ENVIRONMENT.DISCORD_GUILD_ID }),
+  guild,
   announcer: createDiscordRaidAnnouncer({
     ...rest,
     channelId: WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID,
@@ -79,15 +88,30 @@ const cielGris = await seedCharacter("Ciel");
 const duneSable = await seedCharacter("Dune");
 await app.characters.link(officer.member, cielGris.id, true);
 await app.characters.link(lockedMember.member, duneSable.id, true);
+// Discord gives @everyone the server's id: the events of the tests are open to everybody, but one.
+const EVERYBODY = WEB_ENVIRONMENT.DISCORD_GUILD_ID;
+// The officer holds the raiders' role, which the tests give the member whose main is Dune Sable.
+await guild.addRole(officer.member.discordId, RAIDER_ROLE);
+const raiderRoleId = (await app.events.listRoleChoices()).find((role) => role.name === RAIDER_ROLE)?.id ?? "";
 const signupEventId = await app.events.createEvent(
   officer.member,
-  { startsAt: new Date("2031-01-15T20:00:00Z"), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+  {
+    startsAt: new Date("2031-01-15T20:00:00Z"),
+    raidIds: ["salle-des-thanes"],
+    softReservesPerPlayer: 1,
+    roleId: EVERYBODY,
+  },
   "Événement des tests d'inscription",
 );
 
 const softReserveEventId = await app.events.createEvent(
   officer.member,
-  { startsAt: new Date("2031-01-22T20:00:00Z"), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+  {
+    startsAt: new Date("2031-01-22T20:00:00Z"),
+    raidIds: ["salle-des-thanes"],
+    softReservesPerPlayer: 1,
+    roleId: EVERYBODY,
+  },
   "Événement des tests de SR",
 );
 await app.signups.signUp(officer.member, softReserveEventId, {
@@ -104,6 +128,7 @@ const lockedEventId = await app.events.createEvent(
     startsAt: new Date(Date.now() + LOCKED_EVENT_DELAY_MS),
     raidIds: ["salle-des-thanes"],
     softReservesPerPlayer: 1,
+    roleId: EVERYBODY,
   },
   "Événement verrouillé des tests",
 );
@@ -122,9 +147,25 @@ await app.softReserves.override(
   "SR de départ des tests",
 );
 
+const reservedEventId = await app.events.createEvent(
+  officer.member,
+  {
+    startsAt: new Date("2031-01-29T20:00:00Z"),
+    raidIds: ["salle-des-thanes"],
+    softReservesPerPlayer: 1,
+    roleId: raiderRoleId,
+  },
+  "Événement des tests de rôle",
+);
+
 const historyEventId = await app.events.createEvent(
   officer.member,
-  { startsAt: new Date("2031-02-05T20:00:00Z"), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+  {
+    startsAt: new Date("2031-02-05T20:00:00Z"),
+    raidIds: ["salle-des-thanes"],
+    softReservesPerPlayer: 1,
+    roleId: EVERYBODY,
+  },
   "Événement des tests d'historique",
 );
 await app.signups.signUp(lockedMember.member, historyEventId, {
@@ -155,7 +196,7 @@ await importRaidLog(
 const createThanesEvent = (startsAt: string, reason: string) =>
   app.events.createEvent(
     officer.member,
-    { startsAt: new Date(startsAt), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1 },
+    { startsAt: new Date(startsAt), raidIds: ["salle-des-thanes"], softReservesPerPlayer: 1, roleId: EVERYBODY },
     reason,
   );
 const reserveJambieres = async (eventId: string) => {
@@ -211,6 +252,8 @@ const seed: E2ESeed = {
     discordMember: discordMember.token,
   },
   signupEventId,
+  reservedEventId,
+  raiderRoleId,
   softReserveEventId,
   lockedEventId,
   historyEventId,

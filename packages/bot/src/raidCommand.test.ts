@@ -5,8 +5,8 @@ import type { APIInteractionResponse } from "discord-api-types/v10";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext } from "./commands.ts";
 import { VXV_RAID } from "./raidCommand.ts";
-import { createTestApplication, RAID_CHANNEL, TEST_ROLES } from "./testApplication.ts";
-import { autocomplete, slashCommand, type TestActor } from "./testing.ts";
+import { createTestApplication, RAID_CHANNEL, TEST_GUILD_ID, TEST_ROLES } from "./testApplication.ts";
+import { autocomplete, slashCommand, withOptions, type TestActor } from "./testing.ts";
 
 const OFFICER: TestActor = { userId: "100", name: "Officier", roleIds: [TEST_ROLES.officer], channelId: "anywhere" };
 const MEMBER: TestActor = { userId: "200", name: "Membre", channelId: "anywhere" };
@@ -36,8 +36,9 @@ describe("/vxv_raid", () => {
     await database.close();
   });
 
-  const create = async (actor: TestActor, options: Record<string, string>) =>
-    contentOf(await VXV_RAID.run(slashCommand("vxv_raid", options, actor), context));
+  /** The role picked by the officer: @everyone, which Discord gives the server's id, unless said otherwise. */
+  const create = async (actor: TestActor, options: Record<string, string>, role = TEST_GUILD_ID) =>
+    contentOf(await VXV_RAID.run(withOptions(slashCommand("vxv_raid", options, actor), "Role", { role }), context));
   const plan = { raid: "onyxia", date: `12/12/${NEXT_YEAR}`, heure: "21:00", motif: "Raid de la semaine" };
 
   it("lets an officer create an event, published in the raid channel", async () => {
@@ -47,9 +48,22 @@ describe("/vxv_raid", () => {
     const [event] = await app.events.listUpcoming();
     expect(event?.raids.map((raid) => raid.name)).toEqual(["Mont Hyjal", "Onyxia"]);
     expect(event?.startsAt).toEqual(new Date(`${NEXT_YEAR}-12-12T20:00:00Z`));
+    expect(event?.role).toBeUndefined();
     const [message] = discord.messages();
     expect(message?.channelId).toBe(RAID_CHANNEL);
     expect(event?.discordMessageId).toBe(message?.id);
+  });
+
+  it("reserves the event to the role the officer picked", async () => {
+    const raiders = discord.addRole("Raideur R1");
+    await create(OFFICER, plan, raiders);
+    const [event] = await app.events.listUpcoming();
+    expect(event?.role).toEqual({ id: raiders, name: "Raideur R1" });
+  });
+
+  it("refuses a role VXV gives, such as a class", async () => {
+    const classRole = discord.addRole("Démoniste");
+    await expect(create(OFFICER, plan, classRole)).rejects.toThrow(/qui peut s'inscrire/);
   });
 
   it("refuses members who are not officers, and invalid dates", async () => {

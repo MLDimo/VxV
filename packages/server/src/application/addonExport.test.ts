@@ -4,7 +4,7 @@ import type { Member } from "../domain/members.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createAddonExport } from "./addonExport.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
@@ -39,7 +39,7 @@ describe("addon export", () => {
     eventId = await createEvent(sql, officer, new Date("2026-12-10T20:00:00Z"), ["onyxia"]);
     const otherEventId = await createEvent(sql, officer, new Date("2026-12-17T20:00:00Z"), ["onyxia"]);
 
-    const signups = createSignups({ unitOfWork, clock });
+    const signups = createSignups({ unitOfWork, clock, guild: testGuild });
     await signups.signUp(member, eventId, { characterId: ciel.id, role: "tank", spec: "Protection", status: "late" });
     await createSoftReserves({ unitOfWork, clock }).setMine(member, eventId, ["20"]);
     const exclusions = createExclusions({ unitOfWork });
@@ -54,8 +54,8 @@ describe("addon export", () => {
   it("gives an officer the event with its officers, sign-ups, soft reserves and journal", async () => {
     const lines = (await addonExport.exportEvent(officer, eventId)).split("\n");
     expect(lines).toEqual([
-      "VXV-RAID-2",
-      `E;${eventId};1796932800;1796126400;1;Onyxia;onyxia`,
+      "VXV-RAID-3",
+      `E;${eventId};1796932800;1796126400;1;Onyxia;onyxia;Ouvert à tous`,
       "O;Ðéjà Vu",
       "I;21;Sac en peau;Onyxia;1",
       "I;20;Tête d'Onyxia;Onyxia;0",

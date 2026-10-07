@@ -5,7 +5,14 @@ import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { softReserveRepository } from "../infrastructure/postgres/softReserves.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, recordLoot } from "../test/fixtures.ts";
+import {
+  createEvent,
+  createGuildCharacters,
+  createMember,
+  createRaidWithLoot,
+  recordLoot,
+  testGuild,
+} from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createHistory } from "./history.ts";
@@ -32,7 +39,11 @@ describe("loot history", () => {
     await characterRepository(sql).link(deja.id, me.id);
     await createRaidWithLoot(sql);
     const eventId = await createEvent(sql, me, new Date("2026-12-10T20:00:00Z"), ["onyxia"]);
-    const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => new Date("2026-12-01T12:00:00Z") });
+    const signups = createSignups({
+      unitOfWork: createUnitOfWork(sql),
+      clock: () => new Date("2026-12-01T12:00:00Z"),
+      guild: testGuild,
+    });
     await signups.signUp(me, eventId, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
     await softReserveRepository(sql).replaceForCharacter(eventId, deja.id, [20], new Date("2026-12-01T12:00:00Z"));
     return eventId;

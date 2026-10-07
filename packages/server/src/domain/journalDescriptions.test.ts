@@ -33,6 +33,10 @@ describe("describeJournalEntry", () => {
       reason: "Raid",
     };
     expect(describeJournalEntry(entry)).toBe("Mont Hyjal + Onyxia, le 10/12/2026 21:00, 2 SR par joueur");
+    const reserved = { startsAt: "2026-12-10T20:00:00.000Z", raids: ["Onyxia"], softReservesPerPlayer: 1 };
+    expect(describeJournalEntry({ ...entry, after: { ...reserved, audience: "Réservé à Raideur R1" } })).toBe(
+      "Onyxia, le 10/12/2026 21:00, 1 SR par joueur. Réservé à Raideur R1",
+    );
   });
 
   it("summarizes a bet opening: its title, its choices and its closing time in the guild time zone", () => {

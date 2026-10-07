@@ -1,3 +1,4 @@
+import { formatAddonEventRoles } from "@vxv/server/domain/addonEventRoles";
 import { formatAddonEvent, type AddonEventFacts } from "@vxv/server/domain/addonExport";
 import type { Signup } from "@vxv/server/domain/signups";
 import type { BoardItem } from "@vxv/server/domain/softReserves";
@@ -45,6 +46,7 @@ export const ONYXIA_NIGHT: AddonEventFacts = {
     startsAt: new Date("2026-12-10T20:00:00Z"),
     softReservesPerPlayer: 2,
     raids: [{ id: "onyxia", name: "Onyxia" }],
+    role: undefined,
     discordMessageId: undefined,
   },
   signups: [
@@ -106,6 +108,18 @@ export const ONYXIA_PACK = `
 /** The text an officer copies from the website's event page. */
 export function websiteText(facts: AddonEventFacts = ONYXIA_NIGHT): string {
   return formatAddonEvent(facts);
+}
+
+/** The Discord roles an event may be reserved to, as an officer's companion brings them: everybody, then a roster. */
+export const RAIDER_ROLE = { id: "1194373648929263676", name: "Raideur R1" };
+export function roleChoicesText(): string {
+  return formatAddonEventRoles(
+    [
+      { id: "guild", name: "Tout le monde", everyone: true },
+      { ...RAIDER_ROLE, everyone: false },
+    ],
+    { officers: ONYXIA_NIGHT.officers, characters: ONYXIA_NIGHT.officers, exportedAt: ONYXIA_NIGHT.exportedAt },
+  );
 }
 
 /** Pastes the text in the window of /vxv importer and clicks Charger. */

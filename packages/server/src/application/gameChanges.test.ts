@@ -1,11 +1,19 @@
 import type { PGliteInterface } from "@vxv/database/testing";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GameChange } from "../domain/gameChanges.ts";
 import type { Member } from "../domain/members.ts";
+import { createFakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import {
+  createEvent,
+  createGuildCharacters,
+  createMember,
+  createRaidWithLoot,
+  TEST_GUILD_ID,
+  testGuild,
+} from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createAddonExport } from "./addonExport.ts";
 import { createEvents } from "./events.ts";
@@ -33,11 +41,11 @@ describe("changes made in game", () => {
     const unitOfWork = createUnitOfWork(sql);
     const clock = () => NOW;
     announced = [];
-    signups = createSignups({ unitOfWork, clock });
+    signups = createSignups({ unitOfWork, clock, guild: testGuild });
     changes = createGameChanges({
       unitOfWork,
       clock,
-      events: createEvents({ unitOfWork, clock }),
+      events: createEvents({ unitOfWork, clock, guild: testGuild }),
       signups,
       softReserves: createSoftReserves({ unitOfWork, clock }),
       exclusions: createExclusions({ unitOfWork }),
@@ -227,6 +235,18 @@ describe("changes made in game", () => {
   });
 
   describe("events created in game (P9.2)", () => {
+    let raiders: string;
+
+    beforeEach(() => {
+      const discord = createFakeDiscord();
+      vi.stubGlobal("fetch", discord.fetch);
+      raiders = discord.addRole("Raideur R1");
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
     const creation = (id: string, author: string, changes: Partial<Record<string, unknown>> = {}): GameChange =>
       ({
         id,
@@ -237,6 +257,7 @@ describe("changes made in game", () => {
         time: "21:00",
         raidIds: ["onyxia"],
         softReserves: 2,
+        roleId: TEST_GUILD_ID,
         reason: "Raid du lundi",
         ...changes,
       }) as GameChange;
@@ -250,16 +271,24 @@ describe("changes made in game", () => {
         accepted: true,
         message: "Événement du 15/12/2026 21:00 créé et annoncé sur Discord.",
       });
-      const created = await sql.query<{ id: string; soft_reserves_per_player: number }>(
-        "select id, soft_reserves_per_player from events where starts_at = '2026-12-15T20:00:00Z'",
+      const created = await sql.query<{ id: string; soft_reserves_per_player: number; role_id: string | null }>(
+        "select id, soft_reserves_per_player, role_id from events where starts_at = '2026-12-15T20:00:00Z'",
       );
-      expect(created[0]?.soft_reserves_per_player).toBe(2);
+      expect(created[0]).toMatchObject({ soft_reserves_per_player: 2, role_id: null });
       expect(announced).toEqual([created[0]?.id]);
       const text = await createAddonExport({ unitOfWork: createUnitOfWork(sql), clock: () => NOW }).exportEvent(
         officer,
         eventId,
       );
       expect(text.split("\n")).toContain("C;Ðéjà Vu#9#1;1;Événement du 15/12/2026 21:00 créé et annoncé sur Discord.");
+    });
+
+    it("reserves the event to the role the officer chose", async () => {
+      await changes.receive(officer, [creation("Ðéjà Vu#9#3", "Ðéjà Vu", { roleId: raiders })]);
+      const created = await sql.query<{ role_name: string }>("select role_name from events where role_id = $1", [
+        raiders,
+      ]);
+      expect(created).toEqual([{ role_name: "Raideur R1" }]);
     });
 
     it("refuses a member, and a date the website cannot read", async () => {

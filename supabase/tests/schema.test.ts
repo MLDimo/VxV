@@ -167,6 +167,20 @@ describe("initial schema", () => {
     });
   });
 
+  describe("events", () => {
+    it("keeps the name of the role an event is reserved to, or neither", async () => {
+      const memberId = await insertMember(database, "1");
+      const eventId = await insertEvent(database, memberId);
+      const reserve = (roleId: string | null, roleName: string | null) =>
+        database.query("update events set role_id = $2, role_name = $3 where id = $1", [eventId, roleId, roleName]);
+
+      await expect(reserve("1194373648929263676", "Raideur R1")).resolves.toBeDefined();
+      await expect(reserve(null, null)).resolves.toBeDefined();
+      await expect(reserve("1194373648929263676", null)).rejects.toThrow(/events_role_named/);
+      await expect(reserve(null, "Raideur R1")).rejects.toThrow(/events_role_named/);
+    });
+  });
+
   describe("sign-ups", () => {
     it("allows a single sign-up per member and event, whatever the character", async () => {
       const memberId = await insertMember(database, "1");

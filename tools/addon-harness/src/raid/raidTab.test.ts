@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { LoadedAddon } from "../addon.ts";
-import { ONYXIA_NIGHT, startRaid, websiteText } from "./fixtures.ts";
+import { ONYXIA_NIGHT, RAIDER_ROLE, startRaid, websiteText } from "./fixtures.ts";
 
 const PREFIX = "|cff14b8a6VXV|r ";
 /** What the Raid screen shows to this player, section by section. */
@@ -84,9 +84,9 @@ describe("Raid screen", () => {
     expect(errors()).toEqual([]);
   });
 
-  it("heads the event an officer pasted: date, soft reserves, origin, expected players and lock", () => {
+  it("heads the event an officer pasted: date, soft reserves, origin, who signs up, expected players and lock", () => {
     const { raid, client, importText, errors } = startRaid();
-    importText(websiteText());
+    importText(websiteText({ ...ONYXIA_NIGHT, event: { ...ONYXIA_NIGHT.event, role: RAIDER_ROLE } }));
     expect(client("return Printed")).toContain(`${PREFIX}Données chargées : Onyxia, le 10/12 20:00.`);
     expect(client("return VXV_TextWindow:IsShown()")).toBe(false);
     // The test clock starts on the raid's day at noon: the soft reserves lock half an hour before 20:00.
@@ -95,12 +95,13 @@ describe("Raid screen", () => {
       title: "Onyxia",
       subtitle: "10/12 20:00 · 2 SR par joueur · données de Ðéjà Vu, copiées le 10/12 19:45",
       badges: [
+        { text: "Réservé à Raideur R1", color: "amethyst" },
         { text: "2 attendus", color: "gain" },
         { text: "SR verrouillées dans 7 h 30", color: "gold" },
       ],
     });
     client("Clock.now = Clock.now + 8 * 3600");
-    expect(viewOf(raid).header.badges[1]).toEqual({ text: "SR verrouillées", color: "gold" });
+    expect(viewOf(raid).header.badges[2]).toEqual({ text: "SR verrouillées", color: "gold" });
     expect(errors()).toEqual([]);
   });
 

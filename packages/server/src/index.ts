@@ -26,6 +26,7 @@ export type {
   JournalEntry,
   SoftReserveOverrideRecord,
 } from "./domain/journal.ts";
+export type { EventRole, EventRoleChoice } from "./domain/eventRoles.ts";
 export { ROSTER_HEADER, type RosterImportSummary } from "./domain/roster.ts";
 export { TextFormatError } from "./domain/textFormat.ts";
 export {
@@ -71,11 +72,11 @@ export type { Season } from "./application/ports.ts";
 export type { RankingLine, RankingRecordLine, RankingView } from "./application/ranking.ts";
 export { RANKING_CATEGORIES, type RankingCategory, type RankingUnit } from "./domain/rankingBoards.ts";
 export type { MissionView } from "./application/missions.ts";
-export { titleRole, type TitleWeek } from "./application/titles.ts";
+export { type TitleWeek } from "./application/titles.ts";
 export type { RecipeFound } from "./application/artisans.ts";
 export type { DeathrollView } from "./application/deathrolls.ts";
 export type { ArtisanProfession } from "./application/ports.ts";
-export { TITLES, type TitleId } from "./domain/titles.ts";
+export { TITLES, titleRole, type TitleId } from "./domain/titles.ts";
 export {
   MISSION_TYPE_LABELS,
   MISSION_TYPES,

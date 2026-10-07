@@ -47,6 +47,16 @@ describe("Discord guild through the REST API", () => {
     expect(await guild.fetchRoleIds("200")).toBeUndefined();
   });
 
+  it("lists the server's roles, @everyone and the bots' told apart", async () => {
+    const raider = discord.addRole("Raideur R1");
+    const bot = discord.addRole("VXV", true);
+    expect(await guild.listRoles()).toEqual([
+      { id: "guild", name: "@everyone", everyone: true, managed: false },
+      { id: raider, name: "Raideur R1", everyone: false, managed: false },
+      { id: bot, name: "VXV", everyone: false, managed: true },
+    ]);
+  });
+
   it("lets any other refusal surface", async () => {
     const broken = createDiscordGuild({ token: "token", guildId: "guild", apiUrl: "https://discord.test/unknown" });
     await expect(broken.setOnlyRoleAmong("200", "Voleur", CLASSES)).rejects.toBeInstanceOf(DiscordApiError);

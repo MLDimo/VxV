@@ -7,6 +7,7 @@ const event: RaidEvent = {
   startsAt: new Date("2026-12-12T20:00:00Z"),
   softReservesPerPlayer: 1,
   raids: [{ id: "onyxia", name: "Onyxia" }],
+  role: undefined,
   discordMessageId: undefined,
 };
 

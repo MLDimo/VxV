@@ -93,6 +93,7 @@ describe("buildRaidRecap", () => {
       startsAt: new Date("2026-12-10T21:00:00Z"),
       softReservesPerPlayer: 1,
       raids: [{ id: "onyxia", name: "Onyxia" }],
+      role: undefined,
       discordMessageId: undefined,
     };
     const recap = buildRaidRecap(event, parseRaidLog(LOG), {

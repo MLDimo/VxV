@@ -85,6 +85,19 @@ export function slashCommand(
   } as unknown as APIChatInputApplicationCommandGuildInteraction;
 }
 
+/** The same slash command with options of another type than text ("Integer", "Role"…), as Discord sends them. */
+export function withOptions(
+  command: APIChatInputApplicationCommandGuildInteraction,
+  type: keyof typeof ApplicationCommandOptionType,
+  values: Record<string, string | number>,
+): APIChatInputApplicationCommandGuildInteraction {
+  const options = [
+    ...(command.data.options ?? []),
+    ...Object.entries(values).map(([name, value]) => ({ name, type: ApplicationCommandOptionType[type], value })),
+  ];
+  return { ...command, data: { ...command.data, options } } as APIChatInputApplicationCommandGuildInteraction;
+}
+
 /** The autocomplete request Discord sends while the member types an option. */
 export function autocomplete(
   name: string,

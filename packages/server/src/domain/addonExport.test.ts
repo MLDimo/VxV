@@ -51,6 +51,7 @@ const facts: AddonEventFacts = {
       { id: "onyxia", name: "Onyxia" },
       { id: "mont-hyjal", name: "Mont Hyjal" },
     ],
+    role: { id: "1194373648929263676", name: "Raideur R1" },
     discordMessageId: undefined,
   },
   signups: [
@@ -115,7 +116,7 @@ describe("formatAddonEvent", () => {
   it("writes the event, its officers, the reserved or excluded items, the sign-ups, the journal and the changes", () => {
     expect(formatAddonEvent(facts).split("\n")).toEqual([
       ADDON_EVENT_HEADER,
-      "E;e1;1796932800;1796931900;2;Onyxia + Mont Hyjal;onyxia,mont-hyjal",
+      "E;e1;1796932800;1796931900;2;Onyxia + Mont Hyjal;onyxia,mont-hyjal;Réservé à Raideur R1",
       "O;Ðéjà Vu",
       "I;20;Tête d'Onyxia;Onyxia;0",
       "I;21;Sac en peau;Onyxia;0",

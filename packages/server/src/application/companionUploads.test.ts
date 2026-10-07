@@ -5,7 +5,7 @@ import { bossFightRepository } from "../infrastructure/postgres/bossFights.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import { createEvent, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createCharacters } from "./characters.ts";
 import { createCompanionUploads, type CompanionUpload } from "./companionUploads.ts";
@@ -52,8 +52,8 @@ describe("companion uploads", () => {
       gameChanges: createGameChanges({
         unitOfWork,
         clock,
-        events: createEvents({ unitOfWork, clock }),
-        signups: createSignups({ unitOfWork, clock }),
+        events: createEvents({ unitOfWork, clock, guild: testGuild }),
+        signups: createSignups({ unitOfWork, clock, guild: testGuild }),
         softReserves: createSoftReserves({ unitOfWork, clock }),
         exclusions: createExclusions({ unitOfWork }),
         bets: createBets({ unitOfWork, clock }),

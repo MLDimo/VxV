@@ -1,6 +1,7 @@
 import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Member } from "../domain/members.ts";
+import { titleRole } from "../domain/titles.ts";
 import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
 import { createDiscordGuild } from "../infrastructure/discord/guild.ts";
 import { bossFightRepository } from "../infrastructure/postgres/bossFights.ts";
@@ -16,7 +17,7 @@ import { createBets } from "./bets.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createCash } from "./cash.ts";
 import type { AnnouncedTitles } from "./discordPorts.ts";
-import { createTitles, titleRole, type Titles } from "./titles.ts";
+import { createTitles, type Titles } from "./titles.ts";
 
 const WEDNESDAY = new Date("2026-10-07T05:00:00Z");
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;

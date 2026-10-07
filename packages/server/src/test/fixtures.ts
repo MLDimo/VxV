@@ -1,10 +1,16 @@
 import type { Character } from "../domain/characters.ts";
+import type { EventRole } from "../domain/eventRoles.ts";
 import type { LootMethod } from "../domain/history.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
+import { createDiscordGuild } from "../infrastructure/discord/guild.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { eventRepository } from "../infrastructure/postgres/events.ts";
 import { memberRepository } from "../infrastructure/postgres/members.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
+
+/** The guild's Discord server as the bot reaches it: the tests that read it stand in for Discord (createFakeDiscord). */
+export const TEST_GUILD_ID = "guild";
+export const testGuild = createDiscordGuild({ token: "token", guildId: TEST_GUILD_ID });
 
 /** Saves a member as a Discord sign-in would. */
 export function createMember(sql: SqlClient, role: MemberRole, name = `${role}-member`): Promise<Member> {
@@ -43,8 +49,15 @@ export async function createRaids(sql: SqlClient, raids: Record<string, string>)
 }
 
 /** An event on the given raids, as an officer would create it. */
-export function createEvent(sql: SqlClient, createdBy: Member, startsAt: Date, raidIds: string[]): Promise<string> {
-  return eventRepository(sql).create({ startsAt, raidIds, softReservesPerPlayer: 1 }, createdBy.id);
+/** An event with one soft reserve per player, open to everybody unless reserved to a role. */
+export function createEvent(
+  sql: SqlClient,
+  createdBy: Member,
+  startsAt: Date,
+  raidIds: string[],
+  role?: EventRole,
+): Promise<string> {
+  return eventRepository(sql).create({ startsAt, raidIds, softReservesPerPlayer: 1, role }, createdBy.id);
 }
 
 /** Onyxia's lair with two bosses and their loot, as the generated raid data would create it. */

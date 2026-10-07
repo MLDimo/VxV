@@ -33,6 +33,11 @@ export const TITLES = [
 
 export type TitleId = (typeof TITLES)[number]["id"];
 
+/** Each title is a Discord role of this name, held by the week's holder. */
+export function titleRole(titleName: string): string {
+  return `◆ ${titleName}`;
+}
+
 /**
  * The titles an officer may give for the week, in place of the computed holder (owner's decisions of 7 October):
  * those whose measure may miss data. Given again by the reassignment each Wednesday, like the others.

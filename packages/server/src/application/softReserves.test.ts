@@ -12,6 +12,7 @@ import {
   createRaidWithLoot,
   recordAttendance,
   recordLoot,
+  testGuild,
 } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
@@ -41,7 +42,7 @@ describe("soft reserves", () => {
     now = new Date("2026-12-01T12:00:00Z");
     const clock = () => now;
     softReserves = createSoftReserves({ unitOfWork, clock });
-    signups = createSignups({ unitOfWork, clock });
+    signups = createSignups({ unitOfWork, clock, guild: testGuild });
     journal = createJournal({ unitOfWork });
     me = await createMember(sql, "member", "Moi");
     other = await createMember(sql, "member", "Autre");

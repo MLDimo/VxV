@@ -6,8 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext } from "./commands.ts";
 import { VXV_MISSION } from "./missionCommand.ts";
 import { createTestApplication, MISSIONS_CHANNEL, SITE_URL, TEST_ROLES } from "./testApplication.ts";
-import { type TestActor } from "./testing.ts";
-import { slashCommand } from "./testing.ts";
+import { slashCommand, withOptions, type TestActor } from "./testing.ts";
 
 const OFFICER: TestActor = { userId: "100", name: "Officier", roleIds: [TEST_ROLES.officer], channelId: "anywhere" };
 const MEMBER: TestActor = { userId: "200", name: "Membre", channelId: "anywhere" };
@@ -19,15 +18,6 @@ function contentOf(response: APIInteractionResponse): string | undefined {
   return "data" in response && response.data !== undefined && "content" in response.data
     ? response.data.content
     : undefined;
-}
-
-/** A slash command with an integer option, as Discord sends it. */
-function withIntegers(command: ReturnType<typeof slashCommand>, integers: Record<string, number>) {
-  const options = [
-    ...(command.data.options ?? []),
-    ...Object.entries(integers).map(([name, value]) => ({ name, type: 4, value })),
-  ];
-  return { ...command, data: { ...command.data, options } } as typeof command;
 }
 
 describe("/vxv_mission", () => {
@@ -47,7 +37,12 @@ describe("/vxv_mission", () => {
 
   const publish = async (actor: TestActor, options: Record<string, string>, reward = 2000) =>
     contentOf(
-      await VXV_MISSION.run(withIntegers(slashCommand("vxv_mission", options, actor), { recompense: reward }), context),
+      await VXV_MISSION.run(
+        withOptions(slashCommand("vxv_mission", options, actor), "Integer", {
+          recompense: reward,
+        }),
+        context,
+      ),
     );
   const embed = () => (discord.messages()[0]?.body.embeds as APIEmbed[] | undefined)?.[0];
 

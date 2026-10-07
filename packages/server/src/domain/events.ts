@@ -1,3 +1,5 @@
+import type { EventRole } from "./eventRoles.ts";
+
 export interface RaidSummary {
   id: string;
   name: string;
@@ -9,14 +11,24 @@ export interface RaidEvent {
   softReservesPerPlayer: number;
   /** One or several raids played the same evening, by name. */
   raids: RaidSummary[];
+  /** The Discord role whose holders alone may sign up; none: everybody on the guild's Discord server. */
+  role: EventRole | undefined;
   /** Sign-up message published by the bot on Discord, once it exists. */
   discordMessageId: string | undefined;
 }
 
+/** An event as an officer plans it, on the website, with Discord's /vxv_raid or in game. */
 export interface NewRaidEvent {
   startsAt: Date;
   raidIds: string[];
   softReservesPerPlayer: number;
+  /** The Discord role chosen among eventRoleChoices: its holders alone may sign up (@everyone: everybody). */
+  roleId: string;
+}
+
+/** An event as it is kept: the role chosen, found on the guild's Discord server. */
+export interface PlannedRaidEvent extends Omit<NewRaidEvent, "roleId"> {
+  role: EventRole | undefined;
 }
 
 export const DEFAULT_SOFT_RESERVES = 1;
