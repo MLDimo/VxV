@@ -18,7 +18,7 @@ local TOGGLE_GAP, BUTTON_WIDTH, BUTTON_HEIGHT, STEP_SIZE = 6, 160, 30, 26
 -- The website's bounds of the soft reserves per player.
 local MIN_SOFT_RESERVES, MAX_SOFT_RESERVES, DEFAULT_SOFT_RESERVES = 1, 10, 1
 local MAX_LETTERS = { date = 10, time = 5, reason = 200 }
-local MISSING = "Indique la date, l'heure, au moins un raid, qui peut s'inscrire et le motif."
+local MISSING = "Il manque : %s."
 local NO_ROLE = "Choisis un rôle avec les flèches."
 local NO_ROLES = "Rôles pas encore reçus : ton compagnon VXV les apporte au /reload."
 
@@ -126,8 +126,18 @@ local function send()
     end
     table.sort(raidIds)
     local date, at, reason, role = trimmed("date"), trimmed("time"), trimmed("reason"), roles[roleIndex]
-    if date == "" or at == "" or reason == "" or #raidIds == 0 or role == nil then
-        problem:SetText(MISSING)
+    -- Each part left empty, named: the officer sees what to fill.
+    local missing = {}
+    for _, part in ipairs({
+        { date == "", "la date" }, { at == "", "l'heure" }, { #raidIds == 0, "un raid" },
+        { role == nil, "qui peut s'inscrire (flèches)" }, { reason == "", "le motif" },
+    }) do
+        if part[1] then
+            missing[#missing + 1] = part[2]
+        end
+    end
+    if #missing > 0 then
+        problem:SetText(MISSING:format(table.concat(missing, ", ")))
         return
     end
     if Changes.Submit({ kind = "event", date = date, time = at, raidIds = raidIds, softReserves = softReserves,
@@ -144,8 +154,10 @@ local function build()
     addCount(2 * SECTION)
     addRole(3 * SECTION)
     addField("reason", 0, 4 * SECTION, body:GetWidth(), "Motif (visible dans le journal)")
+    -- Across the form, from left to right: a long list of what is missing wraps upward.
     problem = Theme.Text(body, "text", 13, "loss")
     problem:SetPoint("BOTTOMLEFT", 0, BUTTON_HEIGHT + FIELD_PADDING)
+    problem:SetPoint("BOTTOMRIGHT", 0, BUTTON_HEIGHT + FIELD_PADDING)
     local button = Theme.Button(body, "pixel", "Créer", BUTTON_WIDTH, BUTTON_HEIGHT)
     button:SetPoint("BOTTOMRIGHT")
     button:SetScript("OnClick", send)
