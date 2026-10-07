@@ -52,7 +52,7 @@ export function parseDeathroll(text: string): DeathrollGame {
   const bets: DeathrollGame["bets"] = [];
   let paid: DeathrollGame["paid"];
   readRecords(text, {
-    headers: [DEATHROLL_HEADER],
+    header: DEATHROLL_HEADER,
     wrongHeader: `Une partie doit commencer par la ligne ${DEATHROLL_HEADER}.`,
     readers: {
       G: ([id, challenger, challenged, stake, start, acceptedAt, endedAt]) => {

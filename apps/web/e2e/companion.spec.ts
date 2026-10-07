@@ -73,7 +73,7 @@ test("an officer's companion sends the roster, the raid's record and the charact
     roster: { text: ["VXV-ROSTER-1", ...SEED_ROSTER].join("\n"), capturedAt: Math.floor(Date.now() / 1000) },
     raidLogs: [
       [
-        "VXV-LOG-1",
+        "VXV-LOG-2",
         `R;${readSeed().companionEventId};${String(night)};${String(night + 3600)}`,
         `K;3493;${String(night + 1800)}`,
         "P;Ciel Gris",

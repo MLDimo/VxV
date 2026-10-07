@@ -11,7 +11,7 @@ VXV_SyncDB = {
 		["capturedAt"] = 1796904000,
 	},
 	["raidLogs"] = {
-		["e1"] = "VXV-LOG-1\\nR;e1;1796904000;1796904120",
+		["e1"] = "VXV-LOG-2\\nR;e1;1796904000;1796904120",
 	},
 	["characters"] = {
 		["Ðéjà Vu"] = {
@@ -64,7 +64,7 @@ describe("outbox of the addon", () => {
       kind: "read",
       outbox: {
         roster: { text: "VXV-ROSTER-1\nÐéjà;Vu;ROGUE", capturedAt: 1796904000 },
-        raidLogs: ["VXV-LOG-1\nR;e1;1796904000;1796904120"],
+        raidLogs: ["VXV-LOG-2\nR;e1;1796904000;1796904120"],
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
         changes: [
           {

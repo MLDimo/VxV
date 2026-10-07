@@ -49,16 +49,16 @@ export type RecordReader = (fields: string[]) => boolean;
 export function readRecords(
   text: string,
   format: {
-    /** The headers read, the current version's last. */
-    headers: readonly string[];
+    /** The format's first line, with its version. */
+    header: string;
     wrongHeader: string;
     readers: Readonly<Record<string, RecordReader>>;
     /** What to do with an unreadable line ("recopiez le journal depuis l'addon"). */
     advice?: string;
   },
 ): void {
-  const [header, ...rows] = textLines(text);
-  if (header?.fields.length !== 1 || !format.headers.includes(header.fields[0] ?? "")) {
+  const [first, ...rows] = textLines(text);
+  if (first?.fields.length !== 1 || first.fields[0] !== format.header) {
     throw new TextFormatError([format.wrongHeader]);
   }
   const advice = format.advice === undefined ? "" : ` : ${format.advice}`;

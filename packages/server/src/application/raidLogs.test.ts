@@ -17,7 +17,7 @@ const NOW = new Date("2026-12-11T09:00:00Z");
 
 function logOf(eventId: string, ...extra: string[]): string {
   return [
-    "VXV-LOG-1",
+    "VXV-LOG-2",
     `R;${eventId};1796936400;1796940720`,
     "K;2;1796940600",
     "P;Ðéjà Vu",
@@ -126,7 +126,7 @@ describe("raid logs", () => {
     const member = await createMember(sql, "member", "Membre");
     await expect(raidLogs.importLog(member, eventId, logOf(eventId), "Essai")).rejects.toThrow(ForbiddenError);
     await expect(raidLogs.importLog(officer, eventId, logOf("autre"), "Essai")).rejects.toThrow(ValidationError);
-    await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-1\nK;x;y", "Essai")).rejects.toThrow(TextFormatError);
+    await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-2\nK;x;y", "Essai")).rejects.toThrow(TextFormatError);
   });
 
   describe("from the officers' companions", () => {

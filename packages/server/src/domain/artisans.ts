@@ -43,7 +43,7 @@ export function parseProfessions(text: string): CharacterProfessions {
   const professions: ProfessionReading[] = [];
   const byId = new Map<number, ProfessionReading>();
   readRecords(text, {
-    headers: [PROFESSIONS_HEADER],
+    header: PROFESSIONS_HEADER,
     wrongHeader: `Les métiers doivent commencer par la ligne ${PROFESSIONS_HEADER}.`,
     readers: {
       C: ([name]) => {

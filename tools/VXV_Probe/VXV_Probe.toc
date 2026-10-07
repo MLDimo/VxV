@@ -2,7 +2,7 @@
 ## Title: VXV Probe
 ## Notes: Sonde technique de la Phase 0 (non distribuée)
 ## Author: VXV
-## Version: 0.4.0
+## Version: 0.4.1
 ## SavedVariables: VXV_ProbeDB
 
 # Core: generic tooling, no test logic.
@@ -14,10 +14,6 @@ Core\Log.lua
 Core\Registry.lua
 Core\Report.lua
 Core\Slash.lua
-
-# Files written by an external program (test 0.6).
-External\Seed.lua
-External\Inbox.lua
 
 # Tests: one file per plan step, each registers itself.
 Tests\Api.lua
