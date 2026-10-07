@@ -10,7 +10,7 @@ VXV.RegisterModule({
     name = "Le Dé Pipé",
     Enable = function(data)
         ns.BetsData.Restore(data)
-        ns.Stakes.Restore(data)
+        ns.Changes.Restore(data)
         tellCash(ns.BetsData.Current())
     end,
     tab = {

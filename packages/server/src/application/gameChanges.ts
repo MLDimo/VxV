@@ -2,7 +2,7 @@ import { fullName, type Character } from "../domain/characters.ts";
 import type { NewRaidEvent } from "../domain/events.ts";
 import { isBetChange, type GameChange, type GameChangeOutcome } from "../domain/gameChanges.ts";
 import { formatDateTime, formatGold } from "../domain/labels.ts";
-import type { BetChoice } from "../domain/bets.ts";
+import type { BetChoice, NewBet } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
 import { parseRaidStart } from "../domain/raidStart.ts";
@@ -29,6 +29,7 @@ interface GameChangeDependencies {
   /** The event's message on Discord follows its sign-ups, and a new event gets one. */
   announcements: { announceQuietly(eventId: string): Promise<boolean> };
   bets: {
+    create(officer: Member, input: NewBet, reason: string): Promise<string>;
     stake(member: Member, betId: string, choiceId: string, amount: number): Promise<{ bet: { choices: BetChoice[] } }>;
     withdraw(member: Member, betId: string): Promise<unknown>;
   };
@@ -47,8 +48,14 @@ export function createGameChanges({
   bets,
   betAnnouncements,
 }: GameChangeDependencies) {
-  /** Does the change as its author's member would on the website; returns what the game tells the author. */
-  async function perform(author: { character: Character; member: Member }, change: GameChange): Promise<string> {
+  /**
+   * Does the change as its author's member would on the website; returns what the game tells the author, and the bet
+   * it opened.
+   */
+  async function perform(
+    author: { character: Character; member: Member },
+    change: GameChange,
+  ): Promise<{ message: string; betId?: string }> {
     switch (change.kind) {
       case "signup":
         await signups.signUp(
@@ -58,10 +65,10 @@ export function createGameChanges({
           change.madeAt,
         );
         await announcements.announceQuietly(change.eventId);
-        return "Inscription enregistrée sur le site.";
+        return { message: "Inscription enregistrée sur le site." };
       case "reserves":
         await softReserves.setMine(author.member, change.eventId, change.itemIds.map(String), change.madeAt);
-        return "SR enregistrées sur le site.";
+        return { message: "SR enregistrées sur le site." };
       case "exclusion":
         await (change.excluded ? exclusions.exclude : exclusions.include)(
           author.member,
@@ -69,7 +76,7 @@ export function createGameChanges({
           String(change.itemId),
           change.reason,
         );
-        return change.excluded ? "Objet exclu des SR." : "Objet de nouveau ouvert aux SR.";
+        return { message: change.excluded ? "Objet exclu des SR." : "Objet de nouveau ouvert aux SR." };
       case "event": {
         const startsAt = parseRaidStart(change.date, change.time, clock());
         if (startsAt === undefined) {
@@ -81,18 +88,31 @@ export function createGameChanges({
           change.reason,
         );
         await announcements.announceQuietly(eventId);
-        return `Événement du ${formatDateTime(startsAt)} créé et annoncé sur Discord.`;
+        return { message: `Événement du ${formatDateTime(startsAt)} créé et annoncé sur Discord.` };
       }
       case "stake": {
         const { bet } = await bets.stake(author.member, change.betId, change.choiceId, change.amount);
         await betAnnouncements.announceQuietly(change.betId);
         const label = bet.choices.find((choice) => choice.id === change.choiceId)?.label ?? "";
-        return `Mise de ${formatGold(change.amount)} sur « ${label} » enregistrée : à payer au trésorier.`;
+        return { message: `Mise de ${formatGold(change.amount)} sur « ${label} » enregistrée : à payer au trésorier.` };
       }
       case "withdraw":
         await bets.withdraw(author.member, change.betId);
         await betAnnouncements.announceQuietly(change.betId);
-        return "Mise retirée.";
+        return { message: "Mise retirée." };
+      case "bet": {
+        const closesAt = parseRaidStart(change.date, change.time, clock());
+        if (closesAt === undefined) {
+          throw new ValidationError(UNREADABLE_START);
+        }
+        const betId = await bets.create(
+          author.member,
+          { title: change.title, choices: change.choices, closesAt },
+          change.reason,
+        );
+        await betAnnouncements.announceQuietly(betId);
+        return { message: `Pari « ${change.title} » ouvert et annoncé sur Discord.`, betId };
+      }
     }
   }
 
@@ -107,7 +127,7 @@ export function createGameChanges({
 
   /** What becomes of one change; undefined when it cannot be kept (unknown event, or relayed by a member). */
   async function receiveOne(sender: Member, change: GameChange): Promise<GameChangeOutcome | undefined> {
-    const creation = change.kind === "event";
+    const creation = change.kind === "event" || change.kind === "bet";
     const betId = isBetChange(change) ? change.betId : undefined;
     const known = await unitOfWork.run(async ({ gameChanges, events: storedEvents, bets: storedBets }) => ({
       outcome: await gameChanges.find(change.id),
@@ -137,7 +157,8 @@ export function createGameChanges({
       outcome = { ...base, accepted: false, message: UNKNOWN_AUTHOR };
     } else {
       try {
-        outcome = { ...base, accepted: true, message: await perform(author, change) };
+        const done = await perform(author, change);
+        outcome = { ...base, betId: done.betId ?? base.betId, accepted: true, message: done.message };
       } catch (error) {
         if (!(error instanceof ApplicationError)) {
           throw error;

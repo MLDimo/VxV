@@ -1,3 +1,4 @@
+import { MAX_BET_TITLE_LENGTH, MAX_CHOICE_LENGTH, MAX_CHOICES } from "@vxv/server/domain/bets";
 import { z } from "zod";
 import { getApplication } from "@/server/application";
 import { asCompanion, errorResponse } from "@/server/companionApi";
@@ -66,6 +67,15 @@ const changeSchema = z.discriminatedUnion("kind", [
     amount: z.number(),
   }),
   z.object({ ...changeBase, kind: z.literal("withdraw"), betId: z.string().max(60) }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("bet"),
+    title: z.string().max(MAX_BET_TITLE_LENGTH),
+    choices: z.array(z.string().max(MAX_CHOICE_LENGTH)).max(MAX_CHOICES),
+    date: z.string().max(10),
+    time: z.string().max(5),
+    reason: z.string().max(500),
+  }),
 ]);
 
 /** What the companion read in the addon's saved data (apps/companion/src/domain/outbox.ts). */

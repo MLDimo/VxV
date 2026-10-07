@@ -1,12 +1,12 @@
 local _, ns = ...
 
 --- The player's stake on a bet, in game (P11.8): a choice and an amount in gold pieces, or the stake taken back;
---- sent to the website as a change (Stakes.lua). Filled with the change waiting for the website, else the stake it
+--- sent to the website as a change (Changes.lua). Filled with the change waiting for the website, else the stake it
 --- knows.
 local StakeDialog = {}
 ns.StakeDialog = StakeDialog
 
-local Bets, BetsData, Stakes = ns.Bets, ns.BetsData, ns.Stakes
+local Bets, BetsData, Changes = ns.Bets, ns.BetsData, ns.Changes
 
 local Theme = VXV.Theme
 
@@ -73,13 +73,13 @@ local function send()
         problem:SetText(MISSING_CHOICE)
     elseif amount == nil or amount < MIN_STAKE or amount ~= math.floor(amount) then
         problem:SetText(BAD_AMOUNT)
-    elseif Stakes.Place(betId, chosen, amount) then
+    elseif Changes.Place(betId, chosen, amount) then
         frame:Hide()
     end
 end
 
 local function takeBack()
-    if Stakes.Withdraw(betId) then
+    if Changes.Withdraw(betId) then
         frame:Hide()
     end
 end
@@ -125,7 +125,7 @@ function StakeDialog.Open(id)
     if frame == nil then
         build()
     end
-    local pending, stake = Stakes.Pending(bet.id), Bets.StakeOf(bet, memberId)
+    local pending, stake = Changes.Pending(bet.id), Bets.StakeOf(bet, memberId)
     local current = pending ~= nil and pending.kind == "stake" and pending or stake
     chosen = current and current.choiceId
     title:SetText(bet.title)

@@ -79,6 +79,10 @@ titres d'officier et Princesse, journal de combat, Ranking).
     paris, classement, caisse, carte de la Taverne, onglet « Paris » du mode réduit ; caisse aussi sur la page gauche
     du Journal). Données `VXV-PARIS-1` apportées par le compagnon et relayées par les officiers ; le partage des
     données et les changements faits en jeu sont passés dans le socle (`VXV.SiteData`, `VXV.PendingChanges`).
+  - Ouverture d'un pari en jeu (7 octobre) : bouton « Ouvrir un pari » des officiers sur la table de jeu
+    (`VXV_Paris/UI/BetDialog.lua` : question, choix séparés par « ; », fermeture comme `/vxv_pari`, motif), changement
+    `bet` en attente puis confirmé (`VXV_Paris/Changes.lua`, qui porte aussi les mises) ; le site l'ouvre comme sur le
+    site, avec journal et message Discord, et la réponse revient avec les données du pari ouvert.
   Validation en attente : un pari réel mené jusqu'au versement des gains ; publier le compagnon 1.1 (données des
   paris).
 - **P12 Tableau de missions** : code terminé.

@@ -5,12 +5,13 @@ local _, ns = ...
 local DiceView = {}
 ns.DiceView = DiceView
 
-local Bets, Book, Gold, Stakes = ns.Bets, ns.Book, VXV.Gold, ns.Stakes
+local Bets, Book, Gold, Changes = ns.Bets, ns.Book, VXV.Gold, ns.Changes
 
 local DATE = "%d/%m %H:%M"
 local EXAMPLE_STAKE = 10
 local NO_DATA = "Aucune donnée des paris : un officier les envoie à la guilde, ou ton compagnon VXV les apporte."
-local NO_BET = "Aucun pari ouvert : les officiers les lancent sur le site et sur Discord."
+local NO_BET = "Aucun pari ouvert : les officiers les lancent ici, sur le site ou sur Discord."
+local OPENING = "En attente du site : pari « %s »"
 local UNLINKED = "Ce personnage n'est lié à aucun membre sur le site : lie-le avec /vxv_main ou /vxv_reroll."
 -- Where a stake stands with the treasurer (domain/bets.ts).
 local STANDINGS = {
@@ -35,7 +36,7 @@ end
 
 --- The player's stake on the bet as it stands: waiting for the website, known by it, or none.
 local function myStake(bet, memberId, book)
-    local pending, stake, answer = Stakes.Pending(bet.id), Bets.StakeOf(bet, memberId), Stakes.Answer(bet.id)
+    local pending, stake, answer = Changes.Pending(bet.id), Bets.StakeOf(bet, memberId), Changes.Answer(bet.id)
     local rows = {}
     if pending ~= nil then
         rows[#rows + 1] = row("line", pending.kind == "withdraw" and "Retrait de ta mise en attente du site"
@@ -77,16 +78,17 @@ function DiceView.Bet(bet, memberId)
     return rows
 end
 
---- Le Dé Pipé's table: every open bet, closing soonest first; or why there is none. A bet's title opens the stake.
+--- Le Dé Pipé's table: the bets the player opened, waiting for the website, then every open bet, closing soonest
+--- first; or why there is none. A bet's title opens the stake.
 function DiceView.Table(data, memberId, now, onStake)
-    if data == nil then
-        return { row("line", NO_DATA) }
-    end
-    local open = Bets.Open(data, now)
-    if #open == 0 then
-        return { row("line", NO_BET) }
-    end
     local rows = {}
+    for _, opening in ipairs(Changes.Openings()) do
+        rows[#rows + 1] = row("line", OPENING:format(opening.title))
+    end
+    local open = data ~= nil and Bets.Open(data, now) or {}
+    if #open == 0 then
+        rows[#rows + 1] = row("line", data == nil and NO_DATA or NO_BET)
+    end
     for _, bet in ipairs(open) do
         for index, entry in ipairs(DiceView.Bet(bet, memberId)) do
             if index == 1 then

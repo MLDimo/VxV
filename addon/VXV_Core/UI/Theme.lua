@@ -283,6 +283,17 @@ function Theme.Button(parent, styleName, text, width, height, textColor)
     return button
 end
 
+-- A small wood button on the right of a panel's title.
+local TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT, TITLE_BUTTON_TOP = 104, 22, 9
+
+--- A small wood button on the right of a titled panel's title, its text in gold for an officer's action.
+function Theme.TitleButton(panel, text, run, textColor)
+    local button = Theme.Button(panel, "wood", text, TITLE_BUTTON_WIDTH, TITLE_BUTTON_HEIGHT, textColor)
+    button:SetPoint("TOPRIGHT", -PANEL_PADDING, -TITLE_BUTTON_TOP)
+    button:SetScript("OnClick", run)
+    return button
+end
+
 -- Tabs (§3): wood, plum and a gold underline when selected.
 local TAB_HEIGHT, TAB_FONT_SIZE, TAB_UNDERLINE, TAB_PADDING = 36, 15, 3, 24
 
