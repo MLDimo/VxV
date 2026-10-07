@@ -1,7 +1,7 @@
 local _, ns = ...
 
 --- Le Dé Pipé's Deathroll tab (P15): challenge a member connected with VXV, follow the games being played, the
---- player's debts (the winner confirms the payment here), and the ranking.
+--- player's debts (the winner confirms the payment here), and the latest games (the ranking is in Ranking).
 local DeathrollTab = {}
 ns.DeathrollTab = DeathrollTab
 
@@ -63,21 +63,20 @@ local function debts()
     return #rows > 0 and rows or { row("line", "Aucune dette de deathroll.") }
 end
 
---- The deathroll's ranking since always, as the website exports it (P15.7).
-function DeathrollTab.Ranking()
+--- The latest games over, as the website exports them: the winner, the loser and the stake.
+local function latest()
     local data, rows = DeathrollData.Current(), {}
-    for _, entry in ipairs(data and data.ranking or {}) do
-        rows[#rows + 1] = row("line", ("%d. %s · %s · %d parties"):format(entry.rank,
-            VXV.ClassColored(entry.name, entry.class), Gold.Signed(entry.net), entry.games))
+    for _, game in ipairs(data and data.latest or {}) do
+        rows[#rows + 1] = row("line", ("%s bat %s · %s"):format(game.winner, game.loser, Gold.Format(game.stake)))
     end
-    return #rows > 0 and rows or { row("line", "Le classement arrive avec les données du site.") }
+    return #rows > 0 and rows or { row("line", "Les dernières parties arrivent avec les données du site.") }
 end
 
 local function render()
     lists.members.SetRows(members())
     lists.live.SetRows(live())
     lists.debts.SetRows(debts())
-    lists.ranking.SetRows(DeathrollTab.Ranking())
+    lists.latest.SetRows(latest())
 end
 
 local function challenge()
@@ -118,7 +117,7 @@ function DeathrollTab.Build(frame)
         "Mes dettes")
     local x, width = PADDING + LEFT + GAP, content:GetWidth() - 2 * PADDING - LEFT - GAP
     lists.live = RowList.Panel(content, x, GRID_TOP, width, topHeight, "Parties en cours")
-    lists.ranking = RowList.Panel(content, x, GRID_TOP + topHeight + GAP, width, height - topHeight - GAP,
-        "Classement")
+    lists.latest = RowList.Panel(content, x, GRID_TOP + topHeight + GAP, width, height - topHeight - GAP,
+        "Dernières parties")
     Screen.Follow(content, render, { "deathroll.updated", "presence.changed" })
 end

@@ -1,21 +1,23 @@
 import { canManageRaids, TITLES, titleRole } from "@vxv/server";
-import { formatTitleWeek } from "@vxv/server/domain/labels";
 import { MemberName } from "@/components/MemberName";
 import { Panel } from "@/components/Panel";
-import { RankingHeader } from "@/components/RankingHeader";
+import { RankingScreen } from "@/components/RankingScreen";
 import { TitleGiveForm } from "@/components/TitleGiveForm";
 import { getApplication } from "@/server/application";
 import { guildMembers } from "@/server/guildMembers";
 import { requireMember } from "@/server/session";
 
-/** Ranking · Titres (P13): the week's holders, each title's rule, and the former weeks. */
-export default async function TitlesPage() {
+/** Ranking · Titres (§7.5, P13): the members by weeks of title held, then the week's titles and their rules. */
+export default async function TitlesRankingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ periode?: string | string[] }>;
+}) {
   const member = await requireMember();
-  const [current, ...former] = await getApplication().titles.weeks();
+  const [current] = await getApplication().titles.weeks(1);
   return (
-    <>
-      <RankingHeader category="/ranking/titres" />
-      <p className="mt-6 max-w-3xl text-lavender">
+    <RankingScreen category="titres" member={member} periodParam={(await searchParams).periode}>
+      <p className="mt-10 max-w-3xl text-lavender">
         Chaque mercredi au reset, chaque titre va au membre en tête sur la saison ; à égalité, au premier à atteindre le
         score. Princesse se lit dans le journal de combat des raids ; un officier peut la donner pour la semaine si le
         journal a manqué des soins. Chaque titre est aussi un rôle Discord.
@@ -41,23 +43,8 @@ export default async function TitlesPage() {
       {current === undefined && (
         <p className="mt-4 text-sm text-muted">Les premiers titres seront donnés mercredi matin.</p>
       )}
-      {former.length > 0 && (
-        <Panel title="Semaines passées" className="mt-8">
-          <ul className="mt-3 space-y-2 text-sm">
-            {former.map((week) => (
-              <li key={week.week}>
-                <span className="font-bold">{formatTitleWeek(week.week)}</span> :{" "}
-                {week.holders.map((holder, index) => (
-                  <span key={holder.titleId}>
-                    {index > 0 && " · "}
-                    {TITLES.find((title) => title.id === holder.titleId)?.name ?? holder.titleId}{" "}
-                    <MemberName name={holder.memberName} characterClass={holder.memberClass} />
-                  </span>
-                ))}
-              </li>
-            ))}
-          </ul>
-        </Panel>
+      {current === undefined && (
+        <p className="mt-4 text-sm text-muted">Les premiers titres seront donnés mercredi matin.</p>
       )}
       {canManageRaids(member.roles) && (
         <Panel title="Officiers · titres à donner" officer className="mt-8">
@@ -68,6 +55,6 @@ export default async function TitlesPage() {
           <TitleGiveForm members={await guildMembers()} />
         </Panel>
       )}
-    </>
+    </RankingScreen>
   );
 }

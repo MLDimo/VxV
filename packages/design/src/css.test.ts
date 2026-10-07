@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fontFile, renderCss, renderPlainCss } from "./css.ts";
+import { LUA_TOKENS } from "./files.ts";
 import { renderLua } from "./lua.ts";
 import { FONTS } from "./tokens.ts";
 
@@ -12,8 +13,7 @@ describe("generated styles", () => {
   });
 
   it("give the addon the same tokens (npm run generate)", () => {
-    const tokens = new URL("../../../addon/VXV_Core/UI/Tokens.lua", import.meta.url);
-    expect(readFileSync(tokens, "utf8")).toBe(renderLua());
+    expect(readFileSync(LUA_TOKENS, "utf8")).toBe(renderLua());
   });
 
   it("only use font files the website serves", () => {

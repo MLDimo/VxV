@@ -98,18 +98,13 @@ describe("deathrolls", () => {
     ).rejects.toThrow("La partie n'est pas finie.");
   });
 
-  it("ranks the players and hands the debts, the ranking and the games to the addon", async () => {
+  it("hands the debts and the games to the addon", async () => {
     await deathrolls.recordFromGame(thom, [game("g4", 500)]);
-    expect((await deathrolls.ranking("always")).rows.map((row) => [row.memberName, row.net, row.games])).toEqual([
-      ["Thom Leboss", 500, 1],
-      ["Vorn Cendrelune", -500, 1],
-    ]);
     const text = await createAddonDeathrolls({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
     const lines = text.split("\n");
     expect(lines[0]).toBe("VXV-DEATHROLLS-1");
     expect(lines).toContain(`X;${vorn.id}`);
     expect(lines).toContain(`D;g4;${vorn.id};Vorn Cendrelune;${thom.id};Thom Leboss;500;${String(ACCEPTED + 120)}`);
-    expect(lines).toContain("K;1;Thom Leboss;ROGUE;500;1;500");
     expect(lines).toContain(`H;g4;Thom Leboss;Vorn Cendrelune;500;${String(ACCEPTED + 120)}`);
   });
 });

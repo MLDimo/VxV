@@ -68,11 +68,12 @@ export type {
 export type { BetView } from "./application/bets.ts";
 export type { CashOverview } from "./application/cash.ts";
 export type { Season } from "./application/ports.ts";
-export type { Ranking } from "./application/ranking.ts";
+export type { RankingLine, RankingRecordLine, RankingView } from "./application/ranking.ts";
+export { RANKING_CATEGORIES, type RankingCategory, type RankingUnit } from "./domain/rankingBoards.ts";
 export type { MissionView } from "./application/missions.ts";
 export { titleRole, type TitleWeek } from "./application/titles.ts";
 export type { RecipeFound } from "./application/artisans.ts";
-export type { DeathrollRankRow, DeathrollView } from "./application/deathrolls.ts";
+export type { DeathrollView } from "./application/deathrolls.ts";
 export type { ArtisanProfession } from "./application/ports.ts";
 export { TITLES, type TitleId } from "./domain/titles.ts";
 export {
@@ -86,7 +87,7 @@ export {
   type MissionStatus,
   type MissionType,
 } from "./domain/missions.ts";
-export { RANKING_PERIODS, type BettorRank, type RankingPeriod } from "./domain/ranking.ts";
+export { RANKING_PERIODS, type RankingPeriod } from "./domain/ranking.ts";
 export {
   CASH_KIND_LABELS,
   MANUAL_CASH_KINDS,

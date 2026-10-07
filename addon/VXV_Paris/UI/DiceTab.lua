@@ -1,7 +1,7 @@
 local _, ns = ...
 
 --- Le Dé Pipé's screen (§7.2): the head with the player's debt, the open bets on the gaming table, then the
---- player's bets, the bettors' ranking and the guild's cash.
+--- player's bets and the guild's cash (the bettors' ranking is in Ranking).
 local DiceTab = {}
 ns.DiceTab = DiceTab
 
@@ -10,8 +10,8 @@ local RowList, Screen = VXV.RowList, VXV.Screen
 
 local PADDING, GAP, GRID_TOP = Screen.PADDING, Screen.GAP, Screen.GRID_TOP
 local RIGHT = 340
--- The right column's panels, by their share of its height.
-local MINE_SHARE, RANKING_SHARE = 0.34, 0.33
+-- The right column's panels: the player's bets take this share of its height, the cash the rest.
+local MINE_SHARE = 0.5
 
 local content, header, badges
 local lists = {}
@@ -28,7 +28,6 @@ local function render()
     renderHeader(data, memberId)
     lists.table.SetRows(DiceView.Table(data, memberId, time(), StakeDialog.Open))
     lists.mine.SetRows(DiceView.MyStakes(data, memberId))
-    lists.ranking.SetRows(DiceView.Ranking(data))
     lists.cash.SetRows(DiceView.Cash(data))
 end
 
@@ -42,12 +41,8 @@ function DiceTab.Build(frame)
     lists.table = RowList.Panel(content, PADDING, GRID_TOP, tableWidth, height, "La table de jeu")
     local x = PADDING + tableWidth + GAP
     local mineHeight = math.floor(height * MINE_SHARE)
-    local rankingHeight = math.floor(height * RANKING_SHARE)
-    local cashHeight = height - mineHeight - rankingHeight - 2 * GAP
     lists.mine = RowList.Panel(content, x, GRID_TOP, RIGHT, mineHeight, "Mes paris")
-    lists.ranking = RowList.Panel(content, x, GRID_TOP + mineHeight + GAP, RIGHT, rankingHeight, "Classement")
-    local cashTop = GRID_TOP + mineHeight + rankingHeight + 2 * GAP
-    lists.cash = RowList.Panel(content, x, cashTop, RIGHT, cashHeight, "La caisse")
+    lists.cash = RowList.Panel(content, x, GRID_TOP + mineHeight + GAP, RIGHT, height - mineHeight - GAP, "La caisse")
     -- What depends on the time (the closing of the bets) is up to date each time the screen shows.
     Screen.Follow(content, render, { "paris.updated", "paris.changes" })
 end

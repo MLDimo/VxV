@@ -2,19 +2,16 @@ import { addonHead, flag, line, seconds, text, type AddonReaders } from "./addon
 import { standing, type Bet, type Stake } from "./bets.ts";
 import type { CashMovement, CashSummary } from "./cash.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
-import type { BettorRank } from "./ranking.ts";
 
 /** First line of the bets' data for the addon (contract with VXV_Paris); the number is the format version. */
 export const ADDON_BETS_HEADER = "VXV-PARIS-1";
 
-/** How many of the latest cash movements and of the first bettors the addon shows. */
+/** How many of the latest cash movements the addon shows. */
 export const ADDON_CASH_MOVEMENTS = 10;
-export const ADDON_RANKED_BETTORS = 10;
 
 export interface AddonBetsFacts extends AddonReaders {
   bets: readonly { bet: Bet; stakes: readonly Stake[] }[];
   cash: CashSummary & { movements: readonly CashMovement[] };
-  ranking: readonly BettorRank[];
   /** What became of the stakes made in game, in the order received. */
   changes: readonly GameChangeOutcome[];
 }
@@ -27,7 +24,6 @@ export interface AddonBetsFacts extends AddonReaders {
  * S;bet id;member id;member;class token, empty without main;choice id;amount;standing;gain, 0 while it runs
  * T;balance;entries of the month;exits of the month (the guild's cash)
  * K;time (Unix seconds);amount, negative for an exit;label (the latest movements first)
- * R;rank;member;class token, empty without main;net gain;bets played (the bettors since always)
  * C;change id;1 when done, 0 when refused;message
  * The addon parses the lines in this order.
  */
@@ -62,9 +58,6 @@ export function formatAddonBets(facts: AddonBetsFacts): string {
     ...facts.cash.movements
       .slice(0, ADDON_CASH_MOVEMENTS)
       .map((movement) => line("K", seconds(movement.occurredAt), movement.amount, text(movement.label))),
-    ...facts.ranking
-      .slice(0, ADDON_RANKED_BETTORS)
-      .map((rank) => line("R", rank.rank, text(rank.memberName), rank.memberClass ?? "", rank.net, rank.bets)),
     ...facts.changes.map((change) => line("C", change.id, flag(change.accepted), text(change.message))),
   ].join("\n");
 }

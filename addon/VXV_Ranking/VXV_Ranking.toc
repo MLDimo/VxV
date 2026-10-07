@@ -1,0 +1,16 @@
+## Interface: 16001
+## Title: VXV Ranking
+## Notes: Le Ranking de VXV : paris, deathroll, quêtes et titres, au-dessus de la cheminée.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The boards the website exports (VXV-RANKING), and what the screen shows of them.
+RankingData.lua
+RankingView.lua
+
+# Interface: the banners of the podium, then the Ranking's screen and its reduced mode.
+UI\Banner.lua
+UI\RankingTab.lua
+
+Bootstrap.lua

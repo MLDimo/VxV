@@ -20,6 +20,7 @@ import type {
   NewMission,
 } from "../domain/missions.ts";
 import type { RankedStake } from "../domain/ranking.ts";
+import type { HeldTitle } from "../domain/rankingBoards.ts";
 import type { TitleAward } from "../domain/titles.ts";
 import type { LedgerStake } from "../domain/treasury.ts";
 
@@ -35,12 +36,22 @@ export interface Session {
   expiresAt: Date;
 }
 
+/** A member as the website shows them: by their main character (name, class, race, sex), else their Discord name. */
+export interface MemberLook {
+  memberId: string;
+  name: string;
+  characterClass: string | undefined;
+  race: string | undefined;
+  sex: "male" | "female" | undefined;
+}
+
 export interface MemberRepository {
   /** Creates the member on first sign-in, or refreshes their Discord name and guild roles. */
   saveFromDiscord(identity: DiscordIdentity, roles: readonly MemberRole[]): Promise<Member>;
   /** Undefined when the id is unknown or malformed. */
   findById(id: string): Promise<Member | undefined>;
   listAll(): Promise<Member[]>;
+  listLooks(): Promise<MemberLook[]>;
   /** The member's guild roles, as Discord gives them now. */
   setRoles(memberId: string, roles: readonly MemberRole[]): Promise<void>;
 }
@@ -393,6 +404,8 @@ export interface TitleRepository {
   give(week: string, titleId: string, memberId: string, givenAt: Date): Promise<void>;
   /** The holders of the latest weeks, the latest week first. */
   listLatestWeeks(weeks: number): Promise<TitleHolder[]>;
+  /** The titles held since the week (all of them without one). */
+  listHeld(sinceWeek: string | undefined): Promise<HeldTitle[]>;
 }
 
 export interface Season {

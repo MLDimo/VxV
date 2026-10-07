@@ -1,4 +1,5 @@
 import { debtOf } from "../domain/bets.ts";
+import type { RankedDeathroll } from "../domain/deathrolls.ts";
 import { formatGold } from "../domain/labels.ts";
 import type { Repositories, StoredDeathroll } from "./ports.ts";
 
@@ -10,6 +11,15 @@ export function loserOf(game: StoredDeathroll) {
 /** The deathroll's winner, as one of its players. */
 export function winnerOf(game: StoredDeathroll) {
   return game.challenger.characterId === game.loserCharacterId ? game.challenged : game.challenger;
+}
+
+/** A deathroll for the rankings and the titles: its players' members, or undefined for a player linked to nobody. */
+export function rankedDeathroll(game: StoredDeathroll): RankedDeathroll | undefined {
+  const winnerId = winnerOf(game).memberId;
+  const loserId = loserOf(game).memberId;
+  return winnerId === undefined || loserId === undefined
+    ? undefined
+    : { winnerId, loserId, stake: game.stake, endedAt: game.endedAt };
 }
 
 /**

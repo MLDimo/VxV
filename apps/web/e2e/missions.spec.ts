@@ -115,5 +115,12 @@ test.describe.serial("missions", () => {
     await expect(page.getByText("Mission « Le Chasseur de têtes » : récompense du 1er (Ciel Gris)")).toBeVisible();
     await page.goto("/quetes");
     await expect(page.getByRole("region", { name: "Hall of fame" })).toContainText("Ciel Gris");
+    // Ranking › Quêtes: 3 points for the quest won.
+    await page.goto("/ranking");
+    await page.getByRole("link", { name: "Quêtes", exact: true }).last().click();
+    await expect(page).toHaveURL(/\/ranking\/quetes$/);
+    await expect(
+      page.getByRole("list", { name: "Podium" }).getByRole("listitem").filter({ hasText: "Ciel" }),
+    ).toContainText("3");
   });
 });

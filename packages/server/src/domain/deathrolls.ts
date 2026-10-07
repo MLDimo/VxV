@@ -161,34 +161,3 @@ export interface RankedDeathroll {
   stake: number;
   endedAt: Date;
 }
-
-export interface DeathrollRank {
-  rank: number;
-  memberId: string;
-  /** Won stakes less lost ones. */
-  net: number;
-  games: number;
-  /** The biggest stake won. */
-  biggestWin: number;
-}
-
-/** The players of the games ended since the instant (all of them without one), the best net gain first (P15.7). */
-export function deathrollRanking(games: readonly RankedDeathroll[], since: Date | undefined): DeathrollRank[] {
-  const byMember = new Map<string, Omit<DeathrollRank, "rank">>();
-  const add = (memberId: string, net: number, win: number) => {
-    const known = byMember.get(memberId) ?? { memberId, net: 0, games: 0, biggestWin: 0 };
-    byMember.set(memberId, {
-      memberId,
-      net: known.net + net,
-      games: known.games + 1,
-      biggestWin: Math.max(known.biggestWin, win),
-    });
-  };
-  for (const game of games.filter((candidate) => since === undefined || candidate.endedAt >= since)) {
-    add(game.winnerId, game.stake, game.stake);
-    add(game.loserId, -game.stake, 0);
-  }
-  return [...byMember.values()]
-    .sort((left, right) => right.net - left.net || right.games - left.games)
-    .map((row, index) => ({ rank: index + 1, ...row }));
-}

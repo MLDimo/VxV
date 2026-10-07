@@ -12,7 +12,8 @@ VXV = {
     --- A message in the chat, under the VXV prefix; and (value, singular, plural) for "3 invitations".
     Print = ns.Chat.Print,
     Count = ns.Util.Count,
-    --- Gold pieces as the website writes them: Format(1000) "1 000 po", Signed(-120) "−120 po", Odds, Share.
+    --- Gold pieces as the website writes them: Format(1000) "1 000 po", Signed(-120) "−120 po", SignedNumber(310)
+    --- "+310", Number, Odds, Share.
     Gold = ns.Gold,
     --- (label, confirm(text)): a window to paste a text into, closed when confirm returns true; and (text): a
     --- window showing a text selected, ready for Ctrl+C.

@@ -6,6 +6,7 @@ import { createBossFights } from "./application/bossFights.ts";
 import { createAddonDeathrolls } from "./application/addonDeathrolls.ts";
 import { createDeathrolls } from "./application/deathrolls.ts";
 import { createAddonMissions } from "./application/addonMissions.ts";
+import { createAddonRanking } from "./application/addonRanking.ts";
 import { createAddonTitles } from "./application/addonTitles.ts";
 import { createAuth } from "./application/auth.ts";
 import { createBetAnnouncements } from "./application/betAnnouncements.ts";
@@ -99,6 +100,7 @@ export function createApplication({
     betAnnouncements,
   });
   const titles = createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer });
+  const ranking = createRanking({ unitOfWork, clock });
   const artisans = createArtisans({ unitOfWork });
   const deathrolls = createDeathrolls({ unitOfWork, clock, announcer: deathrollAnnouncer });
   return {
@@ -133,12 +135,13 @@ export function createApplication({
     addonBets: createAddonBets({ unitOfWork, clock }),
     treasury: createTreasury({ unitOfWork, clock }),
     cash: createCash({ unitOfWork, clock }),
-    ranking: createRanking({ unitOfWork, clock }),
+    ranking,
     missions,
     missionAnnouncements,
     addonMissions: createAddonMissions({ unitOfWork, clock, missions }),
     titles,
     addonTitles: createAddonTitles({ unitOfWork, clock, titles }),
+    addonRanking: createAddonRanking({ unitOfWork, clock, ranking }),
     artisans,
     addonArtisans: createAddonArtisans({ unitOfWork, clock }),
     deathrolls,

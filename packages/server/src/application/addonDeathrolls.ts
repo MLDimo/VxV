@@ -1,10 +1,10 @@
 import { formatAddonDeathrolls } from "../domain/addonDeathrolls.ts";
 import { isDebt } from "../domain/bets.ts";
 import { addonReaders } from "./addonReaders.ts";
-import { rankDeathrolls, view } from "./deathrolls.ts";
+import { view } from "./deathrolls.ts";
 import type { Clock, UnitOfWork } from "./ports.ts";
 
-/** The deathrolls as the companion hands them to the addon (P15): debts, ranking and the latest games. */
+/** The deathrolls as the companion hands them to the addon (P15): debts and the latest games (Ranking: VXV-RANKING). */
 export function createAddonDeathrolls({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
   return {
     /** VXV-DEATHROLLS text for the companion of any member: an officer's addon passes it on to the guild. */
@@ -28,7 +28,6 @@ export function createAddonDeathrolls({ unitOfWork, clock }: { unitOfWork: UnitO
             endedAt: game.endedAt,
             paid: game.paidAt !== undefined,
           })),
-          ranking: rankDeathrolls(games, undefined),
           exportedAt: clock(),
         });
       });

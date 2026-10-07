@@ -80,8 +80,13 @@ export function formatGold(amount: number): string {
 
 /** A movement of gold: "+500 po", "−850 po". */
 export function formatSignedGold(amount: number): string {
+  return `${formatSigned(amount)}${NO_BREAK}po`;
+}
+
+/** A whole number with its sign and the French thousands separator: "+1 840", "−680", "0". */
+export function formatSigned(amount: number): string {
   const sign = amount > 0 ? "+" : amount < 0 ? "−" : "";
-  return `${sign}${formatGold(Math.abs(amount))}`;
+  return `${sign}${WHOLE.format(Math.abs(amount))}`;
 }
 
 /** Where a stake stands with the treasurer. */

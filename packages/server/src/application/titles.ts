@@ -4,7 +4,7 @@ import type { TitleGiveRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
 import { awardTitles, OFFICER_TITLES, TITLES, titleWeek, type Tally, type TitleFacts } from "../domain/titles.ts";
-import { loserOf, winnerOf } from "./debts.ts";
+import { rankedDeathroll } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, TitleHolder, UnitOfWork } from "./ports.ts";
@@ -71,11 +71,8 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
     healingReceived: tally((log) => healingReceivedInRaid(log, fights)),
     raised: tally((log) => log.raised.map(({ name, count }) => ({ name, amount: count }))),
     deathrolls: (await repositories.deathrolls.listAll()).flatMap((game) => {
-      const winner = winnerOf(game).memberId;
-      const loser = loserOf(game).memberId;
-      return winner === undefined || loser === undefined || !inSeason(game.endedAt)
-        ? []
-        : [{ winnerId: winner, loserId: loser, stake: game.stake, endedAt: game.endedAt }];
+      const ranked = rankedDeathroll(game);
+      return ranked === undefined || !inSeason(ranked.endedAt) ? [] : [ranked];
     }),
     donations: (await repositories.cash.listAll()).flatMap((movement) =>
       movement.kind === "donation" && movement.memberId !== undefined && inSeason(movement.occurredAt)

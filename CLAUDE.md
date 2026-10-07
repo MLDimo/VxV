@@ -3,8 +3,9 @@
 Outil de guilde pour WoW Forever : addon en jeu, site web, bot Discord et app compagnon, autour d'une base Supabase.
 Gestion des raids, soft reserves (SR), attribution et suivi du loot, puis paris, missions, titres, artisans et deathroll.
 Le plan de référence est le PDF « VXV - Plan de développement » v1.0 du 3 octobre 2026 : 16 phases (P0 à P15),
-avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` (SR+, historique, droits, modèle de données)
-et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
+avancées étape par étape, complété par `docs/plan/decisions-2026-10-03.md` (SR+, historique, droits, modèle de données),
+`docs/plan/decisions-2026-10-06.md` (paris, missions et titres) et `docs/plan/decisions-2026-10-07.md` (refacto,
+titres d'officier et Princesse, journal de combat, Ranking).
 
 ## État d'avancement
 
@@ -110,8 +111,7 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
   - Titres de raid : Chibrax au max (dégâts) et Remboursé par la Sécu (soins), lus dans le compteur du jeu après chaque
     boss tué, une fois hors combat (`VXV_Raid/Meter.lua`, session notée à la mort du boss) ; Lève toi copaing
     (résurrections acceptées : le joueur relevé le dit au groupe, `Raised.lua`). Journal `VXV-LOG-2`.
-  - 13.3, 13.4 et 13.6 en jeu : bundle `VXV_Titles` (catégorie Ranking de la grande fenêtre et du mode réduit,
-    ligne dans l'infobulle d'un membre, titres avant ses messages dans le canal de guilde et après son nom dans la
+  - 13.3, 13.4 et 13.6 en jeu : bundle `VXV_Titles` (ligne dans l'infobulle d'un membre, titres avant ses messages dans le canal de guilde et après son nom dans la
     liste de guilde, mesurés en phase 0, T9). Données `VXV-TITRES-1` (noms et règles compris : un nouveau titre ne
     demande pas de mise à jour de l'addon) apportées par le compagnon et relayées par les officiers.
   Validation en attente : une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu
@@ -157,6 +157,18 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
     joueurs (ou d'un officier) ; dette du perdant, paiement confirmé par le gagnant dans l'onglet ; une dette
     bloque les défis. Données du site `VXV-DEATHROLLS-1` (bloqués, dettes, classement).
   Validation en attente : une partie complète jouée aux boutons entre deux membres, la dette chez le perdant.
+- **Ranking (7 octobre, capture `docs/design/captures/ranking.jpg`, §7.5)** : quatre catégories au même tableau, sur le
+  site et dans l'addon, par période (toujours, mois, saison) :
+  - Paris et Deathroll au gain net, Quêtes aux points de places (3, 2 et 1 par quête validée), Titres aux semaines de
+    titre détenues (`packages/server/src/domain/rankingBoards.ts`, égalités départagées par le nom) ;
+  - fanions des trois premiers (couleur de classe, métal, médaille, portrait, titre de la semaine, valeur), trois
+    records de la période, suite du classement (barre, titre sous le nom) et la position du joueur en bas ;
+  - site : `RankingScreen` et `RankingBoard` (`/ranking`, `/ranking/deathroll`, `/ranking/quetes`, `/ranking/titres`) ;
+  - addon : bundle `VXV_Ranking` (lieu Ranking, mode réduit et carte de la Taverne), données `VXV-RANKING-1` (les 25
+    premiers de chaque tableau) apportées par le compagnon et relayées par les officiers ; fanion en images
+    (`Media/banner.png` teint à la couleur de classe, voile `cloth.png`), portraits copiés du site par
+    `npm run generate`. Le jeu ne fait pas tourner les cadres : pas de balancement des fanions.
+  Validation en attente : l'écran en jeu.
 
 ## Design (charte « La Taverne »)
 
@@ -169,7 +181,7 @@ et `docs/plan/decisions-2026-10-06.md` (paris, missions et titres).
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
-- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll ; Ranking : Paris (`VXV_Paris`), Deathroll (`VXV_Deathroll`), Titres (`VXV_Titles`), comme sur le site.
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus (vu sur le Journal le 5 octobre).
 
@@ -186,7 +198,7 @@ La table complète est dans le README. Règles :
 
 - **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
-- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`, `VXV_Deathroll`) qui ne dépend que du socle.
+- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`, `VXV_Deathroll`, `VXV_Ranking`) qui ne dépend que du socle.
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
@@ -238,6 +250,10 @@ La table complète est dans le README. Règles :
   `VXV-COMBAT-1`, puis `F` (boss, nom, difficulté, taille du groupe, début et fin en secondes Unix) et une ligne `H`
   par joueur soigné (GUID, prénom, soins reçus effectifs), écrites par `apps/companion/src/domain/combatLog.ts` et lues
   par `packages/server/src/domain/bossFights.ts`. Même règle de version.
+- Ranking (contrat du site vers l'addon) : première ligne `VXV-RANKING-1`, puis les lignes communes, `S` (saison), `U`
+  (membre : nom, classe, portrait, titre), `B` (tableau : catégorie, période, mesure, unité), `R` (place) et `D`
+  (record), écrites par `packages/server/src/domain/addonRanking.ts` et lues par `addon/VXV_Ranking/RankingData.lua`.
+  Même règle de version.
 - Journal d'un raid (contrat de l'addon vers le site, P6) : première ligne `VXV-LOG-2` (depuis la P13 ; le site lit encore `VXV-LOG-1`), puis une ligne par enregistrement (raid, boss tués, présents, objets donnés, morts, dégâts et soins du compteur du jeu sur les boss tués, résurrections acceptées), lues par `packages/server/src/domain/raidLog.ts` et écrites par `addon/VXV_Raid/RaidLog.lua`. Même règle de version.
 - Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
 - `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
