@@ -138,9 +138,9 @@ const PILLAGE = 3494;
 const JAMBIERES = 270260;
 const DURGEN = 3496;
 await app.softReserves.setMine(lockedMember.member, historyEventId, [String(BOTTINES)]);
-/** The log the addon exports after a raid (VXV-LOG-1), imported as an officer would. */
+/** The log the addon exports after a raid (VXV-LOG-2), imported as an officer would. */
 const importRaidLog = (eventId: string, lines: readonly string[], reason: string) =>
-  app.raidLogs.importLog(officer.member, eventId, ["VXV-LOG-1", `R;${eventId};;`, ...lines].join("\n"), reason);
+  app.raidLogs.importLog(officer.member, eventId, ["VXV-LOG-2", `R;${eventId};;`, ...lines].join("\n"), reason);
 const RAID_NIGHT = Date.UTC(2031, 1, 5, 21) / 1000;
 await importRaidLog(
   historyEventId,

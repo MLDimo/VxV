@@ -1,6 +1,15 @@
-# Phase 0 — Rapport de faisabilité
+# Résultats de la sonde (phase 0)
 
-Client testé : 1.60.1 build 70170 · Interface : 16001 (confirmée) · Sessions : 2026-10-02, solo, donjon à 5, guilde puis raid à 2 ; 2026-10-03, solo (journal complet dans `sessions/`, aucune erreur Lua de la sonde)
+Ce que la sonde `tools/VXV_Probe` a mesuré sur le client de WoW Forever. Interface 16001 (confirmée). Journaux complets
+dans `sessions/`, aucune erreur Lua de la sonde :
+
+- 2 octobre, build 70170 : solo, donjon à 5, guilde puis raid à 2 ;
+- 3 octobre, build 70170 : tests complémentaires T1 à T10 ;
+- 5 octobre : habillage (sonde 0.3.0, `/vxvtest design show`) ;
+- 6 octobre, build 70235 : inventaire de l'API refait, compteurs du jeu ;
+- 7 octobre, build 70245 : T11, les journaux du jeu.
+
+Les mesures qui manquent encore sont dans `docs/tests-en-jeu.md`.
 
 Légende : ✅ go · ⚠️ go avec contournement · ❌ no-go · ⏳ non testé
 
@@ -18,13 +27,6 @@ Légende : ✅ go · ⚠️ go avec contournement · ❌ no-go · ⏳ non testé
 | `COMBAT_LOG_EVENT_UNFILTERED` | Interdit (ADDON_ACTION_FORBIDDEN) | ❌ sans impact : le plan ne s'en sert pas |
 
 Conséquence pour la couche Compat : utiliser uniquement les espaces `C_*` modernes, jamais les anciennes globales.
-
-## Bilan au 2026-10-03
-
-Aucun no-go bloquant. Le plan tient, avec les ajustements listés en fin de rapport.
-
-Tous les tests sont faits, y compris les tests complémentaires T1 à T10 du 3 octobre (section dédiée plus bas).
-Seul point facultatif non observé : l'avertissement de raid (T4).
 
 ## Résultats par fonctionnalité
 
@@ -66,6 +68,30 @@ Seul point facultatif non observé : l'avertissement de raid (T4).
 | T9 | Peut-on afficher un titre dans l'infobulle, le canal de guilde et la liste de guilde ? | Infobulle : ligne ajoutée par `TooltipDataProcessor.AddTooltipPostCall`. Canal de guilde : message préfixé par le titre, grâce au filtre des messages. Liste de guilde : fenêtre moderne `CommunitiesFrame`, chargée dès la connexion. L'accroche par le mixin n'a rien donné. L'accroche sur les lignes de la liste (`ScrollUtil.AddInitializedFrameCallback`, qui passe le propriétaire avant la ligne) fonctionne : « titre ajouté à Агент Режима » (sonde 0.2.2). | ✅ | Affichage des titres (P13) |
 | T10 | Les métiers et recettes connues du joueur sont-ils lisibles ? | Oui. `GetProfessions` et `GetProfessionInfo` : 4 métiers avec niveau (Herboristerie 95/150, Dépeçage 104/150, Secourisme 22/75, Cuisine 6/75). À l'ouverture de chaque fenêtre de métier, `C_TradeSkillUI` donne les recettes connues avec identifiant et nom (3275 Bandage en lin, 2538 Viande de loup grillée…). Les métiers de récolte ont aussi des recettes (Herboristerie : Bougie d'encens). | ✅ | Annuaire des artisans (P14) |
 
+## Habillage (5 octobre)
+
+Client bêta, interface en français, écran de 2048 × 1152 unités d'interface (échelle 0,667) ; capture d'écran du
+propriétaire et journal de la sonde.
+
+| Point mesuré | Résultat | Conséquence pour l'addon |
+| --- | --- | --- |
+| Textures TGA et PNG depuis le dossier de l'addon, filtrage `NEAREST` | Affichées, nettes | PNG, beaucoup plus léger (272 Ko contre 2,6 Mo en TGA RLE pour la taverne) |
+| Texture hors puissance de deux (d20 223 × 256) | Affichée, en TGA comme en PNG | La taverne reste en 1589 × 672, sans marge |
+| Polices TTF de l'addon (`FontString:SetFont`) | Chargées, mais en différé : le premier appel renvoie `false` le temps que le fichier se charge, les suivants `true` | Objets de police créés au chargement, réappliqués tant que le jeu répond `false` |
+| Alphabets : latin, cyrillique, chinois, coréen | Pixelify : latin, cyrillique sauf la majuscule « О » ; Manrope : latin et cyrillique ; ni l'une ni l'autre n'a le chinois ni le coréen ; la police du jeu affiche tout | Familles de polices ; le propriétaire préfère le rendu de la famille Pixelify mixte, malgré le « О » cyrillique manquant |
+| `CreateFontFamily` (nos polices pour le latin et le cyrillique, celles du jeu pour le reste) | Fonctionne : `Fonts\2002.TTF` (coréen), `Fonts\ARKai_T.ttf` (chinois simplifié), `Fonts\blei00d.TTF` (chinois traditionnel), lues par `GetFontObjectForAlphabet` | Famille Pixelify : Pixelify (latin et cyrillique), polices du jeu (chinois, coréen). Famille Manrope : Manrope (latin, cyrillique), polices du jeu |
+| `RAID_CLASS_COLORS`, `C_ClassColor.GetClassColor` | Présentes ; guerrier `ffc69b6d`, comme nos jetons | Couleurs lues dans le jeu, nos jetons en secours |
+| `UnitRace`, `UnitSex`, `UnitClass` | Présentes (« Elfe de la nuit » `NightElf`, 2, « Voleur » `ROGUE`) | Avatars du joueur (race × classe × sexe) |
+| `SetBlendMode("ADD")`, `AnimationGroup` d'animations `Alpha` | Créées sans erreur ; la lueur clignote bien par paliers (vu par le propriétaire) | Lueurs de la taverne |
+
+## Build 70235 (6 octobre)
+
+| Point mesuré | Résultat |
+| --- | --- |
+| Inventaire de l'API | `PlaySound` et `SOUNDKIT` présents. Anciennes globales absentes : `InviteUnit`, `ConvertToRaid`, `GetNumSkillLines`, `GetNumTradeSkills` (passer par `C_PartyInfo` et `C_TradeSkillUI`) |
+| Événements | `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés à l'enregistrement ; `TRADE_SKILL_UPDATE` refusé, `TRADE_SKILL_LIST_UPDATE` accepté |
+| Statistiques (`/vxvtest counters list`) | 196 compteurs, dont « Poissons et autres objets pêchés » (1456) et « Nombre total de victoires honorables » (588) ; aucun compteur de récoltes (herbes, minerais, peaux), seulement le plus haut niveau de compétence |
+
 ## Complément du 7 octobre (T11) : vers le compagnon sans `/reload`
 
 Session du 7 octobre, build 70245, sonde 0.4.0 (`docs/phase-0/sessions/2026-10-07.txt`), fichiers lus sur le disque
@@ -98,10 +124,3 @@ Confirmée.
 - **Descente** (serveur vers jeu) : le compagnon écrit un fichier Lua dans le bundle `VXV_Sync`, lu au prochain `/reload` ou lancement. ✅ Confirmé jusqu'à 2 Mo.
 - **Remontée** (jeu vers serveur) : le compagnon lit les SavedVariables, écrites à chaque `/reload` et à la déconnexion, et relues par le jeu au lancement suivant. ✅ Confirmé.
 - **Entre joueurs connectés** : messages addon sur GUILD, RAID et PARTY. ✅ Confirmé, avec les limites de la section 0.3.
-
-## Ajustements du plan
-
-- **Identité d'un personnage** (P1 schéma, P2 liaison, P3 bot) : deux champs, prénom et nom de famille, au lieu d'un nom unique. Il n'y a pas de serveur, seulement un type de monde (PvE, PvP, RP, HC) commun à toute la guilde. Le couple prénom + nom est unique dans tout le jeu : contrainte d'unicité en base sur ce couple. Le format Discord prévu « Pseudo - [Prénom Nom] » convient.
-- **Couche Compat** (P4) : une fonction unique lit le prénom et le nom d'une unité. Le reste de l'addon ignore où le client range le nom de famille.
-- **Communication** (P4.6) : découpage en morceaux de 255 octets, file d'envoi limitée à 10 messages en rafale puis 1 par seconde, envois suspendus pendant les rencontres de boss. Pas d'écho sur GUILD : l'expéditeur applique localement ce qu'il diffuse.
-- **Suivi du loot** (P6) : deux sources. L'historique de butin du jeu donne le gagnant de chaque objet en butin de groupe. Sous maître du butin, l'addon du maître du butin capte chaque attribution (`GiveMasterLoot`). Les deux sont validées.

@@ -33,7 +33,7 @@ describe("companion uploads", () => {
   let eventId: string;
 
   const logOf = (event: string) =>
-    ["VXV-LOG-1", `R;${event};1796936400;1796940720`, "K;2;1796940600", "P;Ðéjà Vu"].join("\n");
+    ["VXV-LOG-2", `R;${event};1796936400;1796940720`, "K;2;1796940600", "P;Ðéjà Vu"].join("\n");
 
   beforeEach(async () => {
     ({ database, sql } = await createTestDatabase());
@@ -117,7 +117,7 @@ describe("companion uploads", () => {
   it("explains a refused part and goes on with the others", async () => {
     const report = await uploads.receive(
       officer,
-      upload({ roster: undefined, raidLogs: ["VXV-LOG-1\nK;x;y", logOf("00000000-0000-0000-0000-000000000000")] }),
+      upload({ roster: undefined, raidLogs: ["VXV-LOG-2\nK;x;y", logOf("00000000-0000-0000-0000-000000000000")] }),
     );
     expect(report).toEqual({
       roster: undefined,

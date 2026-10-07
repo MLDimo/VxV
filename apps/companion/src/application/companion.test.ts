@@ -24,7 +24,7 @@ const SAVED_DATA = [
   '\t["version"] = 1,',
   '\t["roster"] = { ["text"] = "VXV-ROSTER-1\\nÐéjà;Vu;ROGUE", ["capturedAt"] = 1796904000 },',
   '\t["raidLogs"] = {',
-  '\t\t["e1"] = "VXV-LOG-1\\nR;e1;1796904000;1796904120",',
+  '\t\t["e1"] = "VXV-LOG-2\\nR;e1;1796904000;1796904120",',
   "\t},",
   '\t["characters"] = { ["Ðéjà Vu"] = { ["race"] = "Scourge", ["sex"] = 3 } },',
   "}",
@@ -263,7 +263,7 @@ describe("companion", () => {
       await companion.start();
       expect(site.upload).toHaveBeenCalledWith("saved-token", {
         roster: { text: "VXV-ROSTER-1\nÐéjà;Vu;ROGUE", capturedAt: 1796904000 },
-        raidLogs: ["VXV-LOG-1\nR;e1;1796904000;1796904120"],
+        raidLogs: ["VXV-LOG-2\nR;e1;1796904000;1796904120"],
         characters: [{ name: "Ðéjà Vu", race: "Scourge", sex: 3 }],
         changes: [],
         counters: [],
@@ -275,13 +275,13 @@ describe("companion", () => {
       });
       // A /reload: the game writes the same data again, plus the record of a second raid.
       savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", {
-        text: SAVED_DATA.replace('["e1"]', '["e2"] = "VXV-LOG-1\\nR;e2;1;2",\n\t\t["e1"]'),
+        text: SAVED_DATA.replace('["e1"]', '["e2"] = "VXV-LOG-2\\nR;e2;1;2",\n\t\t["e1"]'),
         modifiedAt: 2,
       });
       await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
       expect(site.upload).toHaveBeenCalledTimes(2);
       expect(site.upload).toHaveBeenLastCalledWith("saved-token", {
-        raidLogs: ["VXV-LOG-1\nR;e2;1;2"],
+        raidLogs: ["VXV-LOG-2\nR;e2;1;2"],
         characters: [],
         changes: [],
         counters: [],

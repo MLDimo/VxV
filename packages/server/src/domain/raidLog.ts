@@ -4,8 +4,6 @@ import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.t
 
 /** First line of a raid's record exported by the addon (contract with VXV_Raid); the number is the format version. */
 export const RAID_LOG_HEADER = "VXV-LOG-2";
-/** The versions still read: an addon not updated yet writes version 1, without the meter and the resurrections. */
-const READ_HEADERS: readonly string[] = ["VXV-LOG-1", RAID_LOG_HEADER];
 
 export interface RaidLog {
   eventId: string;
@@ -29,7 +27,7 @@ function isLootMethod(value: string | undefined): value is LootMethod {
 /**
  * Reads the record line by line, reporting every problem with its line number:
  * R;event id;start (Unix seconds);end, K;encounter id;time, P;character, L;encounter id;item id;winner;method;time,
- * D;character;deaths, and since version 2 M;character;damage;healing and A;character;resurrections accepted.
+ * D;character;deaths, M;character;damage;healing and A;character;resurrections accepted.
  * Lines of an unknown kind are skipped.
  */
 export function parseRaidLog(text: string): RaidLog {
@@ -43,7 +41,7 @@ export function parseRaidLog(text: string): RaidLog {
     raised: [],
   };
   readRecords(text, {
-    headers: READ_HEADERS,
+    header: RAID_LOG_HEADER,
     wrongHeader: `Le journal doit commencer par la ligne ${RAID_LOG_HEADER} : copiez-le depuis l'addon (onglet Butin).`,
     advice: "recopiez le journal depuis l'addon",
     readers: {

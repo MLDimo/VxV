@@ -11,7 +11,7 @@ const KILL = Date.UTC(2031, 3, 2, 21) / 1000;
 
 function raidLog(eventId: string): string {
   return [
-    "VXV-LOG-1",
+    "VXV-LOG-2",
     `R;${eventId};${String(KILL - 600)};${String(KILL)}`,
     `K;${String(FALDRIM)};${String(KILL)}`,
     "P;Ciel Gris",
@@ -25,7 +25,7 @@ test.describe.serial("raid log", () => {
   test("lists every problem of a damaged log", async ({ page, context }) => {
     await signInAs(context, "officer");
     await page.goto(eventPage());
-    await page.getByLabel(LOG_LABEL).fill(`VXV-LOG-1\nR;${readSeed().raidLogEventId};;\nL;boss;1`);
+    await page.getByLabel(LOG_LABEL).fill(`VXV-LOG-2\nR;${readSeed().raidLogEventId};;\nL;boss;1`);
     await page.getByLabel(REASON_LABEL).fill("Essai");
     await page.getByRole("button", { name: "Importer le journal" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Ligne 3 illisible" })).toBeVisible();

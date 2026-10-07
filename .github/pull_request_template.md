@@ -1,6 +1,6 @@
 ## Quoi et pourquoi
 
-<!-- Étape du plan concernée (ex. P1.4) et résumé du changement. -->
+<!-- Résumé du changement et de sa raison. -->
 
 ## Tests
 
@@ -9,5 +9,5 @@
 ## Vérifications
 
 - [ ] DRY, SRP, KISS, YAGNI et SOLID respectés
-- [ ] Aucun dossier créé avant la phase qui le remplit
+- [ ] Aucun dossier ni fichier sans contenu utile
 - [ ] `npm run check` passe en local

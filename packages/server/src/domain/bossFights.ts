@@ -32,7 +32,7 @@ export function parseBossFight(text: string): BossFight {
   let fight: Omit<BossFight, "healingReceived"> | undefined;
   const healingReceived: BossFight["healingReceived"] = [];
   readRecords(text, {
-    headers: [BOSS_FIGHT_HEADER],
+    header: BOSS_FIGHT_HEADER,
     wrongHeader: `Un combat doit commencer par la ligne ${BOSS_FIGHT_HEADER}.`,
     readers: {
       F: ([encounterId, name, difficulty, groupSize, startedAt, endedAt]) => {

@@ -6,7 +6,6 @@ exclude_files = { "**/External/*.lua" }
 -- Globals each addon is allowed to define.
 globals = {
     "VXV_ProbeDB",
-    "VXV_ProbeInbox",
     "VXV_RaidData",
     "VXV_DB",
     "VXV_SyncDB",

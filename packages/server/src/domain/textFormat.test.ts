@@ -24,16 +24,17 @@ describe("the addon's texts", () => {
   it("gives each line to the reader of its kind, skips unknown kinds and lists the unreadable lines", () => {
     const read: string[][] = [];
     const format = {
-      headers: ["VXV-X-1", "VXV-X-2"],
+      header: "VXV-X-1",
       wrongHeader: "Pas un texte X.",
       readers: { A: (fields: string[]) => read.push(fields) > 0 && fields[0] !== "faux" },
       advice: "recopiez-le",
     };
     readRecords("VXV-X-1\nA;1;2\nZ;newer kind", format);
     expect(read).toEqual([["1", "2"]]);
-    expect(() => readRecords("VXV-X-2\n\nA;faux\nA;faux", format)).toThrow(
+    expect(() => readRecords("VXV-X-1\n\nA;faux\nA;faux", format)).toThrow(
       new TextFormatError(["Ligne 3 illisible : recopiez-le.", "Ligne 4 illisible : recopiez-le."]),
     );
     expect(() => readRecords("VXV-Y-1\nA;1", format)).toThrow("Pas un texte X.");
+    expect(() => readRecords("VXV-X-2\nA;1", format)).toThrow("Pas un texte X.");
   });
 });

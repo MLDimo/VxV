@@ -50,11 +50,6 @@ describe("parseRaidLog", () => {
     expect(log.raised).toEqual([{ name: "Ðéjà Vu", count: 2 }]);
   });
 
-  it("still reads the version 1 of an addon not updated yet, without the meter and the resurrections", () => {
-    const log = parseRaidLog(["VXV-LOG-1", "R;e1;;", "D;Thom Leboss;1"].join("\n"));
-    expect(log).toMatchObject({ eventId: "e1", deaths: [{ name: "Thom Leboss", count: 1 }], meter: [], raised: [] });
-  });
-
   it("lists every problem with its line number", () => {
     const broken = [RAID_LOG_HEADER, "R;e1;;", "L;1084;20;Thom Leboss;cadeau;1", "K;boss;1", "M;Thom Leboss;-5;0"].join(
       "\n",
