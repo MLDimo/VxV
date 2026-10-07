@@ -1,5 +1,6 @@
 import type { AnnouncedRaid, Signup } from "@vxv/server";
 import { classLabel } from "@vxv/server/domain/characterClasses";
+import { eventAudience } from "@vxv/server/domain/eventRoles";
 import { raidTitle, ROLE_LABELS, softReserveCount, STATUS_LABELS } from "@vxv/server/domain/labels";
 import { composition, isComing, SIGNUP_ROLES, type SignupStatus } from "@vxv/server/domain/signups";
 import {
@@ -73,7 +74,12 @@ export function raidMessage({ event, signups }: AnnouncedRaid, siteUrl: string):
       {
         title: raidTitle(event.raids.map((raid) => raid.name)),
         url,
-        description: `📅 ${timestamp(event.startsAt, "F")} (${timestamp(event.startsAt, "R")})\n🎯 ${softReserveCount(event.softReservesPerPlayer)} par joueur`,
+        description: [
+          `📅 ${timestamp(event.startsAt, "F")} (${timestamp(event.startsAt, "R")})`,
+          `🎯 ${softReserveCount(event.softReservesPerPlayer)} par joueur`,
+          // The role mentioned: Discord shows its name and colour, and a mention in an embed notifies nobody.
+          `👥 ${eventAudience(event.role && { ...event.role, name: `<@&${event.role.id}>` })}`,
+        ].join("\n"),
         color: EMBED_COLOR,
         fields: [...roleFields, { name: "Classes", value: classSummary(byClass) }, ...otherFields],
         footer: { text: "Inscris-toi avec le bouton ci-dessous, ou sur le site." },

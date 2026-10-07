@@ -1,6 +1,6 @@
 import type { APIRequestContext } from "@playwright/test";
 import type { FakeMessage } from "@vxv/server/testing";
-import { DISCORD, FAKE_DISCORD_URL } from "./environment";
+import { DISCORD, FAKE_DISCORD_URL, WEB_ENVIRONMENT } from "./environment";
 
 export const INTERACTIONS_ENDPOINT = "/api/discord/interactions";
 
@@ -28,6 +28,13 @@ export async function discordMemberState(
   }>;
 }
 
+/** Discord gives the member a role, as a moderator would by hand. */
+export async function giveDiscordRole(request: APIRequestContext, userId: string, roleId: string): Promise<void> {
+  await request.put(
+    `${FAKE_DISCORD_URL}/api/v10/guilds/${WEB_ENVIRONMENT.DISCORD_GUILD_ID}/members/${userId}/roles/${roleId}`,
+  );
+}
+
 /** Every message the bot published, in order. */
 export async function discordMessages(request: APIRequestContext): Promise<FakeMessage[]> {
   return (await request.get(`${FAKE_DISCORD_URL}/messages`)).json() as Promise<FakeMessage[]>;
@@ -38,6 +45,7 @@ export async function discordEventMessage(request: APIRequestContext, eventId: s
   const messages = await discordMessages(request);
   const link = `/evenements/${eventId}"`;
   const message = messages.find((candidate) => JSON.stringify(candidate.body).includes(link));
-  const embeds = message?.body.embeds as { title: string; fields: { name: string; value: string }[] }[] | undefined;
+  const embeds = message?.body.embeds as
+    { title: string; description: string; fields: { name: string; value: string }[] }[] | undefined;
   return message && { channelId: message.channelId, embed: embeds?.[0] };
 }

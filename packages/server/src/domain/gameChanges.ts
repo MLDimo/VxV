@@ -12,7 +12,7 @@ interface GameChangeBase {
 /**
  * A change made in game (P7.5, P9.2, P11.8), as the author's addon recorded it: a sign-up or soft reserves for the
  * author's member, an officer's exclusion of an item, an event an officer creates (date and time as typed on
- * Discord's /vxv_raid), the member's stake on a bet, placed, moved or taken back, or a bet an officer opens
+ * Discord's /vxv_raid, the Discord role chosen among the website's), the member's stake on a bet, placed, moved or taken back, or a bet an officer opens
  * (closing date and time as typed on Discord's /vxv_pari, owner's decision of 7 October).
  */
 export type GameChange = GameChangeBase &
@@ -20,7 +20,15 @@ export type GameChange = GameChangeBase &
     | { kind: "signup"; role: string; spec: string; status: string }
     | { kind: "reserves"; itemIds: number[] }
     | { kind: "exclusion"; itemId: number; excluded: boolean; reason: string }
-    | { kind: "event"; date: string; time: string; raidIds: string[]; softReserves: number; reason: string }
+    | {
+        kind: "event";
+        date: string;
+        time: string;
+        raidIds: string[];
+        softReserves: number;
+        roleId: string;
+        reason: string;
+      }
     | { kind: "stake"; betId: string; choiceId: string; amount: number }
     | { kind: "withdraw"; betId: string }
     | { kind: "bet"; title: string; choices: string[]; date: string; time: string; reason: string }

@@ -1,11 +1,12 @@
 import type { PGliteInterface } from "@vxv/database/testing";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "../domain/characters.ts";
 import type { Member } from "../domain/members.ts";
+import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaids } from "../test/fixtures.ts";
+import { createEvent, createGuildCharacters, createMember, createRaids, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ValidationError } from "./errors.ts";
 import { createSignups } from "./signups.ts";
@@ -31,7 +32,7 @@ describe("sign-ups", () => {
   beforeEach(async () => {
     ({ database, sql } = await createTestDatabase());
     now = new Date("2026-12-01T12:00:00Z");
-    signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => now });
+    signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => now, guild: testGuild });
     me = await createMember(sql, "member", "Moi");
     [main, reroll] = await createGuildCharacters(sql, "Ðéjà Vu", "Eole Hermes");
     const characters = characterRepository(sql);
@@ -92,5 +93,62 @@ describe("sign-ups", () => {
     now = new Date("2026-12-10T20:00:00Z");
     await expect(signups.signUp(me, eventId, choice(main))).rejects.toBeInstanceOf(ValidationError);
     expect(await signups.listForEvent(eventId)).toEqual([]);
+  });
+
+  describe("for an event reserved to a Discord role", () => {
+    let discord: FakeDiscord;
+    let raiders: string;
+    let reserved: string;
+
+    beforeEach(async () => {
+      discord = createFakeDiscord();
+      vi.stubGlobal("fetch", discord.fetch);
+      raiders = discord.addRole("Raideur R1");
+      reserved = await createEvent(sql, me, new Date("2026-12-11T20:00:00Z"), ["onyxia"], {
+        id: raiders,
+        name: "Raideur R1",
+      });
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    const giveRole = () => discord.handle("PUT", `/guilds/guild/members/${me.discordId}/roles/${raiders}`, undefined);
+
+    it("signs up a holder of the role, as Discord tells at once", async () => {
+      giveRole();
+      await signups.signUp(me, reserved, choice(main));
+      expect(await signups.findMine(me, reserved)).toMatchObject({ characterId: main.id });
+    });
+
+    it("refuses a member without the role, and one who left the server", async () => {
+      await expect(signups.signUp(me, reserved, choice(main))).rejects.toThrow(
+        "Ce raid est réservé au rôle Discord « Raideur R1 ».",
+      );
+      giveRole();
+      discord.leave(me.discordId);
+      await expect(signups.signUp(me, reserved, choice(main))).rejects.toThrow(/réservé au rôle/);
+      expect(await signups.listForEvent(reserved)).toEqual([]);
+    });
+
+    it("lets a member signed up already change their sign-up after losing the role", async () => {
+      giveRole();
+      await signups.signUp(me, reserved, choice(main));
+      discord.handle("DELETE", `/guilds/guild/members/${me.discordId}/roles/${raiders}`, undefined);
+      await signups.signUp(me, reserved, choice(main, { status: "absent" }));
+      expect(await signups.findMine(me, reserved)).toMatchObject({ status: "absent" });
+    });
+
+    it("refuses the sign-up while Discord does not answer", async () => {
+      vi.stubGlobal("fetch", () => Promise.reject(new Error("offline")));
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      await expect(signups.signUp(me, reserved, choice(main))).rejects.toThrow(/Discord ne répond pas/);
+    });
+
+    it("never asks Discord for an event open to everybody", async () => {
+      await signups.signUp(me, eventId, choice(main));
+      expect(discord.requests).toEqual([]);
+    });
   });
 });

@@ -3,17 +3,20 @@ import { fullName } from "../domain/characters.ts";
 import type { TitleGiveRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
-import { awardTitles, OFFICER_TITLES, TITLES, titleWeek, type Tally, type TitleFacts } from "../domain/titles.ts";
+import {
+  awardTitles,
+  OFFICER_TITLES,
+  TITLES,
+  titleRole,
+  titleWeek,
+  type Tally,
+  type TitleFacts,
+} from "../domain/titles.ts";
 import { rankedDeathroll } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, TitleHolder, UnitOfWork } from "./ports.ts";
 import type { GuildGateway, TitleAnnouncer } from "./discordPorts.ts";
-
-/** Each title is a Discord role of this name, held by the week's holder. */
-export function titleRole(titleName: string): string {
-  return `◆ ${titleName}`;
-}
 
 /** How many weeks the website shows. */
 const TITLE_WEEKS_SHOWN = 8;

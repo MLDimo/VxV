@@ -101,7 +101,7 @@ function RaidView.ExpectedByRole(event)
 end
 
 --- The head of the screen: kicker, title, the date and where the data come from, and the badges
---- { text, color }. Without event, how the data arrive.
+--- { text, color }: who may sign up, the players expected, the soft reserves' lock. Without event, how the data arrive.
 function RaidView.Header(event, sender, now)
     if event == nil then
         return { kicker = "Conseil de guerre", title = "Aucun raid chargé", badges = {},
@@ -117,7 +117,11 @@ function RaidView.Header(event, sender, now)
         title = event.title,
         subtitle = string.format("%s · %d SR par joueur · %s", Labels.DateTime(event.startsAt),
             event.softReservesPerPlayer, origin),
-        badges = { { text = VXV.Count(expected, "attendu"), color = "gain" }, { text = lock, color = "gold" } },
+        badges = {
+            { text = event.audience, color = "amethyst" },
+            { text = VXV.Count(expected, "attendu"), color = "gain" },
+            { text = lock, color = "gold" },
+        },
     }
 end
 

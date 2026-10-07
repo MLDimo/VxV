@@ -4,7 +4,7 @@ local _, ns = ...
 --- waits for the website ("en attente") until the event's data bring back what became of it (confirmed or refused,
 --- with why); the core sends it to the website (VXV.PendingChanges). A change carries its event (eventId) and, by
 --- kind: role, spec, status (signup), itemIds (reserves), itemId, excluded, reason (exclusion), date, time, raidIds,
---- softReserves, reason (an event an officer creates, P9.2: it belongs to no event yet).
+--- softReserves, roleId, reason (an event an officer creates, P9.2: it belongs to no event yet).
 local Changes = {}
 ns.Changes = Changes
 
@@ -19,7 +19,7 @@ local FIELDS = {
     exclusion = { eventId = "string", itemId = "number", excluded = "boolean", reason = "string" },
     event = {
         eventId = "string", date = "string", time = "string", raidIds = "strings", softReserves = "number",
-        reason = "string",
+        roleId = "string", reason = "string",
     },
 }
 

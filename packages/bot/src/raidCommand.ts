@@ -1,7 +1,14 @@
 import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES } from "@vxv/server";
 import { normalizeForSearch } from "@vxv/server/domain/characterSearch";
 import { ApplicationCommandOptionType, InteractionResponseType } from "discord-api-types/v10";
-import { focusedOption, integerOption, stringOption, type BotContext, type SlashCommand } from "./commands.ts";
+import {
+  focusedOption,
+  integerOption,
+  roleOption,
+  stringOption,
+  type BotContext,
+  type SlashCommand,
+} from "./commands.ts";
 import { parseRaidStart } from "@vxv/server/domain/raidStart";
 import { actingMember } from "./members.ts";
 import { ephemeral } from "./responses.ts";
@@ -23,7 +30,10 @@ async function raidIds({ app }: BotContext, values: readonly string[]): Promise<
     );
 }
 
-/** /vxv_raid: an officer plans a raid night from Discord; its sign-up message is published in the raid channel. */
+/**
+ * /vxv_raid: an officer plans a raid night from Discord, for the members of a role (@everyone: everybody); its sign-up
+ * message is published in the raid channel.
+ */
 export const VXV_RAID: Required<SlashCommand> = {
   definition: {
     name: "vxv_raid",
@@ -46,6 +56,12 @@ export const VXV_RAID: Required<SlashCommand> = {
         type: ApplicationCommandOptionType.String,
         name: "heure",
         description: "Heure de début, ex. 21:00",
+        required: true,
+      },
+      {
+        type: ApplicationCommandOptionType.Role,
+        name: "role",
+        description: "Qui peut s'inscrire : les membres de ce rôle, ou @everyone pour tout le monde",
         required: true,
       },
       {
@@ -86,6 +102,7 @@ export const VXV_RAID: Required<SlashCommand> = {
           RAID_OPTIONS.map((option) => stringOption(interaction, option)),
         ),
         softReservesPerPlayer: integerOption(interaction, "sr") ?? DEFAULT_SOFT_RESERVES,
+        roleId: roleOption(interaction, "role"),
       },
       stringOption(interaction, "motif"),
     );

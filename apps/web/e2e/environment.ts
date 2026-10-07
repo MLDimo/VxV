@@ -11,6 +11,8 @@ export const WEB_PORT = 3200;
 export const SEED_FILE = join(tmpdir(), "vxv-e2e-seed.json");
 
 export const DISCORD_ROLES = { treasurer: "11", officer: "12", gm: "13" } as const;
+/** A role of the guild's Discord server an event may be reserved to. */
+export const RAIDER_ROLE = "Raideur R1";
 
 /** Stands for the Discord application: signs the interactions sent to the website. */
 export const DISCORD = createTestSigner(Buffer.alloc(32, 7));
@@ -64,6 +66,10 @@ export interface E2ESeed {
   sessions: E2ESessions;
   /** Event on La salle des Thanes, reserved to the sign-up tests. */
   signupEventId: string;
+  /** Event on La salle des Thanes reserved to the raiders' role (RAIDER_ROLE), which only the officer holds. */
+  reservedEventId: string;
+  /** The raiders' role on the fake Discord server. */
+  raiderRoleId: string;
   /** Event on La salle des Thanes where the officer (Ciel Gris) is already signed up, for the soft reserve tests. */
   softReserveEventId: string;
   /** Event starting 10 minutes after the seed: its soft reserves are locked. */

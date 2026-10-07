@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { startGuild } from "../guild.ts";
 import { companionFiles } from "../sync/fixtures.ts";
-import { ONYXIA_NIGHT, ONYXIA_PACK, startRaid, websiteText } from "./fixtures.ts";
+import { ONYXIA_NIGHT, ONYXIA_PACK, RAIDER_ROLE, roleChoicesText, startRaid, websiteText } from "./fixtures.ts";
 
 const PREFIX = "|cff14b8a6VXV|r ";
 const BUNDLES = ["VXV_Raid", "VXV_Sync"];
@@ -167,12 +167,21 @@ describe("changes made in game", () => {
   });
 });
 
+const SHOWN_TEXTS = (frame: string) => `
+  local texts = {}
+  FindWidget(${frame}, function(w) if w.kind == "FontString" and w.text ~= nil then texts[#texts + 1] = w.text end end)
+  return texts
+`;
+
 describe("events created in game (P9.2)", () => {
-  it("lets an officer create an event: date and time as on Discord, raids, soft reserves and reason", () => {
-    const { client, errors } = startRaid({ written: companionFiles({ raid: websiteText() }) });
+  it("lets an officer create an event: date and time as on Discord, raids, soft reserves, role and reason", () => {
+    const { client, errors } = startRaid({
+      written: companionFiles({ raid: websiteText(), raidroles: roleChoicesText() }),
+    });
     client(ONYXIA_PACK);
     client(OPEN_RAID);
     client(click("VXV_Window", "Créer un événement"));
+    expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain("Choisis un rôle avec les flèches.");
     client(click("VXV_EventDialog", "Créer"));
     expect(client(PENDING)).toEqual({});
     client(`
@@ -188,6 +197,14 @@ describe("events created in game (P9.2)", () => {
     `);
     client(click("VXV_EventDialog", "Repaire d'Onyxia"));
     client(click("VXV_EventDialog", "+"));
+    // Who may sign up is chosen, never assumed.
+    client(click("VXV_EventDialog", "Créer"));
+    expect(client(PENDING)).toEqual({});
+    client(click("VXV_EventDialog", "<"));
+    expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain("Raideur R1");
+    client(click("VXV_EventDialog", ">"));
+    expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain("Tout le monde");
+    client(click("VXV_EventDialog", ">"));
     client(click("VXV_EventDialog", "Créer"));
     expect(client(PENDING)).toEqual([
       expect.objectContaining({
@@ -196,9 +213,22 @@ describe("events created in game (P9.2)", () => {
         time: "21:00",
         raidIds: ["onyxia"],
         softReserves: 2,
+        roleId: RAIDER_ROLE.id,
         reason: "Raid du lundi",
       }),
     ]);
+    expect(errors()).toEqual([]);
+  });
+
+  it("tells an officer whose companion has not brought the roles yet", () => {
+    const { client, errors } = startRaid({ written: companionFiles({ raid: websiteText() }) });
+    client(ONYXIA_PACK);
+    client(OPEN_RAID);
+    client(click("VXV_Window", "Créer un événement"));
+    expect(client(SHOWN_TEXTS("VXV_EventDialog"))).toContain(
+      "Rôles pas encore reçus : ton compagnon VXV les apporte au /reload.",
+    );
+    client(click("VXV_EventDialog", ">"));
     expect(errors()).toEqual([]);
   });
 });

@@ -9,6 +9,7 @@
 Labels.lua
 EventData.lua
 RaidData.lua
+RoleChoices.lua
 Group.lua
 Reserves.lua
 Attribution.lua

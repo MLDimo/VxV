@@ -1,6 +1,6 @@
 local _, ns = ...
 
---- The event's data as the website exports it for the addon: contract VXV-RAID-2, described line by line in
+--- The event's data as the website exports it for the addon: contract VXV-RAID-3, described line by line in
 --- packages/server/src/domain/addonExport.ts; read by the core's site data (RaidData.lua).
 local EventData = {}
 ns.EventData = EventData
@@ -27,15 +27,15 @@ end
 --- and each kind of line with its number of fields and how it adds to the event (the officers' O lines are the
 --- core's).
 EventData.FORMAT = {
-    header = "VXV-RAID-2",
+    header = "VXV-RAID-3",
     wrong = "Ce texte n'est pas une donnée d'événement : copie-la depuis la page de l'événement sur le site.",
     New = function()
         return { items = {}, itemOrder = {}, signups = {}, journal = {}, results = {} }
     end,
     lines = {
-        -- E;id;start;export;soft reserves per player;title;raid ids
-        E = { 6, function(event, f)
-            event.id, event.title, event.raidIds = f[1], f[5], split(f[6])
+        -- E;id;start;export;soft reserves per player;title;raid ids;who may sign up
+        E = { 7, function(event, f)
+            event.id, event.title, event.raidIds, event.audience = f[1], f[5], split(f[6]), f[7]
             event.startsAt, event.exportedAt = tonumber(f[2]), tonumber(f[3])
             event.softReservesPerPlayer = tonumber(f[4])
             return event.startsAt ~= nil and event.exportedAt ~= nil and event.softReservesPerPlayer ~= nil

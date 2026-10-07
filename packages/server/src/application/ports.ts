@@ -2,7 +2,7 @@ import type { ProfessionReading, Recipe } from "../domain/artisans.ts";
 import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
 import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
-import type { NewRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
+import type { PlannedRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
 import type { GameChangeOutcome } from "../domain/gameChanges.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
@@ -128,7 +128,7 @@ export interface RaidRepository {
 }
 
 export interface EventRepository {
-  create(event: NewRaidEvent, createdBy: string): Promise<string>;
+  create(event: PlannedRaidEvent, createdBy: string): Promise<string>;
   findById(eventId: string): Promise<RaidEvent | undefined>;
   /** Events starting after the given instant, soonest first. */
   listStartingAfter(instant: Date): Promise<RaidEvent[]>;

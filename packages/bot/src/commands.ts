@@ -54,6 +54,12 @@ export function integerOption(interaction: CommandInteraction, name: string): nu
     : undefined;
 }
 
+/** Id of the Discord role picked for a role option of the command, empty when absent. */
+export function roleOption(interaction: CommandInteraction, name: string): string {
+  const option = optionNamed(interaction, name);
+  return option?.type === ApplicationCommandOptionType.Role ? option.value : "";
+}
+
 /** The option the member is typing, which an autocomplete request is about. */
 export function focusedOption(interaction: APIApplicationCommandAutocompleteGuildInteraction): {
   name: string;

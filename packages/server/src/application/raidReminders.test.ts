@@ -5,7 +5,7 @@ import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { softReserveRepository } from "../infrastructure/postgres/softReserves.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createEvent, createGuildCharacters, createMember, createRaidWithLoot } from "../test/fixtures.ts";
+import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import type { RaidAnnouncer } from "./discordPorts.ts";
 import { createRaidReminders } from "./raidReminders.ts";
@@ -45,7 +45,7 @@ describe("raid reminders", () => {
     const me = await createMember(sql, "member", "Moi");
     await characterRepository(sql).link(deja.id, me.id);
     await characterRepository(sql).link(eole.id, officer.id);
-    const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => now });
+    const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => now, guild: testGuild });
     await signups.signUp(me, tonight, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
     await signups.signUp(officer, tonight, { characterId: eole.id, role: "healer", spec: "Sacré", status: "late" });
     await softReserveRepository(sql).replaceForCharacter(tonight, deja.id, [20], now);

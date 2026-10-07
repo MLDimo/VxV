@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { linkCompanion, linkPage, pkce, PORT, STATE } from "./companionLink";
-import { SEED_ROSTER, WEB_ENVIRONMENT } from "./environment";
+import { RAIDER_ROLE, SEED_ROSTER, WEB_ENVIRONMENT } from "./environment";
 import { readSeed, signInAs } from "./sessions";
 
 test("a member links the companion, which then acts for them until unlinked", async ({ page, context, request }) => {
@@ -41,18 +41,21 @@ test("the companion brings the next event to the addon, as an officer would past
 }) => {
   const token = await linkCompanion(page, context, request);
   const response = await request.get("/api/compagnon/donnees", { headers: { Authorization: `Bearer ${token}` } });
-  const { raid, paris, quetes, titres } = (await response.json()) as {
+  const { raid, paris, quetes, titres, raidroles } = (await response.json()) as {
     raid: { text: string; title: string; startsAt: string };
     paris: { text: string };
     quetes: { text: string };
     titres: { text: string };
+    raidroles: { text: string } | null;
   };
   // The soonest event is the one starting 10 minutes after the seed.
   expect(raid.title).toBe("La salle des Thanes");
   expect(raid.text.split("\n").slice(0, 2)).toEqual([
-    "VXV-RAID-2",
+    "VXV-RAID-3",
     expect.stringMatching(`^E;${readSeed().lockedEventId};`),
   ]);
+  // The roles an event may be reserved to serve the officers only, who create events in game.
+  expect(raidroles).toBeNull();
   // The bets come along, for Le Dé Pipé in game (P11.8).
   expect(paris.text.split("\n")[0]).toBe("VXV-PARIS-1");
   // And the missions, for Les Quêtes in game (P12.8).
@@ -60,6 +63,22 @@ test("the companion brings the next event to the addon, as an officer would past
   // And the titles of the week, for the game's displays (P13.3).
   expect(titres.text.split("\n")[0]).toBe("VXV-TITRES-1");
   expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
+});
+
+test("an officer's companion brings the roles an event may be reserved to, for « Créer un événement » in game", async ({
+  page,
+  context,
+  request,
+}) => {
+  const token = await linkCompanion(page, context, request, "officer");
+  const response = await request.get("/api/compagnon/donnees", { headers: { Authorization: `Bearer ${token}` } });
+  const { raidroles } = (await response.json()) as { raidroles: { text: string } };
+  const lines = raidroles.text.split("\n");
+  expect(lines[0]).toBe("VXV-ROLES-1");
+  expect(lines.filter((line) => line.startsWith("R;"))).toEqual([
+    `R;${WEB_ENVIRONMENT.DISCORD_GUILD_ID};Tout le monde`,
+    `R;${readSeed().raiderRoleId};${RAIDER_ROLE}`,
+  ]);
 });
 
 test("an officer's companion sends the roster, the raid's record and the characters' look", async ({
@@ -131,6 +150,7 @@ test("an officer creates an event in game: the website creates it and announces 
     time: "21:00",
     raidIds: ["salle-des-thanes"],
     softReserves: 1,
+    roleId: readSeed().raiderRoleId,
     reason: "Raid créé en jeu",
   };
   const response = await request.post("/api/compagnon/envoi", {
@@ -141,7 +161,9 @@ test("an officer creates an event in game: the website creates it and announces 
     "1 changement fait en jeu : 1 accepté, 0 refusés.",
   );
   await page.goto("/journal");
-  await expect(page.getByText("Raid créé en jeu")).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ hasText: "Motif : Raid créé en jeu" })).toContainText(
+    "Réservé à Raideur R1",
+  );
 });
 
 test("an officer opens a bet in game: the website opens it and announces it", async ({ page, context, request }) => {

@@ -1,18 +1,21 @@
 "use client";
 
-import type { RaidSummary } from "@vxv/server";
+import type { EventRoleChoice, RaidSummary } from "@vxv/server";
 import { useActionState } from "react";
 import { createEvent } from "@/app/actions/events";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
-import { Field, ReasonField } from "./Field";
+import { Field, Options, ReasonField } from "./Field";
 
 export function EventForm({
   raids,
+  roles,
   defaultSoftReserves,
   maxSoftReserves,
 }: {
   raids: RaidSummary[];
+  /** The Discord roles the event may be reserved to, everybody first. */
+  roles: EventRoleChoice[];
   defaultSoftReserves: number;
   maxSoftReserves: number;
 }) {
@@ -33,6 +36,14 @@ export function EventForm({
           ))}
         </div>
       </fieldset>
+      <Field label="Qui peut s'inscrire (rôle Discord)">
+        <select name="roleId" required defaultValue="" className="field">
+          <option value="" disabled>
+            Choisir un rôle
+          </option>
+          <Options options={roles.map((role) => [role.id, role.name] as const)} />
+        </select>
+      </Field>
       <Field label="SR par joueur">
         <input
           type="number"

@@ -9,6 +9,7 @@ const TITLES_REASON = "VXV : titres de la semaine";
 interface DiscordRole {
   id: string;
   name: string;
+  managed: boolean;
 }
 
 /** The guild's Discord server through the REST API, acting as the bot. */
@@ -16,9 +17,11 @@ export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions &
   const request = createDiscordRest(options);
   const memberPath = (discordId: string) => `/guilds/${guildId}/members/${discordId}`;
 
+  const listRoles = () => request<DiscordRole[]>("GET", `/guilds/${guildId}/roles`);
+
   /** The server's roles, and the one of this name, created when missing. */
   async function roleNamed(roleName: string, reason: string): Promise<{ roles: DiscordRole[]; target: DiscordRole }> {
-    const roles = await request<DiscordRole[]>("GET", `/guilds/${guildId}/roles`);
+    const roles = await listRoles();
     const target =
       roles.find((role) => role.name === roleName) ??
       (await request<DiscordRole>("POST", `/guilds/${guildId}/roles`, {
@@ -59,11 +62,15 @@ export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions &
     },
 
     async removeRole(discordId, roleName) {
-      const roles = await request<DiscordRole[]>("GET", `/guilds/${guildId}/roles`);
-      const target = roles.find((role) => role.name === roleName);
+      const target = (await listRoles()).find((role) => role.name === roleName);
       if (target !== undefined) {
         await request("DELETE", `${memberPath(discordId)}/roles/${target.id}`, { reason: TITLES_REASON });
       }
+    },
+
+    async listRoles() {
+      // Discord gives @everyone the server's own id.
+      return (await listRoles()).map(({ id, name, managed }) => ({ id, name, everyone: id === guildId, managed }));
     },
 
     async fetchRoleIds(discordId) {

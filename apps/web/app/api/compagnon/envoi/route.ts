@@ -57,6 +57,8 @@ const changeSchema = z.discriminatedUnion("kind", [
     time: z.string().max(5),
     raidIds: z.array(z.string().max(60)).min(1).max(5),
     softReserves: z.number().int(),
+    // A Discord id (snowflake), as the website listed it to the addon.
+    roleId: z.string().max(30),
     reason: z.string().max(500),
   }),
   z.object({

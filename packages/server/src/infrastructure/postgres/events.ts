@@ -9,11 +9,14 @@ interface EventRow {
   starts_at: Date;
   soft_reserves_per_player: number;
   raids: RaidSummary[];
+  role_id: string | null;
+  role_name: string | null;
   discord_message_id: string | null;
 }
 
 const SELECT_EVENTS = `
-  select events.id, events.starts_at, events.soft_reserves_per_player, events.discord_message_id,
+  select events.id, events.starts_at, events.soft_reserves_per_player, events.role_id, events.role_name,
+         events.discord_message_id,
          coalesce(json_agg(json_build_object('id', raids.id, 'name', raids.name) order by raids.name)
                   filter (where raids.id is not null), '[]') as raids
   from events
@@ -26,6 +29,7 @@ function toEvent(row: EventRow): RaidEvent {
     startsAt: row.starts_at,
     softReservesPerPlayer: row.soft_reserves_per_player,
     raids: row.raids,
+    role: row.role_id === null || row.role_name === null ? undefined : { id: row.role_id, name: row.role_name },
     discordMessageId: row.discord_message_id ?? undefined,
   };
 }
@@ -34,8 +38,9 @@ export function eventRepository(sql: SqlClient): EventRepository {
   return {
     async create(event, createdBy) {
       const rows = await sql.query<{ id: string }>(
-        "insert into events (starts_at, soft_reserves_per_player, created_by) values ($1, $2, $3) returning id",
-        [event.startsAt, event.softReservesPerPlayer, createdBy],
+        `insert into events (starts_at, soft_reserves_per_player, role_id, role_name, created_by)
+         values ($1, $2, $3, $4, $5) returning id`,
+        [event.startsAt, event.softReservesPerPlayer, event.role?.id ?? null, event.role?.name ?? null, createdBy],
       );
       const { id } = expectRow(rows, "create event");
       await sql.query("insert into event_raids (event_id, raid_id) select $1, unnest($2::text[])", [id, event.raidIds]);

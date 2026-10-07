@@ -28,6 +28,7 @@ function raid(signups: Signup[]): AnnouncedRaid {
         { id: "onyxia", name: "Onyxia" },
         { id: "hyjal", name: "Mont Hyjal" },
       ],
+      role: undefined,
       discordMessageId: undefined,
     },
     signups,
@@ -40,7 +41,14 @@ describe("raid sign-up message", () => {
     expect(embed?.title).toBe("Onyxia + Mont Hyjal");
     expect(embed?.url).toBe(`https://vxv.test/evenements/${EVENT_ID}`);
     const start = Date.UTC(2026, 11, 12, 20) / 1000;
-    expect(embed?.description).toBe(`📅 <t:${start}:F> (<t:${start}:R>)\n🎯 2 SR par joueur`);
+    expect(embed?.description).toBe(`📅 <t:${start}:F> (<t:${start}:R>)\n🎯 2 SR par joueur\n👥 Ouvert à tous`);
+  });
+
+  it("shows the role an event is reserved to, mentioned", () => {
+    const reserved = raid([]);
+    reserved.event.role = { id: "1194373648929263676", name: "Raideur R1" };
+    const [embed] = raidMessage(reserved, "https://vxv.test").embeds ?? [];
+    expect(embed?.description).toMatch(/\n👥 Réservé à <@&1194373648929263676>$/);
   });
 
   it("lists the coming players by role and class, then the other answers", () => {

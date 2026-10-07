@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext } from "./commands.ts";
 import { SIGNUP_BUTTON_PREFIX } from "./raidMessage.ts";
 import { openSignupForm, SIGNUP_FORM_PREFIX, submitSignupForm } from "./signupForm.ts";
-import { createTestApplication, LINK_CHANNEL, TEST_ROLES } from "./testApplication.ts";
+import { createTestApplication, LINK_CHANNEL, TEST_GUILD_ID, TEST_ROLES } from "./testApplication.ts";
 import { buttonClick, formSubmission, type TestActor } from "./testing.ts";
 
 const ME: TestActor = { userId: "200", name: "Déjà", channelId: "raids" };
@@ -60,7 +60,12 @@ describe("sign-up by Discord buttons", () => {
     const officer = await app.auth.identify({ discordId: "100", discordName: "Officier" }, [TEST_ROLES.officer]);
     eventId = await app.events.createEvent(
       officer,
-      { startsAt: new Date(`${NEXT_YEAR}-12-12T20:00:00Z`), raidIds: ["onyxia"], softReservesPerPlayer: 1 },
+      {
+        startsAt: new Date(`${NEXT_YEAR}-12-12T20:00:00Z`),
+        raidIds: ["onyxia"],
+        softReservesPerPlayer: 1,
+        roleId: TEST_GUILD_ID,
+      },
       "Raid de test",
     );
     await app.raidAnnouncements.announce(eventId);

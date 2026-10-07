@@ -1,3 +1,4 @@
+import { eventAudience } from "@vxv/server/domain/eventRoles";
 import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@vxv/server/domain/labels";
 import { canManageRaids, fullName, MAX_SPEC_LENGTH } from "@vxv/server";
 import { isComing } from "@vxv/server/domain/signups";
@@ -44,6 +45,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     <>
       <ScreenHeader kicker="Conseil de guerre" title={raidTitle(event.raids.map((raid) => raid.name))}>
         <span className="text-lavender">{formatEventDate(event.startsAt)}</span>
+        <Badge tone="amethyst">{eventAudience(event.role)}</Badge>
         <Badge tone="gain">{expected} attendus</Badge>
         <Badge tone="gold">{board.locked ? "SR verrouillées" : `SR jusqu'au ${formatDateTime(board.lockAt)}`}</Badge>
       </ScreenHeader>

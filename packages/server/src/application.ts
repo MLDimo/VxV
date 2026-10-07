@@ -1,4 +1,5 @@
 import { createAddonBets } from "./application/addonBets.ts";
+import { createAddonEventRoles } from "./application/addonEventRoles.ts";
 import { createAddonExport } from "./application/addonExport.ts";
 import { createAddonArtisans } from "./application/addonArtisans.ts";
 import { createArtisans } from "./application/artisans.ts";
@@ -79,11 +80,11 @@ export function createApplication({
   const roster = createRoster({ unitOfWork });
   const characters = createCharacters({ unitOfWork });
   const raidLogs = createRaidLogs({ unitOfWork, announcer, clock });
-  const signups = createSignups({ unitOfWork, clock });
+  const signups = createSignups({ unitOfWork, clock, guild });
   const softReserves = createSoftReserves({ unitOfWork, clock });
   const exclusions = createExclusions({ unitOfWork });
   const raidAnnouncements = createRaidAnnouncements({ unitOfWork, announcer });
-  const events = createEvents({ unitOfWork, clock });
+  const events = createEvents({ unitOfWork, clock, guild });
   const missions = createMissions({ unitOfWork, clock });
   const missionAnnouncements = createMissionAnnouncements({ unitOfWork, announcer: missionAnnouncer, clock });
   const bets = createBets({ unitOfWork, clock });
@@ -129,6 +130,7 @@ export function createApplication({
     history: createHistory({ unitOfWork }),
     journal: createJournal({ unitOfWork }),
     addonExport: createAddonExport({ unitOfWork, clock }),
+    addonEventRoles: createAddonEventRoles({ unitOfWork, clock, events }),
     raidLogs,
     bets,
     betAnnouncements,

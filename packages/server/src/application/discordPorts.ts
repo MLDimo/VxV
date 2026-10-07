@@ -1,4 +1,5 @@
 import type { Bet, DiscordMessage, Stake } from "../domain/bets.ts";
+import type { ServerRole } from "../domain/eventRoles.ts";
 import type { RaidEvent } from "../domain/events.ts";
 import type { Mission, MissionScore, MissionStatus } from "../domain/missions.ts";
 import type { RaidRecap } from "../domain/raidRecap.ts";
@@ -15,6 +16,8 @@ export interface GuildGateway {
   setOnlyRoleAmong(discordId: string, roleName: string, group: readonly string[]): Promise<void>;
   /** The Discord roles the member holds on the server, or undefined when they are no longer on it. */
   fetchRoleIds(discordId: string): Promise<string[] | undefined>;
+  /** The server's roles, @everyone included. */
+  listRoles(): Promise<ServerRole[]>;
   /** Gives the member this role, creating it if needed; and takes it away. */
   addRole(discordId: string, roleName: string): Promise<void>;
   removeRole(discordId: string, roleName: string): Promise<void>;

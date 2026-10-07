@@ -1,4 +1,5 @@
 import { fullName, type Character } from "./characters.ts";
+import { eventAudience } from "./eventRoles.ts";
 import type { RaidEvent } from "./events.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { JournalEntry } from "./journal.ts";
@@ -9,7 +10,7 @@ import { flag, line, seconds, text } from "./addonText.ts";
 import type { BoardItem } from "./softReserves.ts";
 
 /** First line of an event exported for the addon (contract with VXV_Raid); the number is the format version. */
-export const ADDON_EVENT_HEADER = "VXV-RAID-2";
+export const ADDON_EVENT_HEADER = "VXV-RAID-3";
 
 export interface AddonEventFacts {
   event: RaidEvent;
@@ -28,7 +29,8 @@ export interface AddonEventFacts {
 
 /**
  * The event as the officers paste it into the addon, one record per line:
- * E;event id;start (Unix seconds);export (Unix seconds);SR per player;title;raid ids separated by commas
+ * E;event id;start (Unix seconds);export (Unix seconds);SR per player;title;raid ids separated by commas;who may sign
+ *   up (eventAudience)
  * O;officer character
  * I;item id;item name;boss;1 when excluded from SR
  * S;character;class token;role;status;1 for a reroll;spec;item id:SR+ bonus,…
@@ -55,6 +57,7 @@ export function formatAddonEvent(facts: AddonEventFacts): string {
       event.softReservesPerPlayer,
       text(raidTitle(event.raids.map((raid) => raid.name))),
       event.raids.map((raid) => raid.id).join(","),
+      text(eventAudience(event.role)),
     ),
     ...facts.officers.map((officer) => line("O", fullName(officer))),
     ...board

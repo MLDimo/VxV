@@ -10,6 +10,7 @@ export interface FakeDiscordReply {
 interface Role {
   id: string;
   name: string;
+  managed: boolean;
 }
 
 /** A message the bot published in a channel, as last edited. */
@@ -40,18 +41,17 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
   const newId = () => String((lastId += 1));
   const rolesOf = (userId: string) => memberRoles.get(userId) ?? new Set<string>();
   const ok = (body?: unknown): FakeDiscordReply => ({ status: body === undefined ? HTTP_NO_CONTENT : HTTP_OK, body });
+  const everyone = (guildId: string): Role => ({ id: guildId, name: "@everyone", managed: false });
+  function addRole(name: string, managed = false): Role {
+    const role = { id: newId(), name, managed };
+    roles.push(role);
+    return role;
+  }
 
   const routes: [method: string, path: RegExp, handler: Handler][] = [
-    ["GET", /^\/guilds\/[^/]+\/roles$/, () => ok(roles)],
-    [
-      "POST",
-      /^\/guilds\/[^/]+\/roles$/,
-      (_, body) => {
-        const role = { id: newId(), name: (body as { name: string }).name };
-        roles.push(role);
-        return ok(role);
-      },
-    ],
+    // Like Discord, @everyone has the server's id.
+    ["GET", /^\/guilds\/([^/]+)\/roles$/, ([guildId = ""]) => ok([everyone(guildId), ...roles])],
+    ["POST", /^\/guilds\/[^/]+\/roles$/, (_, body) => ok(addRole((body as { name: string }).name))],
     [
       "GET",
       /^\/guilds\/[^/]+\/members\/([^/]+)$/,
@@ -132,6 +132,8 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
       return new Response(reply.body === undefined ? null : JSON.stringify(reply.body), { status: reply.status });
     },
     nicknameOf: (userId: string) => nicknames.get(userId),
+    /** A role created on the server by hand, or given by Discord to a bot (managed); returns its id. */
+    addRole: (name: string, managed = false) => addRole(name, managed).id,
     /** The user leaves the guild's server. */
     leave: (userId: string) => departed.add(userId),
     roleNamesOf: (userId: string) => roles.filter((role) => rolesOf(userId).has(role.id)).map((role) => role.name),

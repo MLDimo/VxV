@@ -39,6 +39,8 @@ export interface EventCreationRecord {
   startsAt: string;
   raids: string[];
   softReservesPerPlayer: number;
+  /** Who may sign up (eventAudience); none for the events created before roles. */
+  audience?: string;
 }
 
 /** What the journal keeps about an exclusion change. */

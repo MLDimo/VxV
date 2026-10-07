@@ -1,4 +1,4 @@
-import { autocomplete, buttonClick, formSubmission, slashCommand, type TestActor } from "@vxv/bot/testing";
+import { autocomplete, buttonClick, formSubmission, slashCommand, withOptions, type TestActor } from "@vxv/bot/testing";
 import { expect, test } from "@playwright/test";
 import { DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
 import {
@@ -73,7 +73,9 @@ test.describe.serial("Discord bot", () => {
       channelId: "1",
     };
     const plan = { raid: "salle-des-thanes", date: "20/03/2031", heure: "21h", motif: "Raid créé depuis Discord" };
-    const reply = await postSigned(request, slashCommand("vxv_raid", plan, officer));
+    // For everybody: @everyone, which has the server's id.
+    const everybody = { role: WEB_ENVIRONMENT.DISCORD_GUILD_ID };
+    const reply = await postSigned(request, withOptions(slashCommand("vxv_raid", plan, officer), "Role", everybody));
     expect(await reply.json()).toMatchObject({
       data: { content: `Événement créé et publié dans <#${WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID}>.` },
     });

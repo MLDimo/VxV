@@ -23,7 +23,12 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - **Raid et SR** (`VXV_Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
-  Discord. Le nombre de SR est fixé à la création. SR+ (`domain/softReserves.ts`), par personnage et par objet
+  Discord. Le nombre de SR est fixé à la création. Chaque événement est réservé à un rôle Discord choisi à la création
+  (`domain/eventRoles.ts`) : tout rôle du serveur sauf ceux de Discord (bots, boosters) et de VXV (classes, titres), ou
+  @everyone pour tout le monde ; nom gardé tel qu'à la création, affiché partout, mentionné sans notification sur
+  Discord. Seuls ses membres s'inscrivent : rôles du joueur lus sur Discord à sa première inscription (un rôle donné à
+  l'instant compte ; Discord muet, inscription refusée), une inscription déjà faite reste modifiable sans le rôle. En
+  jeu, la liste des rôles vient du compagnon d'un officier, sans relais dans la guilde. SR+ (`domain/softReserves.ts`), par personnage et par objet
   réservé : en remontant ses événements précédents, +10 quand il était présent, avait réservé l'objet et ne l'a pas
   obtenu ; neutre s'il était absent ou si l'événement n'avait pas le raid de l'objet ; arrêt à l'objet obtenu ou à une
   présence sans l'avoir réservé ; plafond +50. Conflits : le site fait foi, et la modification la plus récente gagne
@@ -174,7 +179,8 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-METIERS-1` (métiers d'un personnage) | addon → site | `VXV_Artisans/Website.lua` | `domain/artisans.ts` |
 | `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV_Deathroll/Games.lua` | `domain/deathrolls.ts` |
 | `VXV-COMBAT-1` (boss tués, soins reçus) | compagnon → site | `apps/companion/src/domain/combatLog.ts` | `domain/bossFights.ts` |
-| `VXV-RAID-2` (événement) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
+| `VXV-RAID-3` (événement) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
+| `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Raid/RoleChoices.lua` |
 | `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
 | `VXV-QUETES-1` | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV_Titles/TitlesData.lua` |

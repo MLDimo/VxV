@@ -18,6 +18,8 @@ export const RAID_CHANNEL = "raids";
 export const BETS_CHANNEL = "bets";
 export const MISSIONS_CHANNEL = "missions";
 export const SITE_URL = "https://vxv.test";
+/** The test server's id, which Discord also gives @everyone. */
+export const TEST_GUILD_ID = "guild";
 
 /**
  * The real use cases on a fresh migrated database, with guild characters imported by an officer,
@@ -32,7 +34,7 @@ export async function createTestApplication(
   const app = createApplication({
     sql,
     discordRoles: TEST_ROLES,
-    guild: createDiscordGuild({ token: "token", guildId: "guild" }),
+    guild: createDiscordGuild({ token: "token", guildId: TEST_GUILD_ID }),
     announcer: createDiscordRaidAnnouncer({ token: "token", channelId: RAID_CHANNEL, siteUrl: SITE_URL }),
     betAnnouncer: createDiscordBetAnnouncer({ token: "token", channelId: BETS_CHANNEL, siteUrl: SITE_URL }),
     missionAnnouncer: createDiscordMissionAnnouncer({ token: "token", channelId: MISSIONS_CHANNEL, siteUrl: SITE_URL }),
