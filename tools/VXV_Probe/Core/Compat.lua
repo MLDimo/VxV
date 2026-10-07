@@ -42,6 +42,14 @@ local ALIASES = {
     GetNumTradeSkills = { "GetNumTradeSkills" },
     GetTradeSkillLine = { "GetTradeSkillLine" },
     GetTradeSkillInfo = { "GetTradeSkillInfo" },
+    -- T11: the logs the game writes while it runs, and a private chat channel.
+    LoggingCombat = { "LoggingCombat" },
+    LoggingChat = { "LoggingChat" },
+    GetCVar = { "C_CVar.GetCVar", "GetCVar" },
+    SetCVar = { "C_CVar.SetCVar", "SetCVar" },
+    JoinChannelByName = { "JoinChannelByName" },
+    LeaveChannelByName = { "LeaveChannelByName" },
+    GetChannelName = { "GetChannelName" },
 }
 
 local MISSING_API = "API absente"

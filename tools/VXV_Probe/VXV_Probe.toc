@@ -2,7 +2,7 @@
 ## Title: VXV Probe
 ## Notes: Sonde technique de la Phase 0 (non distribuée)
 ## Author: VXV
-## Version: 0.3.0
+## Version: 0.4.0
 ## SavedVariables: VXV_ProbeDB
 
 # Core: generic tooling, no test logic.
@@ -34,5 +34,6 @@ Tests\Counters.lua
 Tests\Display.lua
 Tests\Professions.lua
 Tests\Design.lua
+Tests\Logs.lua
 
 Bootstrap.lua

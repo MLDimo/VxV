@@ -108,6 +108,29 @@ function Tick()
     for ticker in pairs(tickers) do ticker.fn() end
 end
 
+-- T11: the logs and a private channel.
+local logging = { combat = false, chat = false }
+function LoggingCombat(on)
+    if on ~= nil then logging.combat = on end
+    return logging.combat
+end
+function LoggingChat(on)
+    if on ~= nil then logging.chat = on end
+    return logging.chat
+end
+local cvars = {}
+C_CVar = {
+    GetCVar = function(name) return cvars[name] or "0" end,
+    SetCVar = function(name, value) cvars[name] = value return true end,
+}
+local channels = {}
+function JoinChannelByName(name)
+    channels[name] = 5
+    Fire("CHAT_MSG_CHANNEL_NOTICE", "YOU_CHANGED", "", "", "5. " .. name)
+end
+function LeaveChannelByName(name) channels[name] = nil end
+function GetChannelName(name) return channels[name] or 0, channels[name] and name or nil end
+
 GetBuildInfo = function() return "1.60.1", "70170", "Oct 1 2026", 16001 end
 IsInInstance = function() return true, "raid" end
 GetInstanceInfo = function() return "Molten Core", "raid", 9, "40 joueurs", 40, 0, false, 409 end
