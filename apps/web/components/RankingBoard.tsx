@@ -21,12 +21,12 @@ const PERCENT = 100;
  * and how its values read. */
 export type Board = Pick<RankingView, "unit" | "lines" | "records">;
 
-/** A value as the board writes it: gold with its sign (and po on the banners), or a count. */
+/** A value as the board writes it: gold with its sign (and po on the banners), points with their sign, or a count. */
 function valueText(board: Board, value: number, withGold: boolean): string {
   if (board.unit === "count") {
     return String(value);
   }
-  return withGold ? formatSignedGold(value) : formatSigned(value);
+  return board.unit === "gold" && withGold ? formatSignedGold(value) : formatSigned(value);
 }
 
 const cloth = (line: RankingLine) =>

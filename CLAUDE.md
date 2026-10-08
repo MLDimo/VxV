@@ -55,7 +55,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   appelé sur Discord (salon des duels, `DISCORD_DUELS_CHANNEL_ID`, salon PvP sans lui) et répond avant l'heure. Défi
   relevé : un pari ordinaire s'ouvre jusqu'à l'heure du duel (un choix par joueur, règles des paris, sans les deux
   joueurs). Résultat lu en jeu, sinon reconnu par le perdant ; un officier peut saisir le vainqueur ou annuler, avec
-  motif ; annulé, les mises sont rendues. Classement Elo recalculé des duels joués dans l'ordre : départ 1500,
+  motif ; annulé, les mises sont rendues. Classement Elo recalculé des duels joués dans l'ordre : départ 0 (une cote se lit en points gagnés ou perdus,
+  affichée avec son signe),
   E = 1 / (1 + 10^((Rb − Ra) / 400)), R' = R + 20 × (résultat − E) ; montré comme le Ranking (fanions des trois
   premiers, records des duels : plus de victoires, plus de duels, plus longue série ; suite du classement, position du
   joueur). En jeu : défier sa cible ou un « Prénom Nom », relever, refuser, reconnaître sa défaite, annuler ; le

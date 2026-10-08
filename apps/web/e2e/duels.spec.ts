@@ -57,8 +57,8 @@ test.describe.serial("duels", () => {
     // The Elo board, as the Ranking's: the winner on the podium's banners, the officer's own place below.
     const podium = page.getByRole("list", { name: "Podium" });
     await expect(podium).toContainText("Dune");
-    await expect(podium).toContainText("1510");
-    await expect(page.getByRole("list", { name: "Ta position" })).toContainText("1490");
+    await expect(podium).toContainText("+10");
+    await expect(page.getByRole("list", { name: "Ta position" })).toContainText("−10");
     await expect(page.getByText("Records des duels")).toBeVisible();
   });
 });

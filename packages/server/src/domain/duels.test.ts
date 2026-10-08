@@ -101,12 +101,12 @@ describe("Elo", () => {
       { winnerId: "vorn", loserId: "morgane", playedAt: at(3) },
       { winnerId: "morgane", loserId: "thessa", playedAt: at(2) },
     ]);
-    // Between equals, 20 × (1 − 0.5) = 10 points; Vorn, still at 1500, then beats Morgane at 1510.
-    const vornGain = 20 * (1 - expectedScore(1500, 1510));
+    // Everybody starts at 0. Between equals, 20 × (1 − 0.5) = 10 points; Vorn, still at 0, then beats Morgane at 10.
+    const vornGain = 20 * (1 - expectedScore(0, 10));
     expect(ratings).toEqual([
-      { memberId: "vorn", rating: 1500 + vornGain, played: 1, won: 1 },
-      { memberId: "morgane", rating: 1510 - vornGain, played: 2, won: 1 },
-      { memberId: "thessa", rating: 1490, played: 1, won: 0 },
+      { memberId: "vorn", rating: vornGain, played: 1, won: 1 },
+      { memberId: "morgane", rating: 10 - vornGain, played: 2, won: 1 },
+      { memberId: "thessa", rating: -10, played: 1, won: 0 },
     ]);
     // Beating a stronger player brings more than 10 points.
     expect(vornGain).toBeGreaterThan(10);

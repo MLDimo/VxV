@@ -66,8 +66,8 @@ const PVP: AddonPvpFacts = {
     { duel: duel("d3", "m-deja", "m-ciel", { accepted: true, winnerId: "m-deja" }), status: "played" },
   ],
   ranking: [
-    { rank: 1, memberId: "m-deja", rating: 1510, won: 1, played: 1 },
-    { rank: 2, memberId: "m-ciel", rating: 1490, won: 0, played: 1 },
+    { rank: 1, memberId: "m-deja", rating: 10, won: 1, played: 1 },
+    { rank: 2, memberId: "m-ciel", rating: -10, won: 0, played: 1 },
   ],
   records: [{ label: "Plus de victoires", value: "1 victoire", memberId: "m-deja" }],
   changes: [],
@@ -151,10 +151,11 @@ describe("the PvP place in game", () => {
     }
     expect(rows).toContainEqual(expect.stringContaining("Ðéjà Vu gagne"));
     const shown = plain(client(SHOWN("VXV_Window")));
-    for (const text of ["OR", "ARGENT", "Ðéjà", "Ciel", "1510", "1490", "Records des duels", "PLUS DE VICTOIRES"]) {
+    // The ratings with their sign: points won or lost since 0.
+    for (const text of ["OR", "ARGENT", "Ðéjà", "Ciel", "+10", "−10", "Records des duels", "PLUS DE VICTOIRES"]) {
       expect(shown).toContain(text);
     }
-    expect(shown).toContain("Mon Elo : 1500");
+    expect(shown).toContain("Mon Elo : 0");
     const portrait = client(`return FindWidget(VXV_Window, function(widget)
       return type(widget.path) == "string" and widget.path:find("mv_pretre_f", 1, true) ~= nil end) ~= nil`);
     expect(portrait).toBe(true);

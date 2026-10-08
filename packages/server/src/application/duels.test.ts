@@ -147,8 +147,8 @@ describe("duels", () => {
     expect(bet?.stakes[0]?.outcome).toBe("won");
     const { lines, records } = await duels.ranking();
     expect(lines).toEqual([
-      { rank: 1, member: expect.objectContaining({ name: "Vorn Cendrelune" }), rating: 1510, played: 1, won: 1 },
-      { rank: 2, member: expect.objectContaining({ name: "Morgane Nuitsombre" }), rating: 1490, played: 1, won: 0 },
+      { rank: 1, member: expect.objectContaining({ name: "Vorn Cendrelune" }), rating: 10, played: 1, won: 1 },
+      { rank: 2, member: expect.objectContaining({ name: "Morgane Nuitsombre" }), rating: -10, played: 1, won: 0 },
     ]);
     expect(records[0]).toMatchObject({
       label: "Plus de victoires",
