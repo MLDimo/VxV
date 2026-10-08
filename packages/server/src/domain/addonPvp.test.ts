@@ -61,14 +61,15 @@ describe("formatAddonPvp", () => {
         },
       ],
       players: [
-        { memberId: "m-officer", name: "Ðéjà Vu", characterClass: "ROGUE" },
-        { memberId: "m-thom", name: "Thom Leboss", characterClass: undefined },
+        { memberId: "m-officer", name: "Ðéjà Vu", characterClass: "ROGUE", avatar: "mv_voleur_m" },
+        { memberId: "m-thom", name: "Thom Leboss", characterClass: undefined, avatar: undefined },
       ],
       duels: [{ duel, status: "played" }],
       ranking: [
         { rank: 1, memberId: "m-officer", rating: 1510, won: 1, played: 1 },
         { rank: 2, memberId: "m-thom", rating: 1490, won: 0, played: 1 },
       ],
+      records: [{ label: "Plus de victoires", value: "1 victoire", memberId: "m-officer" }],
       changes: [
         {
           id: "Thom Leboss#1#1",
@@ -82,17 +83,18 @@ describe("formatAddonPvp", () => {
       ],
     });
     expect(text.split("\n")).toEqual([
-      "VXV-PVP-1",
+      "VXV-PVP-2",
       "P;1796126400",
       "O;Ðéjà Vu",
       "M;m-officer;Ðéjà Vu",
       "E;e1;1796932800;Raid sur Astranaar;Réservé à Raideur R1",
       "S;e1;Thom Leboss;PRIEST;healer;present;Sacré",
-      "U;m-officer;Ðéjà Vu;ROGUE",
-      "U;m-thom;Thom Leboss;",
+      "U;m-officer;Ðéjà Vu;ROGUE;mv_voleur_m",
+      "U;m-thom;Thom Leboss;;",
       "D;d1;played;1796932800;Porte, d'Orgrimmar;m-officer;m-thom;m-officer;b1",
       "R;1;m-officer;1510;1;1",
       "R;2;m-thom;1490;0;1",
+      "K;Plus de victoires;1 victoire;m-officer",
       "C;Thom Leboss#1#1;1;Défi relevé.",
     ]);
   });

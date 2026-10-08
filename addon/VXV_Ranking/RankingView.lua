@@ -6,8 +6,6 @@ local _, ns = ...
 local RankingView = {}
 ns.RankingView = RankingView
 
-local Gold = VXV.Gold
-
 RankingView.CATEGORIES = {
     { id = "paris", name = "Paris" },
     { id = "deathroll", name = "Deathroll" },
@@ -36,12 +34,7 @@ function RankingView.PeriodLabel(data, period)
 end
 
 --- A value as the board writes it: gold with its sign ("+3 215 po" on the banners, "+310" below), or a count.
-function RankingView.Value(unit, value, withGold)
-    if unit ~= "gold" then
-        return tostring(value)
-    end
-    return withGold and Gold.Signed(value) or Gold.SignedNumber(value)
-end
+RankingView.Value = VXV.RankingBoard.Value
 
 local function lineOf(data, row, memberId)
     local member = data.members[row.memberId] or {}

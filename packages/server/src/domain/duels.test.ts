@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   answerRefusal,
   cancelRefusal,
+  duelFeats,
   duelStatus,
   eloRatings,
   expectedScore,
@@ -109,5 +110,29 @@ describe("Elo", () => {
     ]);
     // Beating a stronger player brings more than 10 points.
     expect(vornGain).toBeGreaterThan(10);
+  });
+});
+
+describe("duelFeats", () => {
+  const at = (day: number) => new Date(Date.UTC(2026, 11, day));
+
+  it("names the most wins, the most duels and the longest run of wins", () => {
+    expect(
+      duelFeats([
+        { winnerId: "vorn", loserId: "morgane", playedAt: at(1) },
+        { winnerId: "vorn", loserId: "thessa", playedAt: at(2) },
+        { winnerId: "morgane", loserId: "vorn", playedAt: at(3) },
+        { winnerId: "morgane", loserId: "thessa", playedAt: at(4) },
+        { winnerId: "morgane", loserId: "kaelys", playedAt: at(5) },
+      ]),
+    ).toEqual([
+      { label: "Plus de victoires", value: "3 victoires", memberId: "morgane" },
+      { label: "Plus de duels", value: "4 duels", memberId: "morgane" },
+      { label: "Plus longue série", value: "3 victoires de suite", memberId: "morgane" },
+    ]);
+  });
+
+  it("has no record before a duel is played", () => {
+    expect(duelFeats([])).toEqual([]);
   });
 });

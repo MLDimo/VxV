@@ -3,6 +3,7 @@ import { fullName } from "../domain/characters.ts";
 import {
   answerRefusal,
   cancelRefusal,
+  duelFeats,
   duelStatus,
   eloRatings,
   newDuelRefusal,
@@ -30,6 +31,12 @@ export interface DuelView {
   status: DuelStatus;
   challenger: MemberLook;
   opponent: MemberLook;
+}
+
+/** The Elo ranking of the duelists, and the duels' records. */
+export interface DuelBoard {
+  lines: DuelRankingLine[];
+  records: { label: string; value: string; member: MemberLook }[];
 }
 
 /** A duelist's line in the Elo ranking. */
@@ -273,8 +280,8 @@ export function createDuels({
       });
     },
 
-    /** The Elo ranking of the duelists, from every duel played. */
-    async ranking(): Promise<DuelRankingLine[]> {
+    /** The Elo ranking of the duelists and the duels' records, from every duel played. */
+    async ranking(): Promise<DuelBoard> {
       const { duels, looks } = await unitOfWork.run(async ({ duels: stored, members }) => ({
         duels: await stored.listAll(),
         looks: await members.listLooks(),
@@ -284,13 +291,20 @@ export function createDuels({
           ? []
           : [{ winnerId: duel.winnerId, loserId: opponentOf(duel, duel.winnerId), playedAt: duel.playedAt }],
       );
-      return eloRatings(outcomes).map((line, index) => ({
-        rank: index + 1,
-        member: lookOf(looks, line.memberId),
-        rating: Math.round(line.rating),
-        played: line.played,
-        won: line.won,
-      }));
+      return {
+        lines: eloRatings(outcomes).map((line, index) => ({
+          rank: index + 1,
+          member: lookOf(looks, line.memberId),
+          rating: Math.round(line.rating),
+          played: line.played,
+          won: line.won,
+        })),
+        records: duelFeats(outcomes).map(({ label, value, memberId }) => ({
+          label,
+          value,
+          member: lookOf(looks, memberId),
+        })),
+      };
     },
   };
 }

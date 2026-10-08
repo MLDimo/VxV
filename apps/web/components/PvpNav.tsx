@@ -1,9 +1,8 @@
 import { SubNav } from "./SubNav";
 
 const LINKS = [
-  { href: "/pvp", name: "Sorties" },
+  { href: "/pvp", name: "Événements" },
   { href: "/pvp/duels", name: "Duels" },
-  { href: "/pvp/classement", name: "Classement" },
 ] as const;
 
 /** The PvP place's sub-menu. */

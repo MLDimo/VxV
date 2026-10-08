@@ -1,4 +1,13 @@
-import { canManageRaids, MAX_DUEL_PLACE_LENGTH, type DuelStatus, type DuelView, type Member } from "@vxv/server";
+import {
+  canManageRaids,
+  ELO_K,
+  ELO_START,
+  MAX_DUEL_PLACE_LENGTH,
+  type DuelBoard,
+  type DuelStatus,
+  type DuelView,
+  type Member,
+} from "@vxv/server";
 import { formatEventDate } from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { actOnDuel } from "@/app/actions/duels";
@@ -9,6 +18,7 @@ import { DuelOfficerForm } from "@/components/DuelOfficerForm";
 import { MemberName } from "@/components/MemberName";
 import { Panel } from "@/components/Panel";
 import { PvpNav } from "@/components/PvpNav";
+import { RankingBoard, type Board } from "@/components/RankingBoard";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { guildMembers } from "@/server/guildMembers";
@@ -73,10 +83,20 @@ function DuelItem({ view, member }: { view: DuelView; member: Member }) {
   );
 }
 
-/** The duels: a challenge to make, those to answer or to play, then the latest ended. */
+/** The duels' Elo board: its places with their portraits, its records. */
+function eloBoard(board: DuelBoard): Board {
+  return {
+    unit: "count",
+    lines: board.lines.map((line) => ({ ...line.member, rank: line.rank, value: line.rating, title: undefined })),
+    records: board.records,
+  };
+}
+
+/** The duels: their Elo ranking on banners, a challenge to make, those to answer or to play, then the latest ended. */
 export default async function DuelsPage() {
   const member = await requireMember();
-  const [views, members] = await Promise.all([getApplication().duels.list(), guildMembers()]);
+  const { duels } = getApplication();
+  const [views, board, members] = await Promise.all([duels.list(), duels.ranking(), guildMembers()]);
   return (
     <>
       <ScreenHeader kicker="Avis de recherche" kickerClassName="text-loss" title="Duels" />
@@ -84,9 +104,17 @@ export default async function DuelsPage() {
       <p className="mt-6 max-w-3xl text-lavender">
         Un contre un, à l&apos;heure et au lieu dits : une fois le défi relevé, la guilde parie sur le vainqueur
         jusqu&apos;à l&apos;heure du duel, sans les deux joueurs. L&apos;addon lit le résultat en jeu ; sinon le perdant
-        le reconnaît ici.
+        le reconnaît ici. Classement Elo : chacun part de {ELO_START} ; le vainqueur gagne {ELO_K} × (1 − la chance
+        qu&apos;il avait de gagner), le perdant les perd : battre un plus fort rapporte beaucoup, un plus faible peu.
       </p>
-      <Panel title="Défier un joueur" className="mt-6">
+      <RankingBoard
+        board={eloBoard(board)}
+        memberId={member.id}
+        recordsTitle="Records des duels"
+        note="Elo · depuis toujours"
+        empty="Aucun duel joué pour l'instant."
+      />
+      <Panel title="Défier un joueur" className="mt-8">
         <DuelForm
           opponents={members.filter((candidate) => candidate.memberId !== member.id)}
           maxPlaceLength={MAX_DUEL_PLACE_LENGTH}

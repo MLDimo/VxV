@@ -84,7 +84,7 @@ ns.Tokens = {
           spot = { 49.5, 57, 24, 36 }, plaque = "table", kicker = "sakura",
           backdrop = { position = { 60, 85 }, zoom = 2.6, opacity = 0.3 } },
         { id = "pvp", name = "PvP", short = "PvP",
-          subtitle = "Duels & sorties",
+          subtitle = "Événements & duels",
           spot = { 52, 25, 19, 31 }, plaque = "board", kicker = "loss",
           backdrop = { position = { 69, 29 }, zoom = 2.5, opacity = 0.3 } },
         { id = "dice", name = "Le Dé Pipé", short = "Paris",

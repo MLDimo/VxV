@@ -29,7 +29,7 @@ export default async function PvpEventPage({ params }: { params: Promise<{ id: s
   const expected = eventSignups.filter((signup) => isComing(signup.status)).length;
   return (
     <>
-      <ScreenHeader kicker="Avis de recherche · sortie PvP" kickerClassName="text-loss" title={eventTitle(event)}>
+      <ScreenHeader kicker="Avis de recherche · événement PvP" kickerClassName="text-loss" title={eventTitle(event)}>
         <span className="text-lavender">{formatEventDate(event.startsAt)}</span>
         <Badge tone="amethyst">{eventAudience(event.role)}</Badge>
         <Badge tone="gain">{expected} attendus</Badge>

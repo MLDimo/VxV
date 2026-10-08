@@ -55,9 +55,9 @@ const PVP: AddonPvpFacts = {
     },
   ],
   players: [
-    { memberId: "m-deja", name: "Ðéjà Vu", characterClass: "ROGUE" },
-    { memberId: "m-thom", name: "Thom Leboss", characterClass: "ROGUE" },
-    { memberId: "m-ciel", name: "Ciel Gris", characterClass: "PRIEST" },
+    { memberId: "m-deja", name: "Ðéjà Vu", characterClass: "ROGUE", avatar: "mv_voleur_m" },
+    { memberId: "m-thom", name: "Thom Leboss", characterClass: "ROGUE", avatar: "mv_voleur_m" },
+    { memberId: "m-ciel", name: "Ciel Gris", characterClass: "PRIEST", avatar: "mv_pretre_f" },
   ],
   duels: [
     { duel: duel("d1", "m-thom", "m-ciel", { accepted: true, betId: "b1" }), status: "scheduled" },
@@ -68,6 +68,7 @@ const PVP: AddonPvpFacts = {
     { rank: 1, memberId: "m-deja", rating: 1510, won: 1, played: 1 },
     { rank: 2, memberId: "m-ciel", rating: 1490, won: 0, played: 1 },
   ],
+  records: [{ label: "Plus de victoires", value: "1 victoire", memberId: "m-deja" }],
   changes: [],
 };
 const ROLES = formatAddonEventRoles(
@@ -82,16 +83,20 @@ const OPEN_PVP = `
   SlashCmdList.VXV("")
   FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "PvP" end):Run("OnClick")
 `;
+/** The PvP place's « Duels » tab. */
+const OPEN_DUELS = `
+  FindWidget(VXV_Window, function(w) return w.SetSelected and w.label.text == "Duels" and IsVisible(w) end):Run("OnClick")
+`;
 const ROWS = `
   local texts = {}
   FindWidget(VXV_Window, function(widget)
-      if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      if widget.row ~= nil and IsVisible(widget) then texts[#texts + 1] = widget.label.text end
   end)
   return texts
 `;
 const SHOWN = (frame: string) => `
   local texts = {}
-  FindWidget(${frame}, function(w) if w.kind == "FontString" and w.text ~= nil and IsVisible(w) then texts[#texts + 1] = w.text end end)
+  FindWidget(${frame}, function(w) if w.kind == "FontString" and w.text ~= nil and IsVisible(w) then texts[#texts + 1] = tostring(w.text) end end)
   return texts
 `;
 const PENDING = `
@@ -122,22 +127,36 @@ function startPvp(playerName = "Thom Leboss", inbox: Record<string, string> = { 
 }
 
 describe("the PvP place in game", () => {
-  it("shows the outings to come, the duels with how they stand, the Elo ranking and the player's Elo", () => {
+  it("shows the PvP events to come in their tab, with the player's sign-up", () => {
     const { client, errors } = startPvp();
     const rows = plain(client(ROWS));
+    expect(rows).toContain("Raid sur Astranaar");
+    expect(rows).toContainEqual(expect.stringContaining("1 attendu · Pas inscrit"));
+    expect(rows).not.toContain("Thom Leboss contre Ciel Gris");
+    expect(errors()).toEqual([]);
+  });
+
+  it("shows in the Duels tab the Elo's first on banners, the records, the duels and the player's Elo", () => {
+    const { client, errors } = startPvp();
+    client(OPEN_DUELS);
+    const rows = plain(client(ROWS));
     for (const text of [
-      "Raid sur Astranaar",
       "Thom Leboss contre Ciel Gris",
       "Ciel Gris contre Thom Leboss",
       "Ðéjà Vu contre Ciel Gris",
       "Pari ouvert : Le Dé Pipé › Paris, ou le site",
-      "1. Ðéjà Vu · 1510 · 1 victoire sur 1 duel",
     ]) {
       expect(rows).toContain(text);
     }
-    expect(rows).toContainEqual(expect.stringContaining("1 attendu · Pas inscrit"));
     expect(rows).toContainEqual(expect.stringContaining("Ðéjà Vu gagne"));
-    expect(plain(client(SHOWN("VXV_Window")))).toContain("Mon Elo : 1500");
+    const shown = plain(client(SHOWN("VXV_Window")));
+    for (const text of ["OR", "ARGENT", "Ðéjà", "Ciel", "1510", "1490", "Records des duels", "PLUS DE VICTOIRES"]) {
+      expect(shown).toContain(text);
+    }
+    expect(shown).toContain("Mon Elo : 1500");
+    const portrait = client(`return FindWidget(VXV_Window, function(widget)
+      return type(widget.path) == "string" and widget.path:find("mv_pretre_f", 1, true) ~= nil end) ~= nil`);
+    expect(portrait).toBe(true);
     expect(errors()).toEqual([]);
   });
 
@@ -157,6 +176,7 @@ describe("the PvP place in game", () => {
 
   it("takes up a challenge, and offers a duelist to concede or call off a duel", () => {
     const { client, errors } = startPvp();
+    client(OPEN_DUELS);
     client(clickRow("Ciel Gris contre Thom Leboss"));
     expect(plain(client(SHOWN("VXV_DuelActions")))).toEqual(
       expect.arrayContaining(["Relever le défi", "Refuser", "Annuler le duel"]),
@@ -172,6 +192,7 @@ describe("the PvP place in game", () => {
 
   it("challenges a member typed by name, whatever its case", () => {
     const { client, errors } = startPvp();
+    client(OPEN_DUELS);
     client(click("VXV_Window", "Défier"));
     client(click("VXV_DuelDialog", "Défier"));
     expect(plain(client(SHOWN("VXV_DuelDialog")))).toContain("Il manque : le joueur défié, la date, l'heure, le lieu.");
@@ -254,6 +275,7 @@ describe("the PvP place in game", () => {
     const started = startPvp();
     const { client, errors } = started;
     expect(client('return IsVisible(FindButton(VXV_Window, "Créer"))')).toBe(false);
+    client(OPEN_DUELS);
     client(clickRow("Ciel Gris contre Thom Leboss"));
     client(click("VXV_DuelActions", "Relever le défi"));
     const id = client("local id = next(VXV_DB.modules.pvp.pending) return id") as string;

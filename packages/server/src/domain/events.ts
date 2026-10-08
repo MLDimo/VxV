@@ -96,7 +96,7 @@ export function newEventRefusal(event: NewRaidEvent, now: Date, knownRaidIds: Re
 export function newPvpEventRefusal(event: NewPvpEvent, now: Date): string | undefined {
   const title = event.title.trim();
   if (title === "" || title.length > MAX_EVENT_TITLE_LENGTH) {
-    return `Donnez un titre à la sortie (${MAX_EVENT_TITLE_LENGTH} caractères au plus).`;
+    return `Donnez un titre à l'événement (${MAX_EVENT_TITLE_LENGTH} caractères au plus).`;
   }
   return startRefusal(event.startsAt, now);
 }

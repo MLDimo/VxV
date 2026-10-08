@@ -126,7 +126,7 @@ export {
   type DiscordRestOptions,
 } from "./infrastructure/discord/rest.ts";
 export type { BoardItem, LootItem, Reserver } from "./domain/softReserves.ts";
-export type { DuelRankingLine, DuelView } from "./application/duels.ts";
+export type { DuelBoard, DuelRankingLine, DuelView } from "./application/duels.ts";
 export {
   duelStatus,
   ELO_K,

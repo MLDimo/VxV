@@ -1,5 +1,4 @@
 import type { RankingLine, RankingView } from "@vxv/server";
-import type { RankingPeriod } from "@vxv/server/domain/ranking";
 import { formatSigned, formatSignedGold } from "@vxv/server/domain/labels";
 import { Avatar } from "./Avatar";
 import { classColor } from "./characterClasses";
@@ -16,16 +15,15 @@ const METALS = [
 const ORDER = [1, 0, 2] as const;
 const SWAY_DELAYS = ["-1.2s", "0s", "-2.4s"] as const;
 const PODIUM_PLACES = 3;
-const RECORDS_TITLES: Record<RankingPeriod, string> = {
-  always: "Records depuis toujours",
-  month: "Records du mois",
-  season: "Records de la saison",
-};
 const PERCENT = 100;
 
+/** What a board shows (a Ranking's category, the duels' Elo): its places, the first three on the podium, its records,
+ * and how its values read. */
+export type Board = Pick<RankingView, "unit" | "lines" | "records">;
+
 /** A value as the board writes it: gold with its sign (and po on the banners), or a count. */
-function valueText(view: RankingView, value: number, withGold: boolean): string {
-  if (view.unit === "count") {
+function valueText(board: Board, value: number, withGold: boolean): string {
+  if (board.unit === "count") {
     return String(value);
   }
   return withGold ? formatSignedGold(value) : formatSigned(value);
@@ -34,7 +32,7 @@ function valueText(view: RankingView, value: number, withGold: boolean): string 
 const cloth = (line: RankingLine) =>
   line.characterClass === undefined ? "var(--color-muted)" : classColor(line.characterClass);
 
-function Banner({ view, line, place }: { view: RankingView; line: RankingLine; place: 0 | 1 | 2 }) {
+function Banner({ board, line, place }: { board: Board; line: RankingLine; place: 0 | 1 | 2 }) {
   const metal = METALS[place];
   return (
     <li className="relative mt-[10px] w-[150px]">
@@ -69,7 +67,7 @@ function Banner({ view, line, place }: { view: RankingView; line: RankingLine; p
           {line.title === undefined ? "" : `◆ ${line.title}`}
         </span>
         <b className="bg-banner-ink px-2 py-0.5 font-pixel text-[19px] text-ivory">
-          {valueText(view, line.value, true)}
+          {valueText(board, line.value, true)}
         </b>
       </div>
     </li>
@@ -77,7 +75,7 @@ function Banner({ view, line, place }: { view: RankingView; line: RankingLine; p
 }
 
 /** The first three on banners hanging from a wooden rod (§7.5). */
-function Podium({ view }: { view: RankingView }) {
+function Podium({ board }: { board: Board }) {
   return (
     <div className="relative pt-1.5">
       <div className="absolute inset-x-1.5 top-0 h-[10px] bg-beam shadow-[0_0_0_2px_var(--color-ink),inset_0_3px_0_var(--color-copper)]" />
@@ -85,22 +83,22 @@ function Podium({ view }: { view: RankingView }) {
       <span className="absolute -top-1 right-0 h-[18px] w-[14px] bg-gold shadow-[0_0_0_2px_var(--color-ink)]" />
       <ol className="flex items-start justify-center gap-[18px]" aria-label="Podium">
         {ORDER.flatMap((place) => {
-          const line = view.lines[place];
-          return line === undefined ? [] : [<Banner key={line.memberId} view={view} line={line} place={place} />];
+          const line = board.lines[place];
+          return line === undefined ? [] : [<Banner key={line.memberId} board={board} line={line} place={place} />];
         })}
       </ol>
     </div>
   );
 }
 
-function Records({ view }: { view: RankingView }) {
+function Records({ board, title }: { board: Board; title: string }) {
   return (
-    <Panel title={RECORDS_TITLES[view.period]} className="mt-auto">
-      {view.records.length === 0 ? (
-        <p className="mt-2 text-sm text-lavender">Aucun record sur cette période.</p>
+    <Panel title={title} className="mt-auto">
+      {board.records.length === 0 ? (
+        <p className="mt-2 text-sm text-lavender">Aucun record pour l&apos;instant.</p>
       ) : (
         <ul className="mt-2 grid gap-2 sm:grid-cols-3">
-          {view.records.map((record) => (
+          {board.records.map((record) => (
             <li
               key={record.label}
               className="flex flex-col gap-0.5 bg-night/55 px-2.5 py-2 shadow-[inset_0_0_0_1px_var(--color-line)]"
@@ -118,7 +116,7 @@ function Records({ view }: { view: RankingView }) {
   );
 }
 
-function Row({ view, line, widest, mine }: { view: RankingView; line: RankingLine; widest: number; mine: boolean }) {
+function Row({ board, line, widest, mine }: { board: Board; line: RankingLine; widest: number; mine: boolean }) {
   const positive = line.value >= 0;
   return (
     <li
@@ -146,44 +144,46 @@ function Row({ view, line, widest, mine }: { view: RankingView; line: RankingLin
         />
       </span>
       <b className={`text-right font-pixel text-[15px] ${positive ? "text-gain" : "text-loss"}`}>
-        {valueText(view, line.value, false)}
+        {valueText(board, line.value, false)}
       </b>
     </li>
   );
 }
 
-/** A category's board (§7.5): the podium and the records, then the others and the member's own position. */
+/** A board (§7.5): the podium and the records, then the others and the member's own position. */
 export function RankingBoard({
-  view,
+  board,
   memberId,
-  periodLabel,
+  recordsTitle,
+  note,
+  empty,
 }: {
-  view: RankingView;
+  board: Board;
   memberId: string;
-  periodLabel: string;
+  recordsTitle: string;
+  /** What the values are, on the right of the following places: "gain net · Saison 2". */
+  note: string;
+  /** Why nobody is on the board. */
+  empty: string;
 }) {
-  const widest = Math.max(0, ...view.lines.map((line) => Math.abs(line.value)));
-  const mine = view.lines.find((line) => line.memberId === memberId);
-  const rest = view.lines.slice(PODIUM_PLACES);
+  const widest = Math.max(0, ...board.lines.map((line) => Math.abs(line.value)));
+  const mine = board.lines.find((line) => line.memberId === memberId);
+  const rest = board.lines.slice(PODIUM_PLACES);
   return (
     <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
       <div className="flex min-h-0 flex-col gap-4">
-        {view.lines.length === 0 ? (
-          <p className="text-lavender">Personne au classement sur cette période.</p>
-        ) : (
-          <Podium view={view} />
-        )}
-        <Records view={view} />
+        {board.lines.length === 0 ? <p className="text-lavender">{empty}</p> : <Podium board={board} />}
+        <Records board={board} title={recordsTitle} />
       </div>
-      <Panel title="Suite du classement" note={`${view.metric} · ${periodLabel}`}>
+      <Panel title="Suite du classement" note={note}>
         <ol className="mt-2 flex flex-col gap-1.5" aria-label="Classement">
           {rest.map((line) => (
-            <Row key={line.memberId} view={view} line={line} widest={widest} mine={false} />
+            <Row key={line.memberId} board={board} line={line} widest={widest} mine={false} />
           ))}
         </ol>
         {mine !== undefined && (
           <ol className="mt-4" aria-label="Ta position">
-            <Row view={view} line={mine} widest={widest} mine />
+            <Row board={board} line={mine} widest={widest} mine />
           </ol>
         )}
       </Panel>

@@ -1,7 +1,7 @@
 local _, ns = ...
 
---- What the PvP place shows, as rows for the core's lists: the outings to come with the player's sign-up, the duels
---- with what the player may do, and the Elo ranking. Built from the data alone.
+--- What the PvP place shows: the PvP events to come with the player's sign-up and the duels with what the player may
+--- do, as rows for the core's lists, and the Elo board for the core's ranking board. Built from the data alone.
 local PvpView = {}
 ns.PvpView = PvpView
 
@@ -10,13 +10,13 @@ local SignupLabels = VXV.SignupLabels
 
 local DATE = "%d/%m %H:%M"
 local NO_DATA = "Aucune donnée PvP : un officier les envoie à la guilde, ou ton compagnon VXV les apporte."
-local NO_OUTING = "Aucune sortie prévue : les officiers les créent ici, sur le site ou sur Discord (/vxv_pvp)."
+local NO_OUTING = "Aucun événement PvP prévu : les officiers les créent ici, sur le site ou sur Discord (/vxv_pvp)."
 local NO_DUEL = "Aucun duel : défie un membre de la guilde, en jeu ou sur le site."
 local NO_RANKING = "Aucun duel joué pour l'instant."
 local WAITING = "En attente du site"
 local DUEL_STATUSES = { proposed = "défi lancé", scheduled = "défi relevé", refused = "refusé", cancelled = "annulé" }
--- The Elo every duelist starts with (domain/duels.ts).
-local ELO_START = 1500
+-- The Elo every duelist starts with (domain/duels.ts); the board's first places, on banners.
+local ELO_START, PODIUM = 1500, 3
 
 local row = VXV.RowList.Row
 
@@ -64,7 +64,7 @@ function PvpView.Outings(data, player, onSignup)
     end
     local rows, waiting = {}, Changes.Pending("pvpEvent")
     if waiting ~= nil then
-        rows[#rows + 1] = row("line", WAITING .. " : sortie « " .. waiting.title .. " »")
+        rows[#rows + 1] = row("line", WAITING .. " : événement « " .. waiting.title .. " »")
     end
     if #data.outings == 0 then
         rows[#rows + 1] = row("line", NO_OUTING)
@@ -139,15 +139,29 @@ function PvpView.Duels(data, memberId, onAct)
     return rows
 end
 
---- The Elo ranking: place, duelist, Elo, duels won and played.
-function PvpView.Ranking(data)
-    if data == nil or #data.ranking == 0 then
-        return { row("line", data == nil and NO_DATA or NO_RANKING) }
+--- The duels' Elo board for the core's ranking board (VXV.RankingBoard), for the player of member id: { empty (why
+--- nobody shows, or nil), podium, rest, mine, widest, unit, metric, recordsTitle, records }.
+function PvpView.Board(data, memberId)
+    local view = { podium = {}, rest = {}, records = {}, widest = 0, unit = "count", metric = "Elo · depuis toujours",
+        recordsTitle = "Records des duels" }
+    if data == nil then
+        view.empty = NO_DATA
+        return view
     end
-    local rows = {}
     for _, entry in ipairs(data.ranking) do
-        rows[#rows + 1] = row("line", ("%d. %s · %d · %s sur %s"):format(entry.rank, nameOf(data, entry.memberId),
-            entry.rating, VXV.Count(entry.won, "victoire"), VXV.Count(entry.played, "duel")))
+        local player = data.players[entry.memberId] or {}
+        local line = { rank = entry.rank, value = entry.rating, name = player.name or "?", class = player.class,
+            avatar = player.avatar }
+        local list = #view.podium < PODIUM and view.podium or view.rest
+        list[#list + 1] = line
+        view.mine = entry.memberId == memberId and line or view.mine
+        view.widest = math.max(view.widest, entry.rating)
     end
-    return rows
+    for _, record in ipairs(data.records) do
+        local player = data.players[record.memberId] or {}
+        view.records[#view.records + 1] = { label = record.label, value = record.value, name = player.name or "?",
+            class = player.class }
+    end
+    view.empty = #view.podium == 0 and NO_RANKING or nil
+    return view
 end

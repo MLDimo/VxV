@@ -29,7 +29,7 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | Mode réduit | Le mode réduit dans « La salle des Thanes » (seul pack de la bêta) : prochain boss, son butin, l'alerte de SR |
 | Prochain boss | L'alerte sur un raid qui enchaîne deux instances (raids ouverts le 9 décembre) |
 | Inscriptions | Une inscription faite en jeu apparaît sur Discord après la synchro du compagnon |
-| PvP | Une sortie créée en jeu par un officier, un défi lancé en jeu à sa cible et relevé par le défié, le pari du duel misé par un tiers, le résultat réglé |
+| PvP | Un événement PvP créé en jeu par un officier, les fanions de l'Elo dans l'onglet Duels, un défi lancé en jeu à sa cible et relevé par le défié, le pari du duel misé par un tiers, le résultat réglé |
 | Rôle d'un raid | Un événement réservé à « Raideur R1 » créé en jeu (rôles apportés par le compagnon d'un officier) : un membre sans ce rôle est refusé, puis inscrit dès que Discord le lui donne |
 | Paris | Un pari réel mené jusqu'au versement des gains |
 | Missions | Une mission d'une semaine menée jusqu'au classement |
