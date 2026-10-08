@@ -1,4 +1,6 @@
 import { MAX_BET_TITLE_LENGTH, MAX_CHOICE_LENGTH, MAX_CHOICES } from "@vxv/server/domain/bets";
+import { MAX_DUEL_PLACE_LENGTH } from "@vxv/server/domain/duels";
+import { MAX_EVENT_TITLE_LENGTH } from "@vxv/server/domain/events";
 import { z } from "zod";
 import { getApplication } from "@/server/application";
 import { asCompanion, errorResponse } from "@/server/companionApi";
@@ -27,8 +29,8 @@ const changeBase = {
   at: z.number().int().positive().optional(),
 };
 /**
- * A change made in game (addon/VXV_Raid/Changes.lua, addon/VXV_Paris/Stakes.lua); one of a kind this website does not
- * know is left aside.
+ * A change made in game (addon/VXV_Raid/Changes.lua, addon/VXV_Paris/Changes.lua, addon/VXV_PvP/Changes.lua); one of a
+ * kind this website does not know is left aside.
  */
 const changeSchema = z.discriminatedUnion("kind", [
   z.object({
@@ -69,6 +71,33 @@ const changeSchema = z.discriminatedUnion("kind", [
     amount: z.number(),
   }),
   z.object({ ...changeBase, kind: z.literal("withdraw"), betId: z.string().max(60) }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("pvpEvent"),
+    title: z.string().max(MAX_EVENT_TITLE_LENGTH),
+    date: z.string().max(10),
+    time: z.string().max(5),
+    roleId: z.string().max(30),
+    reason: z.string().max(500),
+  }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("duel"),
+    opponentId: z.string().max(60),
+    date: z.string().max(10),
+    time: z.string().max(5),
+    place: z.string().max(MAX_DUEL_PLACE_LENGTH),
+  }),
+  z.object({ ...changeBase, kind: z.literal("duelAnswer"), duelId: z.string().max(60), accept: z.boolean() }),
+  z.object({ ...changeBase, kind: z.literal("duelConcede"), duelId: z.string().max(60) }),
+  z.object({ ...changeBase, kind: z.literal("duelCancel"), duelId: z.string().max(60) }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("duelResult"),
+    duelId: z.string().max(60),
+    winner: z.string().max(100),
+    loser: z.string().max(100),
+  }),
   z.object({
     ...changeBase,
     kind: z.literal("bet"),

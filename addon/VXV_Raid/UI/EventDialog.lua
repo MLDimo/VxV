@@ -7,7 +7,7 @@ local _, ns = ...
 local EventDialog = {}
 ns.EventDialog = EventDialog
 
-local Changes, RoleChoices = ns.Changes, ns.RoleChoices
+local Changes = ns.Changes
 
 local Theme = VXV.Theme
 
@@ -19,14 +19,10 @@ local TOGGLE_GAP, BUTTON_WIDTH, BUTTON_HEIGHT, STEP_SIZE = 6, 160, 30, 26
 local MIN_SOFT_RESERVES, MAX_SOFT_RESERVES, DEFAULT_SOFT_RESERVES = 1, 10, 1
 local MAX_LETTERS = { date = 10, time = 5, reason = 200 }
 local MISSING = "Il manque : %s."
-local NO_ROLE = "Choisis un rôle avec les flèches."
-local NO_ROLES = "Rôles pas encore reçus : ton compagnon VXV les apporte au /reload."
 
-local frame, body, problem, countText, roleText
+local frame, body, problem, countText, roleStepper
 local boxes, toggles = {}, {}
 local chosen, softReserves = {}, DEFAULT_SOFT_RESERVES
--- The roles offered when the form opened, and the one chosen (its index), none at first: the officer chooses.
-local roles, roleIndex = {}, nil
 
 local function heading(top, text, x)
     Theme.Heading(body, text):SetPoint("TOPLEFT", x or 0, -top)
@@ -85,36 +81,6 @@ local function addCount(top)
     end)
 end
 
-local function showRole()
-    local role = roles[roleIndex]
-    roleText:SetText(role and role.name or (#roles == 0 and NO_ROLES or NO_ROLE))
-end
-
---- The previous (-1) or next (1) role, round the list; from none, the first or the last.
-local function stepRole(step)
-    if #roles == 0 then
-        return
-    end
-    roleIndex = roleIndex == nil and (step > 0 and 1 or #roles) or (roleIndex - 1 + step) % #roles + 1
-    showRole()
-end
-
-local function addRole(top)
-    heading(top, "Qui peut s'inscrire (rôle Discord)")
-    local previous = Theme.Button(body, "wood", "<", STEP_SIZE, STEP_SIZE)
-    previous:SetPoint("TOPLEFT", 0, -(top + FIELD_TOP))
-    local following = Theme.Button(body, "wood", ">", STEP_SIZE, STEP_SIZE)
-    following:SetPoint("LEFT", previous, "RIGHT", TOGGLE_GAP, 0)
-    roleText = Theme.Text(body, "text", 13, "ivory")
-    roleText:SetPoint("LEFT", following, "RIGHT", 2 * TOGGLE_GAP, 0)
-    previous:SetScript("OnClick", function()
-        stepRole(-1)
-    end)
-    following:SetScript("OnClick", function()
-        stepRole(1)
-    end)
-end
-
 local function trimmed(key)
     return (boxes[key]:GetText() or ""):match("^%s*(.-)%s*$")
 end
@@ -125,7 +91,7 @@ local function send()
         raidIds[#raidIds + 1] = raidId
     end
     table.sort(raidIds)
-    local date, at, reason, role = trimmed("date"), trimmed("time"), trimmed("reason"), roles[roleIndex]
+    local date, at, reason, role = trimmed("date"), trimmed("time"), trimmed("reason"), roleStepper.Chosen()
     -- Each part left empty, named: the officer sees what to fill.
     local missing = {}
     for _, part in ipairs({
@@ -152,7 +118,7 @@ local function build()
     addField("time", SHORT_FIELD + 2 * TOGGLE_GAP, 0, SHORT_FIELD, "Heure (21:00)")
     addRaids(SECTION)
     addCount(2 * SECTION)
-    addRole(3 * SECTION)
+    roleStepper = VXV.RoleStepper(body, 3 * SECTION)
     addField("reason", 0, 4 * SECTION, body:GetWidth(), "Motif (visible dans le journal)")
     -- Across the form, from left to right: a long list of what is missing wraps upward.
     problem = Theme.Text(body, "text", 13, "loss")
@@ -168,7 +134,7 @@ function EventDialog.Open()
     if frame == nil then
         build()
     end
-    chosen, softReserves, roles, roleIndex = {}, DEFAULT_SOFT_RESERVES, RoleChoices.List(), nil
+    chosen, softReserves = {}, DEFAULT_SOFT_RESERVES
     for _, box in pairs(boxes) do
         box:SetText("")
     end
@@ -176,7 +142,7 @@ function EventDialog.Open()
         toggle:SetSelected(false)
     end
     showCount()
-    showRole()
+    roleStepper.Reset()
     problem:SetText("")
     frame:Show()
 end

@@ -65,6 +65,15 @@ VXV = {
     Theme = ns.Theme,
     --- (name, width, height, title): a small window in the charter, closed by Escape; returns it and its body.
     CreateDialog = ns.Dialog.Create,
+    --- The wording of a sign-up to a guild event: ROLE_ORDER, Role(role) { label, plural, icon }, STATUS_ORDER,
+    --- Status(status), IsComing(status).
+    SignupLabels = ns.SignupLabels,
+    --- ({ subtitle, current, send }): « Mon inscription » to a guild event. See UI/SignupDialog.lua.
+    OpenSignupDialog = ns.SignupDialog.Open,
+    --- (): the Discord roles an officer may reserve a guild event to, { id, name }, everybody first; and (body, top):
+    --- their choice with two arrows in a creation dialog, { Reset(), Chosen() }.
+    EventRoles = ns.EventRoles.List,
+    RoleStepper = ns.RoleStepper.Create,
     --- Lists of text rows scrolled with the wheel: RowList.Create(parent, topOffset, palette), RowList.RULE; in a
     --- titled panel of a screen, RowList.Panel.
     RowList = ns.RowList,

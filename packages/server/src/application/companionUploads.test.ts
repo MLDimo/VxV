@@ -9,6 +9,7 @@ import { createEvent, createMember, createRaidWithLoot, testGuild } from "../tes
 import { createTestDatabase } from "../testing.ts";
 import { createCharacters } from "./characters.ts";
 import { createCompanionUploads, type CompanionUpload } from "./companionUploads.ts";
+import { createDuels } from "./duels.ts";
 import { createEvents } from "./events.ts";
 import { createExclusions } from "./exclusions.ts";
 import { createGameChanges } from "./gameChanges.ts";
@@ -59,6 +60,12 @@ describe("companion uploads", () => {
         bets: createBets({ unitOfWork, clock }),
         betAnnouncements: { announceQuietly: async () => true },
         announcements: { announceQuietly: async () => true },
+        duels: createDuels({
+          unitOfWork,
+          clock,
+          announcements: { announceQuietly: async () => true },
+          betAnnouncements: { announceQuietly: async () => true },
+        }),
       }),
       missions: createMissions({ unitOfWork, clock }),
       missionAnnouncements: { announceQuietly: async () => true },

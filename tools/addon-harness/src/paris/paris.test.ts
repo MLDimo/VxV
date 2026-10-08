@@ -70,7 +70,15 @@ describe("Le Dé Pipé in game (P11.8)", () => {
       ...TAVERN_BETS,
       exportedAt: new Date("2026-12-10T07:40:00Z"),
       changes: [
-        { id, eventId: undefined, betId: "b1", author: "Thom Leboss", accepted: true, message: "Mise enregistrée." },
+        {
+          id,
+          eventId: undefined,
+          betId: "b1",
+          duelId: undefined,
+          author: "Thom Leboss",
+          accepted: true,
+          message: "Mise enregistrée.",
+        },
       ],
     });
     paris.run(`local _, ns = ... ns.BetsData.FromCompanion(${JSON.stringify(answered)})`);
@@ -114,7 +122,7 @@ describe("Le Dé Pipé in game (P11.8)", () => {
     const answered = parisText({
       ...TAVERN_BETS,
       exportedAt: new Date("2026-12-10T07:40:00Z"),
-      changes: [{ id, eventId: undefined, betId: "b2", author: "Ðéjà Vu", accepted: true, message }],
+      changes: [{ id, eventId: undefined, betId: "b2", duelId: undefined, author: "Ðéjà Vu", accepted: true, message }],
     });
     paris.run(`local _, ns = ... ns.BetsData.FromCompanion(${JSON.stringify(answered)})`);
     expect(outbox(client)).toEqual([]);

@@ -1,6 +1,7 @@
 import { createAddonBets } from "./application/addonBets.ts";
 import { createAddonEventRoles } from "./application/addonEventRoles.ts";
 import { createAddonExport } from "./application/addonExport.ts";
+import { createAddonPvp } from "./application/addonPvp.ts";
 import { createAddonArtisans } from "./application/addonArtisans.ts";
 import { createArtisans } from "./application/artisans.ts";
 import { createBossFights } from "./application/bossFights.ts";
@@ -95,6 +96,8 @@ export function createApplication({
   const missionAnnouncements = createMissionAnnouncements({ unitOfWork, announcer: missionAnnouncer, clock });
   const bets = createBets({ unitOfWork, clock });
   const betAnnouncements = createBetAnnouncements({ unitOfWork, announcer: betAnnouncer, clock });
+  const duelAnnouncements = createDuelAnnouncements({ unitOfWork, announcer: duelAnnouncer });
+  const duels = createDuels({ unitOfWork, clock, announcements: duelAnnouncements, betAnnouncements });
   const gameChanges = createGameChanges({
     unitOfWork,
     clock,
@@ -105,13 +108,12 @@ export function createApplication({
     announcements: raidAnnouncements,
     bets,
     betAnnouncements,
+    duels,
   });
   const titles = createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer });
   const ranking = createRanking({ unitOfWork, clock });
   const artisans = createArtisans({ unitOfWork });
   const deathrolls = createDeathrolls({ unitOfWork, clock, announcer: deathrollAnnouncer });
-  const duelAnnouncements = createDuelAnnouncements({ unitOfWork, announcer: duelAnnouncer });
-  const duels = createDuels({ unitOfWork, clock, announcements: duelAnnouncements, betAnnouncements });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
@@ -158,6 +160,7 @@ export function createApplication({
     addonDeathrolls: createAddonDeathrolls({ unitOfWork, clock }),
     duels,
     duelAnnouncements,
+    addonPvp: createAddonPvp({ unitOfWork, clock, duels }),
   };
 }
 

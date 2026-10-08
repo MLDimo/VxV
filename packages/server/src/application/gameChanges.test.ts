@@ -1,5 +1,6 @@
 import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DUEL_DONE } from "../domain/duels.ts";
 import type { GameChange } from "../domain/gameChanges.ts";
 import type { Member } from "../domain/members.ts";
 import { createFakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
@@ -16,6 +17,7 @@ import {
 } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createAddonExport } from "./addonExport.ts";
+import { createDuels } from "./duels.ts";
 import { createEvents } from "./events.ts";
 import { createExclusions } from "./exclusions.ts";
 import { createGameChanges } from "./gameChanges.ts";
@@ -62,6 +64,12 @@ describe("changes made in game", () => {
           return true;
         },
       },
+      duels: createDuels({
+        unitOfWork,
+        clock,
+        announcements: { announceQuietly: async () => true },
+        betAnnouncements: { announceQuietly: async () => true },
+      }),
     });
     officer = await createMember(sql, "officer", "Officier");
     member = await createMember(sql, "member", "Membre");
@@ -339,6 +347,93 @@ describe("changes made in game", () => {
       expect(await changes.receive(officer, [opening("Ðéjà Vu#5#2", "Ðéjà Vu", { time: "25:00" })])).toEqual([
         expect.objectContaining({ accepted: false, message: expect.stringContaining("15/10") }),
       ]);
+    });
+  });
+
+  describe("the PvP made in game (owner's request of 7 October)", () => {
+    const pvpChange = (id: string, author: string, fields: Record<string, unknown>): GameChange =>
+      ({ id, eventId: "", author, ...fields }) as GameChange;
+    const sqlDuel = async () =>
+      (await sql.query<{ id: string; winner_id: string | null }>("select id, winner_id from duels"))[0];
+
+    beforeEach(() => {
+      const discord = createFakeDiscord();
+      vi.stubGlobal("fetch", discord.fetch);
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("challenges, answers and records the result the game showed, once whoever tells it", async () => {
+      const [challenge] = await changes.receive(officer, [
+        pvpChange("Ðéjà Vu#7#1", "Ðéjà Vu", {
+          kind: "duel",
+          opponentId: member.id,
+          date: "15/12",
+          time: "21:00",
+          place: "Porte d'Orgrimmar",
+        }),
+      ]);
+      const duelId = (await sqlDuel())?.id;
+      expect(challenge).toMatchObject({ accepted: true, duelId, message: DUEL_DONE.challenged });
+      expect(
+        await changes.receive(member, [
+          pvpChange("Thom Leboss#7#2", "Thom Leboss", { kind: "duelAnswer", duelId, accept: true }),
+        ]),
+      ).toEqual([expect.objectContaining({ accepted: true, duelId, message: DUEL_DONE.accepted })]);
+      const result = { kind: "duelResult", duelId, winner: "Ðéjà Vu", loser: "Thom Leboss" };
+      const [first, second] = await changes.receive(officer, [
+        pvpChange("Thom Leboss#7#3", "Thom Leboss", result),
+        pvpChange("Ðéjà Vu#7#4", "Ðéjà Vu", result),
+      ]);
+      expect(first).toMatchObject({ accepted: true, message: "Duel joué : Ðéjà Vu gagne." });
+      expect(second).toMatchObject({ accepted: true });
+      expect((await sqlDuel())?.winner_id).toBe(officer.id);
+    });
+
+    it("refuses a result whose players are not the duel's", async () => {
+      await changes.receive(officer, [
+        pvpChange("Ðéjà Vu#8#1", "Ðéjà Vu", {
+          kind: "duel",
+          opponentId: member.id,
+          date: "15/12",
+          time: "21:00",
+          place: "Ici",
+        }),
+      ]);
+      const duelId = (await sqlDuel())?.id;
+      await changes.receive(member, [
+        pvpChange("Thom Leboss#8#2", "Thom Leboss", { kind: "duelAnswer", duelId, accept: true }),
+      ]);
+      expect(
+        await changes.receive(member, [
+          pvpChange("Thom Leboss#8#3", "Thom Leboss", {
+            kind: "duelResult",
+            duelId,
+            winner: "Thom Leboss",
+            loser: "Vorn Cendrelune",
+          }),
+        ]),
+      ).toEqual([
+        expect.objectContaining({ accepted: false, message: "Ce résultat ne correspond pas aux joueurs du duel." }),
+      ]);
+    });
+
+    it("plans an officer's PvP outing, its answer kept with the outing", async () => {
+      const [outcome] = await changes.receive(officer, [
+        pvpChange("Ðéjà Vu#9#5", "Ðéjà Vu", {
+          kind: "pvpEvent",
+          title: "Raid sur Astranaar",
+          date: "15/12",
+          time: "21:00",
+          roleId: TEST_GUILD_ID,
+          reason: "Sortie du lundi",
+        }),
+      ]);
+      const [outing] = await sql.query<{ id: string }>("select id from events where kind = 'pvp'");
+      expect(outcome).toMatchObject({ accepted: true, eventId: outing?.id });
+      expect(announced).toContain(outing?.id);
     });
   });
 
