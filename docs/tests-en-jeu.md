@@ -21,11 +21,9 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 
 | Domaine | Test |
 | --- | --- |
-| Bot Discord | Un second compte sur le serveur : `/vxv_main`, puis inscription par le bouton d'un raid |
 | Raid | Essai à deux joueurs au moins (données de l'événement, diffusion, invitations), puis un raid de 40 formé sans invitation manuelle |
 | Butin | Un raid réel enregistré sans saisie manuelle (répétition possible en donjon avec un maître du butin avant la fin de la bêta) |
 | PvP | Un événement PvP créé en jeu par un officier, les fanions de l'Elo dans l'onglet Duels, un défi lancé en jeu à sa cible et relevé par le défié, le pari du duel misé par un tiers, le résultat réglé |
-| Rôle d'un raid | Un événement réservé à « Raideur R1 » créé en jeu (rôles apportés par le compagnon d'un officier) : un membre sans ce rôle est refusé, puis inscrit dès que Discord le lui donne |
 | Paris | Un pari réel mené jusqu'au versement des gains |
 | Missions | Une mission d'une semaine menée jusqu'au classement |
 | Titres | Une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu par un membre sans compagnon |
