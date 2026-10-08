@@ -328,12 +328,12 @@ Fenêtre **420 × 600**, cadre 3 anneaux. En-tête compact (emblème 24px, « mo
 
 ## 8. Avatars
 
-- Portraits pixel art **par race × classe × sexe** (42 combinaisons au total, Horde + paladin MV). 9 livrés : `assets/avatars/` (`*_128.png` pour l'UI, `*.png` source détourée ~560px).
+- Portraits pixel art **par race × classe × sexe** (42 combinaisons au total, Horde + paladin MV), tous livrés le 8 octobre (128 px, fond transparent) : `apps/web/public/images/avatars/`, copiés dans l'addon par `npm run generate`.
 - **Format** : carré 1:1, buste serré (tête dans la moitié haute, vue 3/4), fond transparent, contour 1px `#0D0912`, une gemme améthyste sur l'équipement (signature VXV).
 - **Cadre** = toujours la **couleur de classe du joueur** (même si l'avatar est emprunté) ; fond derrière l'avatar `#141828`.
 - Tailles : 32px (listes), 44px (inscription), 72px (podium), 118px (deathroll). Toujours `image-rendering: pixelated` / filtre NEAREST.
 - **Repli** quand l'avatar exact n'existe pas : (1) même race + classe, autre sexe → (2) même classe, autre race → (3) même race, autre classe. Le sexe/race/classe viennent de `UnitRace`, `UnitSex`, `UnitClass` (déjà connus par l'addon).
-- Fichiers à nommer `race_classe_sexe.png` (ex. `orc_chaman_m.png`) ; les 9 actuels sont à renommer selon cette convention (chasseuse taurène et prêtresse MV = `_f`).
+- Fichiers nommés `race_classe_sexe.png` (ex. `orc_chaman_m.png`).
 
 ---
 
