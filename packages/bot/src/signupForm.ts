@@ -12,6 +12,7 @@ import {
   type APISelectMenuOption,
 } from "discord-api-types/v10";
 import type { BotContext } from "./commands.ts";
+import { classEmoji, componentEmoji, ROLE_EMOJIS, specEmoji, STATUS_EMOJIS, type EmojiName } from "./emojis.ts";
 import { actingMember } from "./members.ts";
 import { submittedValues } from "./modalValues.ts";
 import { ephemeral } from "./responses.ts";
@@ -29,6 +30,9 @@ const SPEC_VALUE_SEPARATOR = "|";
 const WRONG_CLASS_SPEC =
   "Cette spécialisation n'est pas celle de la classe du personnage choisi : choisis-en une autre.";
 
+/** An option's icon, when there is one. */
+const withEmoji = (name: EmojiName | undefined) => (name === undefined ? {} : { emoji: componentEmoji(name) });
+
 /** The usual specs of the member's classes (the chosen character's first), and the current spec if it is another. */
 function specOptions(
   characters: readonly Character[],
@@ -41,6 +45,7 @@ function specOptions(
       label: classes.length > 1 ? `${spec} · ${classLabel(characterClass)}` : spec,
       value: `${characterClass}${SPEC_VALUE_SEPARATOR}${spec}`,
       default: spec === current?.spec && characterClass === current.characterClass,
+      ...withEmoji(specEmoji(characterClass, spec)),
     })),
   );
   const listed = options.some((option) => option.default);
@@ -82,6 +87,7 @@ function signupForm(
             label: `${fullName(character)} · ${classLabel(character.characterClass)}`,
             value: character.id,
             default: character.id === chosen?.id,
+            ...withEmoji(classEmoji(character.characterClass)),
           })),
         },
       },
@@ -92,9 +98,10 @@ function signupForm(
           type: ComponentType.StringSelect,
           custom_id: FIELDS.role,
           options: SIGNUP_ROLES.map((role) => ({
-            label: `${ROLE_LABELS[role].icon} ${ROLE_LABELS[role].label}`,
+            label: ROLE_LABELS[role].label,
             value: role,
             default: role === current?.role,
+            ...withEmoji(ROLE_EMOJIS[role]),
           })),
         },
       },
@@ -104,7 +111,12 @@ function signupForm(
         component: {
           type: ComponentType.StringSelect,
           custom_id: FIELDS.status,
-          options: SIGNUP_STATUSES.map((value) => ({ label: STATUS_LABELS[value], value, default: value === status })),
+          options: SIGNUP_STATUSES.map((value) => ({
+            label: STATUS_LABELS[value],
+            value,
+            default: value === status,
+            ...withEmoji(STATUS_EMOJIS[value]),
+          })),
         },
       },
       {

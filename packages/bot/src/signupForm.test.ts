@@ -10,6 +10,7 @@ import {
 } from "discord-api-types/v10";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext } from "./commands.ts";
+import { componentEmoji, emoji } from "./emojis.ts";
 import { SIGNUP_BUTTON_PREFIX } from "./raidMessage.ts";
 import { openSignupForm, SIGNUP_FORM_PREFIX, submitSignupForm } from "./signupForm.ts";
 import { createTestApplication, LINK_CHANNEL, TEST_GUILD_ID, TEST_ROLES } from "./testApplication.ts";
@@ -111,6 +112,8 @@ describe("sign-up by Discord buttons", () => {
       status: "Présent",
       spec: undefined,
     });
+    expect(selects(form).spec?.[0]?.emoji).toEqual(componentEmoji("spe_voleur_assassinat"));
+    expect(selects(form).character?.[0]?.emoji).toEqual(componentEmoji("voleur"));
     expect(selects(form).spec?.map((option) => option.label)).toEqual([
       "Assassinat · Voleur",
       "Combat · Voleur",
@@ -126,14 +129,16 @@ describe("sign-up by Discord buttons", () => {
       "Inscription enregistrée : Ðéjà Vu, DPS (Combat), En retard.",
     );
     expect(await app.signups.findMine(await identifyMe(), eventId)).toMatchObject({ role: "dps", spec: "Combat" });
-    expect(JSON.stringify(discord.messages()[0]?.body)).toContain("Ðéjà Vu (Combat) ⏰");
+    expect(JSON.stringify(discord.messages()[0]?.body)).toContain(
+      `${emoji("spe_voleur_combat")} \`1\` **Ðéjà Vu** ${emoji("statut_retard")}`,
+    );
   });
 
   it("fills the form with the current sign-up when the member comes back", async () => {
     await send({ role: "tank", status: "maybe", spec: "ROGUE|Finesse" });
     expect(prefilled(formOf(await open()))).toEqual({
       character: "Ðéjà Vu · Voleur",
-      role: "🛡️ Tank",
+      role: "Tank",
       status: "Peut-être",
       spec: "Finesse · Voleur",
     });

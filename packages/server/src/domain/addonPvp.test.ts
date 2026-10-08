@@ -56,6 +56,7 @@ describe("formatAddonPvp", () => {
               role: "healer",
               spec: "Sacré",
               status: "present",
+              signedUpAt: new Date("2026-12-01T12:00:00Z"),
             },
           ],
         },

@@ -11,6 +11,9 @@ import {
 } from "discord-api-types/v10";
 import type { SignedRequest } from "./interactions.ts";
 
+/** The bot's emojis, as its messages write them. */
+export { emoji } from "./emojis.ts";
+
 // PKCS#8 header of an Ed25519 private key, followed by its 32-byte seed.
 const ED25519_PKCS8_PREFIX = Buffer.from("302e020100300506032b657004220420", "hex");
 const SEED_BYTES = 32;

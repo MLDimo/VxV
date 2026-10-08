@@ -10,6 +10,7 @@ interface SignupRow {
   role: SignupRole;
   spec: string;
   status: SignupStatus;
+  signed_up_at: Date;
   first_name: string;
   last_name: string;
   class: string;
@@ -17,7 +18,7 @@ interface SignupRow {
 
 const SELECT_SIGNUPS = `
   select signups.event_id, signups.member_id, signups.character_id, signups.role, signups.spec, signups.status,
-         characters.first_name, characters.last_name, characters.class
+         signups.signed_up_at, characters.first_name, characters.last_name, characters.class
   from signups join characters on characters.id = signups.character_id`;
 
 function toSignup(row: SignupRow): Signup {
@@ -30,6 +31,7 @@ function toSignup(row: SignupRow): Signup {
     role: row.role,
     spec: row.spec,
     status: row.status,
+    signedUpAt: new Date(row.signed_up_at),
   };
 }
 
@@ -86,8 +88,8 @@ export function signupRepository(sql: SqlClient): SignupRepository {
 
     async save(signup, changedAt) {
       await sql.query(
-        `insert into signups (event_id, character_id, member_id, role, spec, status, updated_at)
-         values ($1, $2, $3, $4, $5, $6, $7)
+        `insert into signups (event_id, character_id, member_id, role, spec, status, updated_at, signed_up_at)
+         values ($1, $2, $3, $4, $5, $6, $7, $7)
          on conflict (event_id, character_id) do update
            set role = excluded.role, spec = excluded.spec, status = excluded.status, updated_at = excluded.updated_at`,
         [signup.eventId, signup.characterId, signup.memberId, signup.role, signup.spec, signup.status, changedAt],

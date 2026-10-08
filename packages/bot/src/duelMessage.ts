@@ -1,4 +1,5 @@
 import type { AnnouncedDuel, DuelStatus } from "@vxv/server";
+import { colorValue, COLORS } from "@vxv/design";
 import {
   ButtonStyle,
   ComponentType,
@@ -6,14 +7,15 @@ import {
   type RESTPostAPIChannelMessageJSONBody,
 } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
+import { emoji } from "./emojis.ts";
 
 /** The PvP place's red, as a PvP outing's message. */
-const EMBED_COLOR = 0xf19a9a;
+const EMBED_COLOR = colorValue(COLORS.loss);
 
 const STATUS_LINES: Record<Exclude<DuelStatus, "played">, string> = {
   proposed: "⏳ En attente de la réponse du joueur défié.",
   refused: "✋ Défi refusé.",
-  scheduled: "🎲 Défi relevé : pariez sur le vainqueur jusqu'à l'heure du duel.",
+  scheduled: `${emoji("de")} Défi relevé : pariez sur le vainqueur jusqu'à l'heure du duel.`,
   cancelled: "❌ Duel annulé : les mises sont rendues.",
 };
 

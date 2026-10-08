@@ -1,4 +1,12 @@
-import { autocomplete, buttonClick, formSubmission, slashCommand, withOptions, type TestActor } from "@vxv/bot/testing";
+import {
+  autocomplete,
+  buttonClick,
+  emoji,
+  formSubmission,
+  slashCommand,
+  withOptions,
+  type TestActor,
+} from "@vxv/bot/testing";
 import { expect, test } from "@playwright/test";
 import { DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
 import {
@@ -89,7 +97,7 @@ test.describe.serial("Discord bot", () => {
     await expect(page).toHaveURL(/\/evenements\/[0-9a-f-]{36}$/);
     discordRaidId = page.url().split("/").pop() ?? "";
     const message = await discordEventMessage(request, discordRaidId);
-    expect(message?.embed?.title).toBe("La salle des Thanes");
+    expect(message?.embed?.title).toBe("🄻🄰 🅂🄰🄻🄻🄴 🄳🄴🅂 🅃🄷🄰🄽🄴🅂");
   });
 
   test("a member signs up with the raid message's button: shown on the website and in the message", async ({
@@ -120,7 +128,10 @@ test.describe.serial("Discord bot", () => {
     expect(await sent.json()).toMatchObject({
       data: { content: "Inscription enregistrée : Éole Vent, Soigneur (Restauration), Présent." },
     });
-    expect(JSON.stringify(await discordEventMessage(request, discordRaidId))).toContain("Éole Vent (Restauration)");
+    // The first to arrive, under the icon of their spec.
+    expect(JSON.stringify(await discordEventMessage(request, discordRaidId))).toContain(
+      `${emoji("spe_druide_restauration")} \`1\` **Éole Vent**`,
+    );
 
     await signInAs(context, "officer");
     await page.goto(`/evenements/${discordRaidId}`);
@@ -138,7 +149,11 @@ test.describe.serial("Discord bot", () => {
     await expect(page.getByRole("status")).toContainText("Inscription enregistrée.");
 
     const message = await discordEventMessage(request, discordRaidId);
-    expect(message?.embed?.fields[0]).toEqual({ name: "🛡️ Tank · 1", value: "Ciel Gris (Protection)", inline: true });
+    expect(message?.embed?.fields.find((field) => field.name.includes("__Tank__"))).toEqual({
+      name: `${emoji("role_tank")} __Tank__ (1)`,
+      value: `${emoji("spe_guerrier_protection")} \`2\` **Ciel Gris**`,
+      inline: true,
+    });
   });
 });
 
@@ -149,7 +164,9 @@ test("the daily task reminds tonight's raid on Discord, once, and only when Verc
   const authorization = { authorization: `Bearer ${WEB_ENVIRONMENT.CRON_SECRET}` };
   const first = await request.get(endpoint, { headers: authorization });
   expect(await first.json()).toEqual({ reminded: 1 });
-  const reminder = (await discordMessages(request)).find((message) => String(message.body.content).startsWith("⏰"));
+  const reminder = (await discordMessages(request)).find((message) =>
+    String(message.body.content).startsWith(emoji("raid")),
+  );
   expect(reminder?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID);
   expect(reminder?.body.content).toContain("Inscrits : <@500>");
 

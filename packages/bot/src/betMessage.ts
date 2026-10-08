@@ -1,4 +1,5 @@
 import type { AnnouncedBet } from "@vxv/server";
+import { colorValue, COLORS } from "@vxv/design";
 import { betBook, ORGANISATION_PERCENT } from "@vxv/server/domain/bets";
 import { count, formatGold, formatOdds, formatShare } from "@vxv/server/domain/labels";
 import {
@@ -8,9 +9,10 @@ import {
   type RESTPostAPIChannelMessageJSONBody,
 } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
+import { componentEmoji, emoji } from "./emojis.ts";
 
-/** Le Dé Pipé's ink (§7.7, stamp of the bets). */
-const EMBED_COLOR = 0xb0306e;
+/** Le Dé Pipé's sakura. */
+const EMBED_COLOR = colorValue(COLORS.sakura);
 
 /** The buttons of a bet's message, read back when a member clicks them. */
 export const BET_BUTTON_PREFIX = "bet:";
@@ -48,7 +50,7 @@ export function betMessage({ bet, stakes, open }: AnnouncedBet, siteUrl: string)
     ? `⏳ Fermeture ${timestamp(bet.closesAt, "F")} (${timestamp(bet.closesAt, "R")})`
     : ending(bet, stakes, book.pool);
   const pool =
-    `💰 Cagnotte ${formatGold(book.pool)} · ${count(book.bettors, "parieur")} · ` +
+    `${emoji("po")} Cagnotte ${formatGold(book.pool)} · ${count(book.bettors, "parieur")} · ` +
     `${String(ORGANISATION_PERCENT)} % pour la caisse de la guilde`;
   const fields: APIEmbedField[] = book.choices.map(({ choice, total, bettors, share, odds }) => ({
     name: `${choice.label} · ${formatOdds(odds)}`,
@@ -58,7 +60,7 @@ export function betMessage({ bet, stakes, open }: AnnouncedBet, siteUrl: string)
   return {
     embeds: [
       {
-        title: `🎲 ${bet.title}`,
+        title: `${emoji("de_vxv")} ${bet.title}`,
         url: betUrl(siteUrl, bet.id),
         description: `${closing}\n${pool}`,
         color: EMBED_COLOR,
@@ -79,6 +81,7 @@ export function betMessage({ bet, stakes, open }: AnnouncedBet, siteUrl: string)
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
                 label: "Miser",
+                emoji: componentEmoji("po"),
                 custom_id: `${BET_BUTTON_PREFIX}${bet.id}`,
               },
               {

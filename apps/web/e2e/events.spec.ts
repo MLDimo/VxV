@@ -25,7 +25,7 @@ test.describe.serial("raid events", () => {
     await expect(page.getByText("Réservé à Raideur R1", { exact: true })).toBeVisible();
     const message = await discordEventMessage(request, page.url().split("/").pop() ?? "");
     expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID);
-    expect(message?.embed?.title).toBe("La salle des Thanes");
+    expect(message?.embed?.title).toBe("🄻🄰 🅂🄰🄻🄻🄴 🄳🄴🅂 🅃🄷🄰🄽🄴🅂");
     expect(message?.embed?.description).toContain(`👥 Réservé à <@&${readSeed().raiderRoleId}>`);
 
     await page.getByRole("link", { name: "Raid", exact: true }).click();

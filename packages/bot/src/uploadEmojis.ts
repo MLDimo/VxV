@@ -54,5 +54,5 @@ if (expected === emojiIdsSource(Object.entries(EMOJI_IDS))) {
   console.log(`${files.length} émojis à jour.`);
 } else {
   console.log("::warning::src/emojiIds.ts ne correspond pas aux émojis du bot : le remplacer par le texte qui suit.");
-  console.log(expected);
+  process.stdout.write(expected);
 }

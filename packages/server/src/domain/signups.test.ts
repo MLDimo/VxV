@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Character } from "./characters.ts";
-import { checkSignup, composition, type Signup } from "./signups.ts";
+import { arrivalNumbers, checkSignup, composition, type Signup } from "./signups.ts";
 
 const now = new Date("2026-12-01T12:00:00Z");
 const startsAt = new Date("2026-12-10T20:00:00Z");
@@ -54,6 +54,7 @@ describe("composition", () => {
     role,
     spec: "Spé",
     status,
+    signedUpAt: now,
   });
 
   it("counts expected players by role and class, and everyone by status", () => {
@@ -68,5 +69,32 @@ describe("composition", () => {
     expect(result.byRole).toEqual({ tank: 1, healer: 1, dps: 1 });
     expect(result.byClass).toEqual({ WARRIOR: 1, PRIEST: 1, ROGUE: 1 });
     expect(result.byStatus).toEqual({ present: 2, maybe: 1, late: 1, bench: 1, absent: 1 });
+  });
+});
+
+describe("arrivalNumbers", () => {
+  const arrived = (characterId: string, signedUpAt: string): Signup => ({
+    eventId: "e",
+    memberId: characterId,
+    characterId,
+    characterName: characterId,
+    characterClass: "ROGUE",
+    role: "dps",
+    spec: "Combat",
+    status: "present",
+    signedUpAt: new Date(signedUpAt),
+  });
+
+  it("numbers the sign-ups from 1 in their order of arrival, two at once by character", () => {
+    const numbers = arrivalNumbers([
+      arrived("late", "2026-12-03T20:00:00Z"),
+      arrived("b-first", "2026-12-01T20:00:00Z"),
+      arrived("a-first", "2026-12-01T20:00:00Z"),
+    ]);
+    expect([...numbers]).toEqual([
+      ["a-first", 1],
+      ["b-first", 2],
+      ["late", 3],
+    ]);
   });
 });

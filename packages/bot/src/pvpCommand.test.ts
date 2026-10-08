@@ -47,7 +47,7 @@ describe("/vxv_pvp", () => {
     const [message] = discord.messages();
     expect(message?.channelId).toBe(PVP_CHANNEL);
     const [embed] = message?.body.embeds as APIEmbed[];
-    expect(embed?.title).toBe("Raid sur Astranaar");
+    expect(embed?.title).toBe("🅁🄰🄸🄳 🅂🅄🅁 🄰🅂🅃🅁🄰🄽🄰🄰🅁");
     expect(embed?.url).toMatch(/\/pvp\/evenements\//);
     expect(embed?.description).not.toContain("SR");
   });

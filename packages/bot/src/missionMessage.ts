@@ -1,11 +1,13 @@
 import type { AnnouncedMission } from "@vxv/server";
+import { colorValue, COLORS } from "@vxv/design";
 import { formatGold, formatPlace } from "@vxv/server/domain/labels";
 import { MISSION_TYPE_LABELS, missionRewards, REWARD_SHARES } from "@vxv/server/domain/missions";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
+import { emoji } from "./emojis.ts";
 
 /** Les Quêtes' green (§2.5). */
-const EMBED_COLOR = 0x7ee2a0;
+const EMBED_COLOR = colorValue(COLORS.gain);
 /** The first five of the ranking (§7.4). */
 const SHOWN_SCORES = 5;
 
@@ -42,14 +44,14 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
   return {
     embeds: [
       {
-        title: `📜 ${mission.title}`,
+        title: `${emoji("quete")} ${mission.title}`,
         url: missionUrl(siteUrl, mission.id),
         description:
           `${labels.name} : le plus de ${labels.counts}, du ${timestamp(mission.startsAt, "D")} au ` +
           `${timestamp(mission.endsAt, "D")}\n${statusLine(announced)}`,
         color: EMBED_COLOR,
         fields: [
-          { name: `Récompense : ${formatGold(mission.reward)}`, value: shares },
+          { name: `${emoji("po")} Récompense : ${formatGold(mission.reward)}`, value: shares },
           { name: "Classement", value: ranking.length === 0 ? "Personne pour l'instant." : ranking.join("\n") },
         ],
         footer: { text: "Toute la guilde participe : l'addon VXV et le compagnon relèvent les compteurs du jeu." },
