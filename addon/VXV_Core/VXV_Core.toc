@@ -25,10 +25,12 @@ Core\SendQueue.lua
 Core\Comm.lua
 Core\GroupChat.lua
 Core\Rolls.lua
+Core\SignupLabels.lua
 Core\Presence.lua
 Core\SharedData.lua
 Core\SiteData.lua
 Core\PendingChanges.lua
+Core\EventRoles.lua
 
 # Interface: the charter's theme, window, Taverne tab, /vxv, minimap icon.
 UI\Tokens.lua
@@ -39,6 +41,8 @@ UI\Screen.lua
 UI\PlaceWindow.lua
 UI\Window.lua
 UI\Dialog.lua
+UI\SignupDialog.lua
+UI\RoleStepper.lua
 UI\TextWindow.lua
 UI\TavernTab.lua
 UI\CompactWindow.lua

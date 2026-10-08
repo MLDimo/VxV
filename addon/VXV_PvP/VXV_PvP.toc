@@ -1,0 +1,20 @@
+## Interface: 16001
+## Title: VXV PvP
+## Notes: Le PvP de VXV : les sorties, les duels entre membres et leur classement Elo.
+## Author: VXV
+## Version: @project-version@
+## Dependencies: VXV_Core
+
+# The PvP as the website exports it (VXV-PVP), the changes made in game and the duels' results the game shows.
+PvpData.lua
+Changes.lua
+DuelResults.lua
+
+# Interface: the PvP screen, and the dialogs of a challenge, of a duel's actions and of a new outing.
+UI\PvpView.lua
+UI\DuelDialog.lua
+UI\DuelActions.lua
+UI\OutingDialog.lua
+UI\PvpTab.lua
+
+Bootstrap.lua

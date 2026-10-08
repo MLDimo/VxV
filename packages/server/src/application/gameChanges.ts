@@ -1,6 +1,13 @@
 import { fullName, type Character } from "../domain/characters.ts";
-import type { NewRaidEvent } from "../domain/events.ts";
-import { isBetChange, type GameChange, type GameChangeOutcome } from "../domain/gameChanges.ts";
+import { DUEL_DONE, type NewDuel } from "../domain/duels.ts";
+import type { NewPvpEvent, NewRaidEvent } from "../domain/events.ts";
+import {
+  isBetChange,
+  isCreation,
+  isDuelChange,
+  type GameChange,
+  type GameChangeOutcome,
+} from "../domain/gameChanges.ts";
 import { formatDateTime, formatGold } from "../domain/labels.ts";
 import type { BetChoice, NewBet } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
@@ -25,7 +32,10 @@ interface GameChangeDependencies {
     exclude(officer: Member, eventId: string, itemId: string, reason: string): Promise<void>;
     include(officer: Member, eventId: string, itemId: string, reason: string): Promise<void>;
   };
-  events: { createEvent(officer: Member, event: NewRaidEvent, reason: string): Promise<string> };
+  events: {
+    createEvent(officer: Member, event: NewRaidEvent, reason: string): Promise<string>;
+    createPvpEvent(officer: Member, event: NewPvpEvent, reason: string): Promise<string>;
+  };
   /** The event's message on Discord follows its sign-ups, and a new event gets one. */
   announcements: { announceQuietly(eventId: string): Promise<boolean> };
   bets: {
@@ -35,6 +45,21 @@ interface GameChangeDependencies {
   };
   /** The bet's message on Discord follows its stakes. */
   betAnnouncements: { announceQuietly(betId: string): Promise<boolean> };
+  duels: {
+    challenge(member: Member, input: NewDuel): Promise<string>;
+    answer(member: Member, duelId: string, accept: boolean): Promise<void>;
+    cancel(member: Member, duelId: string): Promise<void>;
+    concede(member: Member, duelId: string): Promise<void>;
+    recordFromGame(member: Member, duelId: string, winner: string, loser: string): Promise<void>;
+  };
+}
+
+/** What a change did: the message the game shows its author, and what it created. */
+interface Done {
+  message: string;
+  eventId?: string;
+  betId?: string;
+  duelId?: string;
 }
 
 export function createGameChanges({
@@ -47,15 +72,22 @@ export function createGameChanges({
   announcements,
   bets,
   betAnnouncements,
+  duels,
 }: GameChangeDependencies) {
+  /** When something typed as on Discord happens ("15/12", "21:00"). */
+  function startOf(date: string, time: string): Date {
+    const startsAt = parseRaidStart(date, time, clock());
+    if (startsAt === undefined) {
+      throw new ValidationError(UNREADABLE_START);
+    }
+    return startsAt;
+  }
+
   /**
-   * Does the change as its author's member would on the website; returns what the game tells the author, and the bet
-   * it opened.
+   * Does the change as its author's member would on the website; returns what the game tells the author, and what it
+   * created.
    */
-  async function perform(
-    author: { character: Character; member: Member },
-    change: GameChange,
-  ): Promise<{ message: string; betId?: string }> {
+  async function perform(author: { character: Character; member: Member }, change: GameChange): Promise<Done> {
     switch (change.kind) {
       case "signup":
         await signups.signUp(
@@ -78,10 +110,7 @@ export function createGameChanges({
         );
         return { message: change.excluded ? "Objet exclu des SR." : "Objet de nouveau ouvert aux SR." };
       case "event": {
-        const startsAt = parseRaidStart(change.date, change.time, clock());
-        if (startsAt === undefined) {
-          throw new ValidationError(UNREADABLE_START);
-        }
+        const startsAt = startOf(change.date, change.time);
         const eventId = await events.createEvent(
           author.member,
           { startsAt, raidIds: change.raidIds, softReservesPerPlayer: change.softReserves, roleId: change.roleId },
@@ -101,10 +130,7 @@ export function createGameChanges({
         await betAnnouncements.announceQuietly(change.betId);
         return { message: "Mise retirée." };
       case "bet": {
-        const closesAt = parseRaidStart(change.date, change.time, clock());
-        if (closesAt === undefined) {
-          throw new ValidationError(UNREADABLE_START);
-        }
+        const closesAt = startOf(change.date, change.time);
         const betId = await bets.create(
           author.member,
           { title: change.title, choices: change.choices, closesAt },
@@ -113,6 +139,37 @@ export function createGameChanges({
         await betAnnouncements.announceQuietly(betId);
         return { message: `Pari « ${change.title} » ouvert et annoncé sur Discord.`, betId };
       }
+      case "pvpEvent": {
+        const startsAt = startOf(change.date, change.time);
+        const eventId = await events.createPvpEvent(
+          author.member,
+          { title: change.title, startsAt, roleId: change.roleId },
+          change.reason,
+        );
+        await announcements.announceQuietly(eventId);
+        return { message: `Sortie PvP du ${formatDateTime(startsAt)} créée et annoncée sur Discord.`, eventId };
+      }
+      case "duel": {
+        const scheduledAt = startOf(change.date, change.time);
+        const duelId = await duels.challenge(author.member, {
+          opponentId: change.opponentId,
+          scheduledAt,
+          place: change.place,
+        });
+        return { message: DUEL_DONE.challenged, duelId };
+      }
+      case "duelAnswer":
+        await duels.answer(author.member, change.duelId, change.accept);
+        return { message: change.accept ? DUEL_DONE.accepted : DUEL_DONE.refused };
+      case "duelCancel":
+        await duels.cancel(author.member, change.duelId);
+        return { message: DUEL_DONE.cancelled };
+      case "duelConcede":
+        await duels.concede(author.member, change.duelId);
+        return { message: DUEL_DONE.conceded };
+      case "duelResult":
+        await duels.recordFromGame(author.member, change.duelId, change.winner, change.loser);
+        return { message: `Duel joué : ${change.winner} gagne.` };
     }
   }
 
@@ -125,19 +182,28 @@ export function createGameChanges({
     });
   }
 
+  /** Whether what the change is about exists: its answer goes back with its data. */
+  async function inScope(change: GameChange): Promise<boolean> {
+    if (isCreation(change)) {
+      return true;
+    }
+    return unitOfWork.run(async ({ events: storedEvents, bets: storedBets, duels: storedDuels }) => {
+      if (isDuelChange(change)) {
+        return (await storedDuels.findById(change.duelId)) !== undefined;
+      }
+      if (isBetChange(change)) {
+        return (await storedBets.findById(change.betId)) !== undefined;
+      }
+      return (await storedEvents.findById(change.eventId)) !== undefined;
+    });
+  }
+
   /** What becomes of one change; undefined when it cannot be kept (unknown event, or relayed by a member). */
   async function receiveOne(sender: Member, change: GameChange): Promise<GameChangeOutcome | undefined> {
-    const creation = change.kind === "event" || change.kind === "bet";
-    const betId = isBetChange(change) ? change.betId : undefined;
-    const known = await unitOfWork.run(async ({ gameChanges, events: storedEvents, bets: storedBets }) => ({
-      outcome: await gameChanges.find(change.id),
-      // The event or the bet the change is about must exist: the answer goes back with its data.
-      scope:
-        creation ||
-        (betId === undefined
-          ? (await storedEvents.findById(change.eventId)) !== undefined
-          : (await storedBets.findById(betId)) !== undefined),
-    }));
+    const known = {
+      outcome: await unitOfWork.run(({ gameChanges }) => gameChanges.find(change.id)),
+      scope: await inScope(change),
+    };
     if (known.outcome !== undefined || !known.scope) {
       return known.outcome;
     }
@@ -146,10 +212,13 @@ export function createGameChanges({
     if (author !== undefined && author.member.id !== sender.id && !canManageRaids(sender.roles)) {
       return undefined;
     }
+    const betId = isBetChange(change) ? change.betId : undefined;
+    const duelId = isDuelChange(change) ? change.duelId : undefined;
     const base = {
       id: change.id,
-      eventId: creation || betId !== undefined ? undefined : change.eventId,
+      eventId: isCreation(change) || betId !== undefined || duelId !== undefined ? undefined : change.eventId,
       betId,
+      duelId,
       author: change.author,
     };
     let outcome: GameChangeOutcome;
@@ -158,7 +227,14 @@ export function createGameChanges({
     } else {
       try {
         const done = await perform(author, change);
-        outcome = { ...base, betId: done.betId ?? base.betId, accepted: true, message: done.message };
+        outcome = {
+          ...base,
+          eventId: done.eventId ?? base.eventId,
+          betId: done.betId ?? base.betId,
+          duelId: done.duelId ?? base.duelId,
+          accepted: true,
+          message: done.message,
+        };
       } catch (error) {
         if (!(error instanceof ApplicationError)) {
           throw error;

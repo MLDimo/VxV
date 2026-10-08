@@ -2,6 +2,7 @@
 
 import type { ActionState } from "@/components/actionState";
 import { wallClockToInstant } from "@vxv/server/domain/dateTime";
+import { DUEL_DONE } from "@vxv/server/domain/duels";
 import { getApplication } from "@/server/application";
 import { formText, runFormAction } from "@/server/formActions";
 import { requireMember, requireOfficer } from "@/server/session";
@@ -18,7 +19,7 @@ export async function challengeDuel(_previous: ActionState, form: FormData): Pro
       scheduledAt: wallClockToInstant(formText(form, "scheduledAt")),
       place: formText(form, "place"),
     });
-    return "Défi lancé : le joueur défié est prévenu sur Discord.";
+    return DUEL_DONE.challenged;
   }, DUEL_PAGES);
 }
 
@@ -31,16 +32,16 @@ export async function actOnDuel(_previous: ActionState, form: FormData): Promise
     switch (formText(form, "intent")) {
       case "accept":
         await duels.answer(member, duelId, true);
-        return "Défi relevé : la guilde peut parier sur le duel.";
+        return DUEL_DONE.accepted;
       case "refuse":
         await duels.answer(member, duelId, false);
-        return "Défi refusé.";
+        return DUEL_DONE.refused;
       case "cancel":
         await duels.cancel(member, duelId);
-        return "Duel annulé : les mises sont rendues.";
+        return DUEL_DONE.cancelled;
       default:
         await duels.concede(member, duelId);
-        return "Défaite enregistrée : le pari est réglé.";
+        return DUEL_DONE.conceded;
     }
   }, DUEL_PAGES);
 }
@@ -54,9 +55,9 @@ export async function settleDuel(_previous: ActionState, form: FormData): Promis
     const { duels } = getApplication();
     if (formText(form, "intent") === "cancel") {
       await duels.cancelAsOfficer(officer, duelId, reason);
-      return "Duel annulé : les mises sont rendues.";
+      return DUEL_DONE.cancelled;
     }
     await duels.recordAsOfficer(officer, duelId, formText(form, "winnerId"), reason);
-    return "Vainqueur enregistré : le pari est réglé.";
+    return DUEL_DONE.recorded;
   }, [...DUEL_PAGES, "/journal"]);
 }

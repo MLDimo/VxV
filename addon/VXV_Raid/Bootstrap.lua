@@ -5,7 +5,6 @@ VXV.RegisterModule({
     name = "Raid",
     Enable = function(data)
         ns.RaidData.Restore(data)
-        ns.RoleChoices.Restore(data)
         ns.RaidLog.Restore(data)
         ns.Changes.Restore(data)
         ns.BossAlert.Restore(data)

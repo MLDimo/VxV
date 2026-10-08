@@ -1,4 +1,5 @@
 import type { Bet } from "../domain/bets.ts";
+import { fullName } from "../domain/characters.ts";
 import {
   answerRefusal,
   cancelRefusal,
@@ -133,12 +134,16 @@ export function createDuels({
   async function record(
     member: Member,
     duelId: string,
-    winnerOf: (duel: Duel) => string,
+    winnerOf: (duel: Duel, repositories: Repositories) => string | Promise<string>,
     officerReason: string | undefined,
   ): Promise<void> {
     const duel = await unitOfWork.run(async (repositories) => {
       const found = await requireDuel(repositories, duelId);
-      const winnerId = winnerOf(found);
+      const winnerId = await winnerOf(found, repositories);
+      // Told twice (both players' addons read the game's message): the first one stands.
+      if (found.winnerId === winnerId) {
+        return undefined;
+      }
       refuseIf(resultRefusal(found, winnerId, officerReason === undefined ? member.id : undefined));
       const now = clock();
       await repositories.duels.recordWinner(found.id, winnerId, now);
@@ -148,7 +153,9 @@ export function createDuels({
       }
       return found;
     });
-    await announce(duel);
+    if (duel !== undefined) {
+      await announce(duel);
+    }
   }
 
   return {
@@ -204,6 +211,27 @@ export function createDuels({
     /** The loser concedes the duel, when the game could not tell it: the other player wins. */
     concede(member: Member, duelId: string): Promise<void> {
       return record(member, duelId, (duel) => opponentOf(duel, member.id), undefined);
+    },
+
+    /**
+     * The result the game showed a duelist (« Prénom Nom a vaincu Prénom Nom en duel »), sent by their addon: the
+     * characters must be the duelists'.
+     */
+    recordFromGame(member: Member, duelId: string, winner: string, loser: string): Promise<void> {
+      return record(
+        member,
+        duelId,
+        async (duel, { characters }) => {
+          const byName = new Map((await characters.listAll()).map((character) => [fullName(character), character]));
+          const winnerId = byName.get(winner)?.memberId;
+          const loserId = byName.get(loser)?.memberId;
+          if (winnerId === undefined || loserId !== opponentOf(duel, winnerId)) {
+            throw new ValidationError("Ce résultat ne correspond pas aux joueurs du duel.");
+          }
+          return winnerId;
+        },
+        undefined,
+      );
     },
 
     /** An officer records the winner of a duel the players do not settle, with a reason in the journal. */

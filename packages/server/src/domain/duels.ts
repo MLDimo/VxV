@@ -49,6 +49,16 @@ export function duelStatus(duel: Duel): DuelStatus {
   return duel.accepted ? "scheduled" : "refused";
 }
 
+/** What the website and the game tell a member once their action on a duel is done. */
+export const DUEL_DONE = {
+  challenged: "Défi lancé : le joueur défié est prévenu sur Discord.",
+  accepted: "Défi relevé : la guilde peut parier sur le duel.",
+  refused: "Défi refusé.",
+  cancelled: "Duel annulé : les mises sont rendues.",
+  conceded: "Défaite enregistrée : le pari est réglé.",
+  recorded: "Vainqueur enregistré : le pari est réglé.",
+} as const;
+
 const NOT_A_DUELIST = "Seuls les deux joueurs du duel peuvent le faire.";
 const OVER = "Ce duel est terminé.";
 export const DUELIST_STAKE = "Les joueurs d'un duel ne parient pas dessus.";

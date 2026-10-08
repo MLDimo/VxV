@@ -16,18 +16,11 @@ local CLASS_NAMES = {
     DRUID = "Druide",
 }
 
--- Role icons of the game's group finder, cut from one texture.
-local ROLE_ICON = "|TInterface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES:14:14:0:0:64:64:%s|t"
-local ROLES = {
-    tank = { label = "Tank", plural = "Tanks", icon = ROLE_ICON:format("0:19:22:41") },
-    healer = { label = "Soigneur", plural = "Soigneurs", icon = ROLE_ICON:format("20:39:1:20") },
-    dps = { label = "DPS", plural = "DPS", icon = ROLE_ICON:format("20:39:22:41") },
-}
-Labels.ROLE_ORDER = { "tank", "healer", "dps" }
-
-local STATUSES = { present = "Présent", late = "En retard", maybe = "Peut-être", bench = "Banc", absent = "Absent" }
--- Players expected in the raid, as the website counts them.
-local COMING = { present = true, late = true }
+-- The sign-ups' wording, shared with the PvP outings: the roles, the statuses and who is expected.
+Labels.ROLE_ORDER = VXV.SignupLabels.ROLE_ORDER
+Labels.Role = VXV.SignupLabels.Role
+Labels.Status = VXV.SignupLabels.Status
+Labels.IsComing = VXV.SignupLabels.IsComing
 
 local DATE_TIME = "%d/%m %H:%M"
 -- How an item was given, as the website names it.
@@ -45,19 +38,6 @@ end
 --- The name in the color of the class.
 function Labels.Colored(name, token)
     return VXV.ClassColored(name, token)
-end
-
---- { label, plural, icon } of a role, or a neutral one for a role this version does not know.
-function Labels.Role(role)
-    return ROLES[role] or { label = tostring(role), plural = tostring(role), icon = "" }
-end
-
-function Labels.Status(status)
-    return STATUSES[status] or tostring(status)
-end
-
-function Labels.IsComing(status)
-    return COMING[status] == true
 end
 
 function Labels.Method(method)

@@ -224,6 +224,8 @@ export interface GameChangeRepository {
   listForEvent(eventId: string, createdSince: Date): Promise<GameChangeOutcome[]>;
   /** The stakes made in game on these bets, in the order received. */
   listForBets(betIds: readonly string[]): Promise<GameChangeOutcome[]>;
+  /** The changes made in game about these PvP outings (their creation included) and duels, in the order received. */
+  listForPvp(eventIds: readonly string[], duelIds: readonly string[]): Promise<GameChangeOutcome[]>;
 }
 
 /** When the latest copy of some data, read in game, was imported ("roster"). */

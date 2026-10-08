@@ -19,7 +19,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`Core/Config.lua` : VXV sur Forever, THE DALIRANAS sur la bêta) ; export de la liste de guilde (`/vxv liste`) ;
   données du site (`VXV.SiteData`) et changements faits en jeu (`VXV.PendingChanges`), en attente puis confirmés ou
   refusés par le site, relayés par un officier équipé pour les membres sans compagnon ; rolls lus dans le chat
-  (`Core/Rolls.lua`, événement `roll`) ; `VXV.SayToGuild`. Installation : `tools/install-addon.sh`.
+  (`Core/Rolls.lua`, événement `roll`) ; `VXV.SayToGuild` ; pour les événements de la guilde (soirées de raid,
+  sorties PvP), la fenêtre « Mon inscription » (`VXV.OpenSignupDialog`, libellés `VXV.SignupLabels`), les rôles
+  Discord apportés par le compagnon d'un officier (`VXV.EventRoles`, `Core/EventRoles.lua`) et leur choix aux
+  flèches (`VXV.RoleStepper`). Installation : `tools/install-addon.sh`.
 - **Raid et SR** (`VXV_Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
@@ -28,7 +31,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   @everyone pour tout le monde ; nom gardé tel qu'à la création, affiché partout, mentionné sans notification sur
   Discord. Seuls ses membres s'inscrivent : rôles du joueur lus sur Discord à sa première inscription (un rôle donné à
   l'instant compte ; Discord muet, inscription refusée), une inscription déjà faite reste modifiable sans le rôle. En
-  jeu, la liste des rôles vient du compagnon d'un officier, sans relais dans la guilde. SR+ (`domain/softReserves.ts`), par personnage et par objet
+  jeu, la liste des rôles vient du compagnon d'un officier, sans relais dans la guilde (socle, `VXV.EventRoles`). SR+ (`domain/softReserves.ts`), par personnage et par objet
   réservé : en remontant ses événements précédents, +10 quand il était présent, avait réservé l'objet et ne l'a pas
   obtenu ; neutre s'il était absent ou si l'événement n'avait pas le raid de l'objet ; arrêt à l'objet obtenu ou à une
   présence sans l'avoir réservé ; plafond +50. Conflits : le site fait foi, et la modification la plus récente gagne
@@ -51,7 +54,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   s'ouvre jusqu'à l'heure du duel (un choix par joueur, règles des paris, sans les deux joueurs). Résultat lu en jeu,
   sinon reconnu par le perdant ; un officier peut saisir le vainqueur ou annuler, avec motif ; annulé, les mises sont
   rendues. Classement Elo (`/pvp/classement`) recalculé des duels joués dans l'ordre : départ 1500,
-  E = 1 / (1 + 10^((Rb − Ra) / 400)), R' = R + 20 × (résultat − E).
+  E = 1 / (1 + 10^((Rb − Ra) / 400)), R' = R + 20 × (résultat − E). En jeu (`VXV_PvP`, onglet PvP) : sorties avec
+  inscription (et création pour un officier), duels (défier sa cible ou un « Prénom Nom », relever, refuser,
+  reconnaître sa défaite, annuler), classement et Elo du joueur ; le résultat d'un duel du joueur est lu dans le canal
+  système avec les formats du jeu (`DUEL_WINNER_KNOCKOUT`, `DUEL_WINNER_RETREAT`, par `Compat.Resolve`, non mesurés)
+  et envoyé au site, qui garde le premier.
 - **Prochain boss** (`VXV_Raid`) : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du
   pack) ; ailleurs, le premier boss debout des raids de l'événement ; un joueur arrivé en retard apprend du maître du
   butin (ou du chef) les boss tués. Panneau en tête des SR du raid et dans le mode réduit ; alerte (message au milieu
@@ -140,7 +147,7 @@ La table complète est dans le README. Règles :
 
 - **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
-- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`, `VXV_Deathroll`, `VXV_Ranking`) qui ne dépend que du socle.
+- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`, `VXV_Deathroll`, `VXV_Ranking`, `VXV_PvP`) qui ne dépend que du socle.
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon. Rôles cumulables (officier, trésorier, GM) ; seul le trésorier a les droits de trésorerie ; tout membre du serveur Discord est membre de la guilde.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
@@ -189,13 +196,14 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV_Deathroll/Games.lua` | `domain/deathrolls.ts` |
 | `VXV-COMBAT-1` (boss tués, soins reçus) | compagnon → site | `apps/companion/src/domain/combatLog.ts` | `domain/bossFights.ts` |
 | `VXV-RAID-3` (événement) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
-| `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Raid/RoleChoices.lua` |
+| `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Core/Core/EventRoles.lua` |
 | `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
 | `VXV-QUETES-1` | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV_Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV_Artisans/ArtisansData.lua` |
 | `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV_Deathroll/DeathrollData.lua` |
 | `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV_Ranking/RankingData.lua` |
+| `VXV-PVP-1` (sorties, duels, classement Elo) | site → addon | `domain/addonPvp.ts` | `VXV_PvP/PvpData.lua` |
 
 - Vers le site : chaque texte se lit avec `domain/textFormat.ts` (lignes numérotées, un lecteur par type de ligne,
   `TextFormatError`).

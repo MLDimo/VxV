@@ -69,6 +69,7 @@ describe("bets for the addon", () => {
         {
           id: "Ðéjà Vu#1#2",
           eventId: undefined,
+          duelId: undefined,
           betId: "bet",
           author: "Ðéjà Vu",
           accepted: true,
