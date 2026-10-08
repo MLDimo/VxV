@@ -13,6 +13,7 @@ import {
   type Settlement,
   type Stake,
 } from "../domain/bets.ts";
+import { DUELIST_STAKE, isDuelist } from "../domain/duels.ts";
 import type { BetCreationRecord, BetEndRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import { debtRefusal, memberDebt } from "./debts.ts";
@@ -179,6 +180,10 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
         const refusal = stakeRefusal(bet, { choiceId, amount, existing }, now);
         if (refusal !== undefined) {
           throw new ValidationError(refusal);
+        }
+        const duel = await repositories.duels.findByBet(bet.id);
+        if (duel !== undefined && isDuelist(duel, member.id)) {
+          throw new ValidationError(DUELIST_STAKE);
         }
         const debt = await memberDebt(repositories, member.id);
         if (debt > 0) {

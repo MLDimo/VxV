@@ -6,6 +6,8 @@ import { createArtisans } from "./application/artisans.ts";
 import { createBossFights } from "./application/bossFights.ts";
 import { createAddonDeathrolls } from "./application/addonDeathrolls.ts";
 import { createDeathrolls } from "./application/deathrolls.ts";
+import { createDuelAnnouncements } from "./application/duelAnnouncements.ts";
+import { createDuels } from "./application/duels.ts";
 import { createAddonMissions } from "./application/addonMissions.ts";
 import { createAddonRanking } from "./application/addonRanking.ts";
 import { createAddonTitles } from "./application/addonTitles.ts";
@@ -36,6 +38,7 @@ import { createTreasury } from "./application/treasury.ts";
 import type {
   BetAnnouncer,
   DeathrollAnnouncer,
+  DuelAnnouncer,
   GuildGateway,
   MissionAnnouncer,
   EventAnnouncer,
@@ -61,6 +64,8 @@ export interface ApplicationConfig {
   titleAnnouncer: TitleAnnouncer;
   /** Where the deathrolls played for a big stake are announced. */
   deathrollAnnouncer: DeathrollAnnouncer;
+  /** The PvP channel, where each duel has its message. */
+  duelAnnouncer: DuelAnnouncer;
   clock?: Clock;
 }
 
@@ -74,6 +79,7 @@ export function createApplication({
   missionAnnouncer,
   titleAnnouncer,
   deathrollAnnouncer,
+  duelAnnouncer,
   clock = () => new Date(),
 }: ApplicationConfig) {
   const unitOfWork = createUnitOfWork(sql);
@@ -104,6 +110,8 @@ export function createApplication({
   const ranking = createRanking({ unitOfWork, clock });
   const artisans = createArtisans({ unitOfWork });
   const deathrolls = createDeathrolls({ unitOfWork, clock, announcer: deathrollAnnouncer });
+  const duelAnnouncements = createDuelAnnouncements({ unitOfWork, announcer: duelAnnouncer });
+  const duels = createDuels({ unitOfWork, clock, announcements: duelAnnouncements, betAnnouncements });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
@@ -148,6 +156,8 @@ export function createApplication({
     addonArtisans: createAddonArtisans({ unitOfWork, clock }),
     deathrolls,
     addonDeathrolls: createAddonDeathrolls({ unitOfWork, clock }),
+    duels,
+    duelAnnouncements,
   };
 }
 

@@ -1,6 +1,7 @@
 import type { ProfessionReading, Recipe } from "../domain/artisans.ts";
 import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
 import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
+import type { Duel, NewDuel } from "../domain/duels.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
 import type { EventKind, GuildEvent, PlannedEvent, RaidSummary } from "../domain/events.ts";
 import type { GameChangeOutcome } from "../domain/gameChanges.ts";
@@ -465,6 +466,21 @@ export interface BossFightRepository {
   }): Promise<void>;
 }
 
+export interface DuelRepository {
+  create(challengerId: string, duel: NewDuel, createdAt: Date): Promise<string>;
+  /** Undefined when the id is unknown or malformed. */
+  findById(duelId: string): Promise<Duel | undefined>;
+  /** The duel the bet is about, if any. */
+  findByBet(betId: string): Promise<Duel | undefined>;
+  /** Every duel, the latest scheduled first. */
+  listAll(): Promise<Duel[]>;
+  /** The opponent's answer; an accepted duel gets its bet. */
+  answer(duelId: string, accepted: boolean, at: Date, betId: string | undefined): Promise<void>;
+  recordWinner(duelId: string, winnerId: string, at: Date): Promise<void>;
+  cancel(duelId: string, at: Date): Promise<void>;
+  setDiscordMessage(duelId: string, message: DiscordMessage): Promise<void>;
+}
+
 export interface Repositories {
   members: MemberRepository;
   sessions: SessionRepository;
@@ -493,6 +509,7 @@ export interface Repositories {
   deathrolls: DeathrollRepository;
   titles: TitleRepository;
   bossFights: BossFightRepository;
+  duels: DuelRepository;
 }
 
 /** Runs work atomically: every repository call inside shares one transaction. */

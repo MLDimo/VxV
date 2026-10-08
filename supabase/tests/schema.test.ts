@@ -201,6 +201,32 @@ describe("initial schema", () => {
     });
   });
 
+  describe("duels", () => {
+    it("opposes two members, is answered before its bet, and is won by one of them once accepted", async () => {
+      const vorn = await insertMember(database, "1");
+      const morgane = await insertMember(database, "2");
+      const thessa = await insertMember(database, "3");
+      const challenge = (challenger: string, opponent: string) =>
+        database.query<{ id: string }>(
+          `insert into duels (challenger_id, opponent_id, scheduled_at, place)
+           values ($1, $2, now() + interval '1 day', 'Porte d''Orgrimmar') returning id`,
+          [challenger, opponent],
+        );
+      await expect(challenge(vorn, vorn)).rejects.toThrow(/duels_two_players/);
+      const [duel] = (await challenge(vorn, morgane)).rows;
+      const update = (set: string, values: unknown[] = []) =>
+        database.query(`update duels set ${set} where id = $1`, [duel?.id, ...values]);
+
+      await expect(update("winner_id = $2, played_at = now()", [vorn])).rejects.toThrow(/duels_played_accepted/);
+      await expect(update("accepted = true")).rejects.toThrow(/duels_answered/);
+      await expect(update("accepted = true, answered_at = now()")).resolves.toBeDefined();
+      await expect(update("winner_id = $2, played_at = now()", [thessa])).rejects.toThrow(/duels_winner_plays/);
+      await expect(update("winner_id = $2", [vorn])).rejects.toThrow(/duels_played/);
+      await expect(update("winner_id = $2, played_at = now()", [vorn])).resolves.toBeDefined();
+      await expect(update("cancelled_at = now()")).rejects.toThrow(/duels_ends_once/);
+    });
+  });
+
   describe("sign-ups", () => {
     it("allows a single sign-up per member and event, whatever the character", async () => {
       const memberId = await insertMember(database, "1");

@@ -5,6 +5,7 @@ import { createDiscordBetAnnouncer } from "./betAnnouncer.ts";
 import { createDiscordMissionAnnouncer } from "./missionAnnouncer.ts";
 import { createDiscordTitleAnnouncer } from "./titleAnnouncer.ts";
 import { createDiscordDeathrollAnnouncer } from "./deathrollAnnouncer.ts";
+import { createDiscordDuelAnnouncer } from "./duelAnnouncer.ts";
 import { createDiscordRaidAnnouncer } from "./raidAnnouncer.ts";
 import { createFakeDiscord, createTestDatabase, type FakeDiscord } from "@vxv/server/testing";
 import { vi } from "vitest";
@@ -46,6 +47,7 @@ export async function createTestApplication(
     missionAnnouncer: createDiscordMissionAnnouncer({ token: "token", channelId: MISSIONS_CHANNEL, siteUrl: SITE_URL }),
     titleAnnouncer: createDiscordTitleAnnouncer({ token: "token", channelId: RAID_CHANNEL, siteUrl: SITE_URL }),
     deathrollAnnouncer: createDiscordDeathrollAnnouncer({ token: "token", channelId: RAID_CHANNEL, siteUrl: SITE_URL }),
+    duelAnnouncer: createDiscordDuelAnnouncer({ token: "token", channelId: PVP_CHANNEL, siteUrl: SITE_URL }),
   });
   const officer = await app.auth.identify({ discordId: "officer", discordName: "Officier" }, [TEST_ROLES.officer]);
   await app.roster.importRoster(officer, ["VXV-ROSTER-1", ...roster].join("\n"), "Liste de guilde des tests");

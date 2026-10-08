@@ -67,7 +67,9 @@ export type {
   AnnouncedTitles,
   TitleAnnouncer,
   AnnouncedDeathroll,
+  AnnouncedDuel,
   DeathrollAnnouncer,
+  DuelAnnouncer,
 } from "./application/discordPorts.ts";
 export type { BetView } from "./application/bets.ts";
 export type { CashOverview } from "./application/cash.ts";
@@ -124,3 +126,13 @@ export {
   type DiscordRestOptions,
 } from "./infrastructure/discord/rest.ts";
 export type { BoardItem, LootItem, Reserver } from "./domain/softReserves.ts";
+export type { DuelRankingLine, DuelView } from "./application/duels.ts";
+export {
+  duelStatus,
+  ELO_K,
+  ELO_START,
+  MAX_DUEL_PLACE_LENGTH,
+  type Duel,
+  type DuelStatus,
+  type NewDuel,
+} from "./domain/duels.ts";

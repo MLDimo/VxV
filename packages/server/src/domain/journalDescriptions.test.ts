@@ -48,6 +48,31 @@ describe("describeJournalEntry", () => {
     );
   });
 
+  it("summarizes a duel an officer settles: its players, its time, its winner unless called off", () => {
+    const duel = {
+      challenger: "Vorn Cendrelune",
+      opponent: "Morgane Nuitsombre",
+      scheduledAt: "2026-12-10T20:00:00.000Z",
+    };
+    const entry: JournalEntry = {
+      id: "10",
+      occurredAt: new Date(),
+      actorName: "Officier",
+      action: "duel.result",
+      entity: "duel",
+      entityId: "d",
+      before: null,
+      after: { ...duel, winner: "Morgane Nuitsombre" },
+      reason: "Vu en jeu",
+    };
+    expect(describeJournalEntry(entry)).toBe(
+      "Vorn Cendrelune contre Morgane Nuitsombre, 10/12/2026 21:00 : Morgane Nuitsombre gagne",
+    );
+    expect(describeJournalEntry({ ...entry, action: "duel.cancel", after: duel })).toBe(
+      "Vorn Cendrelune contre Morgane Nuitsombre, 10/12/2026 21:00",
+    );
+  });
+
   it("summarizes a bet opening: its title, its choices and its closing time in the guild time zone", () => {
     const entry: JournalEntry = {
       id: "9",
