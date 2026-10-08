@@ -81,6 +81,9 @@ son secret et attendre quelques minutes avant de déployer : le « Session poole
 - Application « VXV » : adresses de redirection `/connexion/discord/retour` du site de production, de test et de
   `http://localhost:3000` ; « Interactions Endpoint URL » sur `https://vxv-web.vercel.app/api/discord/interactions`.
   Bot privé, sans intent privilégié ; après chaque déploiement en production, la CI enregistre ses commandes.
+- Émojis du bot : émojis de l'application (`packages/bot/emojis`, pas d'emplacement pris sur le serveur), ajoutés par
+  la CI après chaque déploiement en production. Le bot les écrit par identifiant : pour une image nouvelle, l'étape
+  « Upload the Discord emojis » affiche le texte de `packages/bot/src/emojiIds.ts` à reporter.
 - Serveur : le rôle du bot au-dessus des rôles des membres et des rôles de titre « ◆ … » (il ne modifie que ce qui est
   en dessous de lui ; personne ne renomme le propriétaire). Tout membre du serveur est membre de la guilde ; le GM
   porte un rôle « GM ».
