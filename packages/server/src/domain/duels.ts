@@ -126,8 +126,11 @@ export function opponentOf(duel: Duel, memberId: string): string {
   return memberId === duel.challengerId ? duel.opponentId : duel.challengerId;
 }
 
-/** Elo (owner's choice of 7 October): everybody starts at 1500, a duel moves the ratings by K × (result − expected). */
-export const ELO_START = 1500;
+/**
+ * Elo (owner's choices of 7 and 8 October): everybody starts at 0, so that a rating reads as the points won or lost; a
+ * duel moves the ratings by K × (result − expected).
+ */
+export const ELO_START = 0;
 export const ELO_K = 20;
 const ELO_SCALE = 400;
 

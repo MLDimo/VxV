@@ -86,7 +86,7 @@ function DuelItem({ view, member }: { view: DuelView; member: Member }) {
 /** The duels' Elo board: its places with their portraits, its records. */
 function eloBoard(board: DuelBoard): Board {
   return {
-    unit: "count",
+    unit: "points",
     lines: board.lines.map((line) => ({ ...line.member, rank: line.rank, value: line.rating, title: undefined })),
     records: board.records,
   };
@@ -105,7 +105,8 @@ export default async function DuelsPage() {
         Un contre un, à l&apos;heure et au lieu dits : une fois le défi relevé, la guilde parie sur le vainqueur
         jusqu&apos;à l&apos;heure du duel, sans les deux joueurs. L&apos;addon lit le résultat en jeu ; sinon le perdant
         le reconnaît ici. Classement Elo : chacun part de {ELO_START} ; le vainqueur gagne {ELO_K} × (1 − la chance
-        qu&apos;il avait de gagner), le perdant les perd : battre un plus fort rapporte beaucoup, un plus faible peu.
+        qu&apos;il avait de gagner), le perdant les perd : battre un plus fort rapporte beaucoup, un plus faible peu. Ce
+        que l&apos;un gagne, l&apos;autre le perd : une cote négative veut dire plus de points perdus que gagnés.
       </p>
       <RankingBoard
         board={eloBoard(board)}

@@ -4,8 +4,8 @@ local _, ns = ...
 --- ranks members (the Ranking's categories, the duels' Elo): the first three on banners hanging from a rod, the
 --- records under them, and the following places with the player's own at the bottom. Each part is placed by the
 --- screen and shows a view: { podium (the first three lines), rest (the others), mine (the player's line, or nil),
---- widest (the biggest value, for the bars), unit ("gold" or "count"), metric, recordsTitle, records ({ label, value,
---- name, class }) }. A line: { rank, value, name, class, avatar, title }.
+--- widest (the biggest value, for the bars), unit ("gold", "points" or "count"), metric, recordsTitle, records
+--- ({ label, value, name, class }) }. A line: { rank, value, name, class, avatar, title }.
 local RankingBoard = {}
 ns.RankingBoard = RankingBoard
 
@@ -31,12 +31,13 @@ local RECORD_GAP, RECORD_PADDING = 8, 8
 local ROW_HEIGHT, ROW_GAP, AVATAR, BAR_WIDTH, BAR_HEIGHT, VALUE_WIDTH, RANK_WIDTH = 42, 6, 32, 80, 6, 64, 24
 local ROW_PADDING, ROW_SPACE, MINE_GAP = 8, 10, 16
 
---- A value as the board writes it: gold with its sign ("+3 215 po" on the banners, "+310" below), or a count.
+--- A value as the board writes it: gold with its sign ("+3 215 po" on the banners, "+310" below), points with their
+--- sign ("+24", "−10"), or a count.
 function RankingBoard.Value(unit, value, withGold)
-    if unit ~= "gold" then
+    if unit == "count" then
         return tostring(value)
     end
-    return withGold and Gold.Signed(value) or Gold.SignedNumber(value)
+    return (unit == "gold" and withGold) and Gold.Signed(value) or Gold.SignedNumber(value)
 end
 
 --- The portrait's file, or nil without one.

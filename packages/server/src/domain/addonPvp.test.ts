@@ -67,8 +67,8 @@ describe("formatAddonPvp", () => {
       ],
       duels: [{ duel, status: "played" }],
       ranking: [
-        { rank: 1, memberId: "m-officer", rating: 1510, won: 1, played: 1 },
-        { rank: 2, memberId: "m-thom", rating: 1490, won: 0, played: 1 },
+        { rank: 1, memberId: "m-officer", rating: 10, won: 1, played: 1 },
+        { rank: 2, memberId: "m-thom", rating: -10, won: 0, played: 1 },
       ],
       records: [{ label: "Plus de victoires", value: "1 victoire", memberId: "m-officer" }],
       changes: [
@@ -93,8 +93,8 @@ describe("formatAddonPvp", () => {
       "U;m-officer;Ðéjà Vu;ROGUE;mv_voleur_m",
       "U;m-thom;Thom Leboss;;",
       "D;d1;played;1796932800;Porte, d'Orgrimmar;m-officer;m-thom;m-officer;b1",
-      "R;1;m-officer;1510;1;1",
-      "R;2;m-thom;1490;0;1",
+      "R;1;m-officer;10;1;1",
+      "R;2;m-thom;-10;0;1",
       "K;Plus de victoires;1 victoire;m-officer",
       "C;Thom Leboss#1#1;1;Défi relevé.",
     ]);

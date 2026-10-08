@@ -12,7 +12,8 @@ export const RANKING_CATEGORIES = ["paris", "deathroll", "quetes", "titres"] as 
 export type RankingCategory = (typeof RANKING_CATEGORIES)[number];
 
 /** How a board's values read: gold with its sign, or a count. */
-export type RankingUnit = "gold" | "count";
+/** How a board's values read: gold with its sign, points with their sign (the duels' Elo), or a count. */
+export type RankingUnit = "gold" | "points" | "count";
 
 export interface BoardRow {
   rank: number;

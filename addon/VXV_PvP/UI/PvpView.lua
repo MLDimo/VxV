@@ -16,7 +16,7 @@ local NO_RANKING = "Aucun duel joué pour l'instant."
 local WAITING = "En attente du site"
 local DUEL_STATUSES = { proposed = "défi lancé", scheduled = "défi relevé", refused = "refusé", cancelled = "annulé" }
 -- The Elo every duelist starts with (domain/duels.ts); the board's first places, on banners.
-local ELO_START, PODIUM = 1500, 3
+local ELO_START, PODIUM = 0, 3
 
 local row = VXV.RowList.Row
 
@@ -39,7 +39,7 @@ function PvpView.Header(data, memberId)
     end
     return {
         subtitle = "Données du " .. date(DATE, data.exportedAt),
-        badges = { { text = "Mon Elo : " .. (rating or ELO_START), color = "gold" } },
+        badges = { { text = "Mon Elo : " .. VXV.RankingBoard.Value("points", rating or ELO_START), color = "gold" } },
     }
 end
 
@@ -142,7 +142,7 @@ end
 --- The duels' Elo board for the core's ranking board (VXV.RankingBoard), for the player of member id: { empty (why
 --- nobody shows, or nil), podium, rest, mine, widest, unit, metric, recordsTitle, records }.
 function PvpView.Board(data, memberId)
-    local view = { podium = {}, rest = {}, records = {}, widest = 0, unit = "count", metric = "Elo · depuis toujours",
+    local view = { podium = {}, rest = {}, records = {}, widest = 0, unit = "points", metric = "Elo · depuis toujours",
         recordsTitle = "Records des duels" }
     if data == nil then
         view.empty = NO_DATA
@@ -155,7 +155,7 @@ function PvpView.Board(data, memberId)
         local list = #view.podium < PODIUM and view.podium or view.rest
         list[#list + 1] = line
         view.mine = entry.memberId == memberId and line or view.mine
-        view.widest = math.max(view.widest, entry.rating)
+        view.widest = math.max(view.widest, math.abs(entry.rating))
     end
     for _, record in ipairs(data.records) do
         local player = data.players[record.memberId] or {}
