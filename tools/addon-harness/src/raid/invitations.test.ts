@@ -155,6 +155,7 @@ describe("inviting the whole roster", () => {
           role: "dps" as const,
           spec: "Givre",
           status: "present" as const,
+          signedUpAt: new Date("2026-12-01T12:00:00Z"),
         })),
       ],
       mainCharacterIds: new Set([...ONYXIA_NIGHT.mainCharacterIds, ...names.map((_, index) => `c${index}`)]),

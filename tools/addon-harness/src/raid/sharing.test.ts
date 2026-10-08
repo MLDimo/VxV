@@ -82,6 +82,7 @@ describe("sharing the event in the guild", () => {
         role: "dps",
         spec: "Givre",
         status: "present",
+        signedUpAt: new Date("2026-12-01T12:00:00Z"),
       })),
       board: ONYXIA_NIGHT.board.map((item) => ({
         ...item,

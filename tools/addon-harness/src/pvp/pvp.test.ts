@@ -50,6 +50,7 @@ const PVP: AddonPvpFacts = {
           role: "healer",
           spec: "Sacré",
           status: "present",
+          signedUpAt: SATURDAY,
         },
       ],
     },
