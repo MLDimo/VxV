@@ -28,4 +28,4 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | Missions | Une mission d'une semaine menée jusqu'au classement |
 | Titres | Une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu par un membre sans compagnon |
 | Artisans | Une recette apprise apparaît chez un autre membre après la synchro |
-| Deathroll | Une partie complète jouée aux boutons entre deux membres, la dette chez le perdant |
+| Deathroll | Une partie complète jouée aux boutons entre deux membres, chaque roll de 0 au résultat précédent (le jeu accepte-t-il un `/roll` à partir de 0 ?) jusqu'au premier 0, la dette chez le perdant |

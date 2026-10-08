@@ -101,11 +101,11 @@ function Games.AddRoll(id, character, high, result)
     end
     local roller, expected = Rules.Turn(game)
     if roller == nil or character ~= roller or high ~= expected or Rules.Betting(game) or type(result) ~= "number"
-        or result < 1 or result > high or result % 1 ~= 0 then
+        or result < Rules.LOSING_ROLL or result > high or result % 1 ~= 0 then
         return false
     end
     game.rolls[#game.rolls + 1] = { character = character, high = high, result = result }
-    if result == 1 then
+    if result == Rules.LOSING_ROLL then
         game.endedAt = time()
         keep(game)
     end

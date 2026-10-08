@@ -1,7 +1,7 @@
 local _, ns = ...
 
 --- The duel's window (P15.4, P15.5): the two players with their titles, the big number that scrolls and slows down
---- before stopping on the real result, the background from violet to red as the high comes near 1, the sounds of
+--- before stopping on the real result, the background from violet to red as the high comes near 0, the sounds of
 --- tension and defeat, the Roll button at the player's turn, the stakes during the minute of bets, the rolls so far.
 --- The same window follows the game for its players and for every member who watches it.
 local DuelWindow = {}
@@ -72,7 +72,7 @@ local function render()
     drawnBetting = Rules.Betting(game)
     local roller, high = Rules.Turn(game)
     widgets.roll:SetShown(roller == me and not Rules.Betting(game) and animation == nil)
-    widgets.roll.label:SetText(("Roll (1-%d)"):format(high or 1))
+    widgets.roll.label:SetText(("Roll (%d-%d)"):format(Rules.LOSING_ROLL, high or Rules.LOSING_ROLL))
     local betting = Rules.Betting(game) and me ~= game.challenger and me ~= game.challenged
     for _, widget in ipairs({ widgets.amountHolder, widgets.betLeft, widgets.betRight }) do
         widget:SetShown(betting)
@@ -99,7 +99,7 @@ local function animate()
         return
     end
     if now >= animation.next then
-        widgets.number:SetText(math.random(1, animation.high))
+        widgets.number:SetText(math.random(Rules.LOSING_ROLL, animation.high))
         animation.next = now + FIRST_STEP + (LAST_STEP - FIRST_STEP) * progress * progress
     end
 end

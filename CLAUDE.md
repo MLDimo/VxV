@@ -111,8 +111,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   non possédée par VXV » en rouge, le nom après « : » comparé sans accents ni casse ; rien sur les livres.
 - **Deathroll** (`VXV_Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
   connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde et une minute de paris (pas les joueurs,
-  pas un membre endetté) ; puis chacun roll à son tour de 1 au résultat précédent (`RandomRoll`), le défié en premier,
-  fin au premier 1. Fenêtre du duel animée et synchronisée chez toute la guilde. Partie finie envoyée au site, qui la
+  pas un membre endetté) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,
+  fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel animée et synchronisée chez toute la guilde. Partie finie envoyée au site, qui la
   vérifie, crée et règle le pari de la guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du
   gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
   (`DISCORD_DEATHROLLS_CHANNEL_ID`, salon des paris sans lui).

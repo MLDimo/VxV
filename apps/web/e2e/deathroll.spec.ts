@@ -13,7 +13,7 @@ function game(at: Date): string {
     `G;Ciel Gris#${String(seconds(at))}#1;Ciel Gris;Dune Sable;1500;1000;${String(seconds(at))};${String(seconds(at) + 120)}`,
     "R;Dune Sable;1000;412",
     "R;Ciel Gris;412;87",
-    "R;Dune Sable;87;1",
+    "R;Dune Sable;87;0",
   ].join("\n");
 }
 
@@ -49,7 +49,7 @@ test("a deathroll played in game: Discord tells it, the loser owes the stake unt
   await expect(debts).toContainText(/Dune Sable te doit 1\s500\spo/);
   await debts.getByRole("button", { name: "Paiement reçu" }).click();
   await expect(page.getByRole("region", { name: "Mes dettes de deathroll" })).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Dernières parties" })).toContainText("1000 : 412 → 87 → 1");
+  await expect(page.getByRole("region", { name: "Dernières parties" })).toContainText("1000 : 412 → 87 → 0");
 
   await page.goto("/ranking");
   await page.getByRole("link", { name: "Deathroll" }).click();
