@@ -5,7 +5,8 @@ import { signOut } from "@/app/actions/auth";
 import { rolesLabel } from "./roleLabels";
 import { SECTIONS } from "./sections";
 
-const NAV_LINK = "font-pixel text-[17px] font-semibold text-[#e9dcc0] hover:text-gold focus-visible:text-gold";
+const NAV_LINK =
+  "whitespace-nowrap font-pixel text-[17px] font-semibold text-[#e9dcc0] hover:text-gold focus-visible:text-gold";
 
 function Links({ member }: { member: Member }) {
   return (
@@ -16,7 +17,7 @@ function Links({ member }: { member: Member }) {
         </Link>
       ))}
       <Link href="/personnages" className={NAV_LINK}>
-        Mes personnages
+        Personnages
       </Link>
       <Link href="/compagnon" className={NAV_LINK}>
         Compagnon
@@ -30,20 +31,25 @@ function Links({ member }: { member: Member }) {
   );
 }
 
-function SignOut({ member }: { member: Member }) {
+/** The member and the sign-out; in the bar, the member's name alone, their roles in its tooltip. */
+function SignOut({ member, compact = false }: { member: Member; compact?: boolean }) {
+  const roles = rolesLabel(member.roles);
   return (
     <form action={signOut} className="flex items-center gap-3">
-      <span className="text-sm text-muted">
-        {member.discordName} · {rolesLabel(member.roles)}
+      <span className="text-sm whitespace-nowrap text-muted" title={compact ? roles : undefined}>
+        {compact ? member.discordName : `${member.discordName} · ${roles}`}
       </span>
-      <button type="submit" className="button-wood text-sm">
+      <button type="submit" className="button-wood text-sm whitespace-nowrap">
         Se déconnecter
       </button>
     </form>
   );
 }
 
-/** The site's header (§5.1): emblem and name, the sections, the member; a burger menu on small screens. */
+/**
+ * The site's header (§5.1): emblem and name, the sections, the member. The full menu needs about 1,400 px since the PvP
+ * place; below, the burger menu.
+ */
 export function SiteHeader({ member }: { member: Member }) {
   return (
     <header className="relative bg-wood-night shadow-[0_3px_0_var(--color-ink),0_6px_0_var(--color-beam)]">
@@ -58,13 +64,13 @@ export function SiteHeader({ member }: { member: Member }) {
           />
           <span className="font-pixel text-2xl font-bold text-ivory">VXV</span>
         </Link>
-        <div className="hidden flex-1 items-center gap-6 lg:flex">
+        <div className="hidden flex-1 items-center gap-6 min-[1400px]:flex">
           <Links member={member} />
           <span className="ml-auto">
-            <SignOut member={member} />
+            <SignOut member={member} compact />
           </span>
         </div>
-        <details className="group ml-auto lg:hidden">
+        <details className="group ml-auto min-[1400px]:hidden">
           <summary
             className="flex size-12 cursor-pointer list-none items-center justify-center bg-wood ring-pixel"
             aria-label="Menu"
