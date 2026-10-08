@@ -27,6 +27,17 @@ export interface Signup extends SignupChoice {
   memberId: string;
   characterName: string;
   characterClass: string;
+  /** When the character first signed up, kept through later changes. */
+  signedUpAt: Date;
+}
+
+/** Each sign-up's number in the order of arrival, from 1, by character id: the event's Discord message shows it. */
+export function arrivalNumbers(signups: readonly Signup[]): Map<string, number> {
+  const arrived = [...signups].sort(
+    (left, right) =>
+      left.signedUpAt.getTime() - right.signedUpAt.getTime() || left.characterId.localeCompare(right.characterId),
+  );
+  return new Map(arrived.map((signup, index) => [signup.characterId, index + 1]));
 }
 
 function isOneOf<Value extends string>(values: readonly Value[], candidate: string): candidate is Value {

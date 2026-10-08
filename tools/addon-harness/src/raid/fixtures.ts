@@ -14,6 +14,7 @@ function signup(characterId: string, characterName: string, characterClass: stri
     role: "dps",
     spec: "Combat",
     status: "present",
+    signedUpAt: new Date("2026-12-01T12:00:00Z"),
     ...extra,
   };
 }

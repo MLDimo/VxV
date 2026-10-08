@@ -57,14 +57,23 @@ describe("sign-ups", () => {
       role: "dps",
       spec: "Combat",
       status: "present",
+      signedUpAt: now,
     });
   });
 
-  it("updates the sign-up when the member signs up again", async () => {
+  it("updates the sign-up when the member signs up again, arrived still when they first came", async () => {
+    const arrival = now;
     await signups.signUp(me, eventId, choice(main));
+    now = new Date("2026-12-02T12:00:00Z");
     await signups.signUp(me, eventId, choice(main, { status: "late", role: "tank", spec: "Protection" }));
     expect(await signups.listForEvent(eventId)).toEqual([
-      expect.objectContaining({ characterId: main.id, role: "tank", status: "late", spec: "Protection" }),
+      expect.objectContaining({
+        characterId: main.id,
+        role: "tank",
+        status: "late",
+        spec: "Protection",
+        signedUpAt: arrival,
+      }),
     ]);
   });
 

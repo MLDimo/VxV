@@ -23,6 +23,7 @@ function signup(characterId: string, characterName: string, extra: Partial<Signu
     characterClass: "PRIEST",
     role: "healer",
     spec: "Sacré",
+    signedUpAt: new Date("2026-12-01T12:00:00Z"),
     status: "present",
     ...extra,
   };

@@ -1,3 +1,4 @@
+import { emoji } from "@vxv/bot/testing";
 import { expect, test } from "@playwright/test";
 import { discordMessages } from "./fakeDiscord";
 import { readSeed, signInAs } from "./sessions";
@@ -43,10 +44,10 @@ test.describe.serial("raid log", () => {
 
     const recap = (await discordMessages(request)).find((message) => {
       const content = String(message.body.content);
-      return content.startsWith("📜") && content.includes(readSeed().raidLogEventId);
+      return content.startsWith(emoji("journal")) && content.includes(readSeed().raidLogEventId);
     });
-    expect(recap?.body.content).toContain("⚔️ 1 boss tué en 10 min : Faldrim Courbenclume");
-    expect(recap?.body.content).toContain("💰 Brassards brindecieux → Ciel Gris (Loot council)");
+    expect(recap?.body.content).toContain(`${emoji("raid")} 1 boss tué en 10 min : Faldrim Courbenclume`);
+    expect(recap?.body.content).toContain(`${emoji("loot")} Brassards brindecieux → Ciel Gris (Loot council)`);
     expect(recap?.body.content).toContain("💀 Morts : Dune Sable ×2");
 
     await page.getByRole("link", { name: "Raid", exact: true }).click();

@@ -13,6 +13,7 @@ import { VXV_PARI } from "./betCommand.ts";
 import { BET_FORM_PREFIX, openBetForm, submitBetForm, withdrawStake } from "./betForm.ts";
 import { BET_BUTTON_PREFIX, BET_WITHDRAW_PREFIX, betMessage } from "./betMessage.ts";
 import type { BotContext } from "./commands.ts";
+import { emoji } from "./emojis.ts";
 import { BETS_CHANNEL, createTestApplication, SITE_URL, TEST_ROLES } from "./testApplication.ts";
 import { buttonClick, formSubmission, slashCommand, type TestActor } from "./testing.ts";
 
@@ -74,7 +75,7 @@ describe("bets on Discord", () => {
     expect(await open()).toBe(`Pari ouvert et publié dans <#${BETS_CHANNEL}>.`);
     const [message] = discord.messages();
     expect(message?.channelId).toBe(BETS_CHANNEL);
-    expect(embed()?.title).toBe(`🎲 ${BET.titre}`);
+    expect(embed()?.title).toBe(`${emoji("de_vxv")} ${BET.titre}`);
     expect(embed()?.url).toBe(`${SITE_URL}/paris/${await betId()}`);
     expect(embed()?.fields?.map((field) => [field.name, field.value])).toEqual([
       ["Un tank · —", "Aucune mise"],
@@ -106,7 +107,9 @@ describe("bets on Discord", () => {
       ["Un heal · × 1,20", "75 % · 150 po · 1 parieur"],
       ["Un DPS · —", "Aucune mise"],
     ]);
-    expect(plain(embed()?.description)).toContain("💰 Cagnotte 200 po · 2 parieurs · 10 % pour la caisse de la guilde");
+    expect(plain(embed()?.description)).toContain(
+      `${emoji("po")} Cagnotte 200 po · 2 parieurs · 10 % pour la caisse de la guilde`,
+    );
     const again = await openBetForm(
       buttonClick(`${BET_BUTTON_PREFIX}${await betId()}`, MEMBER),
       context,
@@ -151,7 +154,7 @@ describe("bets on Discord", () => {
     await app.betAnnouncements.announce(await betId());
     expect(plain(embed()?.description)).toBe(
       "🏆 Résultat : « Un tank » · 1 gagnant, 20 po pour la caisse. Gains à récupérer auprès du trésorier.\n" +
-        "💰 Cagnotte 200 po · 2 parieurs · 10 % pour la caisse de la guilde",
+        `${emoji("po")} Cagnotte 200 po · 2 parieurs · 10 % pour la caisse de la guilde`,
     );
     expect(discord.messages()[0]?.body.components).toEqual([]);
   });

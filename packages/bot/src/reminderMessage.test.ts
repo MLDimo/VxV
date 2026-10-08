@@ -1,5 +1,6 @@
 import type { GuildEvent, RaidReminder } from "@vxv/server";
 import { describe, expect, it } from "vitest";
+import { emoji } from "./emojis.ts";
 import { reminderMessage } from "./reminderMessage.ts";
 
 const event: GuildEvent = {
@@ -20,9 +21,9 @@ describe("raid reminder message", () => {
     const reminder: RaidReminder = { event, expected: ["1", "2"], missingSoftReserves: ["2"] };
     expect(reminderMessage(reminder, "https://vxv.test")).toEqual({
       content: [
-        `⏰ **Onyxia** <t:${start}:F> (<t:${start}:R>) · https://vxv.test/evenements/e`,
+        `${emoji("raid")} **Onyxia** <t:${start}:F> (<t:${start}:R>) · https://vxv.test/evenements/e`,
         "Inscrits : <@1> <@2>",
-        `🎯 Pas encore de SR : <@2>, à choisir sur le site avant le verrouillage (<t:${lock}:t>).`,
+        `${emoji("sr")} Pas encore de SR : <@2>, à choisir sur le site avant le verrouillage (<t:${lock}:t>).`,
       ].join("\n"),
       allowed_mentions: { users: ["1", "2"] },
     });

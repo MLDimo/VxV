@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { emoji } from "./emojis.ts";
 import { deathrollMessage } from "./deathrollMessage.ts";
 
 /** French typography keeps numbers and units together: plain spaces here. */
@@ -11,7 +12,7 @@ describe("deathroll message", () => {
       "https://vxv.test",
     );
     expect(plain(message.content)).toBe(
-      "🎲 **Deathroll à 1 500 po** : Thom Leboss bat Vorn Cendrelune en 7 rolls. https://vxv.test/paris/deathroll",
+      `${emoji("deathroll")} **Deathroll à 1 500 po** : Thom Leboss bat Vorn Cendrelune en 7 rolls. https://vxv.test/paris/deathroll`,
     );
     expect(message.allowed_mentions).toEqual({ parse: [] });
   });

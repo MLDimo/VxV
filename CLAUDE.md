@@ -138,6 +138,13 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus.
+- Bot Discord : couleurs des messages tirées des jetons (raids améthyste, Le Dé Pipé sakura, Quêtes vert, titres or,
+  PvP rouge) ; icônes en émojis de l'application (`packages/bot/emojis`, écrits par identifiant par
+  `packages/bot/src/emojis.ts`), jamais en pied de message (Discord ne les y affiche pas). Message d'un événement, raid
+  ou PvP, à la manière de Raid-Helper : titre en capitales encadrées, date, heure et nombre de venus, une colonne Tank
+  puis une par classe, chaque joueur sous l'icône de sa spé (sinon de sa classe, la spé en toutes lettres) avec son
+  numéro d'arrivée (`signups.signed_up_at`, `arrivalNumbers`), puis les autres réponses ; trop rempli pour les
+  6 000 caractères d'un message, il perd les icônes de ses joueurs.
 
 ## Structure du dépôt
 

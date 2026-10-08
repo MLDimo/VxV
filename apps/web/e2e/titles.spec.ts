@@ -1,3 +1,4 @@
+import { emoji } from "@vxv/bot/testing";
 import { expect, test } from "@playwright/test";
 import { WEB_ENVIRONMENT } from "./environment";
 import { discordMemberState, discordMessages } from "./fakeDiscord";
@@ -50,7 +51,7 @@ test("each Wednesday the titles are given once: the Ranking shows them, Discord 
     (candidate) => candidate.channelId === WEB_ENVIRONMENT.DISCORD_TITLES_CHANNEL_ID,
   );
   const embeds = message?.body.embeds as { title: string; fields: { name: string }[] }[] | undefined;
-  expect(embeds?.[0]?.title).toBe("👑 Les titres de la semaine");
+  expect(embeds?.[0]?.title).toBe(`${emoji("ranking")} Les titres de la semaine`);
   expect(embeds?.[0]?.fields.map((field) => field.name)).toEqual(TITLE_NAMES.map((name) => `◆ ${name}`));
   const holders = await Promise.all(MEMBERS_DISCORD_IDS.map((userId) => discordMemberState(request, userId)));
   expect(holders.filter((state) => state.roles.includes("◆ Bien gras"))).toHaveLength(1);

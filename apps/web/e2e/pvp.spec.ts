@@ -26,7 +26,7 @@ test.describe.serial("PvP outings", () => {
     outingPath = new URL(page.url()).pathname;
     const message = await discordEventMessage(request, outingPath.split("/").pop() ?? "");
     expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_PVP_CHANNEL_ID);
-    expect(message?.embed?.title).toBe("Raid sur Astranaar");
+    expect(message?.embed?.title).toBe("🅁🄰🄸🄳 🅂🅄🅁 🄰🅂🅃🅁🄰🄽🄰🄰🅁");
     expect(message?.embed?.description).not.toContain("SR");
 
     await page.goto("/pvp");

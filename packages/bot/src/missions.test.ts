@@ -4,6 +4,7 @@ import type { FakeDiscord } from "@vxv/server/testing";
 import type { APIEmbed, APIInteractionResponse } from "discord-api-types/v10";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { BotContext } from "./commands.ts";
+import { emoji } from "./emojis.ts";
 import { VXV_MISSION } from "./missionCommand.ts";
 import { createTestApplication, MISSIONS_CHANNEL, SITE_URL, TEST_ROLES } from "./testApplication.ts";
 import { slashCommand, withOptions, type TestActor } from "./testing.ts";
@@ -54,10 +55,10 @@ describe("/vxv_mission", () => {
     expect(view?.mission).toMatchObject({ title: "Le Grand Pêcheur", type: "fishing", reward: 2000 });
     expect((view?.mission.endsAt.getTime() ?? 0) - (view?.mission.startsAt.getTime() ?? 0)).toBe(7 * 24 * 3600 * 1000);
     expect(discord.messages()[0]?.channelId).toBe(MISSIONS_CHANNEL);
-    expect(embed()?.title).toBe("📜 Le Grand Pêcheur");
+    expect(embed()?.title).toBe(`${emoji("quete")} Le Grand Pêcheur`);
     expect(embed()?.url).toBe(`${SITE_URL}/quetes/${view?.mission.id ?? ""}`);
     expect(embed()?.fields?.map((field) => [plain(field.name), plain(field.value)])).toEqual([
-      ["Récompense : 2 000 po", "1er 1 400 po · 2e 400 po · 3e 200 po"],
+      [`${emoji("po")} Récompense : 2 000 po`, "1er 1 400 po · 2e 400 po · 3e 200 po"],
       ["Classement", "Personne pour l'instant."],
     ]);
   });
@@ -79,7 +80,7 @@ describe("/vxv_mission", () => {
     ]);
     const [view] = await app.missions.list();
     await app.missionAnnouncements.announce(view?.mission.id ?? "");
-    expect(embed()?.title).toBe("📜 La Pêche du siècle");
+    expect(embed()?.title).toBe(`${emoji("quete")} La Pêche du siècle`);
     expect(embed()?.fields?.[1]?.value).toBe("1. Sira Ventargent — 42 pêches réussies");
   });
 });

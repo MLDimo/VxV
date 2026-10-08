@@ -1,5 +1,6 @@
 import type { GuildEvent, RaidRecap } from "@vxv/server";
 import { describe, expect, it } from "vitest";
+import { emoji } from "./emojis.ts";
 import { recapMessage } from "./recapMessage.ts";
 
 const event: GuildEvent = {
@@ -28,9 +29,9 @@ describe("raid recap message", () => {
     };
     expect(recapMessage(recap, "https://vxv.test")).toEqual({
       content: [
-        `📜 **Récap · Onyxia** <t:${String(start)}:D> · https://vxv.test/evenements/e`,
-        "⚔️ 2 boss tués en 1 h 12 : Gardienne, Onyxia",
-        "💰 Tête d'Onyxia → Thom Leboss (SR+) · Écaille d'Onyxia → Ðéjà Vu (Loot council)",
+        `${emoji("journal")} **Récap · Onyxia** <t:${String(start)}:D> · https://vxv.test/evenements/e`,
+        `${emoji("raid")} 2 boss tués en 1 h 12 : Gardienne, Onyxia`,
+        `${emoji("loot")} Tête d'Onyxia → Thom Leboss (SR+) · Écaille d'Onyxia → Ðéjà Vu (Loot council)`,
         "💀 Morts : Ciel Gris ×3",
       ].join("\n"),
       allowed_mentions: { parse: [] },
@@ -39,7 +40,9 @@ describe("raid recap message", () => {
 
   it("says so when nothing happened, and stays within Discord's limit", () => {
     const empty = recapMessage({ event, kills: [], durationMs: undefined, loots: [], deaths: [] }, "https://vxv.test");
-    expect(empty.content).toContain("⚔️ Aucun boss tué.\n💰 Aucun objet donné.\n💀 Aucune mort.");
+    expect(empty.content).toContain(
+      `${emoji("raid")} Aucun boss tué.\n${emoji("loot")} Aucun objet donné.\n💀 Aucune mort.`,
+    );
     const loots = Array.from({ length: 200 }, () => ({
       itemName: "Objet au nom très long",
       winnerName: "Joueur",
