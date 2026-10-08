@@ -46,6 +46,8 @@ export const ONYXIA_NIGHT: AddonEventFacts = {
     startsAt: new Date("2026-12-10T20:00:00Z"),
     softReservesPerPlayer: 2,
     raids: [{ id: "onyxia", name: "Onyxia" }],
+    kind: "raid",
+    title: undefined,
     role: undefined,
     discordMessageId: undefined,
   },

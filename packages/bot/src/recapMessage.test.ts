@@ -1,12 +1,14 @@
-import type { RaidRecap } from "@vxv/server";
+import type { GuildEvent, RaidRecap } from "@vxv/server";
 import { describe, expect, it } from "vitest";
 import { recapMessage } from "./recapMessage.ts";
 
-const event = {
+const event: GuildEvent = {
   id: "e",
   startsAt: new Date("2026-12-10T20:00:00Z"),
   softReservesPerPlayer: 1,
   raids: [{ id: "onyxia", name: "Onyxia" }],
+  kind: "raid",
+  title: undefined,
   role: undefined,
   discordMessageId: undefined,
 };

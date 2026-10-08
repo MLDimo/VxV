@@ -2,7 +2,7 @@ import type { ProfessionReading, Recipe } from "../domain/artisans.ts";
 import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
 import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
-import type { PlannedRaidEvent, RaidEvent, RaidSummary } from "../domain/events.ts";
+import type { EventKind, GuildEvent, PlannedEvent, RaidSummary } from "../domain/events.ts";
 import type { GameChangeOutcome } from "../domain/gameChanges.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
@@ -128,13 +128,13 @@ export interface RaidRepository {
 }
 
 export interface EventRepository {
-  create(event: PlannedRaidEvent, createdBy: string): Promise<string>;
-  findById(eventId: string): Promise<RaidEvent | undefined>;
+  create(event: PlannedEvent, createdBy: string): Promise<string>;
+  findById(eventId: string): Promise<GuildEvent | undefined>;
   /** Events starting after the given instant, soonest first. */
-  listStartingAfter(instant: Date): Promise<RaidEvent[]>;
+  listStartingAfter(instant: Date, kind: EventKind): Promise<GuildEvent[]>;
   setDiscordMessage(eventId: string, messageId: string): Promise<void>;
   /** Events starting after "from" and up to "until" that were not reminded yet, soonest first. */
-  listToRemind(from: Date, until: Date): Promise<RaidEvent[]>;
+  listToRemind(from: Date, until: Date): Promise<GuildEvent[]>;
   markReminded(eventId: string, at: Date): Promise<void>;
   /** Whether the raid's recap was published on Discord already. */
   isRecapPosted(eventId: string): Promise<boolean>;
@@ -210,7 +210,7 @@ export interface RaidLogRepository {
   find(eventId: string): Promise<string | undefined>;
   save(eventId: string, content: string, receivedAt: Date): Promise<void>;
   /** Events started before the instant, whose record is kept and whose recap is not published yet. */
-  listUnannounced(startedBefore: Date): Promise<{ event: RaidEvent; content: string }[]>;
+  listUnannounced(startedBefore: Date): Promise<{ event: GuildEvent; content: string }[]>;
   /** The records of the raids started since the instant (all of them without one), with their start. */
   listStartedSince(since: Date | undefined): Promise<{ startsAt: Date; content: string }[]>;
 }

@@ -1,8 +1,8 @@
 import { raidReminder, REMINDER_WINDOW_MS } from "../domain/reminders.ts";
 import type { UnitOfWork } from "./ports.ts";
-import type { RaidAnnouncer } from "./discordPorts.ts";
+import type { EventAnnouncer } from "./discordPorts.ts";
 
-export function createRaidReminders({ unitOfWork, announcer }: { unitOfWork: UnitOfWork; announcer: RaidAnnouncer }) {
+export function createRaidReminders({ unitOfWork, announcer }: { unitOfWork: UnitOfWork; announcer: EventAnnouncer }) {
   return {
     /** Reminds every event starting within a day, once: run by a daily task. Returns how many were reminded. */
     async sendDue(now: Date): Promise<number> {

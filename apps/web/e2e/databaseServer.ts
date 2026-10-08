@@ -39,6 +39,7 @@ const app = createApplication({
   announcer: createDiscordRaidAnnouncer({
     ...rest,
     channelId: WEB_ENVIRONMENT.DISCORD_RAID_CHANNEL_ID,
+    pvpChannelId: WEB_ENVIRONMENT.DISCORD_PVP_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
   betAnnouncer: createDiscordBetAnnouncer({

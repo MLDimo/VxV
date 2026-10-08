@@ -70,6 +70,7 @@ describe("events", () => {
     const eventId = await events.createEvent(officer, created, "Raid de la semaine");
     expect(await events.getEvent(eventId)).toEqual({
       id: eventId,
+      kind: "raid",
       startsAt: created.startsAt,
       softReservesPerPlayer: 2,
       raids: [
@@ -101,6 +102,47 @@ describe("events", () => {
     ]);
   });
 
+  it("plans a PvP outing: its title, no raid nor soft reserve, its role, in the journal", async () => {
+    const startsAt = new Date(now.getTime() + 48 * HOUR);
+    const eventId = await events.createPvpEvent(
+      officer,
+      { title: " Raid sur Astranaar ", startsAt, roleId: raiders },
+      "Sortie du jeudi",
+    );
+    expect(await events.getEvent(eventId)).toEqual({
+      id: eventId,
+      kind: "pvp",
+      title: "Raid sur Astranaar",
+      startsAt,
+      softReservesPerPlayer: 0,
+      raids: [],
+      role: { id: raiders, name: "Raideur R1" },
+      discordMessageId: undefined,
+    });
+    expect((await events.listUpcoming("pvp")).map((listed) => listed.id)).toEqual([eventId]);
+    expect(await events.listUpcoming("raid")).toEqual([]);
+    expect(await journal.listRecent()).toEqual([
+      expect.objectContaining({
+        action: "event.create",
+        after: {
+          startsAt: startsAt.toISOString(),
+          title: "Raid sur Astranaar",
+          raids: [],
+          softReservesPerPlayer: 0,
+          audience: "Réservé à Raideur R1",
+        },
+      }),
+    ]);
+  });
+
+  it("refuses a PvP outing to a member, and one without title", async () => {
+    const member = await createMember(sql, "member");
+    const outing = { title: "Sortie", startsAt: new Date(now.getTime() + HOUR), roleId: TEST_GUILD_ID };
+    await expect(events.createPvpEvent(member, outing, "Motif")).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(events.createPvpEvent(officer, { ...outing, title: "" }, "Motif")).rejects.toThrow(/Donnez un titre/);
+    expect(await events.listUpcoming("pvp")).toEqual([]);
+  });
+
   it("refuses an event reserved to a role not offered", async () => {
     const classRole = discord.addRole("Démoniste");
     await expect(events.createEvent(officer, event(48, { roleId: classRole }), "Motif")).rejects.toThrow(
@@ -109,7 +151,7 @@ describe("events", () => {
     await expect(events.createEvent(officer, event(48, { roleId: "" }), "Motif")).rejects.toThrow(
       /qui peut s'inscrire/,
     );
-    expect(await events.listUpcoming()).toEqual([]);
+    expect(await events.listUpcoming("raid")).toEqual([]);
   });
 
   it("refuses an event to a member and an invalid event to an officer", async () => {
@@ -119,7 +161,7 @@ describe("events", () => {
     await expect(events.createEvent(officer, event(48, { raidIds: ["naxxramas"] }), "Motif")).rejects.toThrow(
       /n'existe pas/,
     );
-    expect(await events.listUpcoming()).toEqual([]);
+    expect(await events.listUpcoming("raid")).toEqual([]);
     expect(await journal.listRecent()).toEqual([]);
   });
 
@@ -127,9 +169,9 @@ describe("events", () => {
     const later = await events.createEvent(officer, event(72), "Plus tard");
     const sooner = await events.createEvent(officer, event(24), "Bientôt");
     now = new Date(now.getTime() + 24 * HOUR + EVENT_LISTED_AFTER_START_MS - HOUR);
-    expect((await events.listUpcoming()).map((listed) => listed.id)).toEqual([sooner, later]);
+    expect((await events.listUpcoming("raid")).map((listed) => listed.id)).toEqual([sooner, later]);
     now = new Date(now.getTime() + 2 * HOUR);
-    expect((await events.listUpcoming()).map((listed) => listed.id)).toEqual([later]);
+    expect((await events.listUpcoming("raid")).map((listed) => listed.id)).toEqual([later]);
   });
 
   it("finds no event for an unknown or malformed id", async () => {

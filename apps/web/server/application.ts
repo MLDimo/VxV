@@ -20,7 +20,12 @@ export function getApplication(): Application {
       sql: createPgSqlClient(databaseUrl),
       discordRoles: discord.roles,
       guild: createDiscordGuild({ ...rest, guildId: discord.guildId }),
-      announcer: createDiscordRaidAnnouncer({ ...rest, channelId: discord.raidChannelId, siteUrl }),
+      announcer: createDiscordRaidAnnouncer({
+        ...rest,
+        channelId: discord.raidChannelId,
+        pvpChannelId: discord.pvpChannelId,
+        siteUrl,
+      }),
       betAnnouncer: createDiscordBetAnnouncer({ ...rest, channelId: discord.betsChannelId, siteUrl }),
       missionAnnouncer: createDiscordMissionAnnouncer({ ...rest, channelId: discord.missionsChannelId, siteUrl }),
       titleAnnouncer: createDiscordTitleAnnouncer({ ...rest, channelId: discord.titlesChannelId, siteUrl }),

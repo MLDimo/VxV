@@ -1,5 +1,6 @@
 import type { StakeStanding } from "./bets.ts";
 import { GUILD_TIME_ZONE } from "./dateTime.ts";
+import type { GuildEvent } from "./events.ts";
 import type { LootMethod } from "./history.ts";
 import type { SignupRole, SignupStatus } from "./signups.ts";
 
@@ -126,6 +127,11 @@ export function formatRemaining(durationMs: number): string {
 /** Raids of an evening joined in one title: "Onyxia + Mont Hyjal". */
 export function raidTitle(raidNames: readonly string[]): string {
   return raidNames.join(" + ");
+}
+
+/** An event's name: a PvP outing's title, or a raid night's raids ("Onyxia + Mont Hyjal"). */
+export function eventTitle(event: Pick<GuildEvent, "title" | "raids">): string {
+  return event.title ?? raidTitle(event.raids.map((raid) => raid.name));
 }
 
 export const ROLE_LABELS: Record<SignupRole, { label: string; icon: string }> = {

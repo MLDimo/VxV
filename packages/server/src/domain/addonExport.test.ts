@@ -51,6 +51,8 @@ const facts: AddonEventFacts = {
       { id: "onyxia", name: "Onyxia" },
       { id: "mont-hyjal", name: "Mont Hyjal" },
     ],
+    kind: "raid",
+    title: undefined,
     role: { id: "1194373648929263676", name: "Raideur R1" },
     discordMessageId: undefined,
   },

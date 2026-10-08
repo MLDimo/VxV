@@ -1,12 +1,14 @@
-import type { RaidReminder } from "@vxv/server";
+import type { GuildEvent, RaidReminder } from "@vxv/server";
 import { describe, expect, it } from "vitest";
 import { reminderMessage } from "./reminderMessage.ts";
 
-const event = {
+const event: GuildEvent = {
   id: "e",
   startsAt: new Date("2026-12-12T20:00:00Z"),
   softReservesPerPlayer: 1,
   raids: [{ id: "onyxia", name: "Onyxia" }],
+  kind: "raid",
+  title: undefined,
   role: undefined,
   discordMessageId: undefined,
 };

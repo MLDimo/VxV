@@ -1,5 +1,5 @@
 import type { RaidRecap } from "@vxv/server";
-import { count, formatDuration, LOOT_METHOD_LABELS, raidTitle } from "@vxv/server/domain/labels";
+import { count, formatDuration, LOOT_METHOD_LABELS, eventTitle } from "@vxv/server/domain/labels";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
 import { eventUrl } from "./raidMessage.ts";
@@ -31,9 +31,9 @@ function deathsLine({ deaths }: RaidRecap): string {
 /** The end-of-raid recap (plan 6.10): bosses killed and duration, items given and how, deaths. Pings nobody. */
 export function recapMessage(recap: RaidRecap, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
   const { event } = recap;
-  const title = raidTitle(event.raids.map((raid) => raid.name));
+  const title = eventTitle(event);
   const content = [
-    `📜 **Récap · ${title}** ${timestamp(event.startsAt, "D")} · ${eventUrl(siteUrl, event.id)}`,
+    `📜 **Récap · ${title}** ${timestamp(event.startsAt, "D")} · ${eventUrl(siteUrl, event)}`,
     killsLine(recap),
     lootsLine(recap),
     deathsLine(recap),

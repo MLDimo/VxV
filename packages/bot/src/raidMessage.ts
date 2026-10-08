@@ -1,7 +1,8 @@
-import type { AnnouncedRaid, Signup } from "@vxv/server";
+import type { AnnouncedEvent, EventKind, GuildEvent, Signup } from "@vxv/server";
 import { classLabel } from "@vxv/server/domain/characterClasses";
 import { eventAudience } from "@vxv/server/domain/eventRoles";
-import { raidTitle, ROLE_LABELS, softReserveCount, STATUS_LABELS } from "@vxv/server/domain/labels";
+import { eventPath } from "@vxv/server/domain/events";
+import { eventTitle, ROLE_LABELS, softReserveCount, STATUS_LABELS } from "@vxv/server/domain/labels";
 import { composition, isComing, SIGNUP_ROLES, type SignupStatus } from "@vxv/server/domain/signups";
 import {
   ButtonStyle,
@@ -11,7 +12,8 @@ import {
 } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
 
-const EMBED_COLOR = 0x14b8a6;
+/** A raid night's teal; a PvP outing takes the colour of its place, the wanted posters' red. */
+const EMBED_COLORS: Record<EventKind, number> = { raid: 0x14b8a6, pvp: 0xf19a9a };
 /** Discord's limit for the text of an embed field. */
 const MAX_FIELD_LENGTH = 1024;
 const NOBODY = "—";
@@ -21,8 +23,8 @@ const OTHER_STATUSES: readonly SignupStatus[] = ["maybe", "bench", "absent"];
 /** The sign-up button of an event's message, read back when a member clicks it. */
 export const SIGNUP_BUTTON_PREFIX = "signup:";
 
-export function eventUrl(siteUrl: string, eventId: string): string {
-  return `${siteUrl}/evenements/${eventId}`;
+export function eventUrl(siteUrl: string, event: Pick<GuildEvent, "id" | "kind">): string {
+  return `${siteUrl}${eventPath(event)}`;
 }
 
 /** One line per player, cut short with a count of the others when Discord's field limit is reached. */
@@ -51,7 +53,7 @@ function classSummary(byClass: Record<string, number>): string {
 }
 
 /** The event's sign-up message: date, soft reserves, composition by role and class, other answers. */
-export function raidMessage({ event, signups }: AnnouncedRaid, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
+export function raidMessage({ event, signups }: AnnouncedEvent, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
   const coming = signups.filter((signup) => isComing(signup.status));
   const { byClass } = composition(signups);
   const roleFields: APIEmbedField[] = SIGNUP_ROLES.map((role) => {
@@ -68,19 +70,22 @@ export function raidMessage({ event, signups }: AnnouncedRaid, siteUrl: string):
       ? []
       : [{ name: `${STATUS_LABELS[status]} · ${players.length}`, value: playerLines(players) }];
   });
-  const url = eventUrl(siteUrl, event.id);
+  const url = eventUrl(siteUrl, event);
   return {
     embeds: [
       {
-        title: raidTitle(event.raids.map((raid) => raid.name)),
+        title: eventTitle(event),
         url,
         description: [
           `📅 ${timestamp(event.startsAt, "F")} (${timestamp(event.startsAt, "R")})`,
-          `🎯 ${softReserveCount(event.softReservesPerPlayer)} par joueur`,
+          // A PvP outing has no loot, hence no soft reserve.
+          ...(event.softReservesPerPlayer > 0
+            ? [`🎯 ${softReserveCount(event.softReservesPerPlayer)} par joueur`]
+            : []),
           // The role mentioned: Discord shows its name and colour, and a mention in an embed notifies nobody.
           `👥 ${eventAudience(event.role && { ...event.role, name: `<@&${event.role.id}>` })}`,
         ].join("\n"),
-        color: EMBED_COLOR,
+        color: EMBED_COLORS[event.kind],
         fields: [...roleFields, { name: "Classes", value: classSummary(byClass) }, ...otherFields],
         footer: { text: "Inscris-toi avec le bouton ci-dessous, ou sur le site." },
       },

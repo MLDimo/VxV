@@ -5,15 +5,15 @@ import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
-import type { AnnouncedRaid, RaidAnnouncer } from "./discordPorts.ts";
+import type { AnnouncedEvent, EventAnnouncer } from "./discordPorts.ts";
 import { createRaidAnnouncements } from "./raidAnnouncements.ts";
 import { createSignups } from "./signups.ts";
 
 /** The raid channel, remembering what it shows. */
 function createRecordingChannel() {
-  const shown = new Map<string, AnnouncedRaid>();
+  const shown = new Map<string, AnnouncedEvent>();
   let available = true;
-  const announcer: RaidAnnouncer = {
+  const announcer: EventAnnouncer = {
     async publish(raid) {
       if (!available) {
         throw new Error("Discord is down");

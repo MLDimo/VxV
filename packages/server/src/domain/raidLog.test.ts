@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { GuildEvent } from "./events.ts";
 import type { Character } from "./characters.ts";
 import { parseRaidLog, planRaidLogImport, RAID_LOG_HEADER } from "./raidLog.ts";
 import { TextFormatError } from "./textFormat.ts";
@@ -88,11 +89,13 @@ describe("planRaidLogImport", () => {
 
 describe("buildRaidRecap", () => {
   it("names the bosses and items, measures the raid and orders the deaths", () => {
-    const event = {
+    const event: GuildEvent = {
       id: "e1",
       startsAt: new Date("2026-12-10T21:00:00Z"),
       softReservesPerPlayer: 1,
       raids: [{ id: "onyxia", name: "Onyxia" }],
+      kind: "raid",
+      title: undefined,
       role: undefined,
       discordMessageId: undefined,
     };

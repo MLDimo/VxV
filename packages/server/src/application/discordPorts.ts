@@ -1,6 +1,6 @@
 import type { Bet, DiscordMessage, Stake } from "../domain/bets.ts";
 import type { ServerRole } from "../domain/eventRoles.ts";
-import type { RaidEvent } from "../domain/events.ts";
+import type { GuildEvent } from "../domain/events.ts";
 import type { Mission, MissionScore, MissionStatus } from "../domain/missions.ts";
 import type { RaidRecap } from "../domain/raidRecap.ts";
 import type { RaidReminder } from "../domain/reminders.ts";
@@ -24,17 +24,17 @@ export interface GuildGateway {
 }
 
 /** An event and its sign-ups, as shown in its Discord message. */
-export interface AnnouncedRaid {
-  event: RaidEvent;
+export interface AnnouncedEvent {
+  event: GuildEvent;
   signups: Signup[];
 }
 
 /** The raid channel on Discord, where each event has a sign-up message. */
-export interface RaidAnnouncer {
+export interface EventAnnouncer {
   /** Publishes the event's sign-up message and returns its id. */
-  publish(raid: AnnouncedRaid): Promise<string>;
+  publish(raid: AnnouncedEvent): Promise<string>;
   /** Refreshes the message; false when it no longer exists (deleted on Discord). */
-  update(messageId: string, raid: AnnouncedRaid): Promise<boolean>;
+  update(messageId: string, raid: AnnouncedEvent): Promise<boolean>;
   /** Reminds the signed-up members of the raid, in the raid channel. */
   remind(reminder: RaidReminder): Promise<void>;
   /** Publishes the end-of-raid recap, in the raid channel. */

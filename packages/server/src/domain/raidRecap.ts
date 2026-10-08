@@ -1,10 +1,10 @@
-import type { RaidEvent } from "./events.ts";
+import type { GuildEvent } from "./events.ts";
 import type { LootMethod } from "./history.ts";
 import type { RaidLog } from "./raidLog.ts";
 
 /** The end-of-raid recap the bot publishes on Discord (plan 6.10). */
 export interface RaidRecap {
-  event: RaidEvent;
+  event: GuildEvent;
   /** Bosses killed, in kill order. */
   kills: string[];
   /** From the first pull to the last kill, when the log knows both. */
@@ -16,7 +16,7 @@ export interface RaidRecap {
 
 /** The recap of a raid's log; bosses and items are named from the raid data, unknown ones are left out. */
 export function buildRaidRecap(
-  event: RaidEvent,
+  event: GuildEvent,
   log: RaidLog,
   names: { bosses: ReadonlyMap<number, string>; items: ReadonlyMap<number, string> },
 ): RaidRecap {

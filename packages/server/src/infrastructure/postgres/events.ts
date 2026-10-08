@@ -1,11 +1,13 @@
 import type { EventRepository } from "../../application/ports.ts";
-import type { RaidEvent, RaidSummary } from "../../domain/events.ts";
+import type { EventKind, GuildEvent, RaidSummary } from "../../domain/events.ts";
 import type { SqlClient } from "../sql.ts";
 import { expectRow } from "./rows.ts";
 import { isUuid } from "./uuid.ts";
 
 interface EventRow {
   id: string;
+  kind: EventKind;
+  title: string | null;
   starts_at: Date;
   soft_reserves_per_player: number;
   raids: RaidSummary[];
@@ -15,7 +17,7 @@ interface EventRow {
 }
 
 const SELECT_EVENTS = `
-  select events.id, events.starts_at, events.soft_reserves_per_player, events.role_id, events.role_name,
+  select events.id, events.kind, events.title, events.starts_at, events.soft_reserves_per_player, events.role_id, events.role_name,
          events.discord_message_id,
          coalesce(json_agg(json_build_object('id', raids.id, 'name', raids.name) order by raids.name)
                   filter (where raids.id is not null), '[]') as raids
@@ -23,9 +25,11 @@ const SELECT_EVENTS = `
   left join event_raids on event_raids.event_id = events.id
   left join raids on raids.id = event_raids.raid_id`;
 
-function toEvent(row: EventRow): RaidEvent {
+function toEvent(row: EventRow): GuildEvent {
   return {
     id: row.id,
+    kind: row.kind,
+    title: row.title ?? undefined,
     startsAt: row.starts_at,
     softReservesPerPlayer: row.soft_reserves_per_player,
     raids: row.raids,
@@ -38,9 +42,17 @@ export function eventRepository(sql: SqlClient): EventRepository {
   return {
     async create(event, createdBy) {
       const rows = await sql.query<{ id: string }>(
-        `insert into events (starts_at, soft_reserves_per_player, role_id, role_name, created_by)
-         values ($1, $2, $3, $4, $5) returning id`,
-        [event.startsAt, event.softReservesPerPlayer, event.role?.id ?? null, event.role?.name ?? null, createdBy],
+        `insert into events (kind, title, starts_at, soft_reserves_per_player, role_id, role_name, created_by)
+         values ($1, $2, $3, $4, $5, $6, $7) returning id`,
+        [
+          event.kind,
+          event.title ?? null,
+          event.startsAt,
+          event.softReservesPerPlayer,
+          event.role?.id ?? null,
+          event.role?.name ?? null,
+          createdBy,
+        ],
       );
       const { id } = expectRow(rows, "create event");
       await sql.query("insert into event_raids (event_id, raid_id) select $1, unnest($2::text[])", [id, event.raidIds]);
@@ -84,10 +96,10 @@ export function eventRepository(sql: SqlClient): EventRepository {
       await sql.query("update events set recap_posted_at = $2 where id = $1", [eventId, at]);
     },
 
-    async listStartingAfter(instant) {
+    async listStartingAfter(instant, kind) {
       const rows = await sql.query<EventRow>(
-        `${SELECT_EVENTS} where events.starts_at > $1 group by events.id order by events.starts_at`,
-        [instant],
+        `${SELECT_EVENTS} where events.starts_at > $1 and events.kind = $2 group by events.id order by events.starts_at`,
+        [instant, kind],
       );
       return rows.map(toEvent);
     },

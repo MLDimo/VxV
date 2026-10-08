@@ -37,6 +37,8 @@ export interface JournalEntry extends Omit<NewJournalEntry, "actorId"> {
 /** What the journal keeps about a created event. */
 export interface EventCreationRecord {
   startsAt: string;
+  /** A PvP outing's title; none for a raid night, named after its raids. */
+  title?: string;
   raids: string[];
   softReservesPerPlayer: number;
   /** Who may sign up (eventAudience); none for the events created before roles. */

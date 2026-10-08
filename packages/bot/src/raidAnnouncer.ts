@@ -1,30 +1,38 @@
-import type { DiscordRestOptions, RaidAnnouncer } from "@vxv/server";
+import type { DiscordRestOptions, EventAnnouncer, EventKind } from "@vxv/server";
 import { discordChannel } from "./discordChannel.ts";
 import { raidMessage } from "./raidMessage.ts";
 import { recapMessage } from "./recapMessage.ts";
 import { reminderMessage } from "./reminderMessage.ts";
 
-/** The guild's raid channel: the events' sign-up messages, the reminders and the end-of-raid recaps. */
+/**
+ * The guild's raid channel: the raid nights' sign-up messages, the reminders and the end-of-raid recaps; and the PvP
+ * channel, for the PvP outings'.
+ */
 export function createDiscordRaidAnnouncer({
   siteUrl,
+  channelId,
+  pvpChannelId,
   ...options
-}: DiscordRestOptions & { channelId: string; siteUrl: string }): RaidAnnouncer {
-  const channel = discordChannel(options);
+}: DiscordRestOptions & { channelId: string; pvpChannelId: string; siteUrl: string }): EventAnnouncer {
+  const channels: Record<EventKind, ReturnType<typeof discordChannel>> = {
+    raid: discordChannel({ ...options, channelId }),
+    pvp: discordChannel({ ...options, channelId: pvpChannelId }),
+  };
   return {
-    async publish(raid) {
-      return channel.post(raidMessage(raid, siteUrl));
+    async publish(announced) {
+      return channels[announced.event.kind].post(raidMessage(announced, siteUrl));
     },
 
     async remind(reminder) {
-      await channel.post(reminderMessage(reminder, siteUrl));
+      await channels[reminder.event.kind].post(reminderMessage(reminder, siteUrl));
     },
 
     async recap(recap) {
-      await channel.post(recapMessage(recap, siteUrl));
+      await channels.raid.post(recapMessage(recap, siteUrl));
     },
 
-    async update(messageId, raid) {
-      return channel.edit(messageId, raidMessage(raid, siteUrl));
+    async update(messageId, announced) {
+      return channels[announced.event.kind].edit(messageId, raidMessage(announced, siteUrl));
     },
   };
 }

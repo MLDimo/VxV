@@ -7,7 +7,7 @@ import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createEvent, createGuildCharacters, createMember, createRaidWithLoot, testGuild } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
-import type { RaidAnnouncer } from "./discordPorts.ts";
+import type { EventAnnouncer } from "./discordPorts.ts";
 import { createRaidReminders } from "./raidReminders.ts";
 import { createSignups } from "./signups.ts";
 
@@ -21,7 +21,7 @@ describe("raid reminders", () => {
   beforeEach(async () => {
     ({ database, sql } = await createTestDatabase());
     reminded = [];
-    const announcer: RaidAnnouncer = {
+    const announcer: EventAnnouncer = {
       publish: async () => "message",
       update: async () => true,
       remind: async (reminder) => {

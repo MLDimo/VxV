@@ -1,9 +1,9 @@
 import { eventAudience } from "@vxv/server/domain/eventRoles";
-import { formatDateTime, formatEventDate, raidTitle, softReserveCount } from "@vxv/server/domain/labels";
-import { canManageRaids, fullName, MAX_SPEC_LENGTH } from "@vxv/server";
+import { eventPath } from "@vxv/server/domain/events";
+import { formatDateTime, formatEventDate, eventTitle, softReserveCount } from "@vxv/server/domain/labels";
+import { canManageRaids } from "@vxv/server";
 import { isComing } from "@vxv/server/domain/signups";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AddonExport } from "@/components/AddonExport";
 import { Badge } from "@/components/Badge";
 import { EventSignups } from "@/components/EventSignups";
@@ -11,7 +11,7 @@ import { ExclusionForm } from "@/components/ExclusionForm";
 import { RaidLogImportForm } from "@/components/RaidLogImportForm";
 import { RaidNav } from "@/components/RaidNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { SignupForm } from "@/components/SignupForm";
+import { SignupPanel } from "@/components/SignupPanel";
 import { SoftReserveBoardForm } from "@/components/SoftReserveBoardForm";
 import { SoftReserveOverrideForm } from "@/components/SoftReserveOverrideForm";
 import { getApplication } from "@/server/application";
@@ -24,6 +24,9 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   if (event === undefined) {
     notFound();
   }
+  if (event.kind === "pvp") {
+    redirect(eventPath(event));
+  }
   const isOfficer = canManageRaids(member.roles);
   const [eventSignups, board, ownCharacters, addonText] = await Promise.all([
     signups.listForEvent(event.id),
@@ -35,15 +38,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     notFound();
   }
   const mine = board.mySignup;
-  const signupCharacters = ownCharacters
-    .filter((character) => character.inGuild)
-    .map((character) => ({ id: character.id, name: fullName(character), characterClass: character.characterClass }));
-
   const expected = eventSignups.filter((signup) => isComing(signup.status)).length;
 
   return (
     <>
-      <ScreenHeader kicker="Conseil de guerre" title={raidTitle(event.raids.map((raid) => raid.name))}>
+      <ScreenHeader kicker="Conseil de guerre" title={eventTitle(event)}>
         <span className="text-lavender">{formatEventDate(event.startsAt)}</span>
         <Badge tone="amethyst">{eventAudience(event.role)}</Badge>
         <Badge tone="gain">{expected} attendus</Badge>
@@ -52,26 +51,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       <RaidNav />
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
-        <section className="panel">
-          <h2 className="font-pixel text-lg text-ivory">Mon inscription</h2>
-          <p className="mt-1 text-sm text-muted">{softReserveCount(event.softReservesPerPlayer)} par joueur</p>
-          {signupCharacters.length === 0 ? (
-            <p className="mt-2 text-muted">
-              Pour vous inscrire, liez d&apos;abord un personnage de la guilde dans{" "}
-              <Link href="/personnages" className="text-amethyst underline">
-                Mes personnages
-              </Link>
-              .
-            </p>
-          ) : (
-            <SignupForm
-              eventId={event.id}
-              characters={signupCharacters}
-              current={mine}
-              maxSpecLength={MAX_SPEC_LENGTH}
-            />
-          )}
-        </section>
+        <SignupPanel
+          eventId={event.id}
+          characters={ownCharacters}
+          current={mine}
+          note={`${softReserveCount(event.softReservesPerPlayer)} par joueur`}
+        />
         <EventSignups signups={eventSignups} />
       </div>
 

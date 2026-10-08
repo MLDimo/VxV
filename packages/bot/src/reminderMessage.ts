@@ -1,5 +1,5 @@
 import type { RaidReminder } from "@vxv/server";
-import { raidTitle } from "@vxv/server/domain/labels";
+import { eventTitle } from "@vxv/server/domain/labels";
 import { softReservesLockAt } from "@vxv/server/domain/softReserves";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
@@ -12,12 +12,12 @@ export function reminderMessage(
   { event, expected, missingSoftReserves }: RaidReminder,
   siteUrl: string,
 ): RESTPostAPIChannelMessageJSONBody {
-  const title = raidTitle(event.raids.map((raid) => raid.name));
+  const title = eventTitle(event);
   const lines = [
-    `⏰ **${title}** ${timestamp(event.startsAt, "F")} (${timestamp(event.startsAt, "R")}) · ${eventUrl(siteUrl, event.id)}`,
+    `⏰ **${title}** ${timestamp(event.startsAt, "F")} (${timestamp(event.startsAt, "R")}) · ${eventUrl(siteUrl, event)}`,
     expected.length > 0
       ? `Inscrits : ${mentions(expected)}`
-      : "Aucun inscrit pour l'instant : inscrivez-vous avec le bouton du message du raid, ou sur le site.",
+      : "Aucun inscrit pour l'instant : inscrivez-vous avec le bouton du message de l'événement, ou sur le site.",
   ];
   if (missingSoftReserves.length > 0) {
     lines.push(

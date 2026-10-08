@@ -38,7 +38,7 @@ import type {
   DeathrollAnnouncer,
   GuildGateway,
   MissionAnnouncer,
-  RaidAnnouncer,
+  EventAnnouncer,
   TitleAnnouncer,
 } from "./application/discordPorts.ts";
 import type { Clock } from "./application/ports.ts";
@@ -52,7 +52,7 @@ export interface ApplicationConfig {
   /** The guild's Discord server, where the bot updates nicknames and roles. */
   guild: GuildGateway;
   /** The raid channel, where each event has its sign-up message. */
-  announcer: RaidAnnouncer;
+  announcer: EventAnnouncer;
   /** The bets' channel, where each bet has its message. */
   betAnnouncer: BetAnnouncer;
   /** The missions' channel, where each mission has its message. */

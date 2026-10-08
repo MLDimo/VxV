@@ -45,7 +45,7 @@ describe("/vxv_raid", () => {
     expect(await create(OFFICER, { ...plan, raid2: "Mont Hyjal" })).toBe(
       `Événement créé et publié dans <#${RAID_CHANNEL}>.`,
     );
-    const [event] = await app.events.listUpcoming();
+    const [event] = await app.events.listUpcoming("raid");
     expect(event?.raids.map((raid) => raid.name)).toEqual(["Mont Hyjal", "Onyxia"]);
     expect(event?.startsAt).toEqual(new Date(`${NEXT_YEAR}-12-12T20:00:00Z`));
     expect(event?.role).toBeUndefined();
@@ -57,7 +57,7 @@ describe("/vxv_raid", () => {
   it("reserves the event to the role the officer picked", async () => {
     const raiders = discord.addRole("Raideur R1");
     await create(OFFICER, plan, raiders);
-    const [event] = await app.events.listUpcoming();
+    const [event] = await app.events.listUpcoming("raid");
     expect(event?.role).toEqual({ id: raiders, name: "Raideur R1" });
   });
 
@@ -69,7 +69,7 @@ describe("/vxv_raid", () => {
   it("refuses members who are not officers, and invalid dates", async () => {
     await expect(create(MEMBER, plan)).rejects.toThrow("Cette action est réservée aux officiers.");
     expect(await create(OFFICER, { ...plan, date: "31/02" })).toMatch(/^Date ou heure invalide/);
-    expect(await app.events.listUpcoming()).toEqual([]);
+    expect(await app.events.listUpcoming("raid")).toEqual([]);
   });
 
   it("suggests the raids matching what the officer types", async () => {

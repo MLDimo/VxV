@@ -14,9 +14,12 @@ export {
 } from "./domain/history.ts";
 export {
   DEFAULT_SOFT_RESERVES,
+  MAX_EVENT_TITLE_LENGTH,
   MAX_SOFT_RESERVES,
+  type EventKind,
+  type GuildEvent,
+  type NewPvpEvent,
   type NewRaidEvent,
-  type RaidEvent,
   type RaidSummary,
 } from "./domain/events.ts";
 export type {
@@ -55,12 +58,12 @@ export type { DeathrollPlayer, TitleHolder } from "./application/ports.ts";
 export type {
   AnnouncedBet,
   AnnouncedMission,
-  AnnouncedRaid,
+  AnnouncedEvent,
   BetAnnouncer,
   GuildGateway,
   MessageAnnouncer,
   MissionAnnouncer,
-  RaidAnnouncer,
+  EventAnnouncer,
   AnnouncedTitles,
   TitleAnnouncer,
   AnnouncedDeathroll,

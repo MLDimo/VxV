@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  eventTitle,
   formatDuration,
   formatGold,
   formatOdds,
@@ -28,6 +29,15 @@ describe("labels", () => {
     expect(plain(formatShare(0.42))).toBe("42 %");
     expect(plain(formatSignedGold(500))).toBe("+500 po");
     expect(plain(formatSignedGold(-850))).toBe("−850 po");
+  });
+
+  it("names a PvP outing by its title, a raid night by its raids", () => {
+    const raids = [
+      { id: "onyxia", name: "Onyxia" },
+      { id: "hyjal", name: "Mont Hyjal" },
+    ];
+    expect(eventTitle({ title: undefined, raids })).toBe("Onyxia + Mont Hyjal");
+    expect(eventTitle({ title: "Raid sur Astranaar", raids: [] })).toBe("Raid sur Astranaar");
   });
 
   it("writes what remains in days and hours, else in hours and minutes", () => {
