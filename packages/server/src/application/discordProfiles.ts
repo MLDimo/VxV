@@ -1,4 +1,4 @@
-import { classLabel, CLASS_ROLE_NAMES } from "../domain/characterClasses.ts";
+import { classRole, CLASS_ROLE_NAMES } from "../domain/characterClasses.ts";
 import type { Member } from "../domain/members.ts";
 import { guildNickname } from "../domain/nicknames.ts";
 import type { UnitOfWork } from "./ports.ts";
@@ -24,7 +24,7 @@ export function createDiscordProfiles({ unitOfWork, guild }: { unitOfWork: UnitO
     if (main === undefined) {
       return "noMain";
     }
-    await guild.setOnlyRoleAmong(member.discordId, classLabel(main.characterClass), CLASS_ROLE_NAMES);
+    await guild.setOnlyRoleAmong(member.discordId, classRole(main.characterClass), CLASS_ROLE_NAMES);
     const renamed = await guild.setNickname(member.discordId, guildNickname(member.discordName, main));
     return renamed ? "updated" : "nicknameRefused";
   }

@@ -10,6 +10,7 @@ interface DiscordRole {
   id: string;
   name: string;
   managed: boolean;
+  color: number;
 }
 
 /** The guild's Discord server through the REST API, acting as the bot. */
@@ -19,16 +20,21 @@ export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions &
 
   const listRoles = () => request<DiscordRole[]>("GET", `/guilds/${guildId}/roles`);
 
-  /** The server's roles, and the one of this name, created when missing. */
-  async function roleNamed(roleName: string, reason: string): Promise<{ roles: DiscordRole[]; target: DiscordRole }> {
+  /** The server's roles, and the one of this name, created when missing, recoloured when it has another colour. */
+  async function roleNamed(
+    { name, color }: { name: string; color?: number },
+    reason: string,
+  ): Promise<{ roles: DiscordRole[]; target: DiscordRole }> {
     const roles = await listRoles();
-    const target =
-      roles.find((role) => role.name === roleName) ??
-      (await request<DiscordRole>("POST", `/guilds/${guildId}/roles`, {
-        body: { name: roleName, mentionable: true },
-        reason,
-      }));
-    return { roles, target };
+    const found = roles.find((role) => role.name === name);
+    if (found === undefined) {
+      const body = { name, color, mentionable: true };
+      return { roles, target: await request<DiscordRole>("POST", `/guilds/${guildId}/roles`, { body, reason }) };
+    }
+    if (color !== undefined && found.color !== color) {
+      await request("PATCH", `/guilds/${guildId}/roles/${found.id}`, { body: { color }, reason });
+    }
+    return { roles, target: found };
   }
 
   return {
@@ -44,8 +50,8 @@ export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions &
       }
     },
 
-    async setOnlyRoleAmong(discordId, roleName, group) {
-      const { roles, target } = await roleNamed(roleName, AUDIT_REASON);
+    async setOnlyRoleAmong(discordId, role, group) {
+      const { roles, target } = await roleNamed(role, AUDIT_REASON);
       const groupIds = new Set(roles.filter((role) => group.includes(role.name)).map((role) => role.id));
       const member = await request<{ roles: string[] }>("GET", memberPath(discordId));
       for (const roleId of member.roles.filter((id) => groupIds.has(id) && id !== target.id)) {
@@ -57,7 +63,7 @@ export function createDiscordGuild({ guildId, ...options }: DiscordRestOptions &
     },
 
     async addRole(discordId, roleName) {
-      const { target } = await roleNamed(roleName, TITLES_REASON);
+      const { target } = await roleNamed({ name: roleName }, TITLES_REASON);
       await request("PUT", `${memberPath(discordId)}/roles/${target.id}`, { reason: TITLES_REASON });
     },
 

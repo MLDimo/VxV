@@ -1,3 +1,5 @@
+import { CLASS_COLORS, colorValue, UNKNOWN_CLASS_COLOR } from "@vxv/design";
+
 /** French names of the class tokens reported by the game. */
 export const CLASS_LABELS: Readonly<Record<string, string>> = {
   WARRIOR: "Guerrier",
@@ -16,4 +18,9 @@ export const CLASS_ROLE_NAMES: readonly string[] = Object.values(CLASS_LABELS);
 
 export function classLabel(characterClass: string): string {
   return CLASS_LABELS[characterClass] ?? characterClass;
+}
+
+/** A class's Discord role: its name, in the class's colour, that Discord gives to its holders' names. */
+export function classRole(characterClass: string): { name: string; color: number } {
+  return { name: classLabel(characterClass), color: colorValue(CLASS_COLORS[characterClass] ?? UNKNOWN_CLASS_COLOR) };
 }

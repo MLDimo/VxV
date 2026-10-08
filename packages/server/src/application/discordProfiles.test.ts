@@ -44,6 +44,7 @@ describe("Discord profiles", () => {
     expect(await profiles.sync(me)).toBe("updated");
     expect(discord.nicknameOf(me.discordId)).toBe("Martin - [Ðéjà Vu]");
     expect(discord.roleNamesOf(me.discordId)).toEqual(["Voleur"]);
+    expect(discord.roleColorOf("Voleur")).toBe(0xfff468);
   });
 
   it("leaves Discord untouched for a member without main", async () => {

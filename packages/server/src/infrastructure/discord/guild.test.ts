@@ -5,6 +5,8 @@ import { createDiscordGuild } from "./guild.ts";
 import { DiscordApiError } from "./rest.ts";
 
 const CLASSES = ["Guerrier", "Voleur", "Druide"];
+const ROGUE = { name: "Voleur", color: 0xfff468 };
+const DRUID = { name: "Druide", color: 0xff7c0a };
 
 describe("Discord guild through the REST API", () => {
   let discord: FakeDiscord;
@@ -20,15 +22,24 @@ describe("Discord guild through the REST API", () => {
     vi.unstubAllGlobals();
   });
 
-  it("creates the class role when missing and gives it to the member", async () => {
-    await guild.setOnlyRoleAmong("200", "Voleur", CLASSES);
+  it("creates the class role in its colour when missing and gives it to the member", async () => {
+    await guild.setOnlyRoleAmong("200", ROGUE, CLASSES);
     expect(discord.roleNamesOf("200")).toEqual(["Voleur"]);
+    expect(discord.roleColorOf("Voleur")).toBe(0xfff468);
+  });
+
+  it("gives its colour back to a class role made by hand, and leaves a right one alone", async () => {
+    discord.addRole("Voleur");
+    await guild.setOnlyRoleAmong("200", ROGUE, CLASSES);
+    await guild.setOnlyRoleAmong("300", ROGUE, CLASSES);
+    expect(discord.roleColorOf("Voleur")).toBe(0xfff468);
+    expect(discord.requests.filter((request) => request.method === "PATCH")).toHaveLength(1);
   });
 
   it("swaps the class role when the main changes, reusing existing roles", async () => {
-    await guild.setOnlyRoleAmong("200", "Voleur", CLASSES);
-    await guild.setOnlyRoleAmong("200", "Druide", CLASSES);
-    await guild.setOnlyRoleAmong("300", "Voleur", CLASSES);
+    await guild.setOnlyRoleAmong("200", ROGUE, CLASSES);
+    await guild.setOnlyRoleAmong("200", DRUID, CLASSES);
+    await guild.setOnlyRoleAmong("300", ROGUE, CLASSES);
     expect(discord.roleNamesOf("200")).toEqual(["Druide"]);
     expect(discord.roleNamesOf("300")).toEqual(["Voleur"]);
     expect(discord.requests.filter((request) => request.method === "POST")).toHaveLength(2);
@@ -41,7 +52,7 @@ describe("Discord guild through the REST API", () => {
   });
 
   it("reads the roles of a member, and knows when they left the server", async () => {
-    await guild.setOnlyRoleAmong("200", "Voleur", CLASSES);
+    await guild.setOnlyRoleAmong("200", ROGUE, CLASSES);
     expect(await guild.fetchRoleIds("200")).toHaveLength(1);
     discord.leave("200");
     expect(await guild.fetchRoleIds("200")).toBeUndefined();
@@ -59,6 +70,6 @@ describe("Discord guild through the REST API", () => {
 
   it("lets any other refusal surface", async () => {
     const broken = createDiscordGuild({ token: "token", guildId: "guild", apiUrl: "https://discord.test/unknown" });
-    await expect(broken.setOnlyRoleAmong("200", "Voleur", CLASSES)).rejects.toBeInstanceOf(DiscordApiError);
+    await expect(broken.setOnlyRoleAmong("200", ROGUE, CLASSES)).rejects.toBeInstanceOf(DiscordApiError);
   });
 });

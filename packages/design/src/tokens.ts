@@ -83,6 +83,11 @@ export const CLASS_COLORS: Readonly<Record<string, string>> = {
 /** A class token this version does not know is written in the secondary text color. */
 export const UNKNOWN_CLASS_COLOR = COLORS.muted;
 
+/** A color ("#A35CFF") as a number, as Discord takes it for a message's embed or a role. */
+export function colorValue(hex: string): number {
+  return Number.parseInt(hex.slice(1), 16);
+}
+
 /** The two fonts (§2.4), self-hosted: Pixelify Sans for titles, tabs and big numbers, Manrope for text. */
 export const FONTS = {
   pixel: { family: "Pixelify Sans", file: "pixelify-sans", weights: [500, 600, 700], fallback: "monospace" },
