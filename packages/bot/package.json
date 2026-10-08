@@ -10,7 +10,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run --maxWorkers=2 --hookTimeout=30000 --testTimeout=30000",
-    "register-commands": "tsx src/registerCommands.ts"
+    "register-commands": "tsx src/registerCommands.ts",
+    "upload-emojis": "tsx src/uploadEmojis.ts"
   },
   "dependencies": {
     "@vxv/server": "*",

@@ -81,3 +81,10 @@ jobs:
           DISCORD_CLIENT_ID: ${{ vars.DISCORD_CLIENT_ID }}
           DISCORD_GUILD_ID: ${{ vars.DISCORD_GUILD_ID }}
         run: npm run register-commands -w @vxv/bot
+      # The bot writes its emojis by id: when an image is added, the step prints the ids to commit.
+      - name: Upload the Discord emojis
+        if: steps.token.outputs.present == 'true' && env.VERCEL_ENVIRONMENT == 'production'
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CLIENT_ID: ${{ vars.DISCORD_CLIENT_ID }}
+        run: npm run upload-emojis -w @vxv/bot
