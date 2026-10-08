@@ -6,21 +6,21 @@ import { UpcomingEvents } from "@/components/UpcomingEvents";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
-/** The wall of wanted posters: the PvP outings to come; the duels and their ranking behind its sub-menu. */
+/** The wall of wanted posters: the PvP events to come; the duels and their ranking in the other tab. */
 export default async function PvpPage() {
   const member = await requireMember();
   const events = await getApplication().events.listUpcoming("pvp");
   return (
     <>
-      <ScreenHeader kicker="Avis de recherche" kickerClassName="text-loss" title="Sorties PvP">
+      <ScreenHeader kicker="Avis de recherche" kickerClassName="text-loss" title="Événements PvP">
         {canManageRaids(member.roles) && (
           <Link href="/pvp/nouveau" className="button-wood text-gold">
-            Créer une sortie
+            Créer un événement PvP
           </Link>
         )}
       </ScreenHeader>
       <PvpNav current="/pvp" />
-      <UpcomingEvents events={events} empty="Aucune sortie PvP prévue pour l'instant." />
+      <UpcomingEvents events={events} empty="Aucun événement PvP prévu pour l'instant." />
     </>
   );
 }

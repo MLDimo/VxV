@@ -13,16 +13,16 @@ export function PvpEventForm({ roles, maxTitleLength }: { roles: EventRoleChoice
   const [state, action, pending] = useActionState(createPvpEvent, IDLE);
   return (
     <form action={action} className="mt-6 max-w-lg space-y-5">
-      <Field label="Titre de la sortie">
+      <Field label="Titre de l'événement">
         <input name="title" required maxLength={maxTitleLength} className="field" placeholder="Raid sur Astranaar" />
       </Field>
       <Field label="Date et heure (heure de Paris)">
         <input type="datetime-local" name="startsAt" required className="field" />
       </Field>
       <EventRoleField roles={roles} />
-      <ReasonField placeholder="Sortie du jeudi" />
+      <ReasonField placeholder="Événement du jeudi" />
       <button type="submit" disabled={pending} className="button-pixel">
-        {pending ? "Création…" : "Créer la sortie"}
+        {pending ? "Création…" : "Créer l'événement"}
       </button>
       <ActionMessages state={state} />
     </form>

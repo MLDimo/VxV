@@ -9,8 +9,7 @@
 RankingData.lua
 RankingView.lua
 
-# Interface: the banners of the podium, then the Ranking's screen and its reduced mode.
-UI\Banner.lua
+# Interface: the Ranking's screen, on the core's board, and its reduced mode.
 UI\RankingTab.lua
 
 Bootstrap.lua

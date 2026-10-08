@@ -44,7 +44,7 @@ export const PLACES: readonly Place[] = [
     // The wall of wanted posters (owner's request of 7 October: duels and PvP outings).
     id: "pvp",
     name: "PvP",
-    subtitle: "Duels & sorties",
+    subtitle: "Événements & duels",
     kicker: "loss",
     spot: [52, 25, 19, 31],
     plaque: "board",

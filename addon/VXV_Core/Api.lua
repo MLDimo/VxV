@@ -80,6 +80,9 @@ VXV = {
     --- A place's screen: its head, badges and margins, how it follows its data, the screens of one list and the
     --- simple tabs of the reduced mode. See UI/Screen.lua.
     Screen = ns.Screen,
+    --- A ranking board's parts, placed by the screen: Podium, Records, Rest; and Value(unit, value, withGold). See
+    --- UI/RankingBoard.lua.
+    RankingBoard = ns.RankingBoard,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

@@ -1,8 +1,8 @@
 local _, ns = ...
 
---- « Créer une sortie » in game, for the officers: as « Créer un événement » for a raid night, with a title instead of
---- raids and no soft reserve; who may sign up among the Discord roles the officer's companion brought. Sent to the
---- website as a change: it creates the outing and publishes its sign-up message on Discord.
+--- « Créer un événement PvP » in game, for the officers: as « Créer un événement » for a raid night, with a title
+--- instead of raids and no soft reserve; who may sign up among the Discord roles the officer's companion brought. Sent
+--- to the website as a change: it creates the event and publishes its sign-up message on Discord.
 local OutingDialog = {}
 ns.OutingDialog = OutingDialog
 
@@ -57,7 +57,7 @@ local function send()
 end
 
 local function build()
-    frame, body = VXV.CreateDialog("VXV_OutingDialog", WIDTH, HEIGHT, "Créer une sortie")
+    frame, body = VXV.CreateDialog("VXV_OutingDialog", WIDTH, HEIGHT, "Créer un événement PvP")
     addField("title", 0, 0, body:GetWidth(), "Titre (Raid sur Astranaar)")
     addField("date", 0, SECTION, SHORT_FIELD, "Date (15/10)")
     addField("time", SHORT_FIELD + GAP, SECTION, SHORT_FIELD, "Heure (21:00)")

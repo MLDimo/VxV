@@ -13,12 +13,12 @@ test.describe.serial("PvP outings", () => {
   }) => {
     await signInAs(context, "officer");
     await page.goto("/pvp");
-    await page.getByRole("link", { name: "Créer une sortie" }).click();
-    await page.getByLabel("Titre de la sortie").fill("Raid sur Astranaar");
+    await page.getByRole("link", { name: "Créer un événement PvP" }).click();
+    await page.getByLabel("Titre de l'événement").fill("Raid sur Astranaar");
     await page.getByLabel("Date et heure (heure de Paris)").fill("2031-05-08T21:00");
     await page.getByLabel("Qui peut s'inscrire (rôle Discord)").selectOption({ label: "Tout le monde" });
     await page.getByLabel("Motif (visible dans le journal)").fill("Sortie de test");
-    await page.getByRole("button", { name: "Créer la sortie" }).click();
+    await page.getByRole("button", { name: "Créer l'événement" }).click();
 
     await expect(page).toHaveURL(/\/pvp\/evenements\/[0-9a-f-]{36}$/);
     await expect(page.getByRole("heading", { name: "Raid sur Astranaar" })).toBeVisible();
@@ -55,7 +55,7 @@ test.describe.serial("PvP outings", () => {
   test("a member cannot plan an outing", async ({ page, context }) => {
     await signInAs(context, "member");
     await page.goto("/pvp");
-    await expect(page.getByRole("link", { name: "Créer une sortie" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Créer un événement PvP" })).toHaveCount(0);
     await page.goto("/pvp/nouveau");
     await expect(page).toHaveURL(/\/$/);
   });

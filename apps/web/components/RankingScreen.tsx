@@ -1,10 +1,17 @@
 import type { Member, RankingCategory } from "@vxv/server";
+import type { RankingPeriod } from "@vxv/server/domain/ranking";
 import type { ReactNode } from "react";
 import { getApplication } from "@/server/application";
 import { periodLabel, PeriodNav, periodOf } from "./PeriodNav";
 import { RankingBoard } from "./RankingBoard";
 import { ScreenHeader } from "./ScreenHeader";
 import { SubNav } from "./SubNav";
+
+const RECORDS_TITLES: Record<RankingPeriod, string> = {
+  always: "Records depuis toujours",
+  month: "Records du mois",
+  season: "Records de la saison",
+};
 
 /** Ranking's categories (§7.5), each its own page. */
 const CATEGORIES: readonly { category: RankingCategory; href: string; name: string }[] = [
@@ -41,7 +48,13 @@ export async function RankingScreen({
       {period === "season" && view.season === undefined && (
         <p className="mt-6 text-lavender">Aucune saison lancée : un officier la lance dans la catégorie Paris.</p>
       )}
-      <RankingBoard view={view} memberId={member.id} periodLabel={periodLabel(period, view.season?.number)} />
+      <RankingBoard
+        board={view}
+        memberId={member.id}
+        recordsTitle={RECORDS_TITLES[view.period]}
+        note={`${view.metric} · ${periodLabel(period, view.season?.number)}`}
+        empty="Personne au classement sur cette période."
+      />
       {children}
     </>
   );

@@ -38,6 +38,7 @@ UI\Theme.lua
 UI\Tooltip.lua
 UI\RowList.lua
 UI\Screen.lua
+UI\RankingBoard.lua
 UI\PlaceWindow.lua
 UI\Window.lua
 UI\Dialog.lua

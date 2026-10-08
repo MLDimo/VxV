@@ -13,7 +13,7 @@ test("the tavern opens every place", async ({ page, context }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "PvP", exact: true }).last().click();
   await expect(page).toHaveURL(/\/pvp$/);
-  await expect(page.getByRole("heading", { name: "Sorties PvP" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Événements PvP" })).toBeVisible();
   await expect(page.locator('[data-place="pvp"]')).toHaveCount(1);
 
   await page.goto("/");

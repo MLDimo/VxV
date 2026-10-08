@@ -11,4 +11,4 @@ await mkdir(ADDON_AVATARS, { recursive: true });
 for (const avatar of AVATARS) {
   await copyFile(new URL(`${avatar}.png`, SITE_AVATARS), new URL(`${avatar}.png`, ADDON_AVATARS));
 }
-console.log("packages/design/src/tokens.css, addon/VXV_Core/UI/Tokens.lua, addon/VXV_Ranking/Media/Avatars");
+console.log("packages/design/src/tokens.css, addon/VXV_Core/UI/Tokens.lua, addon/VXV_Core/Media/Avatars");

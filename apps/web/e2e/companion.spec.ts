@@ -64,7 +64,7 @@ test("the companion brings the next event to the addon, as an officer would past
   // And the titles of the week, for the game's displays (P13.3).
   expect(titres.text.split("\n")[0]).toBe("VXV-TITRES-1");
   // And the PvP: the outings, the duels and their ranking, for the PvP tab in game.
-  expect(pvp.text.split("\n")[0]).toBe("VXV-PVP-1");
+  expect(pvp.text.split("\n")[0]).toBe("VXV-PVP-2");
   expect((await request.get("/api/compagnon/donnees")).status()).toBe(401);
 });
 

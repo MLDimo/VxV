@@ -48,14 +48,17 @@ test.describe.serial("duels", () => {
     await expect(page.getByRole("status")).toContainText("Mise de 30 po enregistrée");
   });
 
-  test("the loser concedes: the bet is settled and the Elo ranking moves", async ({ page, context }) => {
+  test("the loser concedes: the bet is settled and the Elo board moves", async ({ page, context }) => {
     await signInAs(context, "officer");
     await page.goto("/pvp/duels");
     await page.getByRole("listitem", { name: DUEL }).getByRole("button", { name: "J'ai perdu" }).click();
     await expect(page.getByRole("listitem", { name: DUEL })).toContainText("Dune Sable gagne");
 
-    await page.getByRole("link", { name: "Classement" }).click();
-    await expect(page.getByRole("row", { name: /Dune Sable/ })).toContainText("1510");
-    await expect(page.getByRole("row", { name: /Ciel Gris/ })).toContainText("1490");
+    // The Elo board, as the Ranking's: the winner on the podium's banners, the officer's own place below.
+    const podium = page.getByRole("list", { name: "Podium" });
+    await expect(podium).toContainText("Dune");
+    await expect(podium).toContainText("1510");
+    await expect(page.getByRole("list", { name: "Ta position" })).toContainText("1490");
+    await expect(page.getByText("Records des duels")).toBeVisible();
   });
 });

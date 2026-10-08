@@ -9,7 +9,7 @@ export default async function NewPvpEventPage() {
   const roles = await getApplication().events.listRoleChoices();
   return (
     <>
-      <ScreenHeader kicker="Avis de recherche · officiers" kickerClassName="text-loss" title="Créer une sortie PvP" />
+      <ScreenHeader kicker="Avis de recherche · officiers" kickerClassName="text-loss" title="Créer un événement PvP" />
       <PvpEventForm roles={roles} maxTitleLength={MAX_EVENT_TITLE_LENGTH} />
     </>
   );

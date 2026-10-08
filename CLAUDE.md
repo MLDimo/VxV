@@ -20,9 +20,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   données du site (`VXV.SiteData`) et changements faits en jeu (`VXV.PendingChanges`), en attente puis confirmés ou
   refusés par le site, relayés par un officier équipé pour les membres sans compagnon ; rolls lus dans le chat
   (`Core/Rolls.lua`, événement `roll`) ; `VXV.SayToGuild` ; pour les événements de la guilde (soirées de raid,
-  sorties PvP), la fenêtre « Mon inscription » (`VXV.OpenSignupDialog`, libellés `VXV.SignupLabels`), les rôles
+  événements PvP), la fenêtre « Mon inscription » (`VXV.OpenSignupDialog`, libellés `VXV.SignupLabels`), les rôles
   Discord apportés par le compagnon d'un officier (`VXV.EventRoles`, `Core/EventRoles.lua`) et leur choix aux
-  flèches (`VXV.RoleStepper`). Installation : `tools/install-addon.sh`.
+  flèches (`VXV.RoleStepper`) ; le tableau d'un classement à fanions, ses images et les portraits
+  (`VXV.RankingBoard`, `Media/`), pour le Ranking et les duels. Installation : `tools/install-addon.sh`.
 - **Raid et SR** (`VXV_Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
@@ -46,20 +47,20 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`Meter.lua`), résurrections acceptées (`Raised.lua`) ; envoyé par le compagnon ou exporté (`/vxv journal`), importé
   sur le site, corrigé par un officier avec motif. Tous les loots sont gardés avec leur mode (SR, SR+, roll libre,
   loot council) ; présences et loots nourrissent le SR+. Récap Discord de chaque raid le lendemain.
-- **PvP** (site `/pvp`, bot) : sorties PvP créées par un officier (site, `/vxv_pvp`) comme les soirées de raid, avec
-  un titre à la place des raids et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes
-  inscriptions et rappels, message dans le salon PvP (`DISCORD_PVP_CHANNEL_ID`, salon des raids sans lui), page
-  `/pvp/evenements/<id>`. Duels (`domain/duels.ts`, `/pvp/duels`) : un membre en défie un autre à une date, une heure
-  et un lieu ; le défié est appelé sur Discord (salon des duels, `DISCORD_DUELS_CHANNEL_ID`, salon PvP sans lui) et
-  répond avant l'heure. Défi relevé : un pari ordinaire
-  s'ouvre jusqu'à l'heure du duel (un choix par joueur, règles des paris, sans les deux joueurs). Résultat lu en jeu,
-  sinon reconnu par le perdant ; un officier peut saisir le vainqueur ou annuler, avec motif ; annulé, les mises sont
-  rendues. Classement Elo (`/pvp/classement`) recalculé des duels joués dans l'ordre : départ 1500,
-  E = 1 / (1 + 10^((Rb − Ra) / 400)), R' = R + 20 × (résultat − E). En jeu (`VXV_PvP`, onglet PvP) : sorties avec
-  inscription (et création pour un officier), duels (défier sa cible ou un « Prénom Nom », relever, refuser,
-  reconnaître sa défaite, annuler), classement et Elo du joueur ; le résultat d'un duel du joueur est lu dans le canal
-  système avec les formats du jeu (`DUEL_WINNER_KNOCKOUT`, `DUEL_WINNER_RETREAT`, par `Compat.Resolve`, non mesurés)
-  et envoyé au site, qui garde le premier.
+- **PvP** (site `/pvp`, bot, `VXV_PvP`) : deux onglets, Événements et Duels, sur le site comme en jeu. Événements
+  PvP créés par un officier (site, `/vxv_pvp`, en jeu) comme les soirées de raid, avec un titre à la place des raids
+  et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes inscriptions et rappels, message
+  dans le salon PvP (`DISCORD_PVP_CHANNEL_ID`, salon des raids sans lui), page `/pvp/evenements/<id>`. Duels
+  (`domain/duels.ts`, `/pvp/duels`) : un membre en défie un autre à une date, une heure et un lieu ; le défié est
+  appelé sur Discord (salon des duels, `DISCORD_DUELS_CHANNEL_ID`, salon PvP sans lui) et répond avant l'heure. Défi
+  relevé : un pari ordinaire s'ouvre jusqu'à l'heure du duel (un choix par joueur, règles des paris, sans les deux
+  joueurs). Résultat lu en jeu, sinon reconnu par le perdant ; un officier peut saisir le vainqueur ou annuler, avec
+  motif ; annulé, les mises sont rendues. Classement Elo recalculé des duels joués dans l'ordre : départ 1500,
+  E = 1 / (1 + 10^((Rb − Ra) / 400)), R' = R + 20 × (résultat − E) ; montré comme le Ranking (fanions des trois
+  premiers, records des duels : plus de victoires, plus de duels, plus longue série ; suite du classement, position du
+  joueur). En jeu : défier sa cible ou un « Prénom Nom », relever, refuser, reconnaître sa défaite, annuler ; le
+  résultat d'un duel du joueur est lu dans le canal système avec les formats du jeu (`DUEL_WINNER_KNOCKOUT`,
+  `DUEL_WINNER_RETREAT`, par `Compat.Resolve`, non mesurés) et envoyé au site, qui garde le premier.
 - **Prochain boss** (`VXV_Raid`) : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du
   pack) ; ailleurs, le premier boss debout des raids de l'événement ; un joueur arrivé en retard apprend du maître du
   butin (ou du chef) les boss tués. Panneau en tête des SR du raid et dans le mode réduit ; alerte (message au milieu
@@ -206,7 +207,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV_Artisans/ArtisansData.lua` |
 | `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV_Deathroll/DeathrollData.lua` |
 | `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV_Ranking/RankingData.lua` |
-| `VXV-PVP-1` (sorties, duels, classement Elo) | site → addon | `domain/addonPvp.ts` | `VXV_PvP/PvpData.lua` |
+| `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV_PvP/PvpData.lua` |
 
 - Vers le site : chaque texte se lit avec `domain/textFormat.ts` (lignes numérotées, un lecteur par type de ligne,
   `TextFormatError`).

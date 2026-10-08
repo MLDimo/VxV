@@ -1,4 +1,5 @@
 import type { DiscordMessage } from "./bets.ts";
+import { count } from "./labels.ts";
 
 /**
  * Duels (owner's request of 7 October): a member challenges another to a 1v1 at a date, a time and a place; the
@@ -172,4 +173,42 @@ export function eloRatings(outcomes: readonly DuelOutcome[]): EloRating[] {
     winner.won += 1;
   }
   return [...ratings.values()].sort((left, right) => right.rating - left.rating || right.won - left.won);
+}
+
+/** A record of the duels board: its label, its value as written, its holder. */
+export interface DuelFeat {
+  label: string;
+  value: string;
+  memberId: string;
+}
+
+/** The holder of the highest count, and that count; at equal counts, the first member id. Undefined when none. */
+function best(counts: ReadonlyMap<string, number>): [string, number] | undefined {
+  return [...counts].sort(([leftId, left], [rightId, right]) => right - left || leftId.localeCompare(rightId))[0];
+}
+
+/** The duels' records: the most duels won, the most played, the longest run of wins. None before a duel is played. */
+export function duelFeats(outcomes: readonly DuelOutcome[]): DuelFeat[] {
+  const won = new Map<string, number>();
+  const played = new Map<string, number>();
+  const run = new Map<string, number>();
+  const longestRun = new Map<string, number>();
+  const add = (counts: Map<string, number>, memberId: string) => counts.set(memberId, (counts.get(memberId) ?? 0) + 1);
+  for (const outcome of [...outcomes].sort((left, right) => left.playedAt.getTime() - right.playedAt.getTime())) {
+    add(won, outcome.winnerId);
+    add(played, outcome.winnerId);
+    add(played, outcome.loserId);
+    add(run, outcome.winnerId);
+    run.set(outcome.loserId, 0);
+    longestRun.set(outcome.winnerId, Math.max(longestRun.get(outcome.winnerId) ?? 0, run.get(outcome.winnerId) ?? 0));
+  }
+  const feats: [string, Map<string, number>, (value: number) => string][] = [
+    ["Plus de victoires", won, (value) => count(value, "victoire")],
+    ["Plus de duels", played, (value) => count(value, "duel")],
+    ["Plus longue série", longestRun, (value) => `${count(value, "victoire")} de suite`],
+  ];
+  return feats.flatMap(([label, counts, write]) => {
+    const holder = best(counts);
+    return holder === undefined ? [] : [{ label, value: write(holder[1]), memberId: holder[0] }];
+  });
 }

@@ -10,11 +10,12 @@ PvpData.lua
 Changes.lua
 DuelResults.lua
 
-# Interface: the PvP screen, and the dialogs of a challenge, of a duel's actions and of a new outing.
+# Interface: the dialogs of a challenge, of a duel's actions and of a new event, then the Événements and Duels tabs.
 UI\PvpView.lua
 UI\DuelDialog.lua
 UI\DuelActions.lua
 UI\OutingDialog.lua
-UI\PvpTab.lua
+UI\EventsTab.lua
+UI\DuelsTab.lua
 
 Bootstrap.lua

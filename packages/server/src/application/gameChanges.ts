@@ -147,7 +147,7 @@ export function createGameChanges({
           change.reason,
         );
         await announcements.announceQuietly(eventId);
-        return { message: `Sortie PvP du ${formatDateTime(startsAt)} créée et annoncée sur Discord.`, eventId };
+        return { message: `Événement PvP du ${formatDateTime(startsAt)} créé et annoncé sur Discord.`, eventId };
       }
       case "duel": {
         const scheduledAt = startOf(change.date, change.time);

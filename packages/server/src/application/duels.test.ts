@@ -145,10 +145,16 @@ describe("duels", () => {
     const bet = await bets.find(betId);
     expect(bet?.bet.winningChoiceId).toBe(await choiceOf(betId, "Vorn Cendrelune"));
     expect(bet?.stakes[0]?.outcome).toBe("won");
-    expect(await duels.ranking()).toEqual([
+    const { lines, records } = await duels.ranking();
+    expect(lines).toEqual([
       { rank: 1, member: expect.objectContaining({ name: "Vorn Cendrelune" }), rating: 1510, played: 1, won: 1 },
       { rank: 2, member: expect.objectContaining({ name: "Morgane Nuitsombre" }), rating: 1490, played: 1, won: 0 },
     ]);
+    expect(records[0]).toMatchObject({
+      label: "Plus de victoires",
+      value: "1 victoire",
+      member: { name: "Vorn Cendrelune" },
+    });
     await expect(duels.concede(vorn, duelId)).rejects.toThrow(/n'attend pas de résultat/);
   });
 
@@ -159,7 +165,7 @@ describe("duels", () => {
     await duels.cancel(vorn, duelId);
     expect((await duels.find(duelId))?.status).toBe("cancelled");
     expect((await bets.find(betId))?.stakes[0]?.outcome).toBe("refunded");
-    expect(await duels.ranking()).toEqual([]);
+    expect(await duels.ranking()).toEqual({ lines: [], records: [] });
   });
 
   it("lets an officer record a winner or call a duel off, with the reason in the journal", async () => {

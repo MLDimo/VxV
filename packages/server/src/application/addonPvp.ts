@@ -1,7 +1,8 @@
+import { avatarName } from "@vxv/design";
 import { formatAddonPvp } from "../domain/addonPvp.ts";
 import { EVENT_LISTED_AFTER_START_MS } from "../domain/events.ts";
 import { addonReaders } from "./addonReaders.ts";
-import type { DuelRankingLine, DuelView } from "./duels.ts";
+import type { DuelBoard, DuelView } from "./duels.ts";
 import type { Clock, UnitOfWork } from "./ports.ts";
 
 /** The PvP as the companion hands it to the addon (VXV_PvP): the outings to come, the duels and their ranking. */
@@ -12,18 +13,19 @@ export function createAddonPvp({
 }: {
   unitOfWork: UnitOfWork;
   clock: Clock;
-  duels: { list(): Promise<DuelView[]>; ranking(): Promise<DuelRankingLine[]> };
+  duels: { list(): Promise<DuelView[]>; ranking(): Promise<DuelBoard> };
 }) {
   return {
     /** VXV-PVP text for the companion of any member: an officer's addon passes it on to the guild. */
     async exportPvp(): Promise<string> {
       const views = await duels.list();
-      const ranking = await duels.ranking();
-      const players = new Map(
-        [...views.flatMap((view) => [view.challenger, view.opponent]), ...ranking.map((entry) => entry.member)].map(
-          (look) => [look.memberId, look],
-        ),
-      );
+      const board = await duels.ranking();
+      const looks = [
+        ...views.flatMap((view) => [view.challenger, view.opponent]),
+        ...board.lines.map((entry) => entry.member),
+        ...board.records.map((record) => record.member),
+      ];
+      const players = new Map(looks.map((look) => [look.memberId, look]));
       return unitOfWork.run(async (repositories) => {
         const now = clock();
         const since = new Date(now.getTime() - EVENT_LISTED_AFTER_START_MS);
@@ -39,8 +41,13 @@ export function createAddonPvp({
           ...(await addonReaders(repositories)),
           outings,
           duels: views.map(({ duel, status }) => ({ duel, status })),
-          players: [...players.values()],
-          ranking: ranking.map((entry) => ({ ...entry, memberId: entry.member.memberId })),
+          players: [...players.values()].map((look) => ({
+            ...look,
+            avatar:
+              look.characterClass === undefined ? undefined : avatarName(look.characterClass, look.race, look.sex),
+          })),
+          ranking: board.lines.map((entry) => ({ ...entry, memberId: entry.member.memberId })),
+          records: board.records.map((record) => ({ ...record, memberId: record.member.memberId })),
           changes,
           exportedAt: now,
         });

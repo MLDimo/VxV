@@ -12,12 +12,12 @@ import { ephemeral } from "./responses.ts";
 export const VXV_PVP: SlashCommand = {
   definition: {
     name: "vxv_pvp",
-    description: "Créer une sortie PvP (officiers)",
+    description: "Créer un événement PvP (officiers)",
     options: [
       {
         type: ApplicationCommandOptionType.String,
         name: "titre",
-        description: "Titre de la sortie, ex. Raid sur Astranaar",
+        description: "Titre de l'événement, ex. Raid sur Astranaar",
         required: true,
         max_length: MAX_EVENT_TITLE_LENGTH,
       },
