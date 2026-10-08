@@ -60,10 +60,10 @@ function roll(guild: Guild, name: string, high: number, result: number): void {
   const player = guild.player(name);
   // The previous roll's digits have scrolled: the button shows again.
   player.client(
-    `AdvanceTime(2) VXV_DuelWindow:Run("OnUpdate", 0.1) ${CLICK("VXV_DuelWindow", `Roll (1-${String(high)})`)}`,
+    `AdvanceTime(2) VXV_DuelWindow:Run("OnUpdate", 0.1) ${CLICK("VXV_DuelWindow", `Roll (0-${String(high)})`)}`,
   );
-  expect(player.client("return Rolled[#Rolled]")).toEqual({ low: 1, high });
-  player.client(`Fire("CHAT_MSG_SYSTEM", "${name} obtient un ${String(result)} (1-${String(high)}).")`);
+  expect(player.client("return Rolled[#Rolled]")).toEqual({ low: 0, high });
+  player.client(`Fire("CHAT_MSG_SYSTEM", "${name} obtient un ${String(result)} (0-${String(high)}).")`);
   settle(guild, 1);
 }
 
@@ -93,23 +93,23 @@ describe("the deathroll in game (P15)", () => {
       guild
         .player(VORN)
         .client(
-          `return IsVisible(FindWidget(VXV_DuelWindow, function(widget) return widget.label and widget.label.text == "Roll (1-1000)" end))`,
+          `return IsVisible(FindWidget(VXV_DuelWindow, function(widget) return widget.label and widget.label.text == "Roll (0-1000)" end))`,
         ),
     ).toBe(false);
     guild.advanceTime(61);
     roll(guild, VORN, 1000, 412);
     roll(guild, THOM, 412, 87);
     // A roll out of turn is not the game's.
-    guild.player(THOM).client(`Fire("CHAT_MSG_SYSTEM", "${THOM} obtient un 5 (1-87).")`);
+    guild.player(THOM).client(`Fire("CHAT_MSG_SYSTEM", "${THOM} obtient un 5 (0-87).")`);
     settle(guild, 1);
-    roll(guild, VORN, 87, 1);
+    roll(guild, VORN, 87, 0);
     for (const name of [THOM, VORN, SIRA]) {
       const game = guild.player(name).bundles.VXV_Deathroll?.run(LAST_GAME(id)) as { rolls: unknown[] };
       expect(game.rolls).toHaveLength(3);
     }
     guild.player(VORN).client("for _ = 1, 40 do AdvanceTime(0.1) VXV_DuelWindow:Run('OnUpdate', 0.1) end");
     expect(plain(guild.player(VORN).client(DUEL_TEXTS))).toContain(
-      "Vorn Cendrelune a fait 1 : Thom Leboss gagne 500 po.",
+      "Vorn Cendrelune a fait 0 : Thom Leboss gagne 500 po.",
     );
     // The players' companions take it to the website, which reads it within the rules.
     const sent = parseDeathroll(guild.player(VORN).client(`return VXV_SyncDB.texts.deathroll["${id}"]`) as string);

@@ -1,10 +1,13 @@
 import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.ts";
 
 /**
- * Deathrolls (P15): one against one, the challenged rolling first from the starting number, each next roll from 1 to
- * the previous result; who rolls 1 loses the stake to the other. The guild bets on the game during the minute before
+ * Deathrolls (P15): one against one, the challenged rolling first from the starting number, each next roll from 0 to
+ * the previous result; who rolls 0 loses the stake to the other. The guild bets on the game during the minute before
  * the first roll.
  */
+
+/** Every roll starts there, and who rolls it loses (owner's rule of 8 October). */
+export const DEATHROLL_LOSING_ROLL = 0;
 
 /** First line of a game sent by the addon (contract with VXV_Deathroll); the number is the format version. */
 export const DEATHROLL_HEADER = "VXV-DEATHROLL-1";
@@ -113,7 +116,7 @@ export function parseDeathroll(text: string): DeathrollGame {
   return { ...requireRecord(game, "La partie ne dit pas qui a joué (ligne G manquante)."), rolls, bets, paid };
 }
 
-/** Who lost: the player who rolled 1, the last roll. */
+/** Who lost: the player who rolled the losing roll, the last roll. */
 export function deathrollLoser(game: Pick<DeathrollGame, "rolls">): string | undefined {
   return game.rolls.at(-1)?.character;
 }
@@ -125,7 +128,7 @@ export function opponentOf(game: Pick<DeathrollGame, "challenger" | "challenged"
 
 /**
  * Why a game breaks the rules, or undefined: two players, a stake, a starting number above 1, the challenged rolling
- * first and each in turn, each roll from 1 to the previous result, the game over at the first 1.
+ * first and each in turn, each roll from 0 to the previous result, the game over at the first 0.
  */
 export function deathrollRefusal(game: DeathrollGame): string | undefined {
   if (game.challenger === game.challenged) {
@@ -137,15 +140,20 @@ export function deathrollRefusal(game: DeathrollGame): string | undefined {
   let high = game.start;
   for (const [index, roll] of game.rolls.entries()) {
     const expected = index % 2 === 0 ? game.challenged : game.challenger;
-    if (roll.character !== expected || roll.high !== high || roll.result < 1 || roll.result > high) {
+    if (
+      roll.character !== expected ||
+      roll.high !== high ||
+      roll.result < DEATHROLL_LOSING_ROLL ||
+      roll.result > high
+    ) {
       return `Roll ${String(index + 1)} hors des règles.`;
     }
-    if (roll.result === 1 && index < game.rolls.length - 1) {
-      return "La partie continue après un 1.";
+    if (roll.result === DEATHROLL_LOSING_ROLL && index < game.rolls.length - 1) {
+      return `La partie continue après un ${String(DEATHROLL_LOSING_ROLL)}.`;
     }
     high = roll.result;
   }
-  return game.rolls.at(-1)?.result === 1 ? undefined : "La partie n'est pas finie.";
+  return game.rolls.at(-1)?.result === DEATHROLL_LOSING_ROLL ? undefined : "La partie n'est pas finie.";
 }
 
 /** The guild's stakes that count (P15.2): on a player, by someone else, of 1 po at least. */

@@ -122,7 +122,7 @@ VXV.OnMessage(BET, function(payload, sender)
     end
 end)
 
---- Rolls for the player whose turn it is: the game's own /roll, from 1 to the previous result.
+--- Rolls for the player whose turn it is: the game's own /roll, from 0 to the previous result.
 function Duels.Roll(id)
     local game = Games.Find(id)
     if game == nil then
@@ -132,13 +132,13 @@ function Duels.Roll(id)
     if roller ~= VXV.PlayerName() or Rules.Betting(game) then
         return
     end
-    VXV.Compat.RandomRoll(1, high)
+    VXV.Compat.RandomRoll(Rules.LOSING_ROLL, high)
 end
 
 -- The roller's own /roll, read in the chat: told to the guild for the game waiting for it.
 VXV.On("roll", function(roll)
     local me = VXV.PlayerName()
-    if roll.name ~= me or roll.low ~= 1 then
+    if roll.name ~= me or roll.low ~= Rules.LOSING_ROLL then
         return
     end
     for _, game in ipairs(Games.Live()) do

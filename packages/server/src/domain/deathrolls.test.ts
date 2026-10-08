@@ -15,7 +15,7 @@ const GAME = [
   "G;Thom Leboss#1796904000#1;Thom Leboss;Ðéjà Vu;500;1000;1796904000;1796904120",
   "R;Ðéjà Vu;1000;412",
   "R;Thom Leboss;412;87",
-  "R;Ðéjà Vu;87;1",
+  "R;Ðéjà Vu;87;0",
   "B;Ciel Gris;Thom Leboss;100",
   "Y;Thom Leboss;1796990400",
 ].join("\n");
@@ -34,7 +34,7 @@ describe("a deathroll from the addon", () => {
       rolls: [
         { character: "Ðéjà Vu", high: 1000, result: 412 },
         { character: "Thom Leboss", high: 412, result: 87 },
-        { character: "Ðéjà Vu", high: 87, result: 1 },
+        { character: "Ðéjà Vu", high: 87, result: 0 },
       ],
       bets: [{ bettor: "Ciel Gris", choice: "Thom Leboss", amount: 100 }],
       paid: { by: "Thom Leboss", at: at(1796990400) },
@@ -56,7 +56,7 @@ describe("the deathroll's rules", () => {
   const game = parseDeathroll(GAME);
   const withRolls = (rolls: DeathrollGame["rolls"]): DeathrollGame => ({ ...game, rolls });
 
-  it("refuses the challenger rolling first, a roll out of range, a game going on after a 1 or not over", () => {
+  it("refuses the challenger rolling first, a roll out of range, a game going on after a 0 or not over", () => {
     expect(deathrollRefusal(withRolls([{ character: "Thom Leboss", high: 1000, result: 1 }]))).toBe(
       "Roll 1 hors des règles.",
     );
@@ -71,11 +71,15 @@ describe("the deathroll's rules", () => {
     expect(
       deathrollRefusal(
         withRolls([
-          { character: "Ðéjà Vu", high: 1000, result: 1 },
-          { character: "Thom Leboss", high: 1, result: 1 },
+          { character: "Ðéjà Vu", high: 1000, result: 0 },
+          { character: "Thom Leboss", high: 0, result: 0 },
         ]),
       ),
-    ).toBe("La partie continue après un 1.");
+    ).toBe("La partie continue après un 0.");
+    // From 0 to the previous result: a 1 leaves the next player a roll from 0 to 1.
+    expect(deathrollRefusal(withRolls([{ character: "Ðéjà Vu", high: 1000, result: 1 }]))).toBe(
+      "La partie n'est pas finie.",
+    );
     expect(deathrollRefusal(withRolls([{ character: "Ðéjà Vu", high: 1000, result: 412 }]))).toBe(
       "La partie n'est pas finie.",
     );

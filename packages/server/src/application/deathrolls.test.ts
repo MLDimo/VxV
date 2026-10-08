@@ -21,7 +21,7 @@ function game(id: string, stake: number, extra: readonly string[] = []): string 
     `G;${id};Thom Leboss;Vorn Cendrelune;${String(stake)};1000;${String(ACCEPTED)};${String(ACCEPTED + 120)}`,
     "R;Vorn Cendrelune;1000;412",
     "R;Thom Leboss;412;87",
-    "R;Vorn Cendrelune;87;1",
+    "R;Vorn Cendrelune;87;0",
     ...extra,
   ].join("\n");
 }
@@ -94,7 +94,7 @@ describe("deathrolls", () => {
       "Seuls les joueurs de la partie, ou un officier qui la relaie, peuvent l'envoyer.",
     );
     await expect(
-      deathrolls.recordFromGame(thom, [game("g3", 300).replace("R;Vorn Cendrelune;87;1", "")]),
+      deathrolls.recordFromGame(thom, [game("g3", 300).replace("R;Vorn Cendrelune;87;0", "")]),
     ).rejects.toThrow("La partie n'est pas finie.");
   });
 

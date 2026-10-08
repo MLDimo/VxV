@@ -1,6 +1,6 @@
 local _, ns = ...
 
---- What the duel's window says (P15.4): the heat of the game, from violet to red as the high comes near 1, the turn,
+--- What the duel's window says (P15.4): the heat of the game, from violet to red as the high comes near 0, the turn,
 --- the rolls so far and the guild's stakes.
 local DuelView = {}
 ns.DuelView = DuelView
@@ -37,13 +37,14 @@ end
 function DuelView.Status(game)
     local roller, high = Rules.Turn(game)
     if roller == nil then
-        return ("%s a fait 1 : %s gagne %s."):format(Rules.Loser(game), Rules.Winner(game), Gold.Format(game.stake))
+        return ("%s a fait %d : %s gagne %s."):format(Rules.Loser(game), Rules.LOSING_ROLL, Rules.Winner(game),
+            Gold.Format(game.stake))
     end
     if Rules.Betting(game) then
-        return ("Paris ouverts encore %d s, puis %s roll de 1 à %d."):format(math.ceil(game.closesAt - GetTime()),
-            roller, high)
+        return ("Paris ouverts encore %d s, puis %s roll de %d à %d."):format(math.ceil(game.closesAt - GetTime()),
+            roller, Rules.LOSING_ROLL, high)
     end
-    return ("À %s : roll de 1 à %d."):format(roller, high)
+    return ("À %s : roll de %d à %d."):format(roller, Rules.LOSING_ROLL, high)
 end
 
 --- The rolls so far: "1000 → 412 → 87 → 1".

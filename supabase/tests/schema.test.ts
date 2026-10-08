@@ -353,6 +353,9 @@ describe("initial schema", () => {
         );
       await roll(1000, 412);
       await expect(roll(87, 88)).rejects.toThrow(/deathroll_rolls_in_range/);
+      // From 0 to the previous result: the first to roll 0 loses.
+      await roll(87, 0);
+      await expect(roll(5, -1)).rejects.toThrow(/deathroll_rolls_in_range/);
     });
   });
 

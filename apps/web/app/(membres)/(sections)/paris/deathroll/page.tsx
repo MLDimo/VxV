@@ -31,8 +31,8 @@ export default async function DeathrollPage() {
       <ScreenHeader kicker="La salle de jeu" kickerClassName="text-neon" title="Deathroll" />
       <DiceNav current="/paris/deathroll" />
       <p className="mt-6 max-w-3xl text-lavender">
-        Un contre un, depuis l&apos;addon : le défié roll le premier, chacun ensuite de 1 au résultat précédent ; qui
-        fait 1 perd la mise, due au gagnant jusqu&apos;à ce qu&apos;il confirme le paiement. Une dette bloque les paris
+        Un contre un, depuis l&apos;addon : le défié roll le premier, chacun ensuite de 0 au résultat précédent ; qui
+        fait 0 perd la mise, due au gagnant jusqu&apos;à ce qu&apos;il confirme le paiement. Une dette bloque les paris
         et les deathrolls.
       </p>
       {(owed.length > 0 || toConfirm.length > 0) && (

@@ -13,7 +13,7 @@ function game(at: Date): string {
     `G;Ciel Gris#${String(seconds(at))}#1;Ciel Gris;Dune Sable;1500;1000;${String(seconds(at))};${String(seconds(at) + 120)}`,
     "R;Dune Sable;1000;412",
     "R;Ciel Gris;412;87",
-    "R;Dune Sable;87;1",
+    "R;Dune Sable;87;0",
   ].join("\n");
 }
 

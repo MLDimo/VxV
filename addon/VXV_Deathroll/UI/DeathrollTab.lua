@@ -6,6 +6,7 @@ local DeathrollTab = {}
 ns.DeathrollTab = DeathrollTab
 
 local DeathrollData, Debts, Duels, DuelWindow, Games = ns.DeathrollData, ns.Debts, ns.Duels, ns.DuelWindow, ns.Games
+local Rules = ns.Rules
 
 local Gold, RowList, Screen, Theme = VXV.Gold, VXV.RowList, VXV.Screen, VXV.Theme
 
@@ -109,7 +110,8 @@ end
 function DeathrollTab.Build(frame)
     content = frame
     Screen.Head(content, "La salle de jeu", "neon", "Deathroll").subtitle:SetText(
-        "Le défié roll le premier, puis chacun de 1 au résultat précédent : qui fait 1 perd la mise.")
+        ("Le défié roll le premier, puis chacun de %d au résultat précédent : qui fait %d perd la mise."):format(
+            Rules.LOSING_ROLL, Rules.LOSING_ROLL))
     local height = content:GetHeight() - GRID_TOP - PADDING
     local topHeight = math.floor(height * TOP_SHARE)
     addChallenge(topHeight)
