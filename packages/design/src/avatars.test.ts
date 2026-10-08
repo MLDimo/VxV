@@ -31,10 +31,13 @@ describe("avatars", () => {
   });
 
   it("are the website's in the addon (npm run generate)", () => {
-    for (const avatar of AVATARS) {
-      expect(readFileSync(new URL(`${avatar}.png`, ADDON_AVATARS))).toEqual(
-        readFileSync(new URL(`${avatar}.png`, SITE_AVATARS)),
-      );
-    }
+    // Buffer.equals: a deep comparison of each image's bytes takes seconds.
+    const different = AVATARS.filter(
+      (avatar) =>
+        !readFileSync(new URL(`${avatar}.png`, ADDON_AVATARS)).equals(
+          readFileSync(new URL(`${avatar}.png`, SITE_AVATARS)),
+        ),
+    );
+    expect(different).toEqual([]);
   });
 });
