@@ -24,6 +24,8 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "mission.create": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
   "mission.close": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
   "title.give": { label: "TITRE", className: "border-ink-brown text-ink-brown" },
+  "duel.result": { label: "PVP", className: "border-stamp-bet text-stamp-bet" },
+  "duel.cancel": { label: "PVP", className: "border-stamp-bet text-stamp-bet" },
 };
 
 /** The accounts book (§7.7): the guild's cash on the left, the officers' journal on the right. */

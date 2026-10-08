@@ -9,6 +9,7 @@ import {
   createDiscordRaidAnnouncer,
   createDiscordTitleAnnouncer,
   createDiscordDeathrollAnnouncer,
+  createDiscordDuelAnnouncer,
 } from "@vxv/bot";
 import { createApplication, createDiscordGuild } from "@vxv/server";
 import { sqlClientFromPGlite } from "@vxv/server/testing";
@@ -55,6 +56,11 @@ const app = createApplication({
   titleAnnouncer: createDiscordTitleAnnouncer({
     ...rest,
     channelId: WEB_ENVIRONMENT.DISCORD_TITLES_CHANNEL_ID,
+    siteUrl: WEB_ENVIRONMENT.SITE_URL,
+  }),
+  duelAnnouncer: createDiscordDuelAnnouncer({
+    ...rest,
+    channelId: WEB_ENVIRONMENT.DISCORD_PVP_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
   deathrollAnnouncer: createDiscordDeathrollAnnouncer({

@@ -16,7 +16,9 @@ export type JournalAction =
   | "season.start"
   | "mission.create"
   | "mission.close"
-  | "title.give";
+  | "title.give"
+  | "duel.result"
+  | "duel.cancel";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -117,6 +119,14 @@ export interface MissionCloseRecord {
 }
 
 /** What the journal keeps about a title an officer gave for the week (the former holder is its "before"). */
+/** What the journal keeps about a duel an officer settles: its players, its time, and its winner unless called off. */
+export interface DuelRecord {
+  challenger: string;
+  opponent: string;
+  scheduledAt: string;
+  winner?: string;
+}
+
 export interface TitleGiveRecord {
   title: string;
   /** The week's Wednesday, "2026-10-07". */

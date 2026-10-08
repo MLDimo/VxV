@@ -1,6 +1,7 @@
 import type {
   BetCreationRecord,
   BetEndRecord,
+  DuelRecord,
   MissionCloseRecord,
   MissionCreationRecord,
   SeasonStartRecord,
@@ -42,6 +43,8 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "mission.create": "Publication d'une mission",
   "mission.close": "Résultat d'une mission",
   "title.give": "Titre donné par un officier",
+  "duel.result": "Résultat d'un duel saisi par un officier",
+  "duel.cancel": "Duel annulé par un officier",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -137,6 +140,11 @@ function describeMissionClose(record: MissionCloseRecord): string {
   return `« ${record.title} » : ${winners.length === 0 ? "aucun gagnant" : winners.join(", ")}`;
 }
 
+function describeDuel(record: DuelRecord): string {
+  const duel = `${record.challenger} contre ${record.opponent}, ${formatDateTime(new Date(record.scheduledAt))}`;
+  return record.winner === undefined ? duel : `${duel} : ${record.winner} gagne`;
+}
+
 /** One-line description of what an officer action changed, as the website and the addon show it. */
 export function describeJournalEntry(entry: JournalEntry): string {
   switch (entry.action) {
@@ -170,6 +178,9 @@ export function describeJournalEntry(entry: JournalEntry): string {
       const record = entry.after as TitleGiveRecord;
       return `${record.title} : ${record.holder}, ${formatTitleWeek(record.week)}`;
     }
+    case "duel.result":
+    case "duel.cancel":
+      return describeDuel(entry.after as DuelRecord);
     case "season.start":
       return `Saison ${String((entry.after as SeasonStartRecord).number)} : les classements par saison repartent de zéro`;
   }

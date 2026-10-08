@@ -1,4 +1,5 @@
 import type { Bet, DiscordMessage, Stake } from "../domain/bets.ts";
+import type { Duel, DuelStatus } from "../domain/duels.ts";
 import type { ServerRole } from "../domain/eventRoles.ts";
 import type { GuildEvent } from "../domain/events.ts";
 import type { Mission, MissionScore, MissionStatus } from "../domain/missions.ts";
@@ -79,6 +80,20 @@ export interface AnnouncedTitles {
 export interface TitleAnnouncer {
   announce(titles: AnnouncedTitles): Promise<void>;
 }
+
+/** A duel as its Discord message shows it: its players, its time and place, where it stands, its bet. */
+export interface AnnouncedDuel {
+  duel: Duel;
+  status: DuelStatus;
+  challenger: string;
+  opponent: string;
+  /** The challenged member, called once in the message of a challenge. */
+  opponentDiscordId: string;
+  winner: string | undefined;
+}
+
+/** The PvP channel, where each duel has its message, refreshed as it goes. */
+export type DuelAnnouncer = MessageAnnouncer<AnnouncedDuel>;
 
 /** A deathroll for a big stake, as announced on Discord (P15.5). */
 export interface AnnouncedDeathroll {

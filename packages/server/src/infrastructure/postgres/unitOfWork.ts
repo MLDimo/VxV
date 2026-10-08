@@ -15,6 +15,7 @@ import { memberRepository } from "./members.ts";
 import { counterReadingRepository, missionRepository, missionRewardRepository } from "./missions.ts";
 import { professionRepository } from "./professions.ts";
 import { deathrollRepository } from "./deathrolls.ts";
+import { duelRepository } from "./duels.ts";
 import { raidLogRepository } from "./raidLogs.ts";
 import { raidRecordRepository } from "./raidRecords.ts";
 import { raidRepository } from "./raids.ts";
@@ -54,6 +55,7 @@ function createRepositories(sql: SqlClient): Repositories {
     deathrolls: deathrollRepository(sql),
     titles: titleRepository(sql),
     bossFights: bossFightRepository(sql),
+    duels: duelRepository(sql),
   };
 }
 

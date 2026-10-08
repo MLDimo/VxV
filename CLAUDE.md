@@ -46,7 +46,12 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - **PvP** (site `/pvp`, bot) : sorties PvP créées par un officier (site, `/vxv_pvp`) comme les soirées de raid, avec
   un titre à la place des raids et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes
   inscriptions et rappels, message dans le salon PvP (`DISCORD_PVP_CHANNEL_ID`, salon des raids sans lui), page
-  `/pvp/evenements/<id>`.
+  `/pvp/evenements/<id>`. Duels (`domain/duels.ts`, `/pvp/duels`) : un membre en défie un autre à une date, une heure
+  et un lieu ; le défié est appelé sur Discord (salon PvP) et répond avant l'heure. Défi relevé : un pari ordinaire
+  s'ouvre jusqu'à l'heure du duel (un choix par joueur, règles des paris, sans les deux joueurs). Résultat lu en jeu,
+  sinon reconnu par le perdant ; un officier peut saisir le vainqueur ou annuler, avec motif ; annulé, les mises sont
+  rendues. Classement Elo (`/pvp/classement`) recalculé des duels joués dans l'ordre : départ 1500,
+  E = 1 / (1 + 10^((Rb − Ra) / 400)), R' = R + 20 × (résultat − E).
 - **Prochain boss** (`VXV_Raid`) : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du
   pack) ; ailleurs, le premier boss debout des raids de l'événement ; un joueur arrivé en retard apprend du maître du
   butin (ou du chef) les boss tués. Panneau en tête des SR du raid et dans le mode réduit ; alerte (message au milieu
