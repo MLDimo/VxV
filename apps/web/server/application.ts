@@ -30,9 +30,8 @@ export function getApplication(): Application {
       betAnnouncer: createDiscordBetAnnouncer({ ...rest, channelId: discord.betsChannelId, siteUrl }),
       missionAnnouncer: createDiscordMissionAnnouncer({ ...rest, channelId: discord.missionsChannelId, siteUrl }),
       titleAnnouncer: createDiscordTitleAnnouncer({ ...rest, channelId: discord.titlesChannelId, siteUrl }),
-      // The big deathrolls go with the bets.
-      deathrollAnnouncer: createDiscordDeathrollAnnouncer({ ...rest, channelId: discord.betsChannelId, siteUrl }),
-      duelAnnouncer: createDiscordDuelAnnouncer({ ...rest, channelId: discord.pvpChannelId, siteUrl }),
+      deathrollAnnouncer: createDiscordDeathrollAnnouncer({ ...rest, channelId: discord.deathrollsChannelId, siteUrl }),
+      duelAnnouncer: createDiscordDuelAnnouncer({ ...rest, channelId: discord.duelsChannelId, siteUrl }),
     });
   }
   return application;

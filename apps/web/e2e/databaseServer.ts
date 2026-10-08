@@ -60,12 +60,12 @@ const app = createApplication({
   }),
   duelAnnouncer: createDiscordDuelAnnouncer({
     ...rest,
-    channelId: WEB_ENVIRONMENT.DISCORD_PVP_CHANNEL_ID,
+    channelId: WEB_ENVIRONMENT.DISCORD_DUELS_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
   deathrollAnnouncer: createDiscordDeathrollAnnouncer({
     ...rest,
-    channelId: WEB_ENVIRONMENT.DISCORD_BETS_CHANNEL_ID,
+    channelId: WEB_ENVIRONMENT.DISCORD_DEATHROLLS_CHANNEL_ID,
     siteUrl: WEB_ENVIRONMENT.SITE_URL,
   }),
 });

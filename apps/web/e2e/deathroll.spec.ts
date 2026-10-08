@@ -33,7 +33,7 @@ test("a deathroll played in game: Discord tells it, the loser owes the stake unt
   const message = (await discordMessages(request)).find((candidate) =>
     JSON.stringify(candidate.body).includes("/paris/deathroll"),
   );
-  expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_BETS_CHANNEL_ID);
+  expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_DEATHROLLS_CHANNEL_ID);
   expect(JSON.stringify(message?.body)).toContain("Ciel Gris bat Dune Sable en 3 rolls");
 
   await signInAs(context, "lockedMember");
