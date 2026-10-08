@@ -57,7 +57,7 @@ describe("raid sign-up message", () => {
         `⏳ <t:${start}:R>`,
         `${emoji("sr")} 2 SR par joueur`,
         "👥 Ouvert à tous",
-        `${emoji("role_tank")} 0 · ${emoji("role_heal")} 0 · ${emoji("role_dps_melee")} 0`,
+        `${emoji("role_tank")} 0 · ${emoji("role_heal")} 0 · ${emoji("role_dps")} 0`,
       ].join("\n"),
     );
     expect(embed.fields?.slice(0, 3)).toEqual([
@@ -83,9 +83,7 @@ describe("raid sign-up message", () => {
         signup("Thom Leboss", { role: "healer", spec: "Lumière", characterClass: "PRIEST" }),
       ]),
     );
-    expect(embed.description).toContain(
-      `${emoji("role_tank")} 1 · ${emoji("role_heal")} 1 · ${emoji("role_dps_melee")} 1`,
-    );
+    expect(embed.description).toContain(`${emoji("role_tank")} 1 · ${emoji("role_heal")} 1 · ${emoji("role_dps")} 1`);
     expect(embed.fields?.slice(2).map((field) => [field.name, field.value])).toEqual([
       [BLANK, "👥 **3**"],
       [`${emoji("role_tank")} __Tank__ (1)`, `${emoji("spe_guerrier_protection")} \`1\` **Ciel Gris**`],

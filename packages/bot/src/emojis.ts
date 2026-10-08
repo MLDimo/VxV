@@ -23,7 +23,7 @@ export const EVENT_EMOJIS: Record<EventKind, EmojiName> = { raid: "raid", pvp: "
 export const ROLE_EMOJIS: Record<SignupRole, EmojiName> = {
   tank: "role_tank",
   healer: "role_heal",
-  dps: "role_dps_melee",
+  dps: "role_dps",
 };
 
 export const STATUS_EMOJIS: Record<SignupStatus, EmojiName> = {
