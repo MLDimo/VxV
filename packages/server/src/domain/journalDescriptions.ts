@@ -55,8 +55,12 @@ export function describeRosterImport(summary: RosterImportSummary): string {
 }
 
 function describeEventCreation(event: EventCreationRecord): string {
+  const parts = [`${event.title ?? raidTitle(event.raids)}, le ${formatDateTime(new Date(event.startsAt))}`];
+  if (event.softReservesPerPlayer > 0) {
+    parts.push(`${softReserveCount(event.softReservesPerPlayer)} par joueur`);
+  }
   const audience = event.audience === undefined ? "" : `. ${event.audience}`;
-  return `${raidTitle(event.raids)}, le ${formatDateTime(new Date(event.startsAt))}, ${softReserveCount(event.softReservesPerPlayer)} par joueur${audience}`;
+  return `${parts.join(", ")}${audience}`;
 }
 
 function describeExclusion(exclusion: ExclusionRecord): string {

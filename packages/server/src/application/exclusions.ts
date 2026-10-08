@@ -1,4 +1,4 @@
-import type { RaidEvent } from "../domain/events.ts";
+import type { GuildEvent } from "../domain/events.ts";
 import type { ExclusionRecord, NewJournalEntry } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import type { LootItem } from "../domain/softReserves.ts";
@@ -12,7 +12,7 @@ async function findEventItem(
   eventId: string,
   rawItemId: string,
   excluded: boolean,
-): Promise<{ event: RaidEvent; item: LootItem }> {
+): Promise<{ event: GuildEvent; item: LootItem }> {
   const event = await repositories.events.findById(eventId);
   if (event === undefined) {
     throw new ValidationError("Cet événement n'existe pas.");
@@ -31,7 +31,7 @@ async function findEventItem(
 function journalEntry(
   officer: Member,
   action: "exclusion.add" | "exclusion.remove",
-  { event, item }: { event: RaidEvent; item: LootItem },
+  { event, item }: { event: GuildEvent; item: LootItem },
   removedSoftReserves: string[],
   reason: string,
 ): NewJournalEntry {

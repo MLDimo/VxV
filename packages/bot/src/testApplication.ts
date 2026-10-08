@@ -15,6 +15,7 @@ export const TEST_ROLES: DiscordRoleMapping = { treasurer: "treasurer-role", off
 export const SERVER_OWNER = "owner";
 export const LINK_CHANNEL = "links";
 export const RAID_CHANNEL = "raids";
+export const PVP_CHANNEL = "pvp";
 export const BETS_CHANNEL = "bets";
 export const MISSIONS_CHANNEL = "missions";
 export const SITE_URL = "https://vxv.test";
@@ -35,7 +36,12 @@ export async function createTestApplication(
     sql,
     discordRoles: TEST_ROLES,
     guild: createDiscordGuild({ token: "token", guildId: TEST_GUILD_ID }),
-    announcer: createDiscordRaidAnnouncer({ token: "token", channelId: RAID_CHANNEL, siteUrl: SITE_URL }),
+    announcer: createDiscordRaidAnnouncer({
+      token: "token",
+      channelId: RAID_CHANNEL,
+      pvpChannelId: PVP_CHANNEL,
+      siteUrl: SITE_URL,
+    }),
     betAnnouncer: createDiscordBetAnnouncer({ token: "token", channelId: BETS_CHANNEL, siteUrl: SITE_URL }),
     missionAnnouncer: createDiscordMissionAnnouncer({ token: "token", channelId: MISSIONS_CHANNEL, siteUrl: SITE_URL }),
     titleAnnouncer: createDiscordTitleAnnouncer({ token: "token", channelId: RAID_CHANNEL, siteUrl: SITE_URL }),
@@ -51,6 +57,7 @@ export async function createTestApplication(
       app,
       linkChannelId: LINK_CHANNEL,
       raidChannelId: RAID_CHANNEL,
+      pvpChannelId: PVP_CHANNEL,
       betsChannelId: BETS_CHANNEL,
       missionsChannelId: MISSIONS_CHANNEL,
     },

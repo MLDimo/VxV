@@ -1,6 +1,10 @@
 import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES } from "@vxv/server";
 import { normalizeForSearch } from "@vxv/server/domain/characterSearch";
-import { ApplicationCommandOptionType, InteractionResponseType } from "discord-api-types/v10";
+import {
+  ApplicationCommandOptionType,
+  InteractionResponseType,
+  type APIChatInputApplicationCommandGuildInteraction,
+} from "discord-api-types/v10";
 import {
   focusedOption,
   integerOption,
@@ -16,7 +20,56 @@ import { ephemeral } from "./responses.ts";
 const RAID_OPTIONS = ["raid", "raid2"];
 /** Discord shows at most 25 suggestions. */
 const MAX_SUGGESTIONS = 25;
-const INVALID_DATE = "Date ou heure invalide : écris par exemple 12/12/2026 (ou 12/12) et 21:00.";
+export const INVALID_DATE = "Date ou heure invalide : écris par exemple 12/12/2026 (ou 12/12) et 21:00.";
+
+/** When an event starts and who may sign up, as /vxv_raid and /vxv_pvp ask it; Discord wants the required first. */
+export const EVENT_OPTIONS = {
+  start: [
+    {
+      type: ApplicationCommandOptionType.String,
+      name: "date",
+      description: "Date, ex. 12/12/2026 ou 12/12",
+      required: true,
+    },
+    {
+      type: ApplicationCommandOptionType.String,
+      name: "heure",
+      description: "Heure de début, ex. 21:00",
+      required: true,
+    },
+    {
+      type: ApplicationCommandOptionType.Role,
+      name: "role",
+      description: "Qui peut s'inscrire : les membres de ce rôle, ou @everyone pour tout le monde",
+      required: true,
+    },
+  ],
+  reason: {
+    type: ApplicationCommandOptionType.String,
+    name: "motif",
+    description: "Motif, visible dans le journal",
+    required: true,
+  },
+} as const;
+
+/** The event an officer plans from Discord: when (undefined when unreadable) and the role chosen. */
+export function plannedOptions(interaction: APIChatInputApplicationCommandGuildInteraction) {
+  return {
+    startsAt: parseRaidStart(stringOption(interaction, "date"), stringOption(interaction, "heure"), new Date()),
+    roleId: roleOption(interaction, "role"),
+    reason: stringOption(interaction, "motif"),
+  };
+}
+
+/** Publishes the new event's sign-up message in its channel, and tells the officer. */
+export async function announcedReply({ app }: BotContext, eventId: string, channelId: string) {
+  const published = await app.raidAnnouncements.announceQuietly(eventId);
+  return ephemeral(
+    published
+      ? `Événement créé et publié dans <#${channelId}>.`
+      : "Événement créé, mais Discord n'a pas pu publier son message : il le sera à la prochaine inscription.",
+  );
+}
 
 /** A raid picked in the suggestions gives its id; a name typed in full also matches. */
 async function raidIds({ app }: BotContext, values: readonly string[]): Promise<string[]> {
@@ -46,30 +99,8 @@ export const VXV_RAID: Required<SlashCommand> = {
         required: true,
         autocomplete: true,
       },
-      {
-        type: ApplicationCommandOptionType.String,
-        name: "date",
-        description: "Date, ex. 12/12/2026 ou 12/12",
-        required: true,
-      },
-      {
-        type: ApplicationCommandOptionType.String,
-        name: "heure",
-        description: "Heure de début, ex. 21:00",
-        required: true,
-      },
-      {
-        type: ApplicationCommandOptionType.Role,
-        name: "role",
-        description: "Qui peut s'inscrire : les membres de ce rôle, ou @everyone pour tout le monde",
-        required: true,
-      },
-      {
-        type: ApplicationCommandOptionType.String,
-        name: "motif",
-        description: "Motif, visible dans le journal",
-        required: true,
-      },
+      ...EVENT_OPTIONS.start,
+      EVENT_OPTIONS.reason,
       {
         type: ApplicationCommandOptionType.String,
         name: "raid2",
@@ -87,7 +118,7 @@ export const VXV_RAID: Required<SlashCommand> = {
   },
 
   async run(interaction, context) {
-    const startsAt = parseRaidStart(stringOption(interaction, "date"), stringOption(interaction, "heure"), new Date());
+    const { startsAt, roleId, reason } = plannedOptions(interaction);
     if (startsAt === undefined) {
       return ephemeral(INVALID_DATE);
     }
@@ -102,16 +133,11 @@ export const VXV_RAID: Required<SlashCommand> = {
           RAID_OPTIONS.map((option) => stringOption(interaction, option)),
         ),
         softReservesPerPlayer: integerOption(interaction, "sr") ?? DEFAULT_SOFT_RESERVES,
-        roleId: roleOption(interaction, "role"),
+        roleId,
       },
-      stringOption(interaction, "motif"),
+      reason,
     );
-    const published = await app.raidAnnouncements.announceQuietly(eventId);
-    return ephemeral(
-      published
-        ? `Événement créé et publié dans <#${context.raidChannelId}>.`
-        : "Événement créé, mais Discord n'a pas pu publier son message : il le sera à la prochaine inscription.",
-    );
+    return announcedReply(context, eventId, context.raidChannelId);
   },
 
   async autocomplete(interaction, { app }) {

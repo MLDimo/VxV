@@ -5,9 +5,9 @@ import {
   type BetView,
   type Composition,
   type MissionView,
-  type RaidEvent,
+  type GuildEvent,
 } from "@vxv/server";
-import { count, formatGold, formatRemaining, formatShortEventDate, raidTitle } from "@vxv/server/domain/labels";
+import { count, formatGold, formatRemaining, formatShortEventDate, eventTitle } from "@vxv/server/domain/labels";
 import Link from "next/link";
 import { HomeCard } from "@/components/HomeCard";
 import { PlaceTiles } from "@/components/PlaceTiles";
@@ -20,7 +20,7 @@ function NextRaid({
   counts,
 }: {
   kicker: string;
-  event: RaidEvent | undefined;
+  event: GuildEvent | undefined;
   counts: Composition | undefined;
 }) {
   if (event === undefined || counts === undefined) {
@@ -37,7 +37,7 @@ function NextRaid({
   return (
     <HomeCard kicker={kicker} title={formatShortEventDate(event.startsAt)}>
       <p>
-        {raidTitle(event.raids.map((raid) => raid.name))} · {expected} attendus
+        {eventTitle(event)} · {expected} attendus
       </p>
       <p className="font-pixel text-lg">
         <span className="text-gain">{counts.byRole.tank} tanks</span>{" "}
@@ -110,7 +110,7 @@ function CurrentQuest({ kicker, view, now }: { kicker: string; view: MissionView
 /** The tavern (§4, §5): the scene with its places, then the cards of the moment. */
 export default async function TavernPage() {
   const { events, signups, bets, missions } = getApplication();
-  const [next] = await events.listUpcoming();
+  const [next] = await events.listUpcoming("raid");
   const nextBet = (await bets.list()).find((view) => view.open);
   const quest = (await missions.list()).find((view) => view.status === "running");
   const now = new Date();

@@ -35,6 +35,7 @@ describe("parseConfig", () => {
         betsChannelId: "444",
         missionsChannelId: "444",
         titlesChannelId: "444",
+        pvpChannelId: "444",
         roles: { treasurer: "2", officer: "3", gm: "4" },
       },
     });
@@ -42,6 +43,7 @@ describe("parseConfig", () => {
 
   it("publishes the bets in their own channel when one is given", () => {
     expect(parseConfig({ ...environment, DISCORD_BETS_CHANNEL_ID: "555" }).discord.betsChannelId).toBe("555");
+    expect(parseConfig({ ...environment, DISCORD_PVP_CHANNEL_ID: "666" }).discord.pvpChannelId).toBe("666");
   });
 
   it("names every missing or invalid variable", () => {

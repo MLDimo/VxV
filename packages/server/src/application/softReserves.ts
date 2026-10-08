@@ -1,4 +1,4 @@
-import type { RaidEvent } from "../domain/events.ts";
+import type { GuildEvent } from "../domain/events.ts";
 import { OLDER_THAN_WEBSITE } from "../domain/gameChanges.ts";
 import type { SoftReserveOverrideRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
@@ -24,7 +24,7 @@ export interface SoftReserveBoard {
   locked: boolean;
 }
 
-async function requireEvent(repositories: Repositories, eventId: string): Promise<RaidEvent> {
+async function requireEvent(repositories: Repositories, eventId: string): Promise<GuildEvent> {
   const event = await repositories.events.findById(eventId);
   if (event === undefined) {
     throw new ValidationError("Cet événement n'existe pas.");
@@ -33,7 +33,7 @@ async function requireEvent(repositories: Repositories, eventId: string): Promis
 }
 
 /** Checks the chosen items against the event's loot, exclusions and allowance; returns the item ids. */
-async function checkChoice(repositories: Repositories, event: RaidEvent, itemIds: readonly string[]) {
+async function checkChoice(repositories: Repositories, event: GuildEvent, itemIds: readonly string[]) {
   const loot = await repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id));
   const excluded = await repositories.exclusions.listByEvent(event.id);
   const check = checkSoftReserveChoice(itemIds, {
@@ -50,7 +50,7 @@ async function checkChoice(repositories: Repositories, event: RaidEvent, itemIds
 /** The event's loot with everyone's soft reserves and their SR+ bonus; "mine" marks the given character's. */
 export async function loadBoardItems(
   repositories: Repositories,
-  event: RaidEvent,
+  event: GuildEvent,
   myCharacterId: string | undefined,
 ): Promise<BoardItem[]> {
   const loot = await repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id));

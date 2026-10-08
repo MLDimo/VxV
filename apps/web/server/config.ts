@@ -18,10 +18,11 @@ const environmentSchema = z.object({
   DISCORD_GUILD_ID: discordId,
   DISCORD_LINK_CHANNEL_ID: discordId,
   DISCORD_RAID_CHANNEL_ID: discordId,
-  // Optional: without a channel of their own, the bets, the missions and the titles go to the raid channel.
+  // Optional: without a channel of their own, the bets, the missions, the titles and the PvP go to the raid channel.
   DISCORD_BETS_CHANNEL_ID: discordId.optional(),
   DISCORD_MISSIONS_CHANNEL_ID: discordId.optional(),
   DISCORD_TITLES_CHANNEL_ID: discordId.optional(),
+  DISCORD_PVP_CHANNEL_ID: discordId.optional(),
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -51,6 +52,8 @@ interface WebConfig {
     missionsChannelId: string;
     /** Channel where each week's titles are announced. */
     titlesChannelId: string;
+    /** Channel where each PvP outing has its sign-up message, and each duel its message. */
+    pvpChannelId: string;
     roles: DiscordRoleMapping;
   };
 }
@@ -79,6 +82,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       betsChannelId: env.DISCORD_BETS_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       missionsChannelId: env.DISCORD_MISSIONS_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       titlesChannelId: env.DISCORD_TITLES_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
+      pvpChannelId: env.DISCORD_PVP_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       roles: {
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,

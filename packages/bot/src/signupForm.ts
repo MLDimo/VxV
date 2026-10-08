@@ -1,6 +1,6 @@
-import { fullName, type Application, type Character, type Member, type RaidEvent, type Signup } from "@vxv/server";
+import { fullName, type Application, type Character, type Member, type GuildEvent, type Signup } from "@vxv/server";
 import { classLabel } from "@vxv/server/domain/characterClasses";
-import { raidTitle, ROLE_LABELS, SPEC_SUGGESTIONS, STATUS_LABELS } from "@vxv/server/domain/labels";
+import { eventTitle, ROLE_LABELS, SPEC_SUGGESTIONS, STATUS_LABELS } from "@vxv/server/domain/labels";
 import { SIGNUP_ROLES, SIGNUP_STATUSES, type SignupStatus } from "@vxv/server/domain/signups";
 import {
   ComponentType,
@@ -59,7 +59,7 @@ function readSpec(value: string): { characterClass: string; spec: string } {
 
 /** One modal holds the whole sign-up: character, role, status and specialisation, filled with the current one. */
 function signupForm(
-  event: RaidEvent,
+  event: GuildEvent,
   characters: readonly Character[],
   current: Signup | undefined,
 ): APIModalInteractionResponseCallbackData {
@@ -70,7 +70,7 @@ function signupForm(
   const status = current?.status ?? DEFAULT_STATUS;
   return {
     custom_id: `${SIGNUP_FORM_PREFIX}${event.id}`,
-    title: `Inscription · ${raidTitle(event.raids.map((raid) => raid.name))}`.slice(0, MAX_TITLE_LENGTH),
+    title: `Inscription · ${eventTitle(event)}`.slice(0, MAX_TITLE_LENGTH),
     components: [
       {
         type: ComponentType.Label,

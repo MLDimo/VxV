@@ -13,8 +13,10 @@ export interface BotContext {
   app: Application;
   /** Channel where members link their characters. */
   linkChannelId: string;
-  /** Channel where each event has its sign-up message. */
+  /** Channel where each raid night has its sign-up message. */
   raidChannelId: string;
+  /** Channel where each PvP outing has its sign-up message. */
+  pvpChannelId: string;
   /** Channel where each bet has its message. */
   betsChannelId: string;
   /** Channel where each mission has its message. */

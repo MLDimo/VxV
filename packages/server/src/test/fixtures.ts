@@ -57,7 +57,10 @@ export function createEvent(
   raidIds: string[],
   role?: EventRole,
 ): Promise<string> {
-  return eventRepository(sql).create({ startsAt, raidIds, softReservesPerPlayer: 1, role }, createdBy.id);
+  return eventRepository(sql).create(
+    { kind: "raid", title: undefined, startsAt, raidIds, softReservesPerPlayer: 1, role },
+    createdBy.id,
+  );
 }
 
 /** Onyxia's lair with two bosses and their loot, as the generated raid data would create it. */

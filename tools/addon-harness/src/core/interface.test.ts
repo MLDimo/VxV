@@ -21,7 +21,7 @@ const WINDOW = `
 `;
 const TAB = (name: string) =>
   `FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "${name}" end)`;
-const TABS = ["Taverne", "Raid", "Le Dé Pipé", "Quêtes", "Ranking", "Artisans", "Journal"];
+const TABS = ["Taverne", "Raid", "PvP", "Le Dé Pipé", "Quêtes", "Ranking", "Artisans", "Journal"];
 /** The minimap icon: the last offset it was placed at, from the minimap's center. */
 const ICON_OFFSET = `
   local icon = Minimap.children[#Minimap.children]

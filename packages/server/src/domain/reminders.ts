@@ -1,4 +1,4 @@
-import type { RaidEvent } from "./events.ts";
+import type { GuildEvent } from "./events.ts";
 import type { SignupStatus } from "./signups.ts";
 
 /** Events starting within this delay are reminded, by a task that runs once a day. */
@@ -12,7 +12,7 @@ export interface ReminderTarget {
 }
 
 export interface RaidReminder {
-  event: RaidEvent;
+  event: GuildEvent;
   /** Discord ids of the members who answered anything but absent. */
   expected: string[];
   /** Among them, those who have not chosen their soft reserves yet. */
@@ -20,7 +20,7 @@ export interface RaidReminder {
 }
 
 /** Who a raid's reminder calls: everyone signed up but the absent, and who still has soft reserves to choose. */
-export function raidReminder(event: RaidEvent, targets: readonly ReminderTarget[]): RaidReminder {
+export function raidReminder(event: GuildEvent, targets: readonly ReminderTarget[]): RaidReminder {
   const expected = targets.filter((target) => target.status !== "absent");
   return {
     event,

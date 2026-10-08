@@ -1,5 +1,5 @@
 import { fullName } from "../domain/characters.ts";
-import { EVENT_LISTED_AFTER_START_MS, type RaidEvent } from "../domain/events.ts";
+import { EVENT_LISTED_AFTER_START_MS, type GuildEvent } from "../domain/events.ts";
 import type { RaidLogImportRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
@@ -8,7 +8,7 @@ import { buildRaidRecap, type RaidRecap } from "../domain/raidRecap.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
-import type { RaidAnnouncer } from "./discordPorts.ts";
+import type { EventAnnouncer } from "./discordPorts.ts";
 
 export type RaidLogImportSummary = Omit<RaidLogImportRecord, "raids" | "eventStartsAt">;
 
@@ -20,14 +20,14 @@ const UNKNOWN_EVENT = "Cet événement n'existe pas.";
 
 /** What a log brought to the website. */
 interface Recorded {
-  event: RaidEvent;
+  event: GuildEvent;
   summary: RaidLogImportSummary;
   /** Presences and gives the website did not know before this log. */
   news: number;
 }
 
 /** The names of the event's bosses and items, for the recap and the journal. */
-async function raidNames(repositories: Repositories, event: RaidEvent) {
+async function raidNames(repositories: Repositories, event: GuildEvent) {
   const raidIds = event.raids.map((raid) => raid.id);
   const bosses = await repositories.raids.listBosses(raidIds);
   const loot = await repositories.bossLoot.listForRaids(raidIds);
@@ -111,7 +111,7 @@ export function createRaidLogs({
   clock,
 }: {
   unitOfWork: UnitOfWork;
-  announcer: RaidAnnouncer;
+  announcer: EventAnnouncer;
   clock: Clock;
 }) {
   /** Publishes the recap once; Discord being down never fails the caller, the next attempt retries. */

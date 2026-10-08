@@ -1,25 +1,24 @@
 import { canManageRaids } from "@vxv/server";
 import Link from "next/link";
-import { RaidNav } from "@/components/RaidNav";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { UpcomingEvents } from "@/components/UpcomingEvents";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
-export default async function RaidPage() {
+/** The wall of wanted posters: the PvP outings to come. */
+export default async function PvpPage() {
   const member = await requireMember();
-  const events = await getApplication().events.listUpcoming("raid");
+  const events = await getApplication().events.listUpcoming("pvp");
   return (
     <>
-      <ScreenHeader kicker="Conseil de guerre" title="Raids à venir">
+      <ScreenHeader kicker="Avis de recherche" kickerClassName="text-loss" title="Sorties PvP">
         {canManageRaids(member.roles) && (
-          <Link href="/evenements/nouveau" className="button-wood text-gold">
-            Créer un événement
+          <Link href="/pvp/nouveau" className="button-wood text-gold">
+            Créer une sortie
           </Link>
         )}
       </ScreenHeader>
-      <RaidNav current="/raid" />
-      <UpcomingEvents events={events} empty="Aucun raid prévu pour l'instant." />
+      <UpcomingEvents events={events} empty="Aucune sortie PvP prévue pour l'instant." />
     </>
   );
 }

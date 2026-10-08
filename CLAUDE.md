@@ -43,6 +43,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`Meter.lua`), résurrections acceptées (`Raised.lua`) ; envoyé par le compagnon ou exporté (`/vxv journal`), importé
   sur le site, corrigé par un officier avec motif. Tous les loots sont gardés avec leur mode (SR, SR+, roll libre,
   loot council) ; présences et loots nourrissent le SR+. Récap Discord de chaque raid le lendemain.
+- **PvP** (site `/pvp`, bot) : sorties PvP créées par un officier (site, `/vxv_pvp`) comme les soirées de raid, avec
+  un titre à la place des raids et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes
+  inscriptions et rappels, message dans le salon PvP (`DISCORD_PVP_CHANNEL_ID`, salon des raids sans lui), page
+  `/pvp/evenements/<id>`.
 - **Prochain boss** (`VXV_Raid`) : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du
   pack) ; ailleurs, le premier boss debout des raids de l'événement ; un joueur arrivé en retard apprend du maître du
   butin (ou du chef) les boss tués. Panneau en tête des SR du raid et dans le mode réduit ; alerte (message au milieu
@@ -107,7 +111,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - Jetons dans `packages/design/src/tokens.ts`, seule source des couleurs et des polices. `npm run generate` écrit `tokens.css` (thème Tailwind du site) et `VXV_Core/UI/Tokens.lua` ; un test vérifie que les fichiers générés sont à jour.
 - Pixel art : aucun arrondi (retirés du thème), reliefs en anneaux d'ombres pleines, survol prune et or, zones officier à liseré or.
 - Pixelify Sans pour les titres, onglets, plaques, boutons et gros chiffres ; Manrope pour le texte, noms de joueurs compris. Polices et images servies par le site (`apps/web/public`), licences OFL à côté des polices. Chinois et coréen : familles de polices qui prennent celles du jeu pour ces alphabets.
-- Un lieu = un onglet, même nom partout : Taverne, Raid, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal. Le mur des avis de recherche (JcJ) reste sans interaction.
+- Un lieu = un onglet, même nom partout : Taverne, Raid, PvP, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal. PvP est le mur des avis de recherche.
 - Fond de chaque écran : la taverne cadrée sur son lieu, très sombre (`backdrop` de `packages/design/src/places.ts`),
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.

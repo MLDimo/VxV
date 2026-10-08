@@ -10,7 +10,7 @@ import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createHistory } from "./history.ts";
 import { createJournal } from "./journal.ts";
-import type { RaidAnnouncer } from "./discordPorts.ts";
+import type { EventAnnouncer } from "./discordPorts.ts";
 import { COMPANION_LOG_REASON, createRaidLogs } from "./raidLogs.ts";
 
 const NOW = new Date("2026-12-11T09:00:00Z");
@@ -46,7 +46,7 @@ describe("raid logs", () => {
     const unitOfWork = createUnitOfWork(sql);
     recaps = [];
     discordDown = false;
-    const announcer: RaidAnnouncer = {
+    const announcer: EventAnnouncer = {
       publish: async () => "message",
       update: async () => true,
       remind: async () => {},

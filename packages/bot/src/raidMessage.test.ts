@@ -1,4 +1,4 @@
-import type { AnnouncedRaid, Signup } from "@vxv/server";
+import type { AnnouncedEvent, Signup } from "@vxv/server";
 import { describe, expect, it } from "vitest";
 import { raidMessage, SIGNUP_BUTTON_PREFIX } from "./raidMessage.ts";
 
@@ -18,7 +18,7 @@ function signup(characterName: string, overrides: Partial<Signup> = {}): Signup 
   };
 }
 
-function raid(signups: Signup[]): AnnouncedRaid {
+function raid(signups: Signup[]): AnnouncedEvent {
   return {
     event: {
       id: EVENT_ID,
@@ -28,6 +28,8 @@ function raid(signups: Signup[]): AnnouncedRaid {
         { id: "onyxia", name: "Onyxia" },
         { id: "hyjal", name: "Mont Hyjal" },
       ],
+      kind: "raid",
+      title: undefined,
       role: undefined,
       discordMessageId: undefined,
     },

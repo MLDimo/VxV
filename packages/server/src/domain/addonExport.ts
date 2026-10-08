@@ -1,10 +1,10 @@
 import { fullName, type Character } from "./characters.ts";
 import { eventAudience } from "./eventRoles.ts";
-import type { RaidEvent } from "./events.ts";
+import type { GuildEvent } from "./events.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { JournalEntry } from "./journal.ts";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "./journalDescriptions.ts";
-import { raidTitle } from "./labels.ts";
+import { eventTitle } from "./labels.ts";
 import type { Signup } from "./signups.ts";
 import { flag, line, seconds, text } from "./addonText.ts";
 import type { BoardItem } from "./softReserves.ts";
@@ -13,7 +13,7 @@ import type { BoardItem } from "./softReserves.ts";
 export const ADDON_EVENT_HEADER = "VXV-RAID-3";
 
 export interface AddonEventFacts {
-  event: RaidEvent;
+  event: GuildEvent;
   signups: readonly Signup[];
   board: readonly BoardItem[];
   /** Characters of the officers and the guild master: the addon takes the event's data from them only. */
@@ -55,7 +55,7 @@ export function formatAddonEvent(facts: AddonEventFacts): string {
       seconds(event.startsAt),
       seconds(facts.exportedAt),
       event.softReservesPerPlayer,
-      text(raidTitle(event.raids.map((raid) => raid.name))),
+      text(eventTitle(event)),
       event.raids.map((raid) => raid.id).join(","),
       text(eventAudience(event.role)),
     ),

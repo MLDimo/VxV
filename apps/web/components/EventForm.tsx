@@ -5,7 +5,8 @@ import { useActionState } from "react";
 import { createEvent } from "@/app/actions/events";
 import { ActionMessages } from "./ActionMessages";
 import { IDLE } from "./actionState";
-import { Field, Options, ReasonField } from "./Field";
+import { EventRoleField } from "./EventRoleField";
+import { Field, ReasonField } from "./Field";
 
 export function EventForm({
   raids,
@@ -36,14 +37,7 @@ export function EventForm({
           ))}
         </div>
       </fieldset>
-      <Field label="Qui peut s'inscrire (rôle Discord)">
-        <select name="roleId" required defaultValue="" className="field">
-          <option value="" disabled>
-            Choisir un rôle
-          </option>
-          <Options options={roles.map((role) => [role.id, role.name] as const)} />
-        </select>
-      </Field>
+      <EventRoleField roles={roles} />
       <Field label="SR par joueur">
         <input
           type="number"

@@ -11,6 +11,12 @@ test("the tavern opens every place", async ({ page, context }) => {
   await expect(page.getByRole("heading", { name: "Raids à venir" })).toBeVisible();
 
   await page.goto("/");
+  await page.getByRole("link", { name: "PvP", exact: true }).last().click();
+  await expect(page).toHaveURL(/\/pvp$/);
+  await expect(page.getByRole("heading", { name: "Sorties PvP" })).toBeVisible();
+  await expect(page.locator('[data-place="pvp"]')).toHaveCount(1);
+
+  await page.goto("/");
   await page.getByRole("link", { name: "Le Dé Pipé", exact: true }).last().click();
   await expect(page).toHaveURL(/\/paris$/);
   // Its screen stands over the tavern framed on its door, as in the addon.

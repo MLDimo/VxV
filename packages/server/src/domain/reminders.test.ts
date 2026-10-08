@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
-import type { RaidEvent } from "./events.ts";
+import type { GuildEvent } from "./events.ts";
 import { raidReminder, type ReminderTarget } from "./reminders.ts";
 
-const event: RaidEvent = {
+const event: GuildEvent = {
   id: "e",
   startsAt: new Date("2026-12-12T20:00:00Z"),
   softReservesPerPlayer: 1,
   raids: [{ id: "onyxia", name: "Onyxia" }],
+  kind: "raid",
+  title: undefined,
   role: undefined,
   discordMessageId: undefined,
 };

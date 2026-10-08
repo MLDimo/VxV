@@ -1,12 +1,12 @@
 import type { UnitOfWork } from "./ports.ts";
-import type { RaidAnnouncer } from "./discordPorts.ts";
+import type { EventAnnouncer } from "./discordPorts.ts";
 
 export function createRaidAnnouncements({
   unitOfWork,
   announcer,
 }: {
   unitOfWork: UnitOfWork;
-  announcer: RaidAnnouncer;
+  announcer: EventAnnouncer;
 }) {
   /** Publishes the event's sign-up message on Discord the first time (or again if deleted), then updates it. */
   async function announce(eventId: string): Promise<void> {

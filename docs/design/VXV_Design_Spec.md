@@ -28,15 +28,15 @@ Règles absolues :
 |---|---|---|---|
 | 0 | Taverne | (accueil, la scène elle-même) | — |
 | 1 | Raid | Table du conseil de guerre | Raids & SR |
-| 2 | Le Dé Pipé | Porte néon rose | Paris & deathroll |
-| 3 | Quêtes | Tableau à parchemins | Missions |
-| 4 | Ranking | Tableau au-dessus de la cheminée | Classements & titres |
-| 5 | Artisans | Forge | Forge & métiers |
-| 6 | Journal | Comptoir | Caisse & historique |
-| — | JcJ (réservé) | Mur des avis de recherche | **Aucun onglet ni zone cliquable pour l'instant** |
+| 2 | PvP | Mur des avis de recherche | Duels & sorties (demande du propriétaire, 7 octobre) |
+| 3 | Le Dé Pipé | Porte néon rose | Paris & deathroll |
+| 4 | Quêtes | Tableau à parchemins | Missions |
+| 5 | Ranking | Tableau au-dessus de la cheminée | Classements & titres |
+| 6 | Artisans | Forge | Forge & métiers |
+| 7 | Journal | Comptoir | Caisse & historique |
 
-Ordre des onglets dans l'addon : `Taverne · Raid · Le Dé Pipé · Quêtes · Ranking · Artisans · Journal`.
-Ordre du menu du site : `Raid · Quêtes · Le Dé Pipé · Ranking · Artisans · Journal` (+ bouton Connexion Discord).
+Ordre des onglets dans l'addon : `Taverne · Raid · PvP · Le Dé Pipé · Quêtes · Ranking · Artisans · Journal`.
+Ordre du menu du site : `Raid · PvP · Quêtes · Le Dé Pipé · Ranking · Artisans · Journal` (+ bouton Connexion Discord).
 
 ---
 
@@ -176,7 +176,7 @@ Survol / focus (partout) : la cible passe en prune `#4A2A6A` avec liseré or `#F
 | Raid (table) | 49.5% | 57% | 24% | 36% | `top: 80%` du spot (au sol, au pied de la table) |
 | Le Dé Pipé (porte) | 73.5% | 21% | 11% | 68% | `bottom: 66%` (juste au-dessus de l'arche) |
 | Artisans (forge) | 85.5% | 22% | 14% | 72% | `top: 36%` du spot |
-| *JcJ (mur avis)* | *≈ 52%* | *≈ 17%* | *≈ 21%* | *≈ 32%* | *réservé — ne pas implémenter* |
+| PvP (mur des avis) | 52% | 25% | 19% | 31% | `bottom: calc(100% - 10px)` (touche le haut du panneau) |
 
 Plaque toujours centrée horizontalement (`left:50%; transform:translateX(-50%)`), `white-space: nowrap`. Site : plaque = titre + `<small>` sous-titre. Addon : titre seul (14px).
 
@@ -356,7 +356,7 @@ Fenêtre **420 × 600**, cadre 3 anneaux. En-tête compact (emblème 24px, « mo
 - [ ] Animations en `steps()` (flick, bob, tumble, turn, blink) sauf parallaxe et pulse ; toutes coupées en reduced-motion.
 - [ ] Deathroll : défaite à **0**, fond qui rougit, pas de jauge.
 - [ ] Ranking : fanions couleur de classe, sans rayures ni franges.
-- [ ] Mur des avis de recherche : aucune interaction tant que le JcJ n'existe pas.
+- [ ] Mur des avis de recherche : lieu PvP (duels et sorties).
 
 ---
 

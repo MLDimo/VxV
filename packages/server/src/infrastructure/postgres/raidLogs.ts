@@ -1,5 +1,5 @@
 import type { RaidLogRepository } from "../../application/ports.ts";
-import type { RaidEvent } from "../../domain/events.ts";
+import type { GuildEvent } from "../../domain/events.ts";
 import type { SqlClient } from "../sql.ts";
 import { eventRepository } from "./events.ts";
 
@@ -27,7 +27,7 @@ export function raidLogRepository(sql: SqlClient): RaidLogRepository {
         [startedBefore],
       );
       const events = eventRepository(sql);
-      const found: { event: RaidEvent; content: string }[] = [];
+      const found: { event: GuildEvent; content: string }[] = [];
       for (const row of rows) {
         const event = await events.findById(row.event_id);
         if (event !== undefined) {

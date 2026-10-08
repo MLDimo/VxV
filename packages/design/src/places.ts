@@ -9,7 +9,7 @@ import type { ColorToken } from "./tokens.ts";
 export type PlaqueAnchor = "above" | "board" | "middle" | "table" | "door";
 
 export interface Place {
-  id: "raid" | "dice" | "quests" | "ranking" | "artisans" | "journal";
+  id: "raid" | "pvp" | "dice" | "quests" | "ranking" | "artisans" | "journal";
   name: string;
   /** Name of the tab in the addon's reduced mode (§7.8), when the place's name is too long. */
   short?: string;
@@ -39,6 +39,17 @@ export const PLACES: readonly Place[] = [
     plaque: "table",
     tile: [-560, -300],
     backdrop: { position: [60, 85], zoom: 2.6, opacity: 0.3 },
+  },
+  {
+    // The wall of wanted posters (owner's request of 7 October: duels and PvP outings).
+    id: "pvp",
+    name: "PvP",
+    subtitle: "Duels & sorties",
+    kicker: "loss",
+    spot: [52, 25, 19, 31],
+    plaque: "board",
+    tile: [-590, -139],
+    backdrop: { position: [69, 29], zoom: 2.5, opacity: 0.3 },
   },
   {
     id: "dice",
