@@ -13,8 +13,11 @@ import type { Signup } from "../domain/signups.ts";
 export interface GuildGateway {
   /** Sets the member's nickname; false when Discord refuses (server owner, or member ranked above the bot). */
   setNickname(discordId: string, nickname: string): Promise<boolean>;
-  /** Gives the member this role, creating it if needed, and takes away the other roles of the group. */
-  setOnlyRoleAmong(discordId: string, roleName: string, group: readonly string[]): Promise<void>;
+  /**
+   * Gives the member this role, created if needed and kept in its colour, and takes away the other roles of the
+   * group.
+   */
+  setOnlyRoleAmong(discordId: string, role: { name: string; color: number }, group: readonly string[]): Promise<void>;
   /** The Discord roles the member holds on the server, or undefined when they are no longer on it. */
   fetchRoleIds(discordId: string): Promise<string[] | undefined>;
   /** The server's roles, @everyone included. */

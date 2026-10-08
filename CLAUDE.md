@@ -130,7 +130,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - Un lieu = un onglet, même nom partout : Taverne, Raid, PvP, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal. PvP est le mur des avis de recherche.
 - Fond de chaque écran : la taverne cadrée sur son lieu, très sombre (`backdrop` de `packages/design/src/places.ts`),
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
-- Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), et ces couleurs ne servent à rien d'autre.
+- Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), jusque sur Discord par la couleur des rôles de
+  classe (`classRole`, rendue par le bot à un rôle d'une autre couleur), et ces couleurs ne servent à rien d'autre.
 - Avatars : portraits de la charte choisis par race, classe et sexe du personnage principal (transmis par l'addon), avec repli.
 - Le site est réservé aux membres : un visiteur ne voit que la page de connexion.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.

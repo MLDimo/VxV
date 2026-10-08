@@ -11,6 +11,8 @@ interface Role {
   id: string;
   name: string;
   managed: boolean;
+  /** Discord's default: 0, no colour. */
+  color: number;
 }
 
 /** A message the bot published in a channel, as last edited. */
@@ -41,9 +43,9 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
   const newId = () => String((lastId += 1));
   const rolesOf = (userId: string) => memberRoles.get(userId) ?? new Set<string>();
   const ok = (body?: unknown): FakeDiscordReply => ({ status: body === undefined ? HTTP_NO_CONTENT : HTTP_OK, body });
-  const everyone = (guildId: string): Role => ({ id: guildId, name: "@everyone", managed: false });
-  function addRole(name: string, managed = false): Role {
-    const role = { id: newId(), name, managed };
+  const everyone = (guildId: string): Role => ({ id: guildId, name: "@everyone", managed: false, color: 0 });
+  function addRole(name: string, managed = false, color = 0): Role {
+    const role = { id: newId(), name, managed, color };
     roles.push(role);
     return role;
   }
@@ -51,7 +53,26 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
   const routes: [method: string, path: RegExp, handler: Handler][] = [
     // Like Discord, @everyone has the server's id.
     ["GET", /^\/guilds\/([^/]+)\/roles$/, ([guildId = ""]) => ok([everyone(guildId), ...roles])],
-    ["POST", /^\/guilds\/[^/]+\/roles$/, (_, body) => ok(addRole((body as { name: string }).name))],
+    [
+      "POST",
+      /^\/guilds\/[^/]+\/roles$/,
+      (_, body) => {
+        const { name, color } = body as { name: string; color?: number };
+        return ok(addRole(name, false, color));
+      },
+    ],
+    [
+      "PATCH",
+      /^\/guilds\/[^/]+\/roles\/([^/]+)$/,
+      ([roleId = ""], body) => {
+        const role = roles.find((candidate) => candidate.id === roleId);
+        if (role === undefined) {
+          return { status: HTTP_NOT_FOUND, body: { message: "Unknown Role", code: 10011 } };
+        }
+        role.color = (body as { color: number }).color;
+        return ok(role);
+      },
+    ],
     [
       "GET",
       /^\/guilds\/[^/]+\/members\/([^/]+)$/,
@@ -137,6 +158,8 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
     /** The user leaves the guild's server. */
     leave: (userId: string) => departed.add(userId),
     roleNamesOf: (userId: string) => roles.filter((role) => rolesOf(userId).has(role.id)).map((role) => role.name),
+    /** The colour of the server's role of this name, 0 for none. */
+    roleColorOf: (roleName: string) => roles.find((role) => role.name === roleName)?.color,
     /** Messages published by the bot, in publication order. */
     messages: () => [...messages.values()],
   };
