@@ -300,7 +300,7 @@ Mesurées par la sonde (détail et journaux : `docs/phase-0/resultats.md`).
 - `COMBAT_LOG_EVENT_UNFILTERED` interdit : le client émet ADDON_ACTION_FORBIDDEN, sans erreur Lua.
 - Journaux écrits par le jeu : l'addon allume sans clic `LoggingCombat(true)`, `LoggingChat(true)` et le mode avancé
   (`advancedCombatLogging`). Le journal de combat (`Logs/WoWCombatLog-*.txt`) s'écrit pendant la partie (soins reçus
-  compris ; joueurs par prénom et GUID, sans nom de famille) ; le journal du chat n'est écrit qu'à la fermeture du jeu.
+  et rencontres de boss compris ; joueurs par prénom et GUID, sans nom de famille) ; le journal du chat n'est écrit qu'à la fermeture du jeu.
   Canal de discussion privé : envois sans clic bloqués.
 - `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés.
 - Habillage : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.

@@ -7,7 +7,8 @@ dans `sessions/`, aucune erreur Lua de la sonde :
 - 3 octobre, build 70170 : tests complémentaires T1 à T10 ;
 - 5 octobre : habillage (sonde 0.3.0, `/vxvtest design show`) ;
 - 6 octobre, build 70235 : inventaire de l'API refait, compteurs du jeu ;
-- 7 octobre, build 70245 : T11, les journaux du jeu.
+- 7 octobre, build 70245 : T11, les journaux du jeu ; le soir, un raid à 5 dans La salle des Thanes (rencontres de
+  boss dans le journal de combat, compteur de dégâts lu par identifiant).
 
 Les mesures qui manquent encore sont dans `docs/tests-en-jeu.md`.
 
@@ -100,9 +101,17 @@ pendant la partie.
 | Test | Question | Résultat | Statut | Conséquence |
 | --- | --- | --- | --- | --- |
 | T11 activation | L'addon peut-il allumer seul, sans clic, le journal de combat et le journal du chat ? | Oui : `LoggingCombat(true)`, `LoggingChat(true)` et `SetCVar("advancedCombatLogging", "1")` depuis un délai, sans action bloquée. Aussi présents : `C_ChatInfo.IsLoggingCombat`, `C_ChatInfo.IsLoggingChat`. | ✅ | — |
-| T11 journal de combat | Le journal de combat s'écrit-il pendant la partie, et que contient-il ? | Oui, au fil de l'eau (`Logs/WoWCombatLog-<date>.txt`, lignes vues quelques secondes après le combat), version 22, mode avancé. Soins donnés et reçus (`SPELL_HEAL`, `SPELL_PERIODIC_HEAL` avec la cible), dégâts, morts (`UNIT_DIED`), monstres tués (`PARTY_KILL`), et tous les joueurs proches, pas seulement le groupe. Les joueurs n'y figurent que par leur prénom et leur type de monde (`"Ðéjà-ClassicBetaPvP-"`, sans le nom de famille) et leur GUID (`Player-4619-00F6AB29`) : le nom complet se retrouve par le GUID, que l'addon connaît (`UnitGUID`). Rencontres de boss (`ENCOUNTER_START` / `ENCOUNTER_END`) pas encore vues (combat en extérieur). | ✅ | Le compagnon peut lire le combat en direct : morts, dégâts, soins reçus (Princesse mesurable), sans `/reload`. Rien d'autre que du combat. |
+| T11 journal de combat | Le journal de combat s'écrit-il pendant la partie, et que contient-il ? | Oui, au fil de l'eau (`Logs/WoWCombatLog-<date>.txt`, lignes vues quelques secondes après le combat), version 22, mode avancé. Soins donnés et reçus (`SPELL_HEAL`, `SPELL_PERIODIC_HEAL` avec la cible), dégâts, morts (`UNIT_DIED`), monstres tués (`PARTY_KILL`), et tous les joueurs proches, pas seulement le groupe. Les joueurs n'y figurent que par leur prénom et leur type de monde (`"Ðéjà-ClassicBetaPvP-"`, sans le nom de famille) et leur GUID (`Player-4619-00F6AB29`) : le nom complet se retrouve par le GUID, que l'addon connaît (`UnitGUID`). Rencontres de boss (`ENCOUNTER_START` / `ENCOUNTER_END`) : voir le raid du soir, ci-dessous. | ✅ | Le compagnon peut lire le combat en direct : morts, dégâts, soins reçus (Princesse mesurable), sans `/reload`. Rien d'autre que du combat. |
 | T11 journal du chat | Le journal du chat s'écrit-il pendant la partie ? | Non : `Logs/WoWChatLog.txt` reste vide (0 octet) pendant la partie, après `LoggingChat(false)` et après un `/reload` ; il est écrit en une fois à la fermeture du jeu. Il contient les chuchotements et les messages de canal, pas l'affichage de l'addon ni les messages d'addon. | ❌ | Pas mieux que les données sauvegardées, écrites à la déconnexion : abandonné. |
 | T11 envois sans clic | Quels messages l'addon peut-il envoyer sans clic ? | Chuchotement à soi-même (« Ðéjà Vu » comme « Ðéjà-Vu ») et messages d'addon (chuchotement à soi, guilde) : oui. Canal privé (`JoinChannelByName` accepté sans clic) : envois refusés (`ADDON_ACTION_BLOCKED` pour les 9 premiers), 3 des 4 suivants arrivés 11 s plus tard. | ⚠️ | Canal privé inutilisable sans clic. |
+
+Raid du soir à 5 dans La salle des Thanes, VXV et le compagnon 1.4 ouverts (`Logs/WoWCombatLog-100726_225845.txt`, données
+sauvegardées de VXV_Raid) :
+
+| Test | Question | Résultat | Statut | Conséquence |
+| --- | --- | --- | --- | --- |
+| T11 rencontres de boss | Le journal de combat porte-t-il le début et la fin d'une rencontre de boss ? | Oui : `ENCOUNTER_START,3493,"Faldrim Courbenclume",1,5,3065` puis `ENCOUNTER_END,3493,"Faldrim Courbenclume",1,5,1,21464` (identifiant, nom, difficulté, taille du groupe, succès, durée en ms). Le lecteur du compagnon en tire le boss tué et les soins reçus pendant le combat (Pashi 310, Mirriah 94). | ✅ | Princesse et les boss tués lus en direct par le compagnon (`apps/companion/src/domain/combatLog.ts`). |
+| T7 lecture par identifiant | Le compteur se lit-il par l'identifiant de la session du boss, après le combat ? | Oui : en combat, `C_DamageMeter.GetCombatSessionFromID` rend la session, montants et noms secrets (sonde) ; hors combat, VXV_Raid l'a lue au boss tué avec les chiffres de chacun : dégâts de Ðéjà Vu 664, Wazz Tataz 411, Mirriah Belilou 373, Pashi Dewm 345 ; soins de Cataleya Odc 404. | ✅ | Titres de dégâts et de soins à partir du journal de raid (`VXV_Raid/Meter.lua`). |
 
 Bilan : seul le journal de combat porte des données pendant la partie, et seulement du combat. Les SR, inscriptions,
 mises, deathrolls et changements faits en jeu restent portés par les données sauvegardées (`/reload` ou déconnexion).

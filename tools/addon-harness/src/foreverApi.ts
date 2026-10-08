@@ -51,8 +51,8 @@ const USED_IN_GAME = [
   "GameFontNormal",
   "UnitRace",
   "UnitSex",
-  // The game's damage meter (phase 0, T7, 3 October): both listed by "/vxvtest meter list", the sessions read by
-  // "/vxvtest meter read". Added to the probe's inventory for the next session.
+  // The game's damage meter (phase 0, T7, 3 October): both listed by "/vxvtest meter list"; a session read by its id
+  // after a boss killed, by VXV_Raid in the raid of 7 October.
   "C_DamageMeter.GetAvailableCombatSessions",
   "C_DamageMeter.GetCombatSessionFromID",
   // Showing a title (phase 0, T9, 3 October): a tooltip's line and the guild list's rows, called by the probe.
