@@ -50,7 +50,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   un titre à la place des raids et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes
   inscriptions et rappels, message dans le salon PvP (`DISCORD_PVP_CHANNEL_ID`, salon des raids sans lui), page
   `/pvp/evenements/<id>`. Duels (`domain/duels.ts`, `/pvp/duels`) : un membre en défie un autre à une date, une heure
-  et un lieu ; le défié est appelé sur Discord (salon PvP) et répond avant l'heure. Défi relevé : un pari ordinaire
+  et un lieu ; le défié est appelé sur Discord (salon des duels, `DISCORD_DUELS_CHANNEL_ID`, salon PvP sans lui) et
+  répond avant l'heure. Défi relevé : un pari ordinaire
   s'ouvre jusqu'à l'heure du duel (un choix par joueur, règles des paris, sans les deux joueurs). Résultat lu en jeu,
   sinon reconnu par le perdant ; un officier peut saisir le vainqueur ou annuler, avec motif ; annulé, les mises sont
   rendues. Classement Elo (`/pvp/classement`) recalculé des duels joués dans l'ordre : départ 1500,
@@ -89,7 +90,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct.
 - **Titres** (`VXV_Titles` ; règles dans `domain/titles.ts`) : chaque titre va au membre en tête de sa règle sur la
   saison (à égalité, le premier à l'atteindre ; sans score positif, à personne), réattribué chaque mercredi à 5 h UTC,
-  avec l'historique, un rôle Discord « ◆ <titre> » et l'annonce de la semaine. Princesse : soins reçus sur les boss
+  avec l'historique, un rôle Discord « ◆ <titre> » et l'annonce de la semaine (salon des titres,
+  `DISCORD_TITLES_CHANNEL_ID`, salon des raids sans lui). Princesse : soins reçus sur les boss
   tués en raid VXV, lus dans le journal de combat, que l'addon allume avec son mode avancé dans l'instance d'un raid
   des packs et éteint en sortant s'il l'a allumé (`VXV_Raid/CombatLogging.lua`) ; le site garde le relevé le plus
   complet de chaque combat et retrouve les joueurs par prénom parmi les présents du journal du raid
@@ -110,7 +112,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   pas un membre endetté) ; puis chacun roll à son tour de 1 au résultat précédent (`RandomRoll`), le défié en premier,
   fin au premier 1. Fenêtre du duel animée et synchronisée chez toute la guilde. Partie finie envoyée au site, qui la
   vérifie, crée et règle le pari de la guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du
-  gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des paris.
+  gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
+  (`DISCORD_DEATHROLLS_CHANNEL_ID`, salon des paris sans lui).
 - **Ranking** (`VXV_Ranking` ; site `/ranking`) : Paris et Deathroll au gain net, Quêtes aux points de places (3, 2 et
   1 par quête validée), Titres aux semaines détenues (`domain/rankingBoards.ts`, égalités départagées par le nom), par
   période (toujours, mois, saison). Fanions des trois premiers, trois records, suite du classement, position du joueur

@@ -23,6 +23,9 @@ const environmentSchema = z.object({
   DISCORD_MISSIONS_CHANNEL_ID: discordId.optional(),
   DISCORD_TITLES_CHANNEL_ID: discordId.optional(),
   DISCORD_PVP_CHANNEL_ID: discordId.optional(),
+  // Optional too: without their own channel, the duels go to the PvP channel, the deathrolls to the bets'.
+  DISCORD_DUELS_CHANNEL_ID: discordId.optional(),
+  DISCORD_DEATHROLLS_CHANNEL_ID: discordId.optional(),
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -52,8 +55,12 @@ interface WebConfig {
     missionsChannelId: string;
     /** Channel where each week's titles are announced. */
     titlesChannelId: string;
-    /** Channel where each PvP outing has its sign-up message, and each duel its message. */
+    /** Channel where each PvP outing has its sign-up message. */
     pvpChannelId: string;
+    /** Channel where each duel has its message. */
+    duelsChannelId: string;
+    /** Channel where the deathrolls played for a big stake are announced. */
+    deathrollsChannelId: string;
     roles: DiscordRoleMapping;
   };
 }
@@ -83,6 +90,9 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       missionsChannelId: env.DISCORD_MISSIONS_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       titlesChannelId: env.DISCORD_TITLES_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       pvpChannelId: env.DISCORD_PVP_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
+      duelsChannelId: env.DISCORD_DUELS_CHANNEL_ID ?? env.DISCORD_PVP_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
+      deathrollsChannelId:
+        env.DISCORD_DEATHROLLS_CHANNEL_ID ?? env.DISCORD_BETS_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       roles: {
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,

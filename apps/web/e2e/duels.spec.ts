@@ -6,7 +6,7 @@ import { signInAs } from "./sessions";
 const DUEL = "Duel : Dune Sable contre Ciel Gris";
 
 test.describe.serial("duels", () => {
-  test("a member challenges another, who is called on Discord in the PvP channel", async ({
+  test("a member challenges another, who is called on Discord in the duels channel", async ({
     page,
     context,
     request,
@@ -23,7 +23,7 @@ test.describe.serial("duels", () => {
     const message = (await discordMessages(request)).find((candidate) =>
       String(candidate.body.content).includes("te défie en duel"),
     );
-    expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_PVP_CHANNEL_ID);
+    expect(message?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_DUELS_CHANNEL_ID);
     expect(message?.body.content).toBe("<@100>, Dune Sable te défie en duel !");
   });
 
