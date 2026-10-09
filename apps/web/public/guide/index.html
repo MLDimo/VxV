@@ -422,7 +422,7 @@ figure { margin: 0; min-width: 0; }
 .drs-player { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; transition: opacity .5s, filter .5s; }
 .drs-player.left { grid-area: left; } .drs-player.right { grid-area: right; }
 .drs-player.waiting { opacity: .7; }
-.drs-player.lost { opacity: .75; filter: grayscale(1); }
+.drs-player.lost :is(.drs-frame, .drs-plaque, .drs-titles, .drs-role) { opacity: .75; filter: grayscale(1); }
 .drs-frame { width: clamp(84px, 13vw, 132px); aspect-ratio: 1; display: grid; place-items: center; box-shadow: 0 0 0 3px #0d0912, 0 0 0 7px #8a5a2a, 0 0 0 10px #0d0912, inset -6px -6px 0 rgba(0,0,0,.28), inset 6px 6px 0 rgba(255,255,255,.25); }
 .drs-frame img { width: 89%; height: 89%; image-rendering: pixelated; background: linear-gradient(180deg, #1a2a4a, #0d1424); box-shadow: 0 0 0 2px #0d0912; }
 .drs-player.turn .drs-frame { animation: drs-turn 1.2s steps(2) infinite; }
@@ -431,9 +431,12 @@ figure { margin: 0; min-width: 0; }
 .drs-titles { font-size: 12px; font-weight: 700; color: #ff8cc8; }
 .drs-role { font-size: 12px; color: #c9c2ea; }
 .drs-stamp { transform: rotate(-10deg); border: 3px solid #ff4d6d; color: #ff4d6d; font: 700 15px var(--font-pixel); letter-spacing: .08em; padding: 4px 10px; background: rgba(40,0,10,.7); }
-.drs-win { display: grid; gap: 2px; }
-.drs-win span { font: 700 22px var(--font-pixel); color: #f2c94c; text-shadow: 0 0 14px rgba(242,201,76,.8); }
-.drs-win b { color: #7ee2a0; font-size: 17px; }
+.drs-result { display: grid; gap: 2px; }
+.drs-result[hidden] { display: none; }
+.drs-result span { font: 700 22px var(--font-pixel); color: #f2c94c; text-shadow: 0 0 14px rgba(242,201,76,.8); }
+.drs-result b { color: #7ee2a0; font-size: 17px; }
+.drs-result.lost span { color: #ff4d6d; text-shadow: 0 0 14px rgba(255,77,109,.8); }
+.drs-result.lost b { color: #ff4d6d; }
 .drs-center { grid-area: center; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; min-width: 0; }
 .drs-die { width: clamp(96px, 14vw, 150px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 0 18px rgba(163,92,255,.6)) drop-shadow(0 10px 0 rgba(0,0,0,.35)); animation: drs-bob 2.4s steps(6) infinite; }
 .drs-die.rolling { animation: drs-tumble .5s steps(8) infinite; }
@@ -1721,7 +1724,7 @@ figure { margin: 0; min-width: 0; }
                 <span class="drs-titles">◆ Loser · ◆ Bien gras</span>
                 <span class="drs-role">Orc chaman · lanceur du défi</span>
                 <span class="drs-stamp" hidden>A goûté le sol</span>
-                <div class="drs-win" hidden><span>VICTOIRE</span><b>+500 po</b></div>
+                <div class="drs-result" hidden><span></span><b></b></div>
               </div>
               <div class="drs-center">
                 <img class="drs-die" id="drs-die" src="/images/d20.png" alt="Dé à vingt faces VXV">
@@ -1737,7 +1740,7 @@ figure { margin: 0; min-width: 0; }
                 <span class="drs-titles">◆ Il cheat c'est sûr</span>
                 <span class="drs-role">Morte-vivante démoniste · défiée, roll en premier</span>
                 <span class="drs-stamp" hidden>A goûté le sol</span>
-                <div class="drs-win" hidden><span>VICTOIRE</span><b>+500 po</b></div>
+                <div class="drs-result" hidden><span></span><b></b></div>
               </div>
             </div>
             <div class="drs-foot">
@@ -2210,6 +2213,7 @@ figure { margin: 0; min-width: 0; }
   const NAMES = ["Ulric", "Morgane"];
   const COLORS = ["#0070DD", "#8788EE"];
   const START = 1000;
+  const STAKE = "500 po";
   const STEPS = [55, 55, 60, 65, 75, 85, 100, 120, 145, 175, 210, 260];
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (id) => document.getElementById(id);
@@ -2233,8 +2237,14 @@ figure { margin: 0; min-width: 0; }
       player.classList.toggle("turn", !done && state.turn === index);
       player.classList.toggle("waiting", !done && state.turn !== index);
       player.classList.toggle("lost", done && state.loser === index);
-      player.querySelector(".drs-stamp").hidden = !(done && state.loser === index);
-      player.querySelector(".drs-win").hidden = !(done && state.loser !== index);
+      const lost = done && state.loser === index;
+      player.querySelector(".drs-stamp").hidden = !lost;
+      // The end of the game: victory and the stake won, or defeat and the stake lost.
+      const result = player.querySelector(".drs-result");
+      result.hidden = !done;
+      result.classList.toggle("lost", lost);
+      result.querySelector("span").textContent = lost ? "DÉFAITE" : "VICTOIRE";
+      result.querySelector("b").textContent = `${lost ? "−" : "+"}${STAKE}`;
     });
     $("drs-die").className = "drs-die" + (state.rolling ? " rolling" : done ? " lost" : "");
     const number = $("drs-number");
