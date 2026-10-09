@@ -24,6 +24,8 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "mission.create": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
   "mission.close": { label: "QUÊTE", className: "border-stamp-quest text-stamp-quest" },
   "title.give": { label: "TITRE", className: "border-ink-brown text-ink-brown" },
+  "title.custom": { label: "TITRE", className: "border-ink-brown text-ink-brown" },
+  "title.takeBack": { label: "TITRE", className: "border-ink-brown text-ink-brown" },
   "duel.result": { label: "PVP", className: "border-stamp-bet text-stamp-bet" },
   "duel.cancel": { label: "PVP", className: "border-stamp-bet text-stamp-bet" },
 };

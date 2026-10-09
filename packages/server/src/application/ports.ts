@@ -1,6 +1,7 @@
 import type { ProfessionReading, Recipe } from "../domain/artisans.ts";
 import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
 import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
+import type { CustomTitle, NewCustomTitle } from "../domain/customTitles.ts";
 import type { Duel, NewDuel } from "../domain/duels.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
 import type { EventKind, GuildEvent, PlannedEvent, RaidSummary } from "../domain/events.ts";
@@ -411,6 +412,18 @@ export interface TitleRepository {
   listHeld(sinceWeek: string | undefined): Promise<HeldTitle[]>;
 }
 
+/** The titles officers make by hand (domain/customTitles.ts). */
+export interface CustomTitleRepository {
+  create(title: NewCustomTitle, reason: string, givenAt: Date): Promise<void>;
+  /** The titles held now, the latest given first. */
+  listHeld(): Promise<CustomTitle[]>;
+  /** The title held of this id; undefined when it ended or the id is unknown. */
+  findHeld(id: string): Promise<CustomTitle | undefined>;
+  end(id: string, at: Date): Promise<void>;
+  /** Ends the titles given until the reset, and returns them. */
+  endUntilReset(at: Date): Promise<CustomTitle[]>;
+}
+
 export interface Season {
   number: number;
   startedAt: Date;
@@ -510,6 +523,7 @@ export interface Repositories {
   professions: ProfessionRepository;
   deathrolls: DeathrollRepository;
   titles: TitleRepository;
+  customTitles: CustomTitleRepository;
   bossFights: BossFightRepository;
   duels: DuelRepository;
 }

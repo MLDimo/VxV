@@ -205,4 +205,56 @@ describe("titles", () => {
     expect(next?.holders.find((holder) => holder.titleId === "princess")?.memberName).toBe("Morgane Nuitsombre");
     expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Princesse"));
   });
+
+  it("lets an officer make titles by hand, until the reset or taken back, with their roles and the journal", async () => {
+    const give = (by: Member, name: string, holder: Member, untilReset: boolean, reason: string) =>
+      titles.giveCustom(by, { name, memberId: holder.id, untilReset }, reason);
+    now = new Date(WEDNESDAY.getTime() - 60 * 60 * 1000);
+    await expect(give(vorn, "Sauveur", vorn, true, "Raid")).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(give(officer, "Princesse", vorn, true, "Raid")).rejects.toThrow(/titre de la guilde/);
+    await give(officer, " Sauveur du raid ", vorn, true, "A tenu Onyxia seul");
+    now = new Date(WEDNESDAY.getTime() - 30 * 60 * 1000);
+    await give(officer, "Mascotte", morgane, false, "Toujours là");
+    await expect(give(officer, "sauveur du raid", vorn, false, "Encore")).rejects.toThrow(/porte déjà/);
+    expect(
+      (await titles.customTitles()).map(({ name, memberName, reason, untilReset }) => [
+        name,
+        memberName,
+        reason,
+        untilReset,
+      ]),
+    ).toEqual([
+      ["Mascotte", "Morgane Nuitsombre", "Toujours là", false],
+      ["Sauveur du raid", "Vorn Cendrelune", "A tenu Onyxia seul", true],
+    ]);
+    expect(discord.roleNamesOf(vorn.discordId)).toContain(titleRole("Sauveur du raid"));
+    const [given] = await journalRepository(sql).listRecent(1);
+    expect(given).toMatchObject({
+      action: "title.custom",
+      after: { title: "Mascotte", holder: "Morgane Nuitsombre", untilReset: false },
+      reason: "Toujours là",
+    });
+
+    // Wednesday's reset ends the titles given until it; the other stays, and the announcement shows it.
+    now = WEDNESDAY;
+    expect(await titles.reassign()).toBe(true);
+    expect((await titles.customTitles()).map((title) => title.name)).toEqual(["Mascotte"]);
+    expect(discord.roleNamesOf(vorn.discordId)).not.toContain(titleRole("Sauveur du raid"));
+    expect(announced[0]?.holders.at(-1)).toEqual({
+      title: "Mascotte",
+      rule: "Toujours là",
+      holder: "Morgane Nuitsombre",
+      score: 0,
+    });
+
+    // An officer takes it back, with a reason.
+    const [mascot] = await titles.customTitles();
+    await expect(titles.takeBackCustom(officer, mascot?.id ?? "", " ")).rejects.toBeInstanceOf(ValidationError);
+    await titles.takeBackCustom(officer, mascot?.id ?? "", "Plus là");
+    expect(await titles.customTitles()).toEqual([]);
+    expect(discord.roleNamesOf(morgane.discordId)).not.toContain(titleRole("Mascotte"));
+    await expect(titles.takeBackCustom(officer, mascot?.id ?? "", "Encore")).rejects.toThrow(/plus porté/);
+    const [taken] = await journalRepository(sql).listRecent(1);
+    expect(taken).toMatchObject({ action: "title.takeBack", before: { title: "Mascotte" }, reason: "Plus là" });
+  });
 });

@@ -6,6 +6,7 @@ import { bossLootRepository } from "./bossLoot.ts";
 import { cashRepository } from "./cash.ts";
 import { characterRepository } from "./characters.ts";
 import { companionRepository } from "./companion.ts";
+import { customTitleRepository } from "./customTitles.ts";
 import { eventRepository } from "./events.ts";
 import { exclusionRepository } from "./exclusions.ts";
 import { gameChangeRepository } from "./gameChanges.ts";
@@ -54,6 +55,7 @@ function createRepositories(sql: SqlClient): Repositories {
     professions: professionRepository(sql),
     deathrolls: deathrollRepository(sql),
     titles: titleRepository(sql),
+    customTitles: customTitleRepository(sql),
     bossFights: bossFightRepository(sql),
     duels: duelRepository(sql),
   };

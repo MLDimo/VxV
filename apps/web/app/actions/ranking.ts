@@ -26,3 +26,29 @@ export async function giveTitle(_previous: ActionState, form: FormData): Promise
     return "Titre donné pour la semaine.";
   }, ["/ranking/titres", "/journal"]);
 }
+
+/** An officer makes a title by hand and gives it to a member, until the reset or for an undetermined time. */
+export async function giveCustomTitle(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const officer = await requireOfficer();
+  return runFormAction(async () => {
+    await getApplication().titles.giveCustom(
+      officer,
+      {
+        name: formText(form, "name"),
+        memberId: formText(form, "memberId"),
+        untilReset: formText(form, "duration") === "reset",
+      },
+      formText(form, "reason"),
+    );
+    return "Titre donné.";
+  }, ["/ranking/titres", "/journal"]);
+}
+
+/** An officer takes back a title made by hand. */
+export async function takeBackCustomTitle(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const officer = await requireOfficer();
+  return runFormAction(async () => {
+    await getApplication().titles.takeBackCustom(officer, formText(form, "titleId"), formText(form, "reason"));
+    return "Titre retiré.";
+  }, ["/ranking/titres", "/journal"]);
+}

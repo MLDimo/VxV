@@ -1,6 +1,8 @@
+import { customTitleDuration } from "./customTitles.ts";
 import type {
   BetCreationRecord,
   BetEndRecord,
+  CustomTitleRecord,
   DuelRecord,
   MissionCloseRecord,
   MissionCreationRecord,
@@ -43,6 +45,8 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "mission.create": "Publication d'une mission",
   "mission.close": "Résultat d'une mission",
   "title.give": "Titre donné par un officier",
+  "title.custom": "Titre fait main donné",
+  "title.takeBack": "Titre fait main retiré",
   "duel.result": "Résultat d'un duel saisi par un officier",
   "duel.cancel": "Duel annulé par un officier",
 };
@@ -177,6 +181,14 @@ export function describeJournalEntry(entry: JournalEntry): string {
     case "title.give": {
       const record = entry.after as TitleGiveRecord;
       return `${record.title} : ${record.holder}, ${formatTitleWeek(record.week)}`;
+    }
+    case "title.custom": {
+      const record = entry.after as CustomTitleRecord;
+      return `${record.title} : ${record.holder}, ${customTitleDuration(record.untilReset)}`;
+    }
+    case "title.takeBack": {
+      const record = entry.before as CustomTitleRecord;
+      return `${record.title} : repris à ${record.holder}`;
     }
     case "duel.result":
     case "duel.cancel":

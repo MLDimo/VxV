@@ -17,6 +17,8 @@ export type JournalAction =
   | "mission.create"
   | "mission.close"
   | "title.give"
+  | "title.custom"
+  | "title.takeBack"
   | "duel.result"
   | "duel.cancel";
 
@@ -132,6 +134,13 @@ export interface TitleGiveRecord {
   /** The week's Wednesday, "2026-10-07". */
   week: string;
   holder: string;
+}
+
+/** What the journal keeps about a title made by hand, given or taken back. */
+export interface CustomTitleRecord {
+  title: string;
+  holder: string;
+  untilReset: boolean;
 }
 
 /** What the journal keeps about a new season of the rankings. */

@@ -21,6 +21,7 @@ export function createAddonTitles({
         formatAddonTitles({
           ...(await addonReaders(repositories)),
           holders: latest?.holders ?? [],
+          custom: await repositories.customTitles.listHeld(),
           exportedAt: clock(),
         }),
       );
