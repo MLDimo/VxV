@@ -16,6 +16,8 @@ Counters.LABELS = {
     skinning = { name = "Dépeçage", counts = "peaux dépecées" },
     honorableKills = { name = "Victoires honorables", counts = "victoires honorables" },
 }
+--- The kinds in the website's order.
+Counters.KINDS = { "fishing", "herbalism", "mining", "skinning", "honorableKills" }
 
 -- The Statistics tab's ids, measured in game with the probe on 6 October (/vxvtest counters list): « Poissons et
 -- autres objets pêchés », every successful catch.

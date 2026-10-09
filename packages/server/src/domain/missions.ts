@@ -173,9 +173,9 @@ export function missionRewards(scores: readonly MissionScore[], reward: number):
   });
 }
 
-/** The mission's end by default: a week after its start. */
-export function defaultEnd(startsAt: Date): Date {
-  return new Date(startsAt.getTime() + DEFAULT_MISSION_DAYS * DAY_MS);
+/** The mission's end, some days after its start: a week by default. */
+export function missionEnd(startsAt: Date, days: number = DEFAULT_MISSION_DAYS): Date {
+  return new Date(startsAt.getTime() + days * DAY_MS);
 }
 
 export interface HallOfFameEntry {

@@ -10,7 +10,6 @@ local RaidData, RaidLog, Raids, Reserves = ns.RaidData, ns.RaidLog, ns.Raids, ns
 
 local Theme = VXV.Theme
 
-local SECONDS_PER_MINUTE, SECONDS_PER_HOUR, SECONDS_PER_DAY = 60, 3600, 86400
 -- Colors of the roles (§7.1): tanks green, healers gold, DPS amethyst.
 local ROLE_COLORS = { tank = "gain", healer = "gold", dps = "amethyst" }
 local ROLE_COUNTS = { tank = "tanks", healer = "heals", dps = "DPS" }
@@ -69,19 +68,6 @@ local function describeSignup(change)
     return string.format("%s · %s · %s", Labels.Role(change.role).label, change.spec, Labels.Status(change.status))
 end
 
---- "2 j 04 h", "4 h 05", "12 min".
-local function remaining(seconds)
-    local days = math.floor(seconds / SECONDS_PER_DAY)
-    local hours = math.floor(seconds % SECONDS_PER_DAY / SECONDS_PER_HOUR)
-    local minutes = math.floor(seconds % SECONDS_PER_HOUR / SECONDS_PER_MINUTE)
-    if days > 0 then
-        return string.format("%d j %02d h", days, hours)
-    elseif hours > 0 then
-        return string.format("%d h %02d", hours, minutes)
-    end
-    return minutes .. " min"
-end
-
 --- The expected players (present or late) of each role, in the website's order, and how many are expected.
 function RaidView.ExpectedByRole(event)
     local byRole, expected = {}, 0
@@ -109,7 +95,7 @@ function RaidView.Header(event, sender, now)
     end
     local _, expected = RaidView.ExpectedByRole(event)
     local lockAt = RaidData.LockAt(event)
-    local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. remaining(lockAt - now))
+    local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. VXV.Remaining(lockAt - now))
     local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
         or ("données du compagnon, du " .. Labels.DateTime(event.exportedAt))
     return {

@@ -227,6 +227,8 @@ export interface GameChangeRepository {
   listForBets(betIds: readonly string[]): Promise<GameChangeOutcome[]>;
   /** The changes made in game about these PvP outings (their creation included) and duels, in the order received. */
   listForPvp(eventIds: readonly string[], duelIds: readonly string[]): Promise<GameChangeOutcome[]>;
+  /** The quests published in game among these, then what was refused since the instant, in the order received. */
+  listForMissions(missionIds: readonly string[], createdSince: Date): Promise<GameChangeOutcome[]>;
 }
 
 /** When the latest copy of some data, read in game, was imported ("roster"). */

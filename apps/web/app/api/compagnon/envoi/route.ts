@@ -1,6 +1,7 @@
 import { MAX_BET_TITLE_LENGTH, MAX_CHOICE_LENGTH, MAX_CHOICES } from "@vxv/server/domain/bets";
 import { MAX_DUEL_PLACE_LENGTH } from "@vxv/server/domain/duels";
 import { MAX_EVENT_TITLE_LENGTH } from "@vxv/server/domain/events";
+import { MAX_MISSION_DAYS, MAX_MISSION_TITLE_LENGTH } from "@vxv/server/domain/missions";
 import { z } from "zod";
 import { getApplication } from "@/server/application";
 import { asCompanion, errorResponse } from "@/server/companionApi";
@@ -29,8 +30,8 @@ const changeBase = {
   at: z.number().int().positive().optional(),
 };
 /**
- * A change made in game (addon/VXV_Raid/Changes.lua, addon/VXV_Paris/Changes.lua, addon/VXV_PvP/Changes.lua); one of a
- * kind this website does not know is left aside.
+ * A change made in game (the Changes.lua of VXV_Raid, VXV_Paris, VXV_PvP and VXV_Missions); one of a kind this
+ * website does not know is left aside.
  */
 const changeSchema = z.discriminatedUnion("kind", [
   z.object({
@@ -97,6 +98,16 @@ const changeSchema = z.discriminatedUnion("kind", [
     duelId: z.string().max(60),
     winner: z.string().max(100),
     loser: z.string().max(100),
+  }),
+  z.object({
+    ...changeBase,
+    kind: z.literal("mission"),
+    type: z.string().max(30),
+    // Empty: the type's title.
+    title: z.string().max(MAX_MISSION_TITLE_LENGTH),
+    reward: z.number(),
+    days: z.number().int().min(1).max(MAX_MISSION_DAYS),
+    reason: z.string().max(500),
   }),
   z.object({
     ...changeBase,

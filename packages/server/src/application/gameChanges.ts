@@ -9,6 +9,7 @@ import {
   type GameChangeOutcome,
 } from "../domain/gameChanges.ts";
 import { formatDateTime, formatGold } from "../domain/labels.ts";
+import { MISSION_TYPE_LABELS, missionEnd, type MissionType, type NewMission } from "../domain/missions.ts";
 import type { BetChoice, NewBet } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
@@ -45,6 +46,9 @@ interface GameChangeDependencies {
   };
   /** The bet's message on Discord follows its stakes. */
   betAnnouncements: { announceQuietly(betId: string): Promise<boolean> };
+  missions: { create(officer: Member, input: NewMission, reason: string): Promise<string> };
+  /** A quest published gets its message on Discord. */
+  missionAnnouncements: { announceQuietly(missionId: string): Promise<boolean> };
   duels: {
     challenge(member: Member, input: NewDuel): Promise<string>;
     answer(member: Member, duelId: string, accept: boolean): Promise<void>;
@@ -60,6 +64,7 @@ interface Done {
   eventId?: string;
   betId?: string;
   duelId?: string;
+  missionId?: string;
 }
 
 export function createGameChanges({
@@ -72,6 +77,8 @@ export function createGameChanges({
   announcements,
   bets,
   betAnnouncements,
+  missions,
+  missionAnnouncements,
   duels,
 }: GameChangeDependencies) {
   /** When something typed as on Discord happens ("15/12", "21:00"). */
@@ -149,6 +156,20 @@ export function createGameChanges({
         await announcements.announceQuietly(eventId);
         return { message: `Événement PvP du ${formatDateTime(startsAt)} créé et annoncé sur Discord.`, eventId };
       }
+      case "mission": {
+        // It starts when the officer published it in game, and the website was told later.
+        const now = clock();
+        const startsAt = change.madeAt !== undefined && change.madeAt < now ? change.madeAt : now;
+        const type = change.type as MissionType;
+        const title = change.title.trim() || (MISSION_TYPE_LABELS[type]?.title ?? "");
+        const missionId = await missions.create(
+          author.member,
+          { type, title, reward: change.reward, startsAt, endsAt: missionEnd(startsAt, change.days) },
+          change.reason,
+        );
+        await missionAnnouncements.announceQuietly(missionId);
+        return { message: `Quête « ${title} » publiée et annoncée sur Discord.`, missionId };
+      }
       case "duel": {
         const scheduledAt = startOf(change.date, change.time);
         const duelId = await duels.challenge(author.member, {
@@ -219,6 +240,7 @@ export function createGameChanges({
       eventId: isCreation(change) || betId !== undefined || duelId !== undefined ? undefined : change.eventId,
       betId,
       duelId,
+      missionId: undefined,
       author: change.author,
     };
     let outcome: GameChangeOutcome;
@@ -232,6 +254,7 @@ export function createGameChanges({
           eventId: done.eventId ?? base.eventId,
           betId: done.betId ?? base.betId,
           duelId: done.duelId ?? base.duelId,
+          missionId: done.missionId,
           accepted: true,
           message: done.message,
         };

@@ -91,7 +91,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   lus à la connexion puis chaque minute hors combat. Résultat validé par un officier ; récompense 70 / 20 / 10 % versée
   par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct. Écran Quêtes comme la
   maquette `AddonMissions.html` : quête épinglée sur son parchemin (sceau VXV, lots, cinq premiers, progression jusqu'au
-  podium par `missionProgress`), À venir, Terminées sous leur tampon, Hall of fame et zone officier.
+  podium par `missionProgress`), À venir, Terminées sous leur tampon, Hall of fame et zone officier ; en jeu, images
+  dans `VXV_Missions/Media`, et « Publier une quête » comme `/vxv_mission` (type aux flèches, titre sinon celui du type,
+  récompense, jours depuis la publication en jeu, motif), envoyée au site comme changement fait en jeu.
 - **Titres** (`VXV_Titles` ; règles dans `domain/titles.ts`) : chaque titre va au membre en tête de sa règle sur la
   saison (à égalité, le premier à l'atteindre ; sans score positif, à personne), réattribué chaque mercredi à 5 h UTC,
   avec l'historique, un rôle Discord « ◆ <titre> » et l'annonce de la semaine (salon des titres,
@@ -226,7 +228,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-RAID-3` (événement) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
 | `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Core/Core/EventRoles.lua` |
 | `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
-| `VXV-QUETES-1` | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
+| `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV_Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV_Artisans/ArtisansData.lua` |
 | `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV_Deathroll/DeathrollData.lua` |

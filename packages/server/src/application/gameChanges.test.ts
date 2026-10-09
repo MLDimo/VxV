@@ -24,7 +24,9 @@ import { createGameChanges } from "./gameChanges.ts";
 import { createSignups } from "./signups.ts";
 import { createSoftReserves } from "./softReserves.ts";
 import { createAddonBets } from "./addonBets.ts";
+import { createAddonMissions } from "./addonMissions.ts";
 import { createBets } from "./bets.ts";
+import { createMissions } from "./missions.ts";
 
 const NOW = new Date("2026-12-01T12:00:00Z");
 
@@ -37,6 +39,7 @@ describe("changes made in game", () => {
   let member: Member;
   let eventId: string;
   let announced: string[];
+  let missions: ReturnType<typeof createMissions>;
 
   beforeEach(async () => {
     ({ database, sql } = await createTestDatabase());
@@ -44,6 +47,7 @@ describe("changes made in game", () => {
     const clock = () => NOW;
     announced = [];
     signups = createSignups({ unitOfWork, clock, guild: testGuild });
+    missions = createMissions({ unitOfWork, clock });
     changes = createGameChanges({
       unitOfWork,
       clock,
@@ -59,6 +63,13 @@ describe("changes made in game", () => {
       },
       bets: createBets({ unitOfWork, clock }),
       betAnnouncements: {
+        announceQuietly: async (id) => {
+          announced.push(id);
+          return true;
+        },
+      },
+      missions,
+      missionAnnouncements: {
         announceQuietly: async (id) => {
           announced.push(id);
           return true;
@@ -346,6 +357,55 @@ describe("changes made in game", () => {
       ]);
       expect(await changes.receive(officer, [opening("Ðéjà Vu#5#2", "Ðéjà Vu", { time: "25:00" })])).toEqual([
         expect.objectContaining({ accepted: false, message: expect.stringContaining("15/10") }),
+      ]);
+    });
+  });
+
+  describe("quests published in game", () => {
+    const publishing = (id: string, author: string, changes: Partial<Record<string, unknown>> = {}): GameChange =>
+      ({
+        id,
+        eventId: "",
+        author,
+        kind: "mission",
+        type: "fishing",
+        title: "",
+        reward: 2000,
+        days: 7,
+        reason: "Quête de la semaine",
+        madeAt: new Date("2026-12-01T10:00:00Z"),
+        ...changes,
+      }) as GameChange;
+    const exportMissions = () =>
+      createAddonMissions({ unitOfWork: createUnitOfWork(sql), clock: () => NOW, missions }).exportMissions();
+
+    it("publishes the officer's quest from when it was made, announces it, and answers with the quests' data", async () => {
+      const [outcome] = await changes.receive(officer, [publishing("Ðéjà Vu#6#1", "Ðéjà Vu")]);
+      const message = "Quête « Le Grand Pêcheur » publiée et annoncée sur Discord.";
+      expect(outcome).toMatchObject({ accepted: true, message });
+      const [view] = await missions.list();
+      expect(outcome?.missionId).toBe(view?.mission.id);
+      expect(view?.mission).toMatchObject({
+        type: "fishing",
+        title: "Le Grand Pêcheur",
+        reward: 2000,
+        startsAt: new Date("2026-12-01T10:00:00Z"),
+        endsAt: new Date("2026-12-08T10:00:00Z"),
+      });
+      expect(announced).toEqual([view?.mission.id]);
+      expect((await exportMissions()).split("\n")).toContain(`C;Ðéjà Vu#6#1;1;${message}`);
+    });
+
+    it("refuses a member and an unknown type, and still answers with the quests' data", async () => {
+      expect(await changes.receive(member, [publishing("Thom Leboss#6#1", "Thom Leboss")])).toEqual([
+        expect.objectContaining({ accepted: false, message: "Cette action est réservée aux officiers." }),
+      ]);
+      expect(await changes.receive(officer, [publishing("Ðéjà Vu#6#2", "Ðéjà Vu", { type: "cooking" })])).toEqual([
+        expect.objectContaining({ accepted: false, message: "Choisis le type de la mission." }),
+      ]);
+      expect((await exportMissions()).split("\n").filter((line) => line.startsWith("C;"))).toEqual([
+        "C;Thom Leboss#6#1;0;Cette action est réservée aux officiers.",
+        "C;Ðéjà Vu#6#2;0;Choisis le type de la mission.",
       ]);
     });
   });

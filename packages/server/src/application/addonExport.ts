@@ -1,5 +1,6 @@
 import { formatAddonEvent } from "../domain/addonExport.ts";
 import { EVENT_LISTED_AFTER_START_MS, type GuildEvent } from "../domain/events.ts";
+import { CREATION_ANSWERS_MS } from "../domain/gameChanges.ts";
 import { eventTitle } from "../domain/labels.ts";
 import type { Member } from "../domain/members.ts";
 import { canManageRaids } from "../domain/permissions.ts";
@@ -7,9 +8,6 @@ import { addonReaders } from "./addonReaders.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
 import { loadBoardItems } from "./softReserves.ts";
-
-/** The answers to the events created in game go with every event's data this long: their author learns them. */
-const EVENT_CREATION_ANSWERS_MS = 14 * 24 * 60 * 60 * 1000;
 
 /** The next event as the companion hands it to the addon, with what its window shows. */
 interface NextEventExport {
@@ -27,7 +25,7 @@ export function createAddonExport({ unitOfWork, clock }: { unitOfWork: UnitOfWor
     const board = await loadBoardItems(repositories, event, undefined);
     const characters = await repositories.characters.listAll();
     const journal = await repositories.journal.listForEvent(event.id);
-    const since = new Date(clock().getTime() - EVENT_CREATION_ANSWERS_MS);
+    const since = new Date(clock().getTime() - CREATION_ANSWERS_MS);
     const changes = await repositories.gameChanges.listForEvent(event.id, since);
     return formatAddonEvent({
       event,

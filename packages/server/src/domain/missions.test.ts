@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   type CounterReading,
-  defaultEnd,
+  missionEnd,
   endedAgo,
   hallOfFame,
   missionPitch,
@@ -111,7 +111,7 @@ describe("missions", () => {
     expect(newMissionRefusal({ ...mission, endsAt: new Date("2026-12-31T00:00:00Z") }, at(5))).toMatch(/31 jours/);
     expect(newMissionRefusal(mission, at(14))).toMatch(/à venir/);
     expect(newMissionRefusal({ ...mission, type: "greyKills" as "fishing" }, at(5))).toMatch(/type/);
-    expect(defaultEnd(START)).toEqual(END);
+    expect(missionEnd(START)).toEqual(END);
   });
 });
 

@@ -26,7 +26,7 @@ const character = (firstName: string, lastName: string, memberId: string | undef
 });
 
 describe("missions for the addon", () => {
-  it("writes the missions, their ranking and rewards, and the hall of fame, one record per line", () => {
+  it("writes the missions, their ranking and rewards, the hall of fame and the answers, one record per line", () => {
     const text = formatAddonMissions({
       missions: [
         {
@@ -59,10 +59,22 @@ describe("missions for the addon", () => {
           averagePosition: 2.1,
         },
       ],
+      changes: [
+        {
+          id: "Aube Claire#1#2",
+          eventId: undefined,
+          betId: undefined,
+          duelId: undefined,
+          missionId: "q1",
+          author: "Aube Claire",
+          accepted: true,
+          message: "Quête « Le Grand Pêcheur » publiée ; annoncée",
+        },
+      ],
       exportedAt: AT,
     });
     expect(text.split("\n")).toEqual([
-      "VXV-QUETES-1",
+      "VXV-QUETES-2",
       "P;1791316800",
       "O;Aube Claire",
       "M;m-sira;Sira Ventargent",
@@ -70,6 +82,7 @@ describe("missions for the addon", () => {
       "R;q1;m-sira;Sira Ventargent;HUNTER;412;1791316800",
       "W;q1;1;Sira Ventargent;1400;0",
       "F;Sira Ventargent;HUNTER;5;6300;2.1",
+      "C;Aube Claire#1#2;1;Quête « Le Grand Pêcheur » publiée, annoncée",
     ]);
   });
 });

@@ -108,6 +108,8 @@ export function createApplication({
     announcements: raidAnnouncements,
     bets,
     betAnnouncements,
+    missions,
+    missionAnnouncements,
     duels,
   });
   const titles = createTitles({ unitOfWork, clock, guild, announcer: titleAnnouncer });
