@@ -6,8 +6,8 @@ local _, ns = ...
 local Window = {}
 ns.Window = Window
 
-local Bus, Modules, PlaceWindow, Screen, Theme, Tokens =
-    ns.Bus, ns.Modules, ns.PlaceWindow, ns.Screen, ns.Theme, ns.Tokens
+local Bus, Modules, PlaceWindow, Screen, TavernPicture, Theme, Tokens =
+    ns.Bus, ns.Modules, ns.PlaceWindow, ns.Screen, ns.TavernPicture, ns.Theme, ns.Tokens
 
 local WIDTH, HEIGHT = 1000, 680
 local BORDER = 12
@@ -44,7 +44,7 @@ local function addBackdrop(content, backdrop)
     local top = (pictureHeight - height) * backdrop.position[2] / PERCENT / pictureHeight
     local picture = content:CreateTexture(nil, "BACKGROUND", nil, BACKDROP_LEVEL)
     picture:SetAllPoints()
-    picture:SetTexture(Theme.MEDIA .. "taverne.png", nil, nil, "NEAREST")
+    picture:SetTexture(TavernPicture.Path(), nil, nil, "NEAREST")
     picture:SetTexCoord(left, left + width / pictureWidth, top, top + height / pictureHeight)
     picture:SetAlpha(backdrop.opacity)
     local veil = content:CreateTexture(nil, "BACKGROUND", nil, BACKDROP_LEVEL + 1)

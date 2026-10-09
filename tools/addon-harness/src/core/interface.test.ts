@@ -205,6 +205,24 @@ describe("VXV_Core interface", () => {
     });
   });
 
+  it("dresses the tavern up for the WoW holiday of the day, on the Taverne tab and behind each screen", () => {
+    const { client } = startCore();
+    // 20 December 2026 at noon: the Voile d'hiver (packages/design/src/seasons.ts).
+    client("Clock.epoch = 1797768000 - Clock.now");
+    client('SlashCmdList.VXV("")');
+    const winterVeil = "Interface\\AddOns\\VXV_Core\\Media\\Tavernes\\voile-d-hiver.png";
+    const pictures = () =>
+      client(`local paths = {}
+        FindWidget(VXV_Window, function(widget)
+            paths[#paths + 1] = widget.path
+            return false
+        end)
+        return paths`) as string[];
+    expect(pictures()).toContain(winterVeil);
+    client(`${TAB("Quêtes")}:Run("OnClick")`);
+    expect(pictures().filter((path) => path === winterVeil)).toHaveLength(2);
+  });
+
   it("frames the tavern on the place behind each screen, very dark under a veil", () => {
     const { client } = startCore();
     client('SlashCmdList.VXV("")');

@@ -46,10 +46,10 @@ function PlaceSpot({ place }: { place: Place }) {
 }
 
 /**
- * The tavern (§4): the picture, its lights, and one zone per place opening its section. The picture follows the mouse
- * a little (parallax), except with reduced motion.
+ * The tavern (§4): the picture (dressed up for a WoW holiday, tavernPicture), its lights, and one zone per place
+ * opening its section. The picture follows the mouse a little (parallax), except with reduced motion.
  */
-export function TavernScene() {
+export function TavernScene({ src }: { src: string }) {
   const picture = useRef<HTMLImageElement>(null);
   const move = (event: MouseEvent<HTMLDivElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -73,7 +73,7 @@ export function TavernScene() {
       {/* eslint-disable-next-line @next/next/no-img-element -- the picture moves with the mouse, outside next/image */}
       <img
         ref={picture}
-        src="/images/taverne.jpg"
+        src={src}
         alt="La taverne de la guilde : le comptoir, le tableau des quêtes, la cheminée, la table du conseil de guerre, la porte du Dé Pipé et la forge"
         className="image-pixelated absolute top-[-1.5%] left-[-1.5%] h-[103%] w-[103%] max-w-none transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] motion-reduce:transform-none"
       />

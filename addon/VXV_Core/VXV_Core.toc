@@ -35,6 +35,7 @@ Core\EventRoles.lua
 # Interface: the charter's theme, window, Taverne tab, /vxv, minimap icon.
 UI\Tokens.lua
 UI\Theme.lua
+UI\TavernPicture.lua
 UI\Tooltip.lua
 UI\RowList.lua
 UI\Screen.lua

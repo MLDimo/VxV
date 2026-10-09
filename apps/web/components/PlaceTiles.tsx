@@ -3,7 +3,7 @@ import Link from "next/link";
 import { sectionHref } from "./sections";
 
 /** On a phone (§5.2): one tile per place, cut out of the tavern, opening its section. */
-export function PlaceTiles() {
+export function PlaceTiles({ picture }: { picture: string }) {
   return (
     <ul className="grid grid-cols-2 gap-3 px-4 py-6">
       {PLACES.map((place) => (
@@ -12,7 +12,7 @@ export function PlaceTiles() {
             href={sectionHref(place)}
             className="image-pixelated relative block h-[118px] ring-pixel"
             style={{
-              backgroundImage: "url(/images/taverne.jpg)",
+              backgroundImage: `url(${picture})`,
               backgroundSize: "1100px auto",
               backgroundPosition: `${String(place.tile[0])}px ${String(place.tile[1])}px`,
             }}
