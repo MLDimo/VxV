@@ -3,8 +3,8 @@ local _, ns = ...
 --- The Taverne tab (§7.0): the tavern's scene, its lights and a plaque per place opening its tab (hovering a
 --- place, only its plaque changes), the picture following the mouse a little; then the cards of the moment and
 --- who is connected with VXV.
-local Bus, Modules, Presence, Theme, Tokens, Window =
-    ns.Bus, ns.Modules, ns.Presence, ns.Theme, ns.Tokens, ns.Window
+local Bus, Modules, Presence, TavernPicture, Theme, Tokens, Window =
+    ns.Bus, ns.Modules, ns.Presence, ns.TavernPicture, ns.Theme, ns.Tokens, ns.Window
 
 local PERCENT = 100
 local PLAQUE_HEIGHT = 28
@@ -143,7 +143,7 @@ local function addScene(content)
     scene:SetSize(width, height)
     local picture = scene:CreateTexture(nil, "BACKGROUND")
     picture:SetAllPoints()
-    picture:SetTexture(Theme.MEDIA .. "taverne.png", nil, nil, "NEAREST")
+    picture:SetTexture(TavernPicture.Path(), nil, nil, "NEAREST")
     followCursor(scene, picture)
     for _, light in ipairs(Tokens.lights) do
         addLight(scene, light, width, height)

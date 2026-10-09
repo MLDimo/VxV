@@ -12,6 +12,7 @@ import Link from "next/link";
 import { HomeCard } from "@/components/HomeCard";
 import { PlaceTiles } from "@/components/PlaceTiles";
 import { TavernScene } from "@/components/TavernScene";
+import { tavernPicture } from "@/components/tavernPicture";
 import { getApplication } from "@/server/application";
 
 function NextRaid({
@@ -114,22 +115,23 @@ export default async function TavernPage() {
   const nextBet = (await bets.list()).find((view) => view.open);
   const quest = (await missions.list()).find((view) => view.status === "running");
   const now = new Date();
+  const picture = tavernPicture(now);
   const counts = next && composition(await signups.listForEvent(next.id));
   return (
     <>
       <div className="hidden md:block">
-        <TavernScene />
+        <TavernScene src={picture} />
       </div>
       <div className="md:hidden">
         {/* A phone shows the tavern as a strip to slide (§5.2), then one tile per place. */}
         <div className="relative h-[196px] overflow-x-auto">
           {/* eslint-disable-next-line @next/next/no-img-element -- a strip wider than the screen, scrolled by hand */}
-          <img src="/images/taverne.jpg" alt="" className="image-pixelated h-[196px] w-[463px] max-w-none" />
+          <img src={picture} alt="" className="image-pixelated h-[196px] w-[463px] max-w-none" />
           <span className="sticky left-0 bottom-2 ml-2 inline-block -translate-y-9 bg-ink/80 px-2 py-1 text-xs text-parchment">
             Glisse pour explorer →
           </span>
         </div>
-        <PlaceTiles />
+        <PlaceTiles picture={picture} />
       </div>
       <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-10 md:grid-cols-3 md:px-16">
         {TAVERN_CARDS.map((card) =>

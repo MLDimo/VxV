@@ -7,7 +7,7 @@ import { placeOfPath } from "./sections";
  * The background of a place's pages, as in the addon (§6): the tavern framed on the place (position in percent, the
  * picture zoom times as wide as the screen), very dark under a veil. Pages of no place keep the night's color.
  */
-export function PlaceBackdrop() {
+export function PlaceBackdrop({ picture }: { picture: string }) {
   const place = placeOfPath(usePathname());
   if (place === undefined) {
     return null;
@@ -18,7 +18,7 @@ export function PlaceBackdrop() {
       <div
         className="image-pixelated absolute inset-0 bg-no-repeat"
         style={{
-          backgroundImage: "url(/images/taverne.jpg)",
+          backgroundImage: `url(${picture})`,
           backgroundSize: `${String(zoom * 100)}% auto`,
           backgroundPosition: `${String(position[0])}% ${String(position[1])}%`,
           opacity,

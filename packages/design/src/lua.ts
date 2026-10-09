@@ -1,4 +1,5 @@
 import { COMPACT_PLACES, PLACES, TAVERN, TAVERN_CARDS } from "./places.ts";
+import { ADDON_SEASON_YEARS, SEASONS } from "./seasons.ts";
 import { CLASS_COLORS, COLORS, UNKNOWN_CLASS_COLOR } from "./tokens.ts";
 
 const CHANNEL = 255;
@@ -32,13 +33,26 @@ const list = (values: readonly (number | string)[]) =>
   `{ ${values.map((value) => (typeof value === "number" ? number(value) : luaString(value))).join(", ")} }`;
 const key = (name: string) => (/^[a-z_][a-z0-9_]*$/i.test(name) ? name : `[${luaString(name)}]`);
 
+/** The holidays of the years the addon knows, their days as YYYYMMDD numbers, as Lua's date("%Y%m%d") reads them. */
+function seasonLines(): string[] {
+  const days = (day: string) => day.replaceAll("-", "");
+  const lines: string[] = [];
+  for (let year = ADDON_SEASON_YEARS.first; year <= ADDON_SEASON_YEARS.last; year += 1) {
+    for (const season of SEASONS) {
+      const [first, last] = season.days(year);
+      lines.push(`        { id = ${luaString(season.id)}, from = ${days(first)}, to = ${days(last)} },`);
+    }
+  }
+  return lines;
+}
+
 /**
  * The tokens for the addon (VXV_Core/UI/Tokens.lua): colors as { r, g, b, a }, class colors as RRGGBB for the
- * |cff…|r codes, the tavern, its places and its cards.
+ * |cff…|r codes, the tavern, its places, its cards and its holidays.
  */
 export function renderLua(): string {
   const lines = [
-    "-- Generated from packages/design/src/tokens.ts and places.ts by npm run generate: do not edit.",
+    "-- Generated from packages/design/src/tokens.ts, places.ts and seasons.ts by npm run generate: do not edit.",
     "local _, ns = ...",
     "",
     "ns.Tokens = {",
@@ -72,6 +86,9 @@ export function renderLua(): string {
       `        { place = ${luaString(card.place)}, kicker = ${luaString(card.kicker)}${card.soon ? "," : " },"}`,
       ...(card.soon ? [`          soon = ${luaString(card.soon)} },`] : []),
     ]),
+    "    },",
+    "    seasons = {",
+    ...seasonLines(),
     "    },",
     "}",
     "",
