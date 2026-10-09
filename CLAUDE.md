@@ -137,8 +137,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - Jetons dans `packages/design/src/tokens.ts`, seule source des couleurs et des polices. `npm run generate` écrit `tokens.css` (thème Tailwind du site) et `VXV_Core/UI/Tokens.lua` ; un test vérifie que les fichiers générés sont à jour.
 - Pixel art : aucun arrondi (retirés du thème), reliefs en anneaux d'ombres pleines, survol prune et or, zones officier à liseré or.
 - Pixelify Sans pour les titres, onglets, plaques, boutons et gros chiffres ; Manrope pour le texte, noms de joueurs compris.
-  Dans nos fichiers de Pixelify Sans (site et addon), le 2 et le 5 sont redessinés sur sa grille, base plate pour
-  le 2 et haut plat et carré pour le 5, pour ne plus se lire Z et S (licence OFL : modification permise). Polices et images servies par le site (`apps/web/public`), licences OFL à côté des polices. Chinois et coréen : familles de polices qui prennent celles du jeu pour ces alphabets.
+  Dans nos fichiers de Pixelify Sans (site et addon), le 2, le 5, le C et le c sont redessinés sur sa grille : base
+  plate pour le 2, haut plat et carré pour le 5, pour ne plus se lire Z et S ; C et c ouverts à droite entre deux
+  courts retours, pour ne plus se lire O et o (licence OFL : modification permise). Polices et images servies par le site (`apps/web/public`), licences OFL à côté des polices. Chinois et coréen : familles de polices qui prennent celles du jeu pour ces alphabets.
 - Un lieu = un onglet, même nom partout : Taverne, Raid, PvP, Le Dé Pipé, Quêtes, Ranking, Artisans, Journal. PvP est le mur des avis de recherche.
 - Fond de chaque écran : la taverne cadrée sur son lieu, très sombre (`backdrop` de `packages/design/src/places.ts`),
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
