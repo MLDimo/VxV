@@ -1,0 +1,2298 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide du membre VXV</title>
+<meta name="description" content="Le guide du membre de la guilde VXV : l'addon, le site, le compagnon et Discord, les raids et les soft reserves, le PvP, les paris, le deathroll, les quêtes, les titres, les artisans et le classement.">
+<!-- The public guide of the guild (owner's decision of 9 October): readable without signing in. -->
+<style>
+@font-face { font-family: "Pixelify Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/pixelify-sans-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Pixelify Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/pixelify-sans-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Pixelify Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/pixelify-sans-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/manrope-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/manrope-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/manrope-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/manrope-latin-800-normal.woff2) format("woff2"); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a tavern at night. A sticky table of contents on the left, the guide in one column of text, with framed
+   examples (game screens, Discord messages) beside or below the text they illustrate. Single dark theme, as the VXV
+   charter "La Taverne": square corners, wood frames, pixel display face. */
+:root {
+  --night: #0B0814;
+  --night-2: #0E0A16;
+  --ink: #0D0912;
+  --card: #1A1222;
+  --panel: #140E1D;
+  --ivory: #F4EFFC;
+  --lavender: #C9C2EA;
+  --muted: #A49BBD;
+  --line: #2E2442;
+  --amethyst: #A35CFF;
+  --amethyst-btn: #8A3FFC;
+  --amethyst-shade: #5A1FB0;
+  --amethyst-light: #B98CFF;
+  --sakura: #E0479E;
+  --sakura-light: #FF8CC8;
+  --gold: #F2C94C;
+  --gold-shade: #B8860B;
+  --gold-light: #FFF2B0;
+  --gain: #7EE2A0;
+  --loss: #F19A9A;
+  --epic: #C58BFF;
+  --rare: #4DA3FF;
+  --wood: #3A2414;
+  --wood-shade: #1A0F08;
+  --beam: #5B3A1C;
+  --copper: #8A5A2A;
+  --parchment: #F8E7C0;
+  --plum: #4A2A6A;
+  /* Class colours (names only). */
+  --warrior: #C69B6D; --paladin: #F48CBA; --hunter: #AAD372; --rogue: #FFF468; --priest: #FFFFFF;
+  --shaman: #0070DD; --mage: #3FC7EB; --warlock: #8788EE; --druid: #FF7C0A;
+  /* Discord, as its own client paints it. */
+  --dc-bg: #313338; --dc-embed: #2B2D31; --dc-text: #DBDEE1; --dc-muted: #949BA4; --dc-head: #F2F3F5;
+  --dc-blurple: #5865F2; --dc-grey: #4E5058; --dc-link: #00A8FC; --dc-input: #383A40; --dc-code: #1E1F22;
+  /* WoW chat colours. */
+  --wow-raid: #FF7F00; --wow-guild: #40FF40; --wow-system: #FFFF00; --wow-teal: #14B8A6; --wow-warning: #FF4709;
+  --font-pixel: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2rem;
+  --step-4: 2.75rem;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--lavender);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--amethyst-light); text-underline-offset: 3px; }
+a:hover { color: var(--gold); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+strong { color: var(--ivory); font-weight: 700; }
+h1, h2, h3, h4 { font-family: var(--font-pixel); color: var(--ivory); text-wrap: balance; margin: 0; font-weight: 600; letter-spacing: 0.01em; }
+p { margin: 0; }
+code, kbd, .cmd {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--ink);
+  color: var(--gold-light);
+  padding: 0.1em 0.4em;
+  box-shadow: 0 0 0 1px var(--line);
+  white-space: nowrap;
+}
+.pixel { font-family: var(--font-pixel); }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--wood-shade);
+  box-shadow: 0 2px 0 var(--beam), 0 4px 0 var(--wood-shade);
+}
+.topbar-in { display: flex; align-items: center; gap: 12px; padding: 10px 16px; max-width: 1360px; margin: 0 auto; }
+.topbar img { width: 36px; height: 36px; box-shadow: 0 0 0 2px var(--amethyst); }
+.topbar .brand { font-family: var(--font-pixel); color: var(--ivory); font-size: 1.25rem; letter-spacing: 0.08em; }
+.topbar .sub { color: var(--parchment); font-family: var(--font-pixel); font-size: 0.95rem; opacity: 0.85; }
+.topbar .spacer { flex: 1; }
+.topbar .to-top { font-family: var(--font-pixel); font-size: 0.9rem; color: var(--parchment); text-decoration: none; padding: 4px 10px; box-shadow: 0 0 0 2px var(--beam); }
+
+/* Page layout */
+.layout { max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); padding-inline: 16px; }
+@media (min-width: 1120px) { .layout { grid-template-columns: 250px minmax(0, 1fr); gap: 40px; padding-inline: 24px; } }
+
+.toc { display: none; }
+@media (min-width: 1120px) {
+  .toc { display: block; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 70px); align-self: start; max-height: calc(100vh - 90px); overflow-y: auto; padding-block: 28px 40px; scrollbar-width: thin; }
+}
+.toc h2 { font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sakura); margin-bottom: 10px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.toc .part > a { font-family: var(--font-pixel); color: var(--parchment); text-decoration: none; font-size: 1rem; display: flex; gap: 8px; }
+.toc .part > a span { color: var(--gold); min-width: 1.4em; }
+.toc .part ol { gap: 2px; margin-top: 4px; padding-left: 1.9em; }
+.toc .part ol a { color: var(--muted); text-decoration: none; font-size: 0.875rem; line-height: 1.5; }
+.toc a:hover { color: var(--gold); }
+
+.toc-mobile { margin-block: 20px 0; box-shadow: 0 0 0 2px var(--beam); background: var(--wood-shade); }
+.toc-mobile summary { cursor: pointer; padding: 12px 14px; font-family: var(--font-pixel); color: var(--parchment); }
+.toc-mobile .toc { display: block; position: static; max-height: none; padding: 4px 16px 18px; }
+@media (min-width: 1120px) { .toc-mobile { display: none; } }
+
+main { min-width: 0; padding-block: 0 80px; }
+
+/* Hero */
+.hero { position: relative; margin-top: 24px; min-height: 0; overflow: hidden; box-shadow: 0 0 0 4px var(--beam), 0 0 0 8px var(--wood-shade); }
+.hero-bg { position: absolute; inset: 0; background: url("/images/taverne.jpg") center 30% / cover no-repeat; filter: saturate(1.05); }
+.hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11,8,20,0.97) 0%, rgba(11,8,20,0.9) 42%, rgba(11,8,20,0.55) 75%, rgba(11,8,20,0.35) 100%); }
+.hero-in { position: relative; padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 48px); max-width: 720px; display: grid; gap: 18px; }
+.kicker { font-family: var(--font-pixel); color: var(--sakura); letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.85rem; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.05; color: var(--ivory); }
+.hero h1 em { font-style: normal; color: var(--gold); }
+.hero .lead { color: var(--lavender); font-size: var(--step-1); max-width: 60ch; }
+.quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 6px; }
+.quick a { display: grid; gap: 4px; text-decoration: none; padding: 12px 14px; background: rgba(13,9,18,0.82); box-shadow: 0 0 0 2px var(--beam); }
+.quick a:hover { box-shadow: 0 0 0 2px var(--gold); }
+.quick b { font-family: var(--font-pixel); color: var(--gold); font-weight: 600; }
+.quick span { color: var(--lavender); font-size: 0.9rem; }
+
+/* Parts and sections */
+.part-head { margin-top: 88px; padding-block: 22px 18px; display: grid; gap: 8px; box-shadow: 0 -4px 0 var(--beam) inset; position: relative; }
+.part-head .num { font-family: var(--font-pixel); color: var(--gold); font-size: 0.95rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.part-head h2 { font-size: clamp(1.9rem, 4.5vw, var(--step-4)); line-height: 1.1; }
+.part-head p { max-width: 68ch; font-size: var(--step-1); }
+
+.sec { margin-top: 60px; display: grid; gap: 18px; }
+.sec > header { display: grid; gap: 6px; max-width: 72ch; }
+.sec .eyebrow { font-family: var(--font-pixel); color: var(--sakura); font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.sec h3 { font-size: clamp(1.45rem, 3vw, 1.85rem); line-height: 1.2; }
+.sec h4 { font-size: 1.1rem; color: var(--parchment); margin-bottom: 4px; }
+.prose { display: grid; gap: 14px; max-width: 68ch; min-width: 0; }
+.prose ul, .prose ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.prose li::marker { color: var(--gold); }
+
+.split { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 1000px) { .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: 36px; } .split.wide-fig { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.25fr); } }
+
+/* Numbered steps (a real sequence) */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: s; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; }
+.steps > li::before { content: counter(s); font-family: var(--font-pixel); color: var(--ink); background: var(--gold); width: 30px; height: 30px; display: grid; place-items: center; box-shadow: 2px 2px 0 var(--gold-shade); margin-top: 1px; }
+
+/* Callouts */
+.note { padding: 14px 16px; background: var(--card); box-shadow: 0 0 0 2px var(--line); display: grid; gap: 6px; max-width: 72ch; }
+.note b.t { font-family: var(--font-pixel); font-weight: 600; color: var(--amethyst-light); }
+.note.officer { background: rgba(42, 26, 10, 0.92); box-shadow: 0 0 0 2px var(--gold); }
+.note.officer b.t { color: var(--gold); }
+.note.warn { box-shadow: 0 0 0 2px var(--sakura); }
+.note.warn b.t { color: var(--sakura-light); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; box-shadow: 0 0 0 2px var(--line); background: var(--panel); max-width: 100%; }
+table { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
+th { font-family: var(--font-pixel); font-weight: 500; color: var(--parchment); text-align: left; padding: 10px 14px; background: var(--wood-shade); letter-spacing: 0.04em; white-space: nowrap; }
+td { padding: 10px 14px; border-top: 1px solid var(--line); vertical-align: top; }
+td:first-child { color: var(--ivory); font-weight: 600; }
+tbody tr:hover td { background: rgba(163, 92, 255, 0.05); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Figures */
+figure { margin: 0; min-width: 0; }
+.fig { display: grid; gap: 10px; }
+.fig > figcaption { font-size: var(--step--1); color: var(--muted); }
+.fig > figcaption b { color: var(--parchment); font-weight: 600; }
+.frame { box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade), 0 12px 32px rgba(0,0,0,0.45); background: var(--ink); }
+.frame img { width: 100%; height: auto; }
+.example-tag { font-family: var(--font-pixel); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sakura); }
+
+/* Icon in text */
+.em { display: inline-block; width: 1.25em; height: 1.25em; vertical-align: -0.28em; }
+.em.lg { width: 28px; height: 28px; vertical-align: middle; }
+
+/* Class-coloured names */
+.c-warrior { color: var(--warrior); } .c-paladin { color: var(--paladin); } .c-hunter { color: var(--hunter); }
+.c-rogue { color: var(--rogue); } .c-priest { color: var(--priest); } .c-shaman { color: var(--shaman); }
+.c-mage { color: var(--mage); } .c-warlock { color: var(--warlock); } .c-druid { color: var(--druid); }
+
+/* ---------- Discord mock ---------- */
+.dc { background: var(--dc-bg); color: var(--dc-text); font-family: "gg sans", var(--font-body); font-size: 15px; line-height: 1.375; padding: 16px 16px 18px; box-shadow: 0 0 0 1px #1e1f22, 0 12px 32px rgba(0,0,0,0.45); border-radius: 8px; min-width: 0; }
+.dc + .dc { margin-top: 0; }
+.dc-chan { color: var(--dc-muted); font-weight: 600; font-size: 14px; display: flex; gap: 6px; align-items: center; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #3f4147; }
+.dc-chan::before { content: "#"; font-size: 20px; line-height: 1; color: #80848E; }
+.dc-msg { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; }
+.dc-msg + .dc-msg { margin-top: 16px; }
+.dc-av { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
+.dc-av img { width: 100%; height: 100%; object-fit: cover; }
+.dc-av.user { background: #5865F2; display: grid; place-items: center; color: #fff; font-weight: 700; }
+.dc-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.dc-name { color: var(--dc-head); font-weight: 600; }
+.dc-app { background: var(--dc-blurple); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 3px; position: relative; top: -1px; }
+.dc-time { color: var(--dc-muted); font-size: 12px; }
+.dc-body { display: grid; gap: 6px; min-width: 0; }
+.dc-body p { overflow-wrap: anywhere; }
+.dc-eph { color: var(--dc-muted); font-size: 12px; display: flex; gap: 6px; align-items: center; }
+.dc-eph::before { content: "👁"; }
+.dc-mention { background: rgba(88,101,242,0.3); color: #c9cdfb; padding: 0 2px; border-radius: 3px; font-weight: 500; }
+.dc-role { padding: 0 3px; border-radius: 3px; font-weight: 500; }
+.dc-ts { background: rgba(78,80,88,0.48); padding: 0 2px; border-radius: 3px; }
+.dc-link { color: var(--dc-link); }
+.dc-code { font-family: var(--font-mono); background: var(--dc-code); padding: 0 3px; border-radius: 3px; font-size: 12.5px; color: var(--dc-text); box-shadow: none; }
+.dc .em { width: 18px; height: 18px; vertical-align: -4px; }
+.dc-embed { background: var(--dc-embed); border-left: 4px solid var(--amethyst); border-radius: 4px; padding: 10px 16px 14px 12px; display: grid; gap: 8px; max-width: 560px; min-width: 0; }
+.dc-embed.pvp { border-left-color: var(--loss); }
+.dc-embed.dice { border-left-color: var(--sakura); }
+.dc-embed.gold { border-left-color: var(--gold); }
+.dc-embed.green { border-left-color: var(--gain); }
+.dc-etitle { color: var(--dc-link); font-weight: 700; font-size: 16px; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.dc-etitle.plain { color: var(--dc-head); }
+.dc-desc { font-size: 14px; display: grid; gap: 2px; }
+.dc-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 12px; font-size: 14px; }
+.dc-fields .f { min-width: 0; }
+.dc-fields .f.full { grid-column: 1 / -1; }
+.dc-fields .fn { color: var(--dc-head); font-weight: 600; min-height: 1.2em; }
+.dc-fields .fn u { text-decoration: underline; text-underline-offset: 2px; }
+.dc-fields .fv { display: grid; gap: 1px; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .dc-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dc-foot { color: var(--dc-muted); font-size: 12px; }
+.dc-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.dc-btn { font-size: 14px; font-weight: 500; padding: 6px 14px; border-radius: 4px; color: #fff; background: var(--dc-grey); display: inline-flex; gap: 6px; align-items: center; }
+.dc-btn.primary { background: var(--dc-blurple); }
+.dc-btn.link::after { content: "↗"; font-size: 12px; opacity: 0.8; }
+.dc-btn .em { width: 18px; height: 18px; }
+.dc-input { background: var(--dc-input); border-radius: 8px; padding: 10px 14px; color: var(--dc-text); font-size: 15px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.dc-input .opt { background: #2b2d31; padding: 1px 6px; border-radius: 4px; color: var(--dc-muted); }
+.dc-auto { background: #2B2D31; border-radius: 8px; overflow: hidden; margin-bottom: 8px; box-shadow: 0 0 0 1px #1e1f22; }
+.dc-auto .h { font-size: 12px; font-weight: 700; color: var(--dc-muted); text-transform: uppercase; padding: 8px 12px 4px; }
+.dc-auto .o { padding: 7px 12px; }
+.dc-auto .o.sel { background: #404249; color: var(--dc-head); }
+.dc-member { display: flex; gap: 10px; align-items: center; padding: 6px 8px; }
+.dc-member .dot { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex: none; }
+.dc-member .dot img { width: 100%; height: 100%; object-fit: cover; }
+.dc-member span { font-weight: 500; }
+
+/* Discord modal */
+.dc-modal { background: #313338; border-radius: 8px; box-shadow: 0 0 0 1px #1e1f22, 0 12px 32px rgba(0,0,0,0.5); color: var(--dc-text); font-family: "gg sans", var(--font-body); max-width: 440px; overflow: hidden; }
+.dc-modal .mh { padding: 18px 16px 6px; font-weight: 700; color: var(--dc-head); font-size: 18px; }
+.dc-modal .mb { padding: 8px 16px 16px; display: grid; gap: 14px; }
+.dc-modal label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #B5BAC1; display: grid; gap: 8px; }
+.dc-select { background: #1E1F22; border-radius: 4px; padding: 9px 10px; display: flex; align-items: center; gap: 8px; font-size: 15px; text-transform: none; font-weight: 500; color: var(--dc-text); }
+.dc-select::after { content: "⌄"; margin-left: auto; color: var(--dc-muted); }
+.dc-select .em { width: 20px; height: 20px; }
+.dc-modal .mf { background: #2B2D31; padding: 14px 16px; display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ---------- WoW / addon mocks ---------- */
+.game { background: radial-gradient(ellipse at 30% 20%, #2a2f3a 0%, #151820 55%, #0b0d12 100%); position: relative; padding: 18px; min-height: 120px; box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade); overflow: hidden; }
+.chat { font-family: "Arial Narrow", "Roboto Condensed", var(--font-body); font-size: 14px; line-height: 1.5; text-shadow: 1px 1px 0 #000; display: grid; gap: 2px; background: rgba(0,0,0,0.35); padding: 10px 12px; }
+.chat .raid { color: var(--wow-raid); }
+.chat .guild { color: var(--wow-guild); }
+.chat .sys { color: var(--wow-system); }
+.chat .whisper { color: #FF80FF; }
+.chat .vxv { color: var(--wow-teal); font-weight: 700; }
+.chat .note-line { color: #ffffff; }
+.chat .item { color: var(--epic); }
+.chat .tag { color: var(--sakura-light); }
+.raid-warning { text-align: center; display: grid; gap: 6px; padding: 26px 10px 30px; }
+.raid-warning .big { font-family: "Friz Quadrata", Georgia, serif; font-size: clamp(1.3rem, 3.4vw, 1.9rem); color: var(--gold); text-shadow: 2px 2px 0 #000, 0 0 18px rgba(242,201,76,0.35); }
+.raid-warning .small { color: #fff; text-shadow: 1px 1px 0 #000; font-size: 1rem; }
+
+.addon { background: var(--night-2); box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade), 0 12px 32px rgba(0,0,0,0.45); padding: 0; min-width: 0; }
+.addon-top { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--wood-shade); box-shadow: 0 2px 0 var(--beam); flex-wrap: wrap; }
+.addon-top img { width: 26px; height: 26px; box-shadow: 0 0 0 2px var(--amethyst); }
+.addon-top b { font-family: var(--font-pixel); color: var(--ivory); letter-spacing: 0.1em; }
+.addon-top .tab { font-family: var(--font-pixel); font-size: 0.82rem; color: var(--parchment); padding: 4px 9px; background: var(--wood); }
+.addon-top .tab.on { background: var(--plum); color: var(--ivory); box-shadow: 0 2px 0 var(--gold); }
+.addon-body { padding: 14px; display: grid; gap: 12px; }
+.panel { background: var(--card); box-shadow: 0 0 0 2px var(--beam); padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.panel.officer { box-shadow: 0 0 0 2px var(--gold); background: rgba(42,26,10,0.9); }
+.panel h5 { margin: 0; font-family: var(--font-pixel); color: var(--ivory); font-size: 1rem; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; }
+.panel h5 small { font-family: var(--font-body); color: var(--muted); font-size: 0.8rem; font-weight: 500; }
+.row { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 10px; background: var(--ink); min-width: 0; }
+.row > span { min-width: 0; overflow-wrap: anywhere; }
+.pill { font-family: var(--font-pixel); font-size: 0.75rem; padding: 2px 7px; background: var(--plum); color: var(--ivory); white-space: nowrap; }
+.pill.gold { background: var(--gold); color: var(--ink); }
+.pill.green { background: #1f4a33; color: var(--gain); }
+.pill.red { background: #4a1f2a; color: var(--loss); }
+.pill.sak { background: #4a1f3a; color: var(--sakura-light); }
+.btn { font-family: var(--font-pixel); font-size: 0.85rem; padding: 7px 12px; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+.btn.pixel { background: var(--amethyst-btn); color: #fff; box-shadow: inset 0 -3px 0 var(--amethyst-shade), 0 0 0 2px var(--ink); }
+.btn.wood { background: var(--wood); color: var(--parchment); box-shadow: inset 0 -3px 0 var(--wood-shade), 0 0 0 2px var(--beam); }
+.btn.gold { background: var(--gold); color: var(--ink); box-shadow: inset 0 -3px 0 var(--gold-shade); }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.item-name { color: var(--epic); font-weight: 600; }
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+.ivory { color: var(--ivory); }
+.gold-t { color: var(--gold); }
+.gain-t { color: var(--gain); }
+.loss-t { color: var(--loss); }
+.sak-t { color: var(--sakura-light); }
+
+/* WoW tooltip */
+.tooltip { background: rgba(9, 9, 22, 0.94); border: 2px solid #8C8C8C; border-radius: 4px; padding: 8px 10px; font-family: "Arial Narrow", var(--font-body); color: #fff; font-size: 14px; line-height: 1.45; max-width: 290px; box-shadow: 0 0 0 1px #000; }
+.tooltip .t { font-size: 15px; font-weight: 700; }
+.tooltip .y { color: #FFD100; }
+.tooltip .g { color: #1EFF00; }
+.tooltip .r { color: #FF2020; }
+.tooltip .w { color: #fff; }
+
+/* SR+ timeline */
+.timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.tl { background: var(--card); box-shadow: 0 0 0 2px var(--line); padding: 10px; display: grid; gap: 4px; align-content: start; }
+.tl .d { font-family: var(--font-pixel); color: var(--parchment); font-size: 0.85rem; }
+.tl .r { font-size: 0.82rem; color: var(--muted); }
+.tl .b { font-family: var(--font-pixel); font-size: 1.15rem; }
+.tl.win { box-shadow: 0 0 0 2px var(--gain); }
+
+/* Companion window */
+.comp { background: var(--night-2); box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade), 0 12px 32px rgba(0,0,0,0.45); max-width: 420px; }
+.comp-head { display: flex; gap: 12px; align-items: center; padding: 14px 16px; background: var(--wood-shade); box-shadow: 0 2px 0 var(--beam); }
+.comp-head img { width: 40px; height: 40px; box-shadow: 0 0 0 2px var(--amethyst); }
+.comp-head .k { font-family: var(--font-pixel); color: var(--sakura); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.comp-head .t { font-family: var(--font-pixel); color: var(--ivory); font-size: 1.3rem; letter-spacing: 0.1em; }
+.comp-body { padding: 14px 16px 18px; display: grid; gap: 12px; }
+.comp-card { background: var(--card); box-shadow: 0 0 0 2px var(--line); padding: 10px 12px; display: grid; gap: 6px; }
+.comp-card h6 { margin: 0; font-family: var(--font-pixel); color: var(--parchment); font-size: 0.95rem; font-weight: 600; }
+.check { display: flex; gap: 8px; align-items: center; color: var(--lavender); font-size: 0.9rem; }
+.check i { width: 14px; height: 14px; background: var(--amethyst-btn); box-shadow: 0 0 0 2px var(--ink); display: inline-block; }
+
+/* Diagram: the three doors */
+.doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.door { background: var(--card); box-shadow: 0 0 0 2px var(--beam); padding: 16px; display: grid; gap: 8px; align-content: start; position: relative; }
+.door .icon { width: 48px; height: 48px; display: grid; place-items: center; font-family: var(--font-pixel); color: var(--ink); font-size: 1.1rem; }
+.door h4 { font-size: 1.15rem; color: var(--ivory); }
+.door p { font-size: 0.93rem; }
+.door .where { font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold-light); }
+.flow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 16px; background: var(--panel); box-shadow: 0 0 0 2px var(--line); }
+@media (min-width: 760px) { .flow { grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr); align-items: center; } }
+.flow .n { background: var(--ink); box-shadow: 0 0 0 2px var(--beam); padding: 10px 12px; text-align: center; display: grid; gap: 2px; }
+.flow .n b { font-family: var(--font-pixel); font-weight: 600; color: var(--ivory); }
+.flow .n span { font-size: 0.82rem; color: var(--muted); }
+.flow .a { text-align: center; color: var(--gold); font-family: var(--font-pixel); font-size: 0.85rem; line-height: 1.3; }
+
+/* Avatars */
+.avatars { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; }
+.av { display: grid; gap: 6px; justify-items: center; text-align: center; }
+.av img { width: 64px; height: 64px; image-rendering: pixelated; box-shadow: 0 0 0 2px var(--cls), 0 0 0 4px var(--ink); background: var(--ink); }
+.av figcaption { font-size: 0.74rem; line-height: 1.3; color: var(--muted); }
+
+/* Podium mock */
+.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.banner { display: grid; justify-items: center; gap: 6px; padding: 12px 6px 22px; text-align: center; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 88%, 0 100%); min-width: 0; }
+.banner.p1 { background: linear-gradient(#d9b45a, #a8812c); padding-top: 18px; }
+.banner.p2 { background: linear-gradient(#c9c9d6, #8e8ea3); }
+.banner.p3 { background: linear-gradient(#d48b4f, #9b5a2a); }
+.banner .rk { font-family: var(--font-pixel); background: var(--ink); color: var(--ivory); padding: 2px 10px; }
+.banner img { width: 56px; height: 56px; image-rendering: pixelated; box-shadow: 0 0 0 2px var(--ink); }
+.banner .nm { font-family: var(--font-pixel); font-weight: 600; text-shadow: 1px 1px 0 #000; overflow-wrap: anywhere; }
+.banner .vl { font-family: var(--font-pixel); color: var(--ink); background: rgba(255,255,255,0.65); padding: 1px 8px; font-size: 0.9rem; }
+
+/* Glossary and FAQ */
+.gloss { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; margin: 0; }
+@media (min-width: 760px) { .gloss { grid-template-columns: 180px minmax(0, 1fr); } }
+.gloss dt { font-family: var(--font-pixel); color: var(--gold); padding: 10px 14px 0; }
+.gloss dd { margin: 0; padding: 0 14px 10px; border-bottom: 1px solid var(--line); }
+@media (min-width: 760px) { .gloss dt, .gloss dd { padding: 10px 14px; border-bottom: 1px solid var(--line); } }
+.faq { display: grid; gap: 10px; max-width: 80ch; }
+.faq details { background: var(--card); box-shadow: 0 0 0 2px var(--line); }
+.faq summary { cursor: pointer; padding: 12px 14px; color: var(--ivory); font-weight: 600; }
+.faq details[open] summary { color: var(--gold); }
+.faq details > div { padding: 0 14px 14px; display: grid; gap: 8px; }
+
+.footer { margin-top: 90px; padding-block: 24px 10px; box-shadow: 0 4px 0 var(--beam) inset; font-size: 0.85rem; color: var(--muted); display: grid; gap: 6px; }
+.two { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stack { display: grid; gap: 14px; min-width: 0; }
+/* ---------- Deathroll simulation (the addon's Le Dé Pipé › Deathroll screen) ---------- */
+.drs { position: relative; overflow: hidden; background: var(--drs-bg, rgb(26,14,46)); transition: background .8s ease; box-shadow: inset 0 0 0 3px #0d0912, inset 0 0 0 7px #8a5a2a, inset 0 0 0 10px #0d0912, inset 0 0 0 12px #5b3a1c; color: #ece7f6; font-family: var(--font-body); }
+.drs-flag { position: absolute; inset: 0; background: url("/images/taverne.jpg") 80% 75% / 250% auto no-repeat; opacity: .2; image-rendering: pixelated; }
+.drs-veil { position: absolute; inset: 0; background: radial-gradient(420px 300px at 50% 55%, rgba(255,255,255,.07), transparent 70%), linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.55)); }
+.drs-in { position: relative; display: grid; gap: 10px; padding: 14px 16px 16px; }
+.drs-tabs { display: flex; align-items: center; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
+.drs-tabs img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px var(--amethyst); flex: none; }
+.drs-tabs b { font-family: var(--font-pixel); letter-spacing: .14em; flex: none; }
+.drs-tab { flex: none; padding: 6px 10px; background: #2a1a10; color: #d9c39a; font: 600 14px var(--font-pixel); box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #1a0f08; }
+.drs-tab.on { background: #4a2a6a; color: #fff; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c; }
+.drs-rule { height: 1px; background: linear-gradient(90deg, transparent, #a35cff 20%, #e0479e 80%, transparent); }
+.drs-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 18px; }
+.drs-head .k { display: block; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #ff5ac8; }
+.drs-head .t { display: block; font-family: var(--font-pixel); font-weight: 700; font-size: 28px; line-height: 1; color: #f4effc; }
+.drs-sub { display: flex; gap: 4px; }
+.drs-sub span { padding: 5px 12px; font: 600 14px var(--font-pixel); color: #d9c39a; background: #2a1a10; box-shadow: 0 0 0 2px #0d0912; }
+.drs-sub span.on { color: #fff; background: #4a2a6a; box-shadow: 0 0 0 2px #0d0912, inset 0 -3px 0 #f2c94c; }
+.drs-badges { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.drs-badges span { padding: 5px 10px; font-size: 12px; font-weight: 800; }
+.drs-arena { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 1fr); grid-template-areas: "left center right"; align-items: center; gap: 16px; padding: 14px 4px; min-height: 420px; }
+.drs-player { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; transition: opacity .5s, filter .5s; }
+.drs-player.left { grid-area: left; } .drs-player.right { grid-area: right; }
+.drs-player.waiting { opacity: .7; }
+.drs-player.lost { opacity: .75; filter: grayscale(1); }
+.drs-frame { width: clamp(84px, 13vw, 132px); aspect-ratio: 1; display: grid; place-items: center; box-shadow: 0 0 0 3px #0d0912, 0 0 0 7px #8a5a2a, 0 0 0 10px #0d0912, inset -6px -6px 0 rgba(0,0,0,.28), inset 6px 6px 0 rgba(255,255,255,.25); }
+.drs-frame img { width: 89%; height: 89%; image-rendering: pixelated; background: linear-gradient(180deg, #1a2a4a, #0d1424); box-shadow: 0 0 0 2px #0d0912; }
+.drs-player.turn .drs-frame { animation: drs-turn 1.2s steps(2) infinite; }
+@keyframes drs-turn { 50% { box-shadow: 0 0 0 3px #0d0912, 0 0 0 7px #f2c94c, 0 0 0 10px #0d0912, 0 0 30px 8px rgba(242,201,76,.5), inset -6px -6px 0 rgba(0,0,0,.28), inset 6px 6px 0 rgba(255,255,255,.25); } }
+.drs-plaque { font-family: var(--font-pixel); font-weight: 700; font-size: 20px; background: #3a2414; padding: 5px 14px; box-shadow: 0 0 0 3px #1a0f08, 0 0 0 6px #8a5a2a; }
+.drs-titles { font-size: 12px; font-weight: 700; color: #ff8cc8; }
+.drs-role { font-size: 12px; color: #c9c2ea; }
+.drs-stamp { transform: rotate(-10deg); border: 3px solid #ff4d6d; color: #ff4d6d; font: 700 15px var(--font-pixel); letter-spacing: .08em; padding: 4px 10px; background: rgba(40,0,10,.7); }
+.drs-win { display: grid; gap: 2px; }
+.drs-win span { font: 700 22px var(--font-pixel); color: #f2c94c; text-shadow: 0 0 14px rgba(242,201,76,.8); }
+.drs-win b { color: #7ee2a0; font-size: 17px; }
+.drs-center { grid-area: center; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; min-width: 0; }
+.drs-die { width: clamp(96px, 14vw, 150px); height: auto; image-rendering: pixelated; filter: drop-shadow(0 0 18px rgba(163,92,255,.6)) drop-shadow(0 10px 0 rgba(0,0,0,.35)); animation: drs-bob 2.4s steps(6) infinite; }
+.drs-die.rolling { animation: drs-tumble .5s steps(8) infinite; }
+.drs-die.lost { filter: hue-rotate(80deg) saturate(1.5) drop-shadow(0 0 22px rgba(255,77,109,.8)); animation: none; transform: rotate(-8deg); }
+@keyframes drs-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes drs-tumble { 0% { transform: rotate(0) translate(0,0); } 25% { transform: rotate(90deg) translate(-6px,-10px); } 50% { transform: rotate(180deg) translate(4px,0); } 75% { transform: rotate(270deg) translate(6px,-8px); } 100% { transform: rotate(360deg) translate(0,0); } }
+.drs-number { font: 700 clamp(60px, 10vw, 100px)/1 var(--font-pixel); font-variant-numeric: tabular-nums; color: #f4effc; text-shadow: 4px 4px 0 #0d0912, 0 0 30px rgba(163,92,255,.6); }
+.drs-number.hot { color: #ffb3c1; }
+.drs-number.lost { color: #ff4d6d; text-shadow: 4px 4px 0 #0d0912, 0 0 30px rgba(255,77,109,.8); }
+.drs-status { font-size: 14px; font-weight: 600; color: #e6d6f2; min-height: 1.4em; }
+.drs-roll { min-height: 52px; min-width: min(240px, 100%); padding: 0 20px; border: 0; font: 700 20px var(--font-pixel); color: #1a1206; background: #f2c94c; box-shadow: inset -4px -4px 0 #b8860b, inset 4px 4px 0 #fff2b0, 0 0 0 3px #0d0912; cursor: pointer; }
+.drs-roll:disabled { cursor: progress; filter: saturate(.7); }
+.drs-again { min-height: 44px; min-width: min(200px, 100%); padding: 0 16px; border: 0; font: 600 16px var(--font-pixel); color: #fff; background: #8a3ffc; box-shadow: inset -3px -3px 0 #5a1fb0, inset 3px 3px 0 #b98cff, 0 0 0 2px #0d0912; cursor: pointer; }
+.drs-history { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 440px; min-height: 26px; }
+.drs-history span { padding: 4px 8px; background: rgba(13,9,18,.7); box-shadow: 0 0 0 2px #0d0912, inset 0 0 0 1px #5b3a1c; font-size: 12px; color: #e6d6f2; }
+.drs-foot { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 10px 14px; background: rgba(13,9,18,.75); box-shadow: 0 0 0 2px #0d0912, 0 0 0 4px #5b3a1c; font-size: 12px; color: #c9b8d8; }
+.drs-foot span:last-child { margin-left: auto; }
+@media (max-width: 700px) {
+  .drs-arena { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "left right" "center center"; min-height: 0; }
+  .drs-plaque { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { .drs-die, .drs-die.rolling, .drs-player.turn .drs-frame { animation: none; } .drs { transition: none; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <img src="/images/logo.jpg" alt="" width="36" height="36">
+    <span class="brand">VXV</span>
+    <span class="sub">Guide du membre</span>
+    <span class="spacer"></span>
+    <a class="to-top" href="#bienvenue">Haut</a>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Sommaire">
+    <h2>Sommaire</h2>
+<ol>
+<li class="part"><a href="#partie-taverne"><span>I</span>Bienvenue à la taverne</a><ol>
+<li><a href="#trois-portes">Trois portes, une seule guilde</a></li>
+<li><a href="#lieux">Chaque lieu de la taverne ouvre un onglet</a></li>
+<li><a href="#fetes">La taverne en fête</a></li>
+<li><a href="#addon-ecrans">La grande fenêtre et le mode réduit</a></li>
+<li><a href="#principes">Nos principes, et qui fait quoi</a></li>
+</ol></li>
+<li class="part"><a href="#partie-premiers-pas"><span>II</span>Premiers pas</a><ol>
+<li><a href="#lier">Lier ton personnage principal</a></li>
+<li><a href="#addon">Installer l'addon</a></li>
+<li><a href="#site">Te connecter au site</a></li>
+<li><a href="#compagnon">Le compagnon, pour un jeu toujours à jour</a></li>
+<li><a href="#personnages">Ton main, tes rerolls et ton portrait</a></li>
+</ol></li>
+<li class="part"><a href="#partie-raids"><span>III</span>Les soirées de raid</a><ol>
+<li><a href="#annonce">L'annonce sur Discord</a></li>
+<li><a href="#inscription">S'inscrire, où tu veux</a></li>
+<li><a href="#sr">Réserver ton loot : les SR</a></li>
+<li><a href="#sr-plus">Le SR+ : la patience paie</a></li>
+<li><a href="#rappels">Les rappels</a></li>
+<li><a href="#onglet-raid">L'onglet Raid</a></li>
+<li><a href="#invitations">Rejoindre le groupe sans chuchoter « inv »</a></li>
+<li><a href="#prochain-boss">Le prochain boss et ton alerte</a></li>
+<li><a href="#butin">L'attribution du butin</a></li>
+<li><a href="#apres-raid">Le journal du raid, le récap et l'historique</a></li>
+</ol></li>
+<li class="part"><a href="#partie-pvp"><span>IV</span>PvP : sorties, duels et Elo</a><ol>
+<li><a href="#pvp-evenements">Les sorties PvP</a></li>
+<li><a href="#duels">Défier un membre en duel</a></li>
+<li><a href="#elo">Le classement Elo</a></li>
+</ol></li>
+<li class="part"><a href="#partie-de-pipe"><span>V</span>Le Dé Pipé</a><ol>
+<li><a href="#paris">Parier sur la vie de la guilde</a></li>
+<li><a href="#deathroll">Le deathroll, en plus beau</a></li>
+<li><a href="#essai-deathroll">Essaie une partie</a></li>
+<li><a href="#dettes">Payer, encaisser, et les dettes</a></li>
+</ol></li>
+<li class="part"><a href="#partie-guilde"><span>VI</span>La vie de la guilde</a><ol>
+<li><a href="#quetes">La quête de la semaine</a></li>
+<li><a href="#titres">Les titres de la semaine</a></li>
+<li><a href="#titres-faits-main">Les titres faits main</a></li>
+<li><a href="#ranking">Les classements</a></li>
+<li><a href="#artisans">Qui peut fabriquer quoi</a></li>
+<li><a href="#journal">La caisse et le journal des officiers</a></li>
+</ol></li>
+<li class="part"><a href="#partie-aide"><span>VII</span>Aide-mémoire</a><ol>
+<li><a href="#commandes">Toutes les commandes</a></li>
+<li><a href="#ou-trouver">Où trouver quoi</a></li>
+<li><a href="#faq">Questions courantes</a></li>
+<li><a href="#glossaire">Glossaire</a></li>
+</ol></li>
+</ol>
+  </nav>
+
+  <main>
+    <details class="toc-mobile">
+      <summary>Sommaire</summary>
+      <nav class="toc" aria-label="Sommaire">
+        <h2>Sommaire</h2>
+<ol>
+<li class="part"><a href="#partie-taverne"><span>I</span>Bienvenue à la taverne</a><ol>
+<li><a href="#trois-portes">Trois portes, une seule guilde</a></li>
+<li><a href="#lieux">Chaque lieu de la taverne ouvre un onglet</a></li>
+<li><a href="#fetes">La taverne en fête</a></li>
+<li><a href="#addon-ecrans">La grande fenêtre et le mode réduit</a></li>
+<li><a href="#principes">Nos principes, et qui fait quoi</a></li>
+</ol></li>
+<li class="part"><a href="#partie-premiers-pas"><span>II</span>Premiers pas</a><ol>
+<li><a href="#lier">Lier ton personnage principal</a></li>
+<li><a href="#addon">Installer l'addon</a></li>
+<li><a href="#site">Te connecter au site</a></li>
+<li><a href="#compagnon">Le compagnon, pour un jeu toujours à jour</a></li>
+<li><a href="#personnages">Ton main, tes rerolls et ton portrait</a></li>
+</ol></li>
+<li class="part"><a href="#partie-raids"><span>III</span>Les soirées de raid</a><ol>
+<li><a href="#annonce">L'annonce sur Discord</a></li>
+<li><a href="#inscription">S'inscrire, où tu veux</a></li>
+<li><a href="#sr">Réserver ton loot : les SR</a></li>
+<li><a href="#sr-plus">Le SR+ : la patience paie</a></li>
+<li><a href="#rappels">Les rappels</a></li>
+<li><a href="#onglet-raid">L'onglet Raid</a></li>
+<li><a href="#invitations">Rejoindre le groupe sans chuchoter « inv »</a></li>
+<li><a href="#prochain-boss">Le prochain boss et ton alerte</a></li>
+<li><a href="#butin">L'attribution du butin</a></li>
+<li><a href="#apres-raid">Le journal du raid, le récap et l'historique</a></li>
+</ol></li>
+<li class="part"><a href="#partie-pvp"><span>IV</span>PvP : sorties, duels et Elo</a><ol>
+<li><a href="#pvp-evenements">Les sorties PvP</a></li>
+<li><a href="#duels">Défier un membre en duel</a></li>
+<li><a href="#elo">Le classement Elo</a></li>
+</ol></li>
+<li class="part"><a href="#partie-de-pipe"><span>V</span>Le Dé Pipé</a><ol>
+<li><a href="#paris">Parier sur la vie de la guilde</a></li>
+<li><a href="#deathroll">Le deathroll, en plus beau</a></li>
+<li><a href="#essai-deathroll">Essaie une partie</a></li>
+<li><a href="#dettes">Payer, encaisser, et les dettes</a></li>
+</ol></li>
+<li class="part"><a href="#partie-guilde"><span>VI</span>La vie de la guilde</a><ol>
+<li><a href="#quetes">La quête de la semaine</a></li>
+<li><a href="#titres">Les titres de la semaine</a></li>
+<li><a href="#titres-faits-main">Les titres faits main</a></li>
+<li><a href="#ranking">Les classements</a></li>
+<li><a href="#artisans">Qui peut fabriquer quoi</a></li>
+<li><a href="#journal">La caisse et le journal des officiers</a></li>
+</ol></li>
+<li class="part"><a href="#partie-aide"><span>VII</span>Aide-mémoire</a><ol>
+<li><a href="#commandes">Toutes les commandes</a></li>
+<li><a href="#ou-trouver">Où trouver quoi</a></li>
+<li><a href="#faq">Questions courantes</a></li>
+<li><a href="#glossaire">Glossaire</a></li>
+</ol></li>
+</ol>
+      </nav>
+    </details>
+
+    <section class="hero" id="bienvenue">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-in">
+        <p class="kicker">VXV · WoW Forever · Horde</p>
+        <h1>Le guide de la <em>taverne</em></h1>
+        <p class="lead">Tout ce que VXV fait pour la guilde, sur Discord, sur le site et dans le jeu. Tu y apprendras à t'inscrire aux raids, réserver ton loot, parier, relever les quêtes, porter des titres et trouver un artisan. Chaque fonctionnalité est montrée avec un exemple.</p>
+        <div class="quick">
+          <a href="#lier"><b>1 · Lier ton perso</b><span><code>/vxv_main</code> dans le salon de liaison, une seule fois</span></a>
+          <a href="#addon"><b>2 · Installer l'addon</b><span>quelques dossiers à copier dans AddOns</span></a>
+          <a href="#inscription"><b>3 · T'inscrire</b><span>au prochain raid, d'un clic</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== PART I -->
+    <div class="part-head" id="partie-taverne">
+      <p class="num">Partie I</p>
+      <h2>Bienvenue à la taverne</h2>
+      <p>VXV est l'outil de la guilde. Une seule base de données garde tout : inscriptions, loot, paris, quêtes, titres. Tu y accèdes par trois portes, et ce que tu fais d'un côté se retrouve partout.</p>
+    </div>
+
+    <section class="sec" id="trois-portes">
+      <header>
+        <p class="eyebrow">Discord · site · jeu</p>
+        <h3>Trois portes, une seule guilde</h3>
+      </header>
+      <div class="doors">
+        <div class="door">
+          <div class="icon" style="background: var(--dc-blurple); color:#fff">BOT</div>
+          <h4>Discord : le bot VXV</h4>
+          <p>Il annonce les raids, les sorties PvP, les paris et les quêtes. Tu t'y inscris d'un bouton, tu y lies ton personnage, et il te donne ton rôle de classe et tes rôles de titre.</p>
+          <p class="where">serveur Discord de la guilde</p>
+        </div>
+        <div class="door">
+          <div class="icon" style="background: var(--amethyst)">WEB</div>
+          <h4>Le site : le tableau de bord</h4>
+          <p>Connexion avec ton compte Discord. Tout y est : inscriptions et SR, historique du loot, paris, quêtes, classements, artisans, journal. Sur ordinateur comme sur téléphone.</p>
+          <p class="where">vxv-web.vercel.app</p>
+        </div>
+        <div class="door">
+          <div class="icon" style="background: var(--gold)">WOW</div>
+          <h4>L'addon : la taverne en jeu</h4>
+          <p>La même taverne dans WoW, plus ce que seul le jeu sait faire : invitations en un clic, alerte du prochain boss, attribution du butin, deathroll, titres au survol, recettes des artisans.</p>
+          <p class="where">/vxv ou l'icône de la minimap</p>
+        </div>
+      </div>
+      <figure class="fig">
+        <div class="flow">
+          <div class="n"><b>Discord</b><span>bot VXV</span></div>
+          <div class="a">⇄<br>tout de suite</div>
+          <div class="n"><b>Site</b><span>la base de la guilde</span></div>
+          <div class="a">⇄<br>compagnon ou officier</div>
+          <div class="n"><b>Addon</b><span>dans WoW Forever</span></div>
+        </div>
+        <figcaption><b>Comment circulent les données.</b> Discord et le site partagent la même base : une inscription faite sur l'un apparaît aussitôt sur l'autre. Le jeu, lui, ne va pas sur Internet : les données y arrivent par le compagnon (une petite application facultative, au <code>/reload</code>) ou par un officier équipé, dont l'addon les partage à toute la guilde connectée.</figcaption>
+      </figure>
+      <div class="note">
+        <b class="t">Tu n'as rien à brancher</b>
+        <p>Les officiers ont le compagnon : grâce à eux, les données du site arrivent dans l'addon de chaque membre connecté. Ce que tu fais en jeu sans compagnon (une inscription, une SR) s'affiche « en attente » jusqu'à ce qu'un officier équipé le transmette au site.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="lieux">
+      <header>
+        <p class="eyebrow">La carte</p>
+        <h3>Chaque lieu de la taverne ouvre un onglet</h3>
+        <p>Le site et l'addon ont la même allure : une taverne de la Horde en pixel art. On clique sur un lieu pour entrer, et chaque lieu porte le même nom partout.</p>
+      </header>
+      <div class="split wide-fig">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Onglet</th><th>Lieu</th><th>Ce que tu y trouves</th></tr></thead>
+            <tbody>
+              <tr><td>Taverne</td><td>la salle entière</td><td>l'accueil : prochain raid, quête en cours, paris ouverts</td></tr>
+              <tr><td>Raid</td><td>la table du conseil de guerre</td><td>inscriptions, SR, composition, invitations, prochain boss, butin</td></tr>
+              <tr><td>PvP</td><td>le mur des avis de recherche</td><td>sorties PvP, duels, classement Elo</td></tr>
+              <tr><td>Le Dé Pipé</td><td>la porte néon</td><td>paris et deathroll</td></tr>
+              <tr><td>Quêtes</td><td>le tableau de quêtes</td><td>la quête de la semaine et son classement</td></tr>
+              <tr><td>Ranking</td><td>la cheminée</td><td>classements, records et titres</td></tr>
+              <tr><td>Artisans</td><td>la forge</td><td>qui sait fabriquer quoi dans la guilde</td></tr>
+              <tr><td>Journal</td><td>le comptoir</td><td>caisse de la guilde et journal des officiers</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="fig">
+          <div class="frame"><img src="/guide/captures/taverne.jpg" alt="L'onglet Taverne de l'addon : la taverne en pixel art, une plaque de bois sur chaque lieu, trois cartes en bas" width="1600" height="1088"></div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'onglet Taverne de l'addon.</b> Les plaques nomment les lieux, les pastilles roses signalent ce qui t'attend (une quête, un défi). En bas : le prochain raid, la quête en cours et Le Dé Pipé. L'onglet PvP s'ajoute dans la barre, après Raid.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="fetes">
+      <header>
+        <p class="eyebrow">Au fil de l'année</p>
+        <h3>La taverne en fête</h3>
+        <p>La taverne suit le calendrier de WoW : pendant chaque fête du jeu, elle se décore toute seule, sur le site comme dans l'addon. Les lieux restent à leur place.</p>
+      </header>
+      <div class="split">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fête</th><th>Quand</th></tr></thead>
+            <tbody>
+              <tr><td>Voile d'hiver</td><td>du 15 décembre au 2 janvier</td></tr>
+              <tr><td>De l'amour dans l'air</td><td>du 7 au 20 février</td></tr>
+              <tr><td>Jardin des nobles</td><td>la semaine de Pâques</td></tr>
+              <tr><td>Fête du Feu du solstice d'été</td><td>du 21 juin au 5 juillet</td></tr>
+              <tr><td>Fête des Brasseurs</td><td>du 20 septembre au 6 octobre</td></tr>
+              <tr><td>Sanssaint</td><td>du 18 octobre au 1er novembre</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="frame"><img src="/images/tavernes/voile-d-hiver.jpg" alt="La taverne décorée pour le Voile d'hiver : sapin, guirlandes, chaussettes sur la cheminée" width="1589" height="672" loading="lazy"></div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>La taverne du Voile d'hiver.</b></figcaption>
+          </figure>
+          <figure class="fig">
+            <div class="frame"><img src="/images/tavernes/sanssaint.jpg" alt="La taverne décorée pour la Sanssaint : citrouilles, toiles d'araignée, squelette et momie à la table" width="1589" height="672" loading="lazy"></div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>La taverne de la Sanssaint.</b></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="addon-ecrans">
+      <header>
+        <p class="eyebrow">En jeu</p>
+        <h3>La grande fenêtre et le mode réduit</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Tape <code>/vxv</code> ou clique sur l'icône VXV de la minimap : la grande fenêtre s'ouvre, avec un onglet par lieu. Elle garde sa place d'une partie à l'autre.</p>
+          <p>Pendant un raid, passe en <strong>mode réduit</strong> : une petite fenêtre qui ne gêne pas le jeu, avec l'essentiel de chaque lieu. Le prochain boss, son butin et tes SR y sont affichés en tête.</p>
+          <ul>
+            <li><code>/vxv</code> rouvre le dernier mode utilisé, grand ou réduit.</li>
+            <li>Les deux boutons en haut à droite passent d'un mode à l'autre et ferment la fenêtre.</li>
+            <li><code>/vxv aide</code> liste toutes les commandes de l'addon.</li>
+          </ul>
+          <div class="note">
+            <b class="t">Les noms dans leur couleur de classe</b>
+            <p>Partout (addon, site, Discord), un joueur apparaît dans la couleur de sa classe : <span class="c-warrior">guerrier</span>, <span class="c-paladin">paladin</span>, <span class="c-hunter">chasseur</span>, <span class="c-rogue">voleur</span>, <span class="c-priest">prêtre</span>, <span class="c-shaman">chaman</span>, <span class="c-mage">mage</span>, <span class="c-warlock">démoniste</span>, <span class="c-druid">druide</span>.</p>
+          </div>
+        </div>
+        <figure class="fig" style="max-width: 420px; justify-self: center;">
+          <div class="frame"><img src="/guide/captures/reduit.jpg" alt="Le mode réduit : l'alerte Tu as une SR sur le prochain boss, puis le butin du prochain boss et les SR posées" width="840" height="1200" loading="lazy"></div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le mode réduit pendant un raid.</b> En tête, l'alerte de ta SR ; dessous, le butin du prochain boss avec les SR de chacun.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="principes">
+      <header>
+        <p class="eyebrow">Les règles du jeu</p>
+        <h3>Nos principes, et qui fait quoi</h3>
+      </header>
+      <div class="two">
+        <div class="prose">
+          <ul>
+            <li><strong>Transparence totale.</strong> Toute action d'un officier (une SR changée après le verrouillage, un objet exclu, un loot corrigé, un résultat de pari) entre dans un journal que personne ne peut effacer, avec son motif. Tu le lis dans l'onglet Journal.</li>
+            <li><strong>Réservé à la guilde.</strong> Le site ne s'ouvre qu'avec un compte Discord du serveur, et l'addon ne répond qu'aux membres de la guilde.</li>
+            <li><strong>Le site fait foi.</strong> Discord, le site et l'addon montrent la même base. En cas de doute, c'est le site qui a raison.</li>
+            <li><strong>Zéro effort.</strong> Installer l'addon et lier ton personnage suffisent. Tout le reste est l'affaire du staff.</li>
+          </ul>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rôle</th><th>Ce qu'il fait</th></tr></thead>
+            <tbody>
+              <tr><td>Membre</td><td>lie ses personnages, s'inscrit, choisit ses SR, rejoint le raid, parie, défie, participe aux quêtes, consulte tout</td></tr>
+              <tr><td>Officier</td><td>crée les raids, sorties PvP, paris et quêtes ; ouvre les invitations ; exclut des objets ; corrige avec un motif</td></tr>
+              <tr><td>Maître du butin</td><td>lance l'attribution de chaque objet ; l'addon applique les règles</td></tr>
+              <tr><td>Trésorier</td><td>note l'or qui change de mains : mises payées, gains versés, dettes réglées, caisse</td></tr>
+              <tr><td>GM</td><td>administre le serveur Discord ; ne touche jamais à la base à la main</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================== PART II -->
+    <div class="part-head" id="partie-premiers-pas">
+      <p class="num">Partie II</p>
+      <h2>Premiers pas</h2>
+      <p>Cinq minutes, une seule fois. Après ça, tu t'inscris, tu réserves et tu paries où tu veux.</p>
+    </div>
+
+    <section class="sec" id="lier">
+      <header>
+        <p class="eyebrow">Étape 1 · Discord</p>
+        <h3>Lier ton personnage principal</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <ol class="steps">
+            <li><p>Va dans le <a href="https://discord.com/channels/1182711022398746684/1556034264179548180" target="_blank" rel="noopener"><strong>salon de liaison des personnages</strong></a> du Discord : le bot n'y accepte la commande que là.</p></li>
+            <li><p>Tape <code>/vxv_main</code>, puis quelques lettres du prénom de ton personnage : le bot propose les personnages de la guilde qui correspondent, accents compris.</p></li>
+            <li><p>Choisis le tien dans la liste et valide.</p></li>
+          </ol>
+          <p>Le bot te répond en privé, puis :</p>
+          <ul>
+            <li>renomme ton pseudo Discord en <strong>Pseudo - [Prénom Nom]</strong> ;</li>
+            <li>te donne le rôle de ta classe, dans sa couleur (tu peux changer ton pseudo ensuite si tu veux).</li>
+          </ul>
+          <p>Tes autres personnages se lient avec <code>/vxv_reroll</code>, de la même façon.</p>
+          <div class="note">
+            <b class="t">Ton personnage n'apparaît pas ?</b>
+            <p>Seuls les personnages de la liste de guilde sont proposés. Si le tien est trop récent, demande à un officier de mettre la liste à jour depuis le jeu, puis réessaie.</p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="dc">
+            <div class="dc-chan">liaison-des-personnages</div>
+            <div class="dc-auto">
+              <div class="h">personnage</div>
+              <div class="o sel">Kaelys Brumenoire · Mage</div>
+              <div class="o">Kaeldor Pierrefer · Guerrier</div>
+              <div class="o">Kaëna Sylvecime · Druide</div>
+            </div>
+            <div class="dc-input"><span>/vxv_main</span><span class="opt">personnage</span><span>kae</span></div>
+            <div style="height:14px"></div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">Aujourd'hui à 18:42</span></div>
+                <p>Kaelys Brumenoire est maintenant ton personnage principal. Pseudo Discord et rôle de classe mis à jour.</p>
+                <p class="dc-eph">Seul·e toi peux voir ce message</p>
+              </div>
+            </div>
+            <div style="margin-top:14px; padding-top:10px; border-top:1px solid #3f4147">
+              <div class="dc-time" style="font-weight:700; text-transform:uppercase; padding: 0 8px 4px;">Mage — 1</div>
+              <div class="dc-member"><span class="dot"><img src="/images/avatars/troll_mage_f.png" alt=""></span><span class="c-mage">Kael - [Kaelys Brumenoire]</span></div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>La liaison sur Discord.</b> La liste propose les personnages de la guilde ; le bot confirme, renomme le membre et lui donne le rôle Mage, dans la couleur des mages.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="addon">
+      <header>
+        <p class="eyebrow">Étape 2 · le jeu</p>
+        <h3>Installer l'addon</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <ol class="steps">
+            <li><p>Récupère l'archive de l'addon VXV : le lien est donné sur le Discord de la guilde.</p></li>
+            <li><p>Ouvre-la : elle contient plusieurs dossiers <code>VXV_…</code>. Copie-les tous dans le dossier <code>Interface/AddOns</code> de WoW Forever.</p></li>
+            <li><p>Relance le jeu (un nouveau dossier d'addon demande un redémarrage, pas seulement un <code>/reload</code>), puis tape <code>/vxv</code>.</p></li>
+          </ol>
+          <p>VXV est fait de plusieurs petits addons : un socle (<code>VXV_Core</code>) et un par lieu. Garde-les tous activés dans la liste des addons du jeu.</p>
+          <p>À chaque nouvelle version annoncée sur Discord, remplace les dossiers <code>VXV_…</code> par ceux de la nouvelle archive, puis relance le jeu.</p>
+          <div class="note">
+            <b class="t">Réservé aux membres</b>
+            <p>Hors de la guilde, l'addon reste muet : <em>« VXV est réservé aux membres de la guilde. »</em></p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="panel" style="box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade);">
+            <h5>Interface/AddOns <small>WoW Forever</small></h5>
+            <div class="row"><span class="ivory">VXV_Core</span><span class="pill">le socle</span></div>
+            <div class="row"><span class="ivory">VXV_Raid</span><span class="muted small">raids, SR, butin</span></div>
+            <div class="row"><span class="ivory">VXV_PvP</span><span class="muted small">sorties et duels</span></div>
+            <div class="row"><span class="ivory">VXV_Paris · VXV_Deathroll</span><span class="muted small">Le Dé Pipé</span></div>
+            <div class="row"><span class="ivory">VXV_Missions</span><span class="muted small">quêtes</span></div>
+            <div class="row"><span class="ivory">VXV_Ranking · VXV_Titles</span><span class="muted small">classements, titres</span></div>
+            <div class="row"><span class="ivory">VXV_Artisans</span><span class="muted small">métiers</span></div>
+            <div class="row"><span class="ivory">VXV_Sync</span><span class="muted small">lien avec le compagnon</span></div>
+            <div class="row"><span class="ivory">VXV_Data_…</span><span class="muted small">un par raid : boss et loot</span></div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Les dossiers de l'addon.</b> Chaque lieu est un petit addon, tous appuyés sur le socle.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="site">
+      <header>
+        <p class="eyebrow">Étape 3 · le site</p>
+        <h3>Te connecter au site</h3>
+      </header>
+      <div class="split wide-fig">
+        <div class="prose">
+          <p>Ouvre <a href="https://vxv-web.vercel.app" target="_blank" rel="noopener">vxv-web.vercel.app</a> et clique sur <strong>Connexion Discord</strong>. Discord te demande d'autoriser VXV, et te voilà dans la taverne.</p>
+          <ul>
+            <li>Le site est réservé aux membres du serveur : un visiteur ne voit que la page de connexion.</li>
+            <li>La barre du haut mène aux lieux (Raid, PvP, Quêtes, Le Dé Pipé, Ranking, Artisans, Journal), à tes <strong>Personnages</strong> et au <strong>Compagnon</strong>.</li>
+            <li>Sur téléphone, la taverne devient un bandeau qu'on fait glisser, une tuile par lieu, et un menu.</li>
+          </ul>
+        </div>
+        <figure class="fig">
+          <div class="frame"><img src="/guide/captures/site.jpg" alt="La page d'accueil du site : la taverne avec ses plaques, puis trois cartes : prochain raid, quête de la semaine, Le Dé Pipé" width="1600" height="1211" loading="lazy"></div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'accueil du site.</b> La taverne elle-même ; dessous, le prochain raid, la quête de la semaine et le pari du moment.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="compagnon">
+      <header>
+        <p class="eyebrow">Étape 4 · facultative</p>
+        <h3>Le compagnon, pour un jeu toujours à jour</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Le compagnon est une petite application pour Windows et Mac. Il fait le lien entre le jeu et le site, sans aucun copier-coller. Indispensable aux officiers, facultatif pour toi.</p>
+          <h4>Ce qu'il fait</h4>
+          <ul>
+            <li>Toutes les 5 minutes, il prépare pour le jeu les inscrits, les SR, les paris, les quêtes et les classements : un <code>/reload</code> en jeu les charge.</li>
+            <li>Après chaque <code>/reload</code> ou déconnexion, il envoie au site ce que tu as fait en jeu (inscription, SR, mise, défi). Plus d'« en attente ».</li>
+            <li>Pendant les raids, il lit le journal de combat et envoie chaque boss tué (c'est ce qui compte les soins reçus, pour le titre Princesse).</li>
+          </ul>
+          <h4>L'installer</h4>
+          <ol class="steps">
+            <li><p>Télécharge-le depuis la page <strong>Compagnon</strong> du site (Windows ou Mac).</p></li>
+            <li><p>Windows : si Windows protège ton ordinateur, clique sur « Informations complémentaires » puis « Exécuter quand même ». Mac : glisse VXV Compagnon dans Applications ; si le Mac refuse, Réglages Système › Confidentialité et sécurité › « Ouvrir quand même ».</p></li>
+            <li><p>Clique sur <strong>Relier mon compte</strong> et confirme sur le site. Il trouve le jeu tout seul ; sinon, indique-lui le dossier de World of Warcraft.</p></li>
+          </ol>
+          <p>Il se met à jour tout seul sous Windows ; sur Mac, il te prévient d'une nouvelle version.</p>
+        </div>
+        <figure class="fig" style="justify-self:center; width:100%; max-width:420px">
+          <div class="comp">
+            <div class="comp-head"><img src="/images/logo.jpg" alt=""><div><div class="k">La taverne · compagnon</div><div class="t">VXV</div></div></div>
+            <div class="comp-body">
+              <div class="comp-card"><h6>Compte</h6><p class="small">Relié à <strong>Kael</strong> · membre</p></div>
+              <div class="comp-card"><h6>World of Warcraft</h6><p class="small">Addon VXV trouvé :</p><p class="small muted" style="font-family:var(--font-mono); font-size:0.75rem; overflow-wrap:anywhere">C:\Program Files\World of Warcraft\_forever_\Interface\AddOns</p></div>
+              <div class="comp-card"><h6>Données</h6><p class="small">Prochain raid : <strong>La salle des Thanes</strong>, jeudi 21:00</p><p class="small muted">En jeu, tape /reload pour charger les nouvelles données.</p><div class="btns"><span class="btn wood">Synchroniser maintenant</span></div></div>
+              <span class="check"><i></i> Lancer avec l'ordinateur</span>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>La fenêtre du compagnon</b>, une fois relié.</figcaption>
+        </figure>
+      </div>
+      <div class="note">
+        <b class="t">Pas de bouton pour recharger le jeu</b>
+        <p>Le jeu interdit aux addons de recharger l'interface. Quand l'addon ou le compagnon te le demande, tape toi-même <code>/reload</code> (hors combat).</p>
+      </div>
+    </section>
+
+    <section class="sec" id="personnages">
+      <header>
+        <p class="eyebrow">Ton identité</p>
+        <h3>Ton main, tes rerolls et ton portrait</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>La page <strong>Personnages</strong> du site liste ton main et tes rerolls, choisis parmi les personnages de la guilde. Tu peux en ajouter, et changer ton main.</p>
+          <ul>
+            <li>Ton <strong>main</strong> donne ton pseudo, ton rôle de classe sur Discord et ton portrait.</li>
+            <li>Tes rerolls comptent aussi : leurs compteurs s'ajoutent aux tiens dans les quêtes, et tu peux t'inscrire à un raid avec l'un d'eux.</li>
+            <li>Un personnage n'appartient qu'à un seul membre.</li>
+          </ul>
+          <p><strong>Ton portrait</strong> est choisi tout seul, d'après la race, la classe et le sexe de ton main, que l'addon lit en jeu. Il apparaît au podium du Ranking, au deathroll, à ton inscription et dans l'Elo des duels. Son cadre prend la couleur de ta classe.</p>
+        </div>
+        <figure class="fig">
+          <div class="panel" style="box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade);">
+            <h5>Personnages <small>tes personnages de la guilde</small></h5>
+            <div class="row"><span style="display:flex; gap:10px; align-items:center"><img src="/images/avatars/troll_mage_f.png" alt="" width="40" height="40" style="width:40px;height:40px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--mage)"><span><span class="c-mage" style="font-weight:700">Kaelys Brumenoire</span><br><span class="muted small">Mage</span></span></span><span class="pill gold">Main</span></div>
+            <div class="row"><span style="display:flex; gap:10px; align-items:center"><img src="/images/avatars/orc_guerrier_m.png" alt="" width="40" height="40" style="width:40px;height:40px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--warrior)"><span><span class="c-warrior" style="font-weight:700">Kaeldor Pierrefer</span><br><span class="muted small">Guerrier</span></span></span><span class="pill">Reroll</span></div>
+            <div class="row"><span class="muted small">Ajouter un personnage : tape son nom, choisis-le dans la liste</span><span class="btn pixel">Ajouter</span></div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>La page Personnages</b>, un main et un reroll.</figcaption>
+        </figure>
+      </div>
+      <figure class="fig">
+        <div class="avatars"><figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/orc_guerrier_m.png" alt="Orc guerrier" width="64" height="64" loading="lazy"><figcaption>Orc guerrier</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/orc_guerrier_f.png" alt="Orque guerrière" width="64" height="64" loading="lazy"><figcaption>Orque guerrière</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/mv_guerrier_m.png" alt="Mort-vivant guerrier" width="64" height="64" loading="lazy"><figcaption>Mort-vivant guerrier</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/mv_guerrier_f.png" alt="Morte-vivante guerrière" width="64" height="64" loading="lazy"><figcaption>Morte-vivante guerrière</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/tauren_guerrier_m.png" alt="Tauren guerrier" width="64" height="64" loading="lazy"><figcaption>Tauren guerrier</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/tauren_guerrier_f.png" alt="Taurène guerrière" width="64" height="64" loading="lazy"><figcaption>Taurène guerrière</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/troll_guerrier_m.png" alt="Troll guerrier" width="64" height="64" loading="lazy"><figcaption>Troll guerrier</figcaption></figure>
+<figure class="av" style="--cls:var(--warrior)"><img src="/images/avatars/troll_guerrier_f.png" alt="Trollesse guerrière" width="64" height="64" loading="lazy"><figcaption>Trollesse guerrière</figcaption></figure>
+<figure class="av" style="--cls:var(--paladin)"><img src="/images/avatars/mv_paladin_m.png" alt="Mort-vivant paladin" width="64" height="64" loading="lazy"><figcaption>Mort-vivant paladin</figcaption></figure>
+<figure class="av" style="--cls:var(--paladin)"><img src="/images/avatars/mv_paladin_f.png" alt="Morte-vivante paladine" width="64" height="64" loading="lazy"><figcaption>Morte-vivante paladine</figcaption></figure>
+<figure class="av" style="--cls:var(--hunter)"><img src="/images/avatars/orc_chasseur_m.png" alt="Orc chasseur" width="64" height="64" loading="lazy"><figcaption>Orc chasseur</figcaption></figure>
+<figure class="av" style="--cls:var(--hunter)"><img src="/images/avatars/orc_chasseur_f.png" alt="Orque chasseresse" width="64" height="64" loading="lazy"><figcaption>Orque chasseresse</figcaption></figure>
+<figure class="av" style="--cls:var(--hunter)"><img src="/images/avatars/tauren_chasseur_m.png" alt="Tauren chasseur" width="64" height="64" loading="lazy"><figcaption>Tauren chasseur</figcaption></figure>
+<figure class="av" style="--cls:var(--hunter)"><img src="/images/avatars/tauren_chasseur_f.png" alt="Taurène chasseresse" width="64" height="64" loading="lazy"><figcaption>Taurène chasseresse</figcaption></figure>
+<figure class="av" style="--cls:var(--hunter)"><img src="/images/avatars/troll_chasseur_m.png" alt="Troll chasseur" width="64" height="64" loading="lazy"><figcaption>Troll chasseur</figcaption></figure>
+<figure class="av" style="--cls:var(--hunter)"><img src="/images/avatars/troll_chasseur_f.png" alt="Trollesse chasseresse" width="64" height="64" loading="lazy"><figcaption>Trollesse chasseresse</figcaption></figure>
+<figure class="av" style="--cls:var(--rogue)"><img src="/images/avatars/orc_voleur_m.png" alt="Orc voleur" width="64" height="64" loading="lazy"><figcaption>Orc voleur</figcaption></figure>
+<figure class="av" style="--cls:var(--rogue)"><img src="/images/avatars/orc_voleur_f.png" alt="Orque voleuse" width="64" height="64" loading="lazy"><figcaption>Orque voleuse</figcaption></figure>
+<figure class="av" style="--cls:var(--rogue)"><img src="/images/avatars/mv_voleur_m.png" alt="Mort-vivant voleur" width="64" height="64" loading="lazy"><figcaption>Mort-vivant voleur</figcaption></figure>
+<figure class="av" style="--cls:var(--rogue)"><img src="/images/avatars/mv_voleur_f.png" alt="Morte-vivante voleuse" width="64" height="64" loading="lazy"><figcaption>Morte-vivante voleuse</figcaption></figure>
+<figure class="av" style="--cls:var(--rogue)"><img src="/images/avatars/troll_voleur_m.png" alt="Troll voleur" width="64" height="64" loading="lazy"><figcaption>Troll voleur</figcaption></figure>
+<figure class="av" style="--cls:var(--rogue)"><img src="/images/avatars/troll_voleur_f.png" alt="Trollesse voleuse" width="64" height="64" loading="lazy"><figcaption>Trollesse voleuse</figcaption></figure>
+<figure class="av" style="--cls:var(--priest)"><img src="/images/avatars/mv_pretre_m.png" alt="Mort-vivant prêtre" width="64" height="64" loading="lazy"><figcaption>Mort-vivant prêtre</figcaption></figure>
+<figure class="av" style="--cls:var(--priest)"><img src="/images/avatars/mv_pretre_f.png" alt="Morte-vivante prêtresse" width="64" height="64" loading="lazy"><figcaption>Morte-vivante prêtresse</figcaption></figure>
+<figure class="av" style="--cls:var(--priest)"><img src="/images/avatars/troll_pretre_m.png" alt="Troll prêtre" width="64" height="64" loading="lazy"><figcaption>Troll prêtre</figcaption></figure>
+<figure class="av" style="--cls:var(--priest)"><img src="/images/avatars/troll_pretre_f.png" alt="Trollesse prêtresse" width="64" height="64" loading="lazy"><figcaption>Trollesse prêtresse</figcaption></figure>
+<figure class="av" style="--cls:var(--shaman)"><img src="/images/avatars/orc_chaman_m.png" alt="Orc chaman" width="64" height="64" loading="lazy"><figcaption>Orc chaman</figcaption></figure>
+<figure class="av" style="--cls:var(--shaman)"><img src="/images/avatars/orc_chaman_f.png" alt="Orque chamane" width="64" height="64" loading="lazy"><figcaption>Orque chamane</figcaption></figure>
+<figure class="av" style="--cls:var(--shaman)"><img src="/images/avatars/tauren_chaman_m.png" alt="Tauren chaman" width="64" height="64" loading="lazy"><figcaption>Tauren chaman</figcaption></figure>
+<figure class="av" style="--cls:var(--shaman)"><img src="/images/avatars/tauren_chaman_f.png" alt="Taurène chamane" width="64" height="64" loading="lazy"><figcaption>Taurène chamane</figcaption></figure>
+<figure class="av" style="--cls:var(--shaman)"><img src="/images/avatars/troll_chaman_m.png" alt="Troll chaman" width="64" height="64" loading="lazy"><figcaption>Troll chaman</figcaption></figure>
+<figure class="av" style="--cls:var(--shaman)"><img src="/images/avatars/troll_chaman_f.png" alt="Trollesse chamane" width="64" height="64" loading="lazy"><figcaption>Trollesse chamane</figcaption></figure>
+<figure class="av" style="--cls:var(--mage)"><img src="/images/avatars/mv_mage_m.png" alt="Mort-vivant mage" width="64" height="64" loading="lazy"><figcaption>Mort-vivant mage</figcaption></figure>
+<figure class="av" style="--cls:var(--mage)"><img src="/images/avatars/mv_mage_f.png" alt="Morte-vivante mage" width="64" height="64" loading="lazy"><figcaption>Morte-vivante mage</figcaption></figure>
+<figure class="av" style="--cls:var(--mage)"><img src="/images/avatars/troll_mage_m.png" alt="Troll mage" width="64" height="64" loading="lazy"><figcaption>Troll mage</figcaption></figure>
+<figure class="av" style="--cls:var(--mage)"><img src="/images/avatars/troll_mage_f.png" alt="Trollesse mage" width="64" height="64" loading="lazy"><figcaption>Trollesse mage</figcaption></figure>
+<figure class="av" style="--cls:var(--warlock)"><img src="/images/avatars/orc_demoniste_m.png" alt="Orc démoniste" width="64" height="64" loading="lazy"><figcaption>Orc démoniste</figcaption></figure>
+<figure class="av" style="--cls:var(--warlock)"><img src="/images/avatars/orc_demoniste_f.png" alt="Orque démoniste" width="64" height="64" loading="lazy"><figcaption>Orque démoniste</figcaption></figure>
+<figure class="av" style="--cls:var(--warlock)"><img src="/images/avatars/mv_demoniste_m.png" alt="Mort-vivant démoniste" width="64" height="64" loading="lazy"><figcaption>Mort-vivant démoniste</figcaption></figure>
+<figure class="av" style="--cls:var(--warlock)"><img src="/images/avatars/mv_demoniste_f.png" alt="Morte-vivante démoniste" width="64" height="64" loading="lazy"><figcaption>Morte-vivante démoniste</figcaption></figure>
+<figure class="av" style="--cls:var(--druid)"><img src="/images/avatars/tauren_druide_m.png" alt="Tauren druide" width="64" height="64" loading="lazy"><figcaption>Tauren druide</figcaption></figure>
+<figure class="av" style="--cls:var(--druid)"><img src="/images/avatars/tauren_druide_f.png" alt="Taurène druidesse" width="64" height="64" loading="lazy"><figcaption>Taurène druidesse</figcaption></figure></div>
+        <figcaption><b>Les 42 portraits de la Horde</b>, une race, une classe et un sexe chacun. Le cadre prend la couleur de la classe.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===================================================== PART III -->
+    <div class="part-head" id="partie-raids">
+      <p class="num">Partie III</p>
+      <h2>Les soirées de raid</h2>
+      <p>De l'annonce au récap du lendemain : comment t'inscrire, réserver ton loot, rejoindre le groupe, savoir quand ton objet tombe et comment il est attribué.</p>
+    </div>
+
+    <section class="sec" id="annonce">
+      <header>
+        <p class="eyebrow">Avant le raid</p>
+        <h3>L'annonce sur Discord</h3>
+      </header>
+      <div class="split wide-fig">
+        <div class="prose">
+          <p>Un officier crée la soirée (sur le site, sur Discord avec <code>/vxv_raid</code> ou en jeu) : une date, une heure, un ou deux raids, un nombre de SR par joueur, et le <strong>rôle Discord</strong> de ceux qui peuvent s'inscrire. Le bot publie aussitôt l'annonce dans le salon des raids.</p>
+          <h4>Comment la lire</h4>
+          <ul>
+            <li><strong>Le titre</strong> : le ou les raids de la soirée, en lettres encadrées. Il ouvre la page de l'événement sur le site.</li>
+            <li><strong>En tête</strong> : dans combien de temps, le nombre de SR par joueur, à qui l'événement est réservé, et le compte par rôle (tanks, soigneurs, DPS).</li>
+            <li><strong>Date, heure, venus</strong> : l'heure s'affiche dans ton propre fuseau.</li>
+            <li><strong>Les colonnes</strong> : les tanks, puis une colonne par classe. Chaque joueur a l'icône de sa spé, son <strong>numéro d'arrivée</strong> (l'ordre d'inscription) et son nom. Un joueur en retard porte l'horloge.</li>
+            <li><strong>En bas</strong> : les « peut-être », le banc et les absents.</li>
+          </ul>
+          <p>L'annonce se met à jour toute seule à chaque inscription, d'où qu'elle vienne.</p>
+        </div>
+        <figure class="fig">
+          <div class="dc">
+            <div class="dc-chan">raids</div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">Aujourd'hui à 12:05</span></div>
+                <div class="dc-embed">
+                  <div class="dc-etitle">🄻🄰 🅂🄰🄻🄻🄴 🄳🄴🅂 🅃🄷🄰🄽🄴🅂</div>
+                  <div class="dc-desc">
+                    <span>⏳ <span class="dc-ts">dans 2 jours</span></span>
+                    <span><img class="em" src="/guide/emojis/sr.png" alt="SR"> 2 SR par joueur</span>
+                    <span>👥 Réservé à <span class="dc-role" style="color:#E67E22; background:rgba(230,126,34,0.15)">@Raideur R1</span></span>
+                    <span><img class="em" src="/guide/emojis/role_tank.png" alt="Tank"> 2 · <img class="em" src="/guide/emojis/role_heal.png" alt="Soigneur"> 2 · <img class="em" src="/guide/emojis/role_dps.png" alt="DPS"> 8</span>
+                  </div>
+                  <div class="dc-fields">
+                    <div class="f"><div class="fn">&nbsp;</div><div class="fv"><span>📅 <span class="dc-ts">15 octobre 2026</span></span></div></div>
+                    <div class="f"><div class="fn">&nbsp;</div><div class="fv"><span>🕐 <span class="dc-ts">21:00</span></span></div></div>
+                    <div class="f"><div class="fn">&nbsp;</div><div class="fv"><span>👥 <b>12</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/role_tank.png" alt=""> <u>Tank</u> (2)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_guerrier_protection.png" alt=""> <code class="dc-code">1</code> <b>Vorn</b></span><span><img class="em" src="/guide/emojis/spe_druide_feral.png" alt=""> <code class="dc-code">4</code> <b>Grommak</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/guerrier.png" alt=""> <u>Guerrier</u> (2)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_guerrier_fureur.png" alt=""> <code class="dc-code">3</code> <b>Kaeldor</b></span><span><img class="em" src="/guide/emojis/spe_guerrier_armes.png" alt=""> <code class="dc-code">9</code> <b>Brakka</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/paladin.png" alt=""> <u>Paladin</u> (0)</div><div class="fv">&nbsp;</div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/chasseur.png" alt=""> <u>Chasseur</u> (1)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_chasseur_precision.png" alt=""> <code class="dc-code">6</code> <b>Raka</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/voleur.png" alt=""> <u>Voleur</u> (2)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_voleur_combat.png" alt=""> <code class="dc-code">2</code> <b>Sira</b></span><span><img class="em" src="/guide/emojis/spe_voleur_assassinat.png" alt=""> <code class="dc-code">11</code> <b>Vexa</b> <img class="em" src="/guide/emojis/statut_retard.png" alt="en retard"></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/pretre.png" alt=""> <u>Prêtre</u> (2)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_pretre_sacre.png" alt=""> <code class="dc-code">5</code> <b>Elyra</b></span><span><img class="em" src="/guide/emojis/spe_pretre_ombre.png" alt=""> <code class="dc-code">10</code> <b>Morgane</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/chaman.png" alt=""> <u>Chaman</u> (1)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_chaman_restauration.png" alt=""> <code class="dc-code">7</code> <b>Torvak</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/mage.png" alt=""> <u>Mage</u> (1)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_mage_givre.png" alt=""> <code class="dc-code">8</code> <b>Kaelys</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/demoniste.png" alt=""> <u>Démoniste</u> (1)</div><div class="fv"><span><img class="em" src="/guide/emojis/spe_demoniste_affliction.png" alt=""> <code class="dc-code">12</code> <b>Zul'rak</b></span></div></div>
+                    <div class="f"><div class="fn"><img class="em" src="/guide/emojis/druide.png" alt=""> <u>Druide</u> (0)</div><div class="fv">&nbsp;</div></div>
+                    <div class="f full"><div class="fn"><img class="em" src="/guide/emojis/statut_peutetre.png" alt=""> <u>Peut-être</u> (1)</div><div class="fv"><span><code class="dc-code">13</code> Thessa</span></div></div>
+                    <div class="f full"><div class="fn"><img class="em" src="/guide/emojis/statut_absent.png" alt=""> <u>Absent</u> (1)</div><div class="fv"><span><code class="dc-code">14</code> Ulric</span></div></div>
+                  </div>
+                  <div class="dc-foot">Inscris-toi avec le bouton ci-dessous, ou sur le site.</div>
+                </div>
+                <div class="dc-btns"><span class="dc-btn primary">S'inscrire</span><span class="dc-btn link">Voir sur le site</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'annonce d'une soirée de raid</b>, réservée au rôle Raideur R1. Grommak, druide farouche, tient le rôle de tank : il est dans la colonne Tank. Vexa arrivera en retard.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="inscription">
+      <header>
+        <p class="eyebrow">Avant le raid</p>
+        <h3>S'inscrire, où tu veux</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Trois façons de t'inscrire, qui donnent la même inscription :</p>
+          <ul>
+            <li><strong>Sur Discord</strong> : le bouton <strong>S'inscrire</strong> de l'annonce ouvre un formulaire (personnage, rôle, statut, spécialisation). Ton main est choisi d'avance.</li>
+            <li><strong>Sur le site</strong> : la page de l'événement, formulaire « Mon inscription ».</li>
+            <li><strong>En jeu</strong> : l'onglet Raid, panneau « Mon inscription ».</li>
+          </ul>
+          <p>Tu peux revenir changer ton inscription à tout moment avant le raid : le formulaire s'ouvre rempli avec tes choix.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Statut</th><th>Ce qu'il veut dire</th></tr></thead>
+              <tbody>
+                <tr><td><img class="em" src="/guide/emojis/statut_present.png" alt=""> Présent</td><td>tu viens ; tu comptes dans la composition et tu es invité</td></tr>
+                <tr><td><img class="em" src="/guide/emojis/statut_retard.png" alt=""> En retard</td><td>tu viens mais plus tard ; tu comptes aussi, avec l'horloge</td></tr>
+                <tr><td><img class="em" src="/guide/emojis/statut_peutetre.png" alt=""> Peut-être</td><td>pas sûr ; listé à part, pas compté</td></tr>
+                <tr><td><img class="em" src="/guide/emojis/statut_banc.png" alt=""> Banc</td><td>dispo en remplaçant ; un officier t'invite si besoin</td></tr>
+                <tr><td><img class="em" src="/guide/emojis/statut_absent.png" alt=""> Absent</td><td>tu ne viens pas ; la guilde le sait</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note warn">
+            <b class="t">Un événement réservé à un rôle</b>
+            <p>Chaque soirée est réservée à un rôle Discord (Raideur R1, Raideur R2…) ou ouverte à tous (@everyone). Sans ce rôle, l'inscription est refusée ; dès qu'un officier te le donne sur Discord, tu peux t'inscrire. Une inscription déjà faite reste modifiable, même si tu perds le rôle.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="dc-modal">
+              <div class="mh">Inscription · La salle des Thanes</div>
+              <div class="mb">
+                <label>Personnage<span class="dc-select"><img class="em" src="/guide/emojis/voleur.png" alt="">Sira Ventargent · Voleur</span></label>
+                <label>Rôle<span class="dc-select"><img class="em" src="/guide/emojis/role_dps.png" alt="">DPS</span></label>
+                <label>Statut<span class="dc-select"><img class="em" src="/guide/emojis/statut_present.png" alt="">Présent</span></label>
+                <label>Spécialisation<span class="dc-select"><img class="em" src="/guide/emojis/spe_voleur_combat.png" alt="">Combat · Voleur</span></label>
+              </div>
+              <div class="mf"><span class="dc-btn" style="background:transparent">Annuler</span><span class="dc-btn primary">Envoyer</span></div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Le formulaire du bouton S'inscrire</b>, sur Discord.</figcaption>
+          </figure>
+          <figure class="fig">
+            <div class="dc">
+              <div class="dc-msg">
+                <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+                <div class="dc-body">
+                  <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">Aujourd'hui à 12:31</span></div>
+                  <p>Inscription enregistrée : Sira Ventargent, DPS (Combat), Présent.</p>
+                  <p class="dc-eph">Seul·e toi peux voir ce message</p>
+                </div>
+              </div>
+            </div>
+            <figcaption><b>La confirmation</b>, visible de toi seul ; l'annonce se met à jour en même temps.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="sr">
+      <header>
+        <p class="eyebrow">Avant le raid</p>
+        <h3>Réserver ton loot : les SR</h3>
+        <p>Une SR (soft reserve) est une réservation douce : tu annonces l'objet que tu veux. S'il tombe, seuls ceux qui l'ont réservé jouent pour lui.</p>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <ul>
+            <li>Choisis tes SR <strong>sur le site</strong> (page de l'événement, « Mes SR ») ou <strong>en jeu</strong> (onglet Raid), parmi le loot des raids de la soirée.</li>
+            <li>Le <strong>nombre de SR par joueur</strong> est fixé à la création de l'événement, compté sur toute la soirée.</li>
+            <li>Pour chaque objet, tu vois qui l'a déjà réservé, avec son bonus SR+.</li>
+            <li>Les officiers peuvent <strong>exclure</strong> un objet des SR : il partira au loot council.</li>
+            <li>Les SR se <strong>verrouillent 30 minutes avant le raid</strong>. Ensuite, seul un officier peut en changer une, avec un motif inscrit au journal.</li>
+          </ul>
+          <div class="note">
+            <b class="t">Changé à deux endroits ?</b>
+            <p>Avant le verrouillage, la modification la plus récente gagne, qu'elle vienne du site ou du jeu.</p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="panel" style="box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade);">
+            <h5>Mes SR <small>2 SR par joueur · verrouillées jeu. 20:30</small></h5>
+            <div class="row"><span><span class="gold-t">☑</span> <span class="item-name">Croc de Magmatus</span><br><span class="muted small">Infurnus · SR : Kaelys <span class="pill gold">SR+ +20</span> Raka</span></span></div>
+            <div class="row"><span><span class="gold-t">☑</span> <span class="item-name">Brassards brindecieux</span><br><span class="muted small">Faldrim Courbenclume · SR : Kaelys</span></span></div>
+            <div class="row"><span><span class="muted">☐</span> <span class="item-name">Bottines du golem protecteur</span><br><span class="muted small">Pillage · aucune SR</span></span></div>
+            <div class="row" style="opacity:0.7"><span><span class="muted">✕</span> <span class="item-name">Jambières de Dirgehammer</span><br><span class="muted small">Durgen Mornemartel · exclu par les officiers</span></span><span class="pill sak">Exclu</span></div>
+            <div class="btns"><span class="btn pixel">Enregistrer mes SR</span></div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le choix des SR sur le site</b>, vu par Kaelys : deux SR posées, un objet exclu.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="sr-plus">
+      <header>
+        <p class="eyebrow">Avant le raid</p>
+        <h3>Le SR+ : la patience paie</h3>
+        <p>Chaque soirée où tu étais là, avec une SR sur un objet, sans l'obtenir, te donne <strong>+10</strong> au roll sur cet objet. Jusqu'à <strong>+50</strong>.</p>
+      </header>
+      <figure class="fig">
+        <div class="timeline">
+          <div class="tl"><span class="d">Soirée 1</span><span class="r">présent, SR sur le Croc, pas obtenu</span><span class="b gold-t">+10</span></div>
+          <div class="tl"><span class="d">Soirée 2</span><span class="r">absent : neutre</span><span class="b muted">+10</span></div>
+          <div class="tl"><span class="d">Soirée 3</span><span class="r">présent, raid sans le Croc : neutre</span><span class="b muted">+10</span></div>
+          <div class="tl"><span class="d">Soirée 4</span><span class="r">présent, SR sur le Croc, pas obtenu</span><span class="b gold-t">+20</span></div>
+          <div class="tl win"><span class="d">Soirée 5</span><span class="r">roll 74 + 20 = 94 : obtenu</span><span class="b gain-t">gagné</span></div>
+          <div class="tl"><span class="d">Ensuite</span><span class="r">le compteur repart de zéro</span><span class="b muted">0</span></div>
+        </div>
+        <figcaption><span class="example-tag">Exemple</span> · <b>Le SR+ de Kaelys sur le Croc de Magmatus</b>, soirée après soirée.</figcaption>
+      </figure>
+      <div class="two">
+        <div class="prose">
+          <h4>Ce qui compte</h4>
+          <ul>
+            <li>Le bonus est <strong>par personnage et par objet</strong>.</li>
+            <li>Une soirée où tu étais <strong>absent</strong>, ou dont les raids n'avaient pas l'objet, ne change rien.</li>
+            <li>Le bonus s'arrête quand tu <strong>obtiens</strong> l'objet, ou si tu étais présent <strong>sans l'avoir réservé</strong>.</li>
+          </ul>
+        </div>
+        <div class="prose">
+          <h4>Où le voir</h4>
+          <p>À côté de chaque nom dans la liste des SR (site et addon), dans tes SR du mode réduit, et dans l'alerte du prochain boss. Au moment du roll, l'addon l'ajoute tout seul.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="rappels">
+      <header>
+        <p class="eyebrow">Avant le raid</p>
+        <h3>Les rappels</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Chaque matin, le bot rappelle les soirées des prochaines 24 heures dans le salon des raids :</p>
+          <ul>
+            <li>il mentionne les inscrits attendus (tous sauf les absents) ;</li>
+            <li>il relance ceux qui n'ont pas encore choisi leurs SR, avec l'heure du verrouillage.</li>
+          </ul>
+        </div>
+        <figure class="fig">
+          <div class="dc">
+            <div class="dc-chan">raids</div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">Aujourd'hui à 10:00</span></div>
+                <p><img class="em" src="/guide/emojis/raid.png" alt=""> <b>La salle des Thanes</b> <span class="dc-ts">jeudi 15 octobre 2026 21:00</span> (<span class="dc-ts">dans 11 heures</span>) · <span class="dc-link">vxv-web.vercel.app/evenements/…</span></p>
+                <p>Inscrits : <span class="dc-mention">@Vorn</span> <span class="dc-mention">@Sira</span> <span class="dc-mention">@Kaeldor</span> <span class="dc-mention">@Grommak</span> <span class="dc-mention">@Elyra</span> …</p>
+                <p><img class="em" src="/guide/emojis/sr.png" alt=""> Pas encore de SR : <span class="dc-mention">@Raka</span>, à choisir sur le site avant le verrouillage (<span class="dc-ts">20:30</span>).</p>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le rappel du jour du raid.</b></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="onglet-raid">
+      <header>
+        <p class="eyebrow">En jeu</p>
+        <h3>L'onglet Raid</h3>
+      </header>
+      <div class="split wide-fig">
+        <div class="prose">
+          <p>Le conseil de guerre de la soirée, en un coup d'œil :</p>
+          <ul>
+            <li><strong>Mon inscription</strong> : ton personnage, ton portrait, tes boutons de statut et <strong>Rejoindre le raid</strong>.</li>
+            <li><strong>Composition</strong> : tanks, soigneurs et DPS, chacun dans sa couleur de classe, avec l'icône de son rôle. La classe s'affiche au survol.</li>
+            <li><strong>Mes SR</strong> : tes objets et leur SR+.</li>
+            <li><strong>SR du raid</strong> : toutes les SR, avec le prochain boss en tête.</li>
+            <li><strong>Derniers loots</strong> : qui a eu quoi, et comment (SR, SR+, roll, council).</li>
+          </ul>
+          <p>Les badges du haut montrent le nombre d'inscrits et le temps avant le verrouillage des SR.</p>
+        </div>
+        <figure class="fig">
+          <div class="frame"><img src="/guide/captures/raid.jpg" alt="L'onglet Raid de l'addon : mon inscription, composition, mes SR, derniers loots, prochain boss, et la zone officier" width="1600" height="1088" loading="lazy"></div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'onglet Raid de l'addon.</b> La zone au liseré or (Créer le raid, Inviter tout le roster) n'est visible que des officiers.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="invitations">
+      <header>
+        <p class="eyebrow">Pendant le raid</p>
+        <h3>Rejoindre le groupe sans chuchoter « inv »</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <ol class="steps">
+            <li><p>Un officier <strong>ouvre les invitations</strong> depuis l'onglet Raid. Tout le monde reçoit un message dans le chat.</p></li>
+            <li><p>Clique sur <strong>Rejoindre le raid</strong> dans l'onglet Raid, ou tape <code>/vxv rejoindre</code>.</p></li>
+            <li><p>Si tu es inscrit présent ou en retard, avec ton main : l'invitation part toute seule. Le groupe passe en raid dès la première acceptation.</p></li>
+          </ol>
+          <p>Connecté sur un reroll, au banc ou pas inscrit ? Ta demande est transmise à l'officier, qui t'invite à la main.</p>
+          <div class="note officer">
+            <b class="t">Côté officiers</b>
+            <p><strong>Inviter tout le roster</strong> (ou <code>/vxv inviter</code>) invite d'un coup tous les inscrits attendus qui sont connectés.</p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="game">
+            <div class="chat">
+              <span><span class="vxv">VXV</span> <span class="note-line">Brann a ouvert les invitations : clique sur Rejoindre le raid dans l'onglet Raid, ou tape /vxv rejoindre.</span></span>
+              <span class="sys">Brann vous invite à rejoindre un groupe.</span>
+              <span class="sys">Vous rejoignez un raid.</span>
+              <span>&nbsp;</span>
+              <span><span class="vxv">VXV</span> <span class="note-line">Demande transmise à Brann (inscrit avec un reroll) : il t'invitera à la main.</span></span>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Dans le chat</b> : l'ouverture des invitations, puis le cas d'un joueur venu avec un reroll.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="prochain-boss">
+      <header>
+        <p class="eyebrow">Pendant le raid</p>
+        <h3>Le prochain boss et ton alerte</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>L'addon sait où en est la soirée. Dans l'instance, il montre le <strong>premier boss pas encore tué</strong>, son butin et les SR posées dessus. Ailleurs, le premier boss encore debout des raids de la soirée. Ça marche aussi quand la soirée enchaîne deux raids.</p>
+          <p>Si tu as une SR sur ce boss, une <strong>alerte</strong> apparaît au milieu de l'écran, avec le son de l'avertissement de raid. Une seule fois par boss.</p>
+          <ul>
+            <li>Arrivé en retard ? L'addon apprend du maître du butin (ou du chef) les boss déjà tués.</li>
+            <li><code>/vxv alerte</code> coupe ou remet l'alerte.</li>
+            <li><code>/vxv butin</code> affiche le butin du dernier boss.</li>
+          </ul>
+        </div>
+        <figure class="fig">
+          <div class="game">
+            <div class="raid-warning">
+              <span class="big">Tu as une SR sur le prochain boss</span>
+              <span class="small">Croc de Magmatus · SR+ 20</span>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'alerte à l'écran</b>, avant Infurnus. Le mode réduit l'affiche aussi en tête (voir plus haut).</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="butin">
+      <header>
+        <p class="eyebrow">Pendant le raid</p>
+        <h3>L'attribution du butin</h3>
+        <p>Quand le maître du butin ouvre le corps, tout le raid voit le butin et ses SR. Il clique sur un objet ; l'addon applique les règles, annonce dans le canal du raid et suit les rolls en direct.</p>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Situation</th><th>Ce qui se passe</th></tr></thead>
+          <tbody>
+            <tr><td><img class="em" src="/guide/emojis/sr.png" alt=""> Une seule SR</td><td>l'objet va à ce joueur, sans roll</td></tr>
+            <tr><td><img class="em" src="/guide/emojis/sr_plus.png" alt=""> Plusieurs SR</td><td>seuls eux font <code>/roll</code> (30 s) ; le SR+ de chacun s'ajoute à son jet ; à égalité, seuls les ex æquo relancent</td></tr>
+            <tr><td><img class="em" src="/guide/emojis/roll.png" alt=""> Aucune SR</td><td>roll libre pour tout le monde (30 s)</td></tr>
+            <tr><td><img class="em" src="/guide/emojis/council.png" alt=""> Objet exclu des SR</td><td>pas de roll : l'organisation l'attribue (loot council), inscrit au journal</td></tr>
+            <tr><td>Aucune SR n'a roll</td><td>l'objet passe en roll libre (30 s)</td></tr>
+            <tr><td>Personne n'a roll</td><td>l'organisation l'attribue</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split">
+        <div class="stack">
+          <figure class="fig">
+            <div class="game">
+              <div class="chat">
+                <span class="raid">[Raid] [Brann] : [VXV] <span class="item">[Croc de Magmatus]</span> : SR de Kaelys, Raka. Eux seuls roll (30 s).</span>
+                <span class="sys">Kaelys obtient un 74 (1-100)</span>
+                <span class="sys">Raka obtient un 88 (1-100)</span>
+                <span class="raid">[Raid] [Brann] : [VXV] <span class="item">[Brassards brindecieux]</span> : SR de Kaelys, attribué sans roll.</span>
+                <span class="raid">[Raid] [Brann] : [VXV] <span class="item">[Bottines du golem protecteur]</span> : aucune SR, tout le monde peut roll (30 s).</span>
+                <span class="raid">[Raid] [Brann] : [VXV] <span class="item">[Jambières de Dirgehammer]</span> : pas de roll, attribué par l'organisation (loot council).</span>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Les annonces dans le canal du raid</b>, lisibles même sans l'addon. Pour le Croc, Kaelys a 74 + 20 de SR+ = 94 : il passe devant les 88 de Raka.</figcaption>
+          </figure>
+        </div>
+        <figure class="fig">
+          <div class="addon">
+            <div class="addon-top"><img src="/images/logo.jpg" alt=""><b>VXV</b><span class="tab on">Butin</span><span class="muted small" style="margin-left:auto">Infurnus vaincu</span></div>
+            <div class="addon-body">
+              <div class="panel">
+                <h5>Croc de Magmatus <small>SR de Kaelys, Raka</small></h5>
+                <div class="row"><span><span class="c-mage" style="font-weight:700">Kaelys</span> : 94 <span class="muted small">(74 + SR+ 20)</span></span><span class="pill gold">SR+</span></div>
+                <div class="row"><span><span class="c-hunter" style="font-weight:700">Raka</span> : 88</span><span class="pill">SR</span></div>
+                <div class="row"><span><span class="c-warrior" style="font-weight:700">Vorn</span> : 99</span><span class="pill red">pas de SR</span></div>
+                <div class="btns"><span class="btn pixel">Donner à Kaelys</span></div>
+              </div>
+              <div class="panel">
+                <p class="small">Ce que voit chaque joueur, selon son cas :</p>
+                <div class="row"><span class="gold-t small">Tu as une SR : fais ton roll. Ton SR+ ajoute 20.</span></div>
+                <div class="row"><span class="small">Objet SR par Kaelys, Raka : tu ne peux pas roll.</span></div>
+                <div class="row"><span class="small">Ce loot n'est pas disponible au roll : l'organisation l'attribue (loot council).</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Les rolls suivis en direct</b> par l'addon. Le jet de Vorn, sans SR, ne compte pas. Le maître du butin donne l'objet d'un clic.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="apres-raid">
+      <header>
+        <p class="eyebrow">Après le raid</p>
+        <h3>Le journal du raid, le récap et l'historique</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Personne ne prend de notes. Le maître du butin tient pour toute la guilde le <strong>journal du raid</strong> :</p>
+          <ul>
+            <li>les boss tués et la durée ;</li>
+            <li>les présents ;</li>
+            <li>les morts et les résurrections acceptées ;</li>
+            <li>chaque objet, son gagnant et son mode (SR, SR+, roll libre, loot council) ;</li>
+            <li>les dégâts et les soins du compteur du jeu sur chaque boss.</li>
+          </ul>
+          <p>Le journal arrive sur le site. Les présences et les loots nourrissent le SR+ des prochaines soirées, et les chiffres donnent les titres de la semaine.</p>
+          <p>Le lendemain matin, le bot publie le <strong>récap</strong> sur Discord. Sur le site, la page <strong>Historique</strong> garde tous les loots des soirées passées.</p>
+          <div class="note officer">
+            <b class="t">Une erreur ?</b>
+            <p>Un officier corrige un loot sur le site, avec un motif inscrit au journal.</p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="dc">
+            <div class="dc-chan">raids</div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">Aujourd'hui à 09:00</span></div>
+                <p><img class="em" src="/guide/emojis/journal.png" alt=""> <b>Récap · La salle des Thanes</b> <span class="dc-ts">15 octobre 2026</span> · <span class="dc-link">vxv-web.vercel.app/evenements/…</span></p>
+                <p><img class="em" src="/guide/emojis/raid.png" alt=""> 4 boss tués en 1 h 52 : Faldrim Courbenclume, Infurnus, Pillage, Durgen Mornemartel</p>
+                <p><img class="em" src="/guide/emojis/loot.png" alt=""> Croc de Magmatus → Kaelys (SR+) · Brassards brindecieux → Kaelys (SR) · Bottines du golem protecteur → Raka (Roll libre) · Jambières de Dirgehammer → Grommak (Loot council)</p>
+                <p>💀 Morts : Vexa ×3, Kaeldor ×1</p>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le récap du lendemain</b>, sur Discord.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================================================== PART IV -->
+    <div class="part-head" id="partie-pvp">
+      <p class="num">Partie IV</p>
+      <h2>PvP : sorties, duels et Elo</h2>
+      <p>Le mur des avis de recherche. Deux onglets, sur le site comme en jeu : <strong>Événements</strong> et <strong>Duels</strong>.</p>
+    </div>
+
+    <section class="sec" id="pvp-evenements">
+      <header>
+        <p class="eyebrow">Événements</p>
+        <h3>Les sorties PvP</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Une sortie PvP se passe comme une soirée de raid, avec un titre à la place des raids et sans SR. Les officiers la créent sur le site, en jeu ou sur Discord (<code>/vxv_pvp</code>), et le bot l'annonce dans le salon PvP, en rouge.</p>
+          <ul>
+            <li>Même rôle Discord réservé, mêmes statuts, mêmes inscriptions : bouton Discord, site ou jeu.</li>
+            <li>Mêmes rappels le jour J.</li>
+          </ul>
+        </div>
+        <figure class="fig">
+          <div class="dc">
+            <div class="dc-chan">pvp</div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span></div>
+                <div class="dc-embed pvp">
+                  <div class="dc-etitle">🅁🄰🄸🄳 🅂🅄🅁 🄰🅂🅃🅁🄰🄽🄰🄰🅁</div>
+                  <div class="dc-desc">
+                    <span>⏳ <span class="dc-ts">dans 3 jours</span></span>
+                    <span>👥 Ouvert à tous</span>
+                    <span><img class="em" src="/guide/emojis/role_tank.png" alt=""> 1 · <img class="em" src="/guide/emojis/role_heal.png" alt=""> 2 · <img class="em" src="/guide/emojis/role_dps.png" alt=""> 6</span>
+                  </div>
+                  <div class="dc-fields">
+                    <div class="f"><div class="fn">&nbsp;</div><div class="fv"><span>📅 <span class="dc-ts">17 octobre 2026</span></span></div></div>
+                    <div class="f"><div class="fn">&nbsp;</div><div class="fv"><span>🕐 <span class="dc-ts">21:00</span></span></div></div>
+                    <div class="f"><div class="fn">&nbsp;</div><div class="fv"><span>👥 <b>9</b></span></div></div>
+                  </div>
+                  <div class="dc-foot">Inscris-toi avec le bouton ci-dessous, ou sur le site.</div>
+                </div>
+                <div class="dc-btns"><span class="dc-btn primary">S'inscrire</span><span class="dc-btn link">Voir sur le site</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'annonce d'une sortie PvP</b> (colonnes des joueurs masquées ici), avec le liseré rouge du mur des avis de recherche.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="duels">
+      <header>
+        <p class="eyebrow">Duels</p>
+        <h3>Défier un membre en duel</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <ol class="steps">
+            <li><p><strong>Défie</strong> un membre sur le site (PvP › Duels) ou en jeu (onglet PvP, sous-onglet Duels) : ta cible, ou son « Prénom Nom », avec une date, une heure et un lieu.</p></li>
+            <li><p>Le bot l'<strong>appelle</strong> dans le salon des duels. Il relève ou refuse avant l'heure, sur le site ou en jeu.</p></li>
+            <li><p>Défi relevé : un <strong>pari</strong> s'ouvre pour la guilde jusqu'à l'heure du duel (les deux duellistes ne parient pas).</p></li>
+            <li><p>Le <strong>résultat</strong> est lu en jeu, dans le message système de fin de duel, et envoyé au site. Sinon, le perdant reconnaît sa défaite.</p></li>
+          </ol>
+          <p>Un défi s'annule tant qu'il n'est pas joué ; les mises sont alors rendues.</p>
+          <div class="note officer">
+            <b class="t">Côté officiers</b>
+            <p>Un officier peut saisir le vainqueur ou annuler un duel, avec un motif.</p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="dc">
+            <div class="dc-chan">duels</div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span></div>
+                <p><span class="dc-mention">@Vorn</span>, Kaelys te défie en duel !</p>
+                <div class="dc-embed pvp">
+                  <div class="dc-etitle plain">⚔️ Duel : Kaelys contre Vorn</div>
+                  <div class="dc-desc">
+                    <span>📅 <span class="dc-ts">samedi 17 octobre 2026 20:00</span> (<span class="dc-ts">dans 2 jours</span>)</span>
+                    <span>📍 Portes d'Orgrimmar</span>
+                    <span>⏳ En attente de la réponse du joueur défié.</span>
+                  </div>
+                </div>
+                <div class="dc-btns"><span class="dc-btn link">Voir sur le site</span></div>
+              </div>
+            </div>
+            <div class="dc-msg">
+              <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+              <div class="dc-body">
+                <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">(le même message, une fois relevé)</span></div>
+                <div class="dc-embed pvp">
+                  <div class="dc-etitle plain">⚔️ Duel : Kaelys contre Vorn</div>
+                  <div class="dc-desc"><span><img class="em" src="/guide/emojis/de.png" alt=""> Défi relevé : pariez sur le vainqueur jusqu'à l'heure du duel.</span></div>
+                </div>
+                <div class="dc-btns"><span class="dc-btn link">Parier</span><span class="dc-btn link">Voir sur le site</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Un défi sur Discord</b>, puis le même message une fois le défi relevé, avec son pari.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="elo">
+      <header>
+        <p class="eyebrow">Duels</p>
+        <h3>Le classement Elo</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Chaque duel joué fait bouger la cote des deux joueurs. Tout le monde part de <strong>0</strong> : ta cote se lit en points gagnés ou perdus, <span class="gain-t">+24</span> ou <span class="loss-t">−10</span>.</p>
+          <ul>
+            <li>Battre un joueur mieux classé que toi rapporte beaucoup ; battre un moins bien classé, peu.</li>
+            <li>Perdre contre un favori coûte peu ; perdre contre un outsider, beaucoup.</li>
+            <li>Un duel se joue au plus <strong>20 points</strong>.</li>
+            <li>Ce que l'un gagne, l'autre le perd : une cote négative veut dire plus de points perdus que gagnés.</li>
+          </ul>
+          <div class="note">
+            <b class="t">Pour les curieux</b>
+            <p>Ton score attendu est E = 1 / (1 + 10<sup>(Elo adverse − ton Elo) / 400</sup>). Après le duel, ta cote devient Elo + 20 × (résultat − E), avec 1 pour une victoire et 0 pour une défaite. Deux joueurs à 0 : le vainqueur passe à +10, le perdant à −10.</p>
+          </div>
+          <p>Le premier du classement, s'il a une cote positive, porte chaque semaine le titre <strong>◆ Grand duelliste</strong>.</p>
+          <p>Le classement s'affiche comme le Ranking : <strong>fanions des trois premiers</strong>, records (plus de victoires, plus de duels, plus longue série), suite du classement et ta position. En jeu, un badge montre ton Elo.</p>
+        </div>
+        <figure class="fig">
+          <div class="addon">
+            <div class="addon-top"><img src="/images/logo.jpg" alt=""><b>VXV</b><span class="tab">Raid</span><span class="tab on">PvP</span><span class="tab">Le Dé Pipé</span><span class="pill gold" style="margin-left:auto">Mon Elo : +36</span></div>
+            <div class="addon-body">
+              <div class="podium">
+                <div class="banner p2"><span class="rk">2</span><img src="/images/avatars/troll_mage_f.png" alt=""><span class="nm c-mage">Kaelys</span><span class="vl">+88</span></div>
+                <div class="banner p1"><span class="rk">1</span><img src="/images/avatars/orc_guerrier_m.png" alt=""><span class="nm c-warrior">Vorn</span><span class="vl">+124</span></div>
+                <div class="banner p3"><span class="rk">3</span><img src="/images/avatars/mv_voleur_f.png" alt=""><span class="nm c-rogue">Sira</span><span class="vl">+51</span></div>
+              </div>
+              <div class="panel">
+                <h5>Records</h5>
+                <div class="row"><span class="small">Plus de victoires</span><span class="small"><span class="c-warrior" style="font-weight:700">Vorn</span> · 9</span></div>
+                <div class="row"><span class="small">Plus de duels</span><span class="small"><span class="c-mage" style="font-weight:700">Kaelys</span> · 14</span></div>
+                <div class="row"><span class="small">Plus longue série</span><span class="small"><span class="c-warrior" style="font-weight:700">Vorn</span> · 5</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le classement Elo</b> dans l'onglet PvP de l'addon, sous-onglet Duels.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================================================== PART V -->
+    <div class="part-head" id="partie-de-pipe">
+      <p class="num">Partie V</p>
+      <h2>Le Dé Pipé</h2>
+      <p>La salle de jeu derrière la porte néon : les paris de la guilde et le deathroll. Tout se joue en pièces d'or entières, et tout l'or passe par le trésorier.</p>
+    </div>
+
+    <section class="sec" id="paris">
+      <header>
+        <p class="eyebrow">Paris</p>
+        <h3>Parier sur la vie de la guilde</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Un officier ouvre un pari : une question, de 2 à 10 choix, une heure de fermeture. Le bot l'annonce dans le salon des paris, et tu mises où tu veux : bouton <strong>Miser</strong> sur Discord, page du pari sur le site, ou Le Dé Pipé › Paris en jeu.</p>
+          <ul>
+            <li><strong>Une mise par pari</strong>, en po entières, 1 po au moins. Modifiable ou retirable (bouton <strong>Retirer ma mise</strong>) jusqu'à la fermeture, tant qu'elle n'est pas notée payée.</li>
+            <li>La cote de chaque choix bouge avec les mises, jusqu'à la fermeture.</li>
+            <li>Le pari ferme tout seul à l'heure dite ; un officier déclare le résultat, ou l'annule (chaque mise est alors rendue).</li>
+          </ul>
+          <h4>Qui gagne quoi</h4>
+          <ul>
+            <li>L'organisation prend <strong>10 %</strong> de la cagnotte pour la caisse de la guilde, jamais plus que les mises perdantes.</li>
+            <li>Le reste est partagé entre les gagnants, <strong>au prorata de leur mise</strong>, arrondi à la po inférieure. Les miettes vont à la caisse.</li>
+            <li>Personne sur le bon choix : la cagnotte va à la caisse. Tout le monde sur le bon choix : chacun récupère sa mise.</li>
+          </ul>
+          <div class="note officer">
+            <b class="t">Où va l'or gagné par la guilde</b>
+            <p>Tout l'or que la caisse gagne avec les paris retourne à la guilde. Il sert :</p>
+            <ul>
+              <li>à acheter les <strong>plans (blueprints)</strong> dont la guilde a besoin ;</li>
+              <li>à l'<strong>effort de guilde</strong> : les quêtes légendaires, comme la Lame-tonnerre (TF) ;</li>
+              <li>aux récompenses des <strong>quêtes de la semaine</strong> ;</li>
+              <li>aux récompenses des <strong>événements ponctuels</strong>.</li>
+            </ul>
+            <p>Chaque dépense est inscrite dans la caisse, visible de tous dans l'onglet Journal.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="dc">
+              <div class="dc-chan">paris</div>
+              <div class="dc-msg">
+                <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+                <div class="dc-body">
+                  <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span></div>
+                  <div class="dc-embed dice">
+                    <div class="dc-etitle"><img class="em" src="/guide/emojis/de_vxv.png" alt=""> Qui meurt en premier sur Infurnus ?</div>
+                    <div class="dc-desc">
+                      <span>⏳ Fermeture <span class="dc-ts">jeudi 15 octobre 2026 21:00</span> (<span class="dc-ts">dans 2 heures</span>)</span>
+                      <span><img class="em" src="/guide/emojis/po.png" alt=""> Cagnotte 1 000 po · 9 parieurs · 10 % pour la caisse de la guilde</span>
+                    </div>
+                    <div class="dc-fields">
+                      <div class="f"><div class="fn">Un tank · × 4,50</div><div class="fv">20 % · 200 po · 2 parieurs</div></div>
+                      <div class="f"><div class="fn">Un soigneur · × 3,00</div><div class="fv">30 % · 300 po · 3 parieurs</div></div>
+                      <div class="f"><div class="fn">Un DPS · × 1,80</div><div class="fv">50 % · 500 po · 4 parieurs</div></div>
+                    </div>
+                    <div class="dc-foot">Mise en po, 1 po au moins, à payer au trésorier ; modifiable tant qu'elle n'est pas payée.</div>
+                  </div>
+                  <div class="dc-btns"><span class="dc-btn primary"><img class="em" src="/guide/emojis/po.png" alt="">Miser</span><span class="dc-btn">Retirer ma mise</span></div>
+                </div>
+              </div>
+              <div class="dc-msg">
+                <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+                <div class="dc-body">
+                  <p>Ta mise : 50 po sur « Un tank » → gain possible 225 po (× 4,50 pour l'instant : les cotes bougent jusqu'à la fermeture). À payer au trésorier ; modifiable tant qu'elle n'est pas payée.</p>
+                  <p class="dc-eph">Seul·e toi peux voir ce message</p>
+                </div>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Un pari sur Discord</b> et la réponse à une mise. 1 000 po de cagnotte, 100 pour la caisse : 900 à partager. Les 200 po misées sur « Un tank » rapporteraient 900, d'où la cote × 4,50.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <figure class="fig">
+        <div class="frame"><img src="/guide/captures/paris.jpg" alt="Le Dé Pipé dans l'addon : paris ouverts avec leurs cotes, ta mise, le deathroll en direct et les défis en attente" width="1600" height="1088" loading="lazy"></div>
+        <figcaption><span class="example-tag">Exemple</span> · <b>Le Dé Pipé › Paris, dans l'addon.</b> Tu choisis ta réponse et ta mise, et le gain possible se calcule tout seul.</figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="deathroll">
+      <header>
+        <p class="eyebrow">Deathroll</p>
+        <h3>Le deathroll, en plus beau</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <ol class="steps">
+            <li><p>Dans Le Dé Pipé › Deathroll, <strong>défie</strong> un membre connecté avec VXV : choisis la mise et le nombre de départ.</p></li>
+            <li><p>Il a <strong>une minute</strong> pour accepter ou refuser.</p></li>
+            <li><p>Défi accepté : toute la guilde est prévenue et peut <strong>parier pendant une minute</strong> (pas les deux joueurs, ni un membre endetté).</p></li>
+            <li><p>Le défié roll le premier, puis chacun roll à son tour <strong>de 0 au résultat précédent</strong>. Un clic sur Roll lance la bonne plage, au bon tour ; le tirage reste celui du serveur de Blizzard.</p></li>
+            <li><p><strong>Le premier qui fait 0 perd la mise</strong>, qui va entièrement au gagnant.</p></li>
+          </ol>
+          <p>La fenêtre du duel est animée (le dé VXV tourne, le fond rougit à l'approche de 0) et toute la guilde la suit en direct. La partie finie part au site, qui la vérifie et règle le pari des spectateurs avec les règles des paris.</p>
+          <div class="note warn">
+            <b class="t">La dette du perdant</b>
+            <p>Le perdant doit la mise au gagnant jusqu'à ce que celui-ci confirme le paiement, sur le site ou en jeu. Tant qu'elle court, plus de deathroll ni de pari pour lui.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="frame"><img src="/guide/captures/deathroll.jpg" alt="Une partie de deathroll dans l'addon : les deux joueurs avec leur portrait, le dé VXV, la plage du roll" width="1600" height="1088" loading="lazy"></div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Une partie de deathroll</b>, suivie par toute la guilde.</figcaption>
+          </figure>
+          <figure class="fig">
+            <div class="game">
+              <div class="chat">
+                <span class="guild">[Guilde] [Brann] : [VXV] Deathroll : Kaelys contre Vorn pour 500 po, départ 1000. Paris ouverts une minute dans l'addon.</span>
+                <span><span class="vxv">VXV</span> <span class="note-line">Deathroll : Kaelys contre Vorn. Suis-le dans Le Dé Pipé › Deathroll.</span></span>
+                <span class="sys">Vorn obtient un 412 (0-1000)</span>
+                <span class="sys">Kaelys obtient un 87 (0-412)</span>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>L'annonce à la guilde</b>, puis les premiers rolls.</figcaption>
+          </figure>
+          <figure class="fig">
+            <div class="dc">
+              <div class="dc-chan">deathrolls</div>
+              <div class="dc-msg">
+                <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+                <div class="dc-body">
+                  <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span></div>
+                  <p><img class="em" src="/guide/emojis/deathroll.png" alt=""> <b>Deathroll à 1 500 po</b> : Vorn bat Kaelys en 7 rolls. <span class="dc-link">vxv-web.vercel.app/paris/deathroll</span></p>
+                </div>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Les parties de 1 000 po et plus</b> sont annoncées sur Discord.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="essai-deathroll">
+      <header>
+        <p class="eyebrow">Deathroll · à toi de jouer</p>
+        <h3>Essaie une partie</h3>
+        <p>La partie de l'onglet Le Dé Pipé › Deathroll, rejouée ici : Ulric a défié Morgane pour 500 po, en partant de 1000. Clique sur Roll pour jouer chaque tour, jusqu'au premier 0.</p>
+      </header>
+      <figure class="fig">
+        <div class="drs" id="drs" aria-label="Simulation d'une partie de deathroll">
+          <div class="drs-flag" aria-hidden="true"></div>
+          <div class="drs-veil" aria-hidden="true"></div>
+          <div class="drs-in">
+            <div class="drs-tabs" aria-hidden="true">
+              <img src="/images/logo.jpg" alt=""><b>VXV</b>
+              <span class="drs-tab">Taverne</span><span class="drs-tab">Raid</span><span class="drs-tab">PvP</span><span class="drs-tab on">Le Dé Pipé</span><span class="drs-tab">Quêtes</span><span class="drs-tab">Ranking</span><span class="drs-tab">Artisans</span><span class="drs-tab">Journal</span>
+            </div>
+            <div class="drs-rule" aria-hidden="true"></div>
+            <div class="drs-head">
+              <div><span class="k">Le Dé Pipé · en direct</span><span class="t">Deathroll</span></div>
+              <div class="drs-sub" aria-hidden="true"><span>Paris</span><span class="on">Deathroll</span></div>
+              <div class="drs-badges">
+                <span style="background: rgba(242,201,76,.16); color: #f2c94c">Mise 500 po</span>
+                <span style="background: rgba(224,71,158,.16); color: #ff8cc8">14 spectateurs</span>
+              </div>
+            </div>
+            <div class="drs-arena">
+              <div class="drs-player left" data-player="0">
+                <div class="drs-frame" style="background: var(--shaman)"><img src="/images/avatars/orc_chaman_m.png" alt="Portrait d'Ulric, orc chaman"></div>
+                <span class="drs-plaque c-shaman">Ulric</span>
+                <span class="drs-titles">◆ Loser · ◆ Bien gras</span>
+                <span class="drs-role">Orc chaman · lanceur du défi</span>
+                <span class="drs-stamp" hidden>A goûté le sol</span>
+                <div class="drs-win" hidden><span>VICTOIRE</span><b>+500 po</b></div>
+              </div>
+              <div class="drs-center">
+                <img class="drs-die" id="drs-die" src="/images/d20.png" alt="Dé à vingt faces VXV">
+                <div class="drs-number" id="drs-number" aria-live="polite">1000</div>
+                <div class="drs-status" id="drs-status" aria-live="polite">À Morgane de roll · plage 0 – 1000</div>
+                <button class="drs-roll" id="drs-roll" type="button">Roll 0 – 1000</button>
+                <button class="drs-again" id="drs-again" type="button" hidden>Nouvelle partie</button>
+                <div class="drs-history" id="drs-history"></div>
+              </div>
+              <div class="drs-player right" data-player="1">
+                <div class="drs-frame" style="background: var(--warlock)"><img src="/images/avatars/mv_demoniste_f.png" alt="Portrait de Morgane, morte-vivante démoniste"></div>
+                <span class="drs-plaque c-warlock">Morgane</span>
+                <span class="drs-titles">◆ Il cheat c'est sûr</span>
+                <span class="drs-role">Morte-vivante démoniste · défiée, roll en premier</span>
+                <span class="drs-stamp" hidden>A goûté le sol</span>
+                <div class="drs-win" hidden><span>VICTOIRE</span><b>+500 po</b></div>
+              </div>
+            </div>
+            <div class="drs-foot">
+              <span>Paris des spectateurs fermés · cagnotte <b style="color: #f2c94c">800 po</b> · 10 % pour la caisse</span>
+              <span>Le fond rougit à mesure que la plage approche de 0 · 0 = défaite</span>
+            </div>
+          </div>
+        </div>
+        <figcaption><span class="example-tag">Simulation</span> · <b>Une partie, comme dans l'addon.</b> Ici le hasard vient de ta page ; en jeu, chaque roll est le <code>/roll</code> du serveur de Blizzard, visible dans le chat, et toute la guilde suit la partie en direct.</figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="dettes">
+      <header>
+        <p class="eyebrow">L'or</p>
+        <h3>Payer, encaisser, et les dettes</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Les mises se paient en jeu, au <strong>trésorier</strong>. Lui seul note sur le site l'or qui change de mains : mise reçue, gain versé, dette réglée. L'historique est visible de tous.</p>
+          <ul>
+            <li>Une mise <strong>pas encore payée</strong> compte quand même dans la cagnotte. Si elle gagne, son montant est déduit du gain ; si elle perd, elle devient une <strong>dette</strong>.</li>
+            <li>Une dette (pari ou deathroll) <strong>bloque les paris et les deathrolls</strong> jusqu'à son règlement.</li>
+            <li>Tes gains se récupèrent auprès du trésorier.</li>
+          </ul>
+        </div>
+        <figure class="fig">
+          <div class="timeline">
+            <div class="tl"><span class="d">Tu mises</span><span class="r">50 po sur « Un tank »</span><span class="b ivory">50 po</span></div>
+            <div class="tl"><span class="d">Tu paies</span><span class="r">au trésorier, en jeu ; il note « payée »</span><span class="b gold-t">payée</span></div>
+            <div class="tl win"><span class="d">Tu gagnes</span><span class="r">le trésorier te verse ton gain</span><span class="b gain-t">+225 po</span></div>
+            <div class="tl" style="box-shadow:0 0 0 2px var(--loss)"><span class="d">Ou tu perds</span><span class="r">non payée : elle devient une dette</span><span class="b loss-t">dette</span></div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>La vie d'une mise.</b></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================================================== PART VI -->
+    <div class="part-head" id="partie-guilde">
+      <p class="num">Partie VI</p>
+      <h2>La vie de la guilde</h2>
+      <p>Les quêtes de la semaine, les titres, les classements, les artisans et la caisse : ce qui fait vivre la guilde entre deux raids.</p>
+    </div>
+
+    <section class="sec" id="quetes">
+      <header>
+        <p class="eyebrow">Quêtes</p>
+        <h3>La quête de la semaine</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Un officier publie une quête avec une récompense en or, en général pour une semaine. <strong>Toute la guilde participe, sans inscription</strong> : les scores viennent des compteurs du jeu, jamais de déclarations.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Quête</th><th>Ce qui compte</th></tr></thead>
+              <tbody>
+                <tr><td>Le Grand Pêcheur</td><td>pêches réussies</td></tr>
+                <tr><td>La Main verte</td><td>herbes cueillies</td></tr>
+                <tr><td>Le Cœur de pierre</td><td>filons minés</td></tr>
+                <tr><td>Le Tanneur</td><td>peaux dépecées</td></tr>
+                <tr><td>Le Chasseur de têtes</td><td>victoires honorables</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ul>
+            <li>Ton score est ce que gagnent, pendant la quête, les compteurs de <strong>tous tes personnages liés</strong>, main et rerolls.</li>
+            <li>Une récolte compte une fois, quel que soit le nombre de ressources : c'est la fenêtre de butin qui compte.</li>
+            <li>L'addon relève les compteurs à ta connexion, puis chaque minute hors combat.</li>
+            <li>À égalité, le premier à atteindre le score passe devant.</li>
+            <li>À la fin, un officier valide le résultat ; le trésorier verse la récompense depuis la caisse : <strong>70 / 20 / 10 %</strong> au podium.</li>
+          </ul>
+          <h4>Le tableau des quêtes</h4>
+          <p>Le même tableau sur le site et dans l'addon : la quête en cours sur son parchemin, avec ses lots, les cinq premiers et <strong>ta progression</strong> (« Encore 162 pêches réussies pour monter sur le podium »), les quêtes à venir, l'<strong>historique</strong> des quêtes terminées sous leur tampon (« Accomplie », ou « À valider » avant la validation d'un officier) et le hall of fame.</p>
+          <p class="small muted">Les officiers publient une quête sur le site, sur Discord (<code>/vxv_mission</code>) ou dans l'addon : Quêtes › Publier une quête.</p>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="dc">
+              <div class="dc-chan">quêtes</div>
+              <div class="dc-msg">
+                <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+                <div class="dc-body">
+                  <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span></div>
+                  <div class="dc-embed green">
+                    <div class="dc-etitle"><img class="em" src="/guide/emojis/quete.png" alt=""> Le Grand Pêcheur</div>
+                    <div class="dc-desc">
+                      <span>Pêche : le plus de pêches réussies, du <span class="dc-ts">12 octobre 2026</span> au <span class="dc-ts">19 octobre 2026</span></span>
+                      <span>🎯 Se termine <span class="dc-ts">dans 4 jours</span></span>
+                    </div>
+                    <div class="dc-fields">
+                      <div class="f full"><div class="fn"><img class="em" src="/guide/emojis/po.png" alt=""> Récompense : 2 000 po</div><div class="fv">1er 1 400 po · 2e 400 po · 3e 200 po</div></div>
+                      <div class="f full"><div class="fn">Classement</div><div class="fv"><span>1. Sira — 412 pêches réussies</span><span>2. Raka — 380 pêches réussies</span><span>3. Torvak — 291 pêches réussies</span><span>4. Kaelys — 120 pêches réussies</span><span>5. Vorn — 64 pêches réussies</span></div></div>
+                    </div>
+                    <div class="dc-foot">Toute la guilde participe : l'addon VXV et le compagnon relèvent les compteurs du jeu.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Le message de la quête</b>, mis à jour avec le classement en direct.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <figure class="fig">
+        <div class="frame"><img src="/guide/captures/quetes.jpg" alt="L'onglet Quêtes de l'addon : la quête en cours sur son parchemin, le classement et la récompense" width="1600" height="1088" loading="lazy"></div>
+        <figcaption><span class="example-tag">Exemple</span> · <b>L'onglet Quêtes de l'addon</b>, avec le hall of fame des quêtes passées.</figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="titres">
+      <header>
+        <p class="eyebrow">Titres</p>
+        <h3>Les titres de la semaine</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>Chaque <strong>mercredi matin</strong>, VXV donne chaque titre au membre en tête de sa règle sur la saison. Un membre peut en porter plusieurs, et ils changent de main chaque semaine. À égalité, le premier à atteindre le score l'emporte ; sans score positif, personne ne le porte.</p>
+          <h4>Où on les voit</h4>
+          <ul>
+            <li><strong>En jeu</strong>, chez tous les membres qui ont l'addon : une ligne par titre au survol du joueur, ses titres devant ses messages dans le canal de guilde, et après son nom dans la liste de guilde.</li>
+            <li><strong>Sur Discord</strong> : un rôle « ◆ Titre » par titre, donné et repris automatiquement, et l'annonce de la semaine dans le salon des titres.</li>
+          </ul>
+          <p class="small muted">Ce sont des titres VXV : un addon ne peut pas créer de vrais titres du jeu, ni les afficher au-dessus des têtes.</p>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="game" style="display:grid; gap:14px; justify-items:start">
+              <div class="tooltip">
+                <div class="t c-warrior">Vorn Cendrelune</div>
+                <div class="w">Niveau 60 Orc Guerrier</div>
+                <div class="g">&lt;VXV&gt;</div>
+                <div class="sak-t">◆ Roi du gambling</div>
+                <div class="sak-t">◆ Bien gras</div>
+              </div>
+              <div class="chat" style="width:100%">
+                <span class="guild">[Guilde] [Morgane] : <span class="tag">[◆ Roi de la dette]</span> je rembourse jeudi, promis</span>
+                <span class="guild">[Guilde] [Sira] : <span class="tag">[◆ Numéro UNO · ◆ Princesse]</span> qui vient pêcher ?</span>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Les titres en jeu</b> : au survol d'un membre, et dans le canal de guilde.</figcaption>
+          </figure>
+          <figure class="fig">
+            <div class="dc">
+              <div class="dc-chan">titres</div>
+              <div class="dc-msg">
+                <div class="dc-av"><img src="/images/logo.jpg" alt=""></div>
+                <div class="dc-body">
+                  <div class="dc-head"><span class="dc-name">VXV</span><span class="dc-app">APP</span><span class="dc-time">Mercredi à 07:00</span></div>
+                  <div class="dc-embed gold">
+                    <div class="dc-etitle"><img class="em" src="/guide/emojis/ranking.png" alt=""> Les titres de la semaine</div>
+                    <div class="dc-desc"><span>Chaque mercredi, les titres vont aux membres en tête sur la saison. Un rôle Discord par titre.</span></div>
+                    <div class="dc-fields">
+                      <div class="f"><div class="fn">◆ Roi du gambling</div><div class="fv"><b>Vorn</b><span>Plus gros gain net aux paris sur la saison.</span></div></div>
+                      <div class="f"><div class="fn">◆ Numéro UNO</div><div class="fv"><b>Sira</b><span>Vainqueur de la dernière mission de guilde terminée.</span></div></div>
+                      <div class="f"><div class="fn">◆ Goûteur de sol</div><div class="fv"><b>Vexa</b><span>Le plus de morts pendant les raids VXV sur la saison.</span></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>L'annonce du mercredi</b> (extrait).</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Titre</th><th>Il revient à…</th></tr></thead>
+          <tbody>
+            <tr><td>◆ Roi du gambling</td><td>plus gros gain net aux paris sur la saison</td></tr>
+            <tr><td>◆ Roi de la dette</td><td>plus grosse perte nette aux paris sur la saison</td></tr>
+            <tr><td>◆ Numéro UNO</td><td>vainqueur de la dernière quête de guilde terminée</td></tr>
+            <tr><td>◆ Bien gras</td><td>le plus d'objets reçus en raid sur la saison</td></tr>
+            <tr><td>◆ Goûteur de sol</td><td>le plus de morts pendant les raids VXV sur la saison</td></tr>
+            <tr><td>◆ Lève toi copaing</td><td>le plus de résurrections acceptées pendant les raids VXV sur la saison</td></tr>
+            <tr><td>◆ Chibrax au max</td><td>le plus de dégâts sur les boss tués en raid VXV sur la saison</td></tr>
+            <tr><td>◆ Remboursé par la Sécu</td><td>le plus de soins sur les boss tués en raid VXV sur la saison</td></tr>
+            <tr><td>◆ Princesse</td><td>le plus de soins reçus sur les boss tués en raid VXV sur la saison (journal de combat ; un officier peut aussi le donner, avec un motif)</td></tr>
+            <tr><td>◆ Sugar Daddy</td><td>le plus gros donateur à la caisse de la guilde sur la saison</td></tr>
+            <tr><td>◆ Il cheat c'est sûr</td><td>plus gros gain net au deathroll sur la saison</td></tr>
+            <tr><td>◆ Loser</td><td>plus grosse perte nette au deathroll sur la saison</td></tr>
+            <tr><td>◆ Grand duelliste</td><td>en tête du classement Elo des duels (tous les duels, s'il a une cote positive)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec" id="titres-faits-main">
+      <header>
+        <p class="eyebrow">Titres</p>
+        <h3>Les titres faits main</h3>
+      </header>
+      <div class="split">
+        <div class="prose">
+          <p>En plus des titres gagnés, les officiers peuvent <strong>créer un titre</strong> et le donner à un membre : un exploit, une blague de raid, un rôle dans la guilde.</p>
+          <ul>
+            <li>Son nom est choisi par l'officier, et la raison s'affiche avec le titre.</li>
+            <li>Il dure <strong>jusqu'au reset du mercredi</strong>, ou <strong>pour une durée indéterminée</strong>, jusqu'à ce qu'un officier le retire.</li>
+            <li>Il se voit partout comme les autres : au survol en jeu, dans le canal de guilde, en rôle Discord « ◆ Nom », et sur le site, Ranking › Titres.</li>
+            <li>Il ne compte pas dans le classement des titres.</li>
+          </ul>
+          <div class="note officer">
+            <b class="t">Côté officiers</b>
+            <p>Sur le site, Ranking › Titres, zone officier : « Créer un titre » (nom, membre, durée, raison). Pour en retirer un, « Retirer le titre » sous le titre, avec un motif. Les deux entrent au journal.</p>
+          </div>
+        </div>
+        <figure class="fig">
+          <div class="panel" style="box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade);">
+            <h5>Titres faits main</h5>
+            <div class="row" style="display:grid; gap:4px; justify-content:stretch">
+              <span class="pixel sak-t" style="font-size:1.05rem">◆ Sauveur du raid</span>
+              <span class="c-warrior" style="font-weight:700">Vorn</span>
+              <span class="small">A tenu Onyxia seul pendant que le raid se relevait</span>
+              <span class="small muted">Porté jusqu'au reset du mercredi</span>
+            </div>
+            <div class="row" style="display:grid; gap:4px; justify-content:stretch">
+              <span class="pixel sak-t" style="font-size:1.05rem">◆ Mascotte de la guilde</span>
+              <span class="c-druid" style="font-weight:700">Grommak</span>
+              <span class="small">Toujours là, toujours de bonne humeur</span>
+              <span class="small muted">Porté pour une durée indéterminée</span>
+            </div>
+          </div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Des titres faits main</b> sur Ranking › Titres.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="ranking">
+      <header>
+        <p class="eyebrow">Ranking</p>
+        <h3>Les classements</h3>
+      </header>
+      <div class="split wide-fig">
+        <div class="prose">
+          <p>Au-dessus de la cheminée : quatre classements, sur trois périodes (<strong>Toujours</strong>, <strong>Mois</strong>, <strong>Saison</strong>, une saison étant lancée par un officier).</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Classement</th><th>Ce qui compte</th><th>Records</th></tr></thead>
+              <tbody>
+                <tr><td>Paris</td><td>gain net</td><td>plus gros gain, plus grosse perte, paris joués</td></tr>
+                <tr><td>Deathroll</td><td>gain net</td><td>plus grosse victoire, plus grosse défaite, parties jouées</td></tr>
+                <tr><td>Quêtes</td><td>points de places : 3, 2 et 1 par quête validée</td><td>plus de victoires, plus grosse récompense, plus de podiums</td></tr>
+                <tr><td>Titres</td><td>semaines de titre</td><td>plus de titres en une semaine, plus long règne…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Les trois premiers ont leur <strong>fanion</strong>, avec portrait. Viennent ensuite les records, la suite du classement, et <strong>ta position</strong>, toujours visible en bas. À égalité, l'ordre alphabétique départage.</p>
+        </div>
+        <figure class="fig">
+          <div class="frame"><img src="/guide/captures/ranking.jpg" alt="L'onglet Ranking : les fanions des trois premiers avec leur portrait, les records, la suite du classement et ta position" width="1600" height="1088" loading="lazy"></div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'onglet Ranking</b>, classement des paris de la saison.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sec" id="artisans">
+      <header>
+        <p class="eyebrow">Artisans</p>
+        <h3>Qui peut fabriquer quoi</h3>
+      </header>
+      <div class="split wide-fig">
+        <div class="prose">
+          <p>L'annuaire des métiers de la guilde, sans demander dans le canal.</p>
+          <ul>
+            <li>Tes niveaux de métier sont relus à chaque connexion ; tes <strong>recettes</strong>, quand tu ouvres la fenêtre du métier. Fais-le une fois sur chaque personnage, rerolls compris.</li>
+            <li>Les addons de la guilde se partagent les métiers de chacun en jeu.</li>
+            <li><strong>« Qui peut fabriquer… ? »</strong> : tape le nom d'un objet, sans te soucier des accents ni des majuscules, en jeu ou sur le site.</li>
+            <li>Au survol d'un <strong>objet de recette</strong>, l'addon dit si quelqu'un dans VXV la connaît déjà.</li>
+          </ul>
+        </div>
+        <div class="stack">
+          <figure class="fig">
+            <div class="frame"><img src="/guide/captures/artisans.jpg" alt="L'onglet Artisans : la recherche d'un objet et la liste des artisans qui savent le fabriquer, avec leur niveau" width="1600" height="1088" loading="lazy"></div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>L'onglet Artisans de l'addon.</b></figcaption>
+          </figure>
+          <figure class="fig">
+            <div class="game" style="display:flex; gap:14px; flex-wrap:wrap">
+              <div class="tooltip">
+                <div class="t" style="color:#1EFF00">Recette : Potion de soins majeurs</div>
+                <div class="w">Requiert Alchimie (275)</div>
+                <div class="g">Recette possédée par VXV</div>
+              </div>
+              <div class="tooltip">
+                <div class="t" style="color:#0070DD">Patron : Robe de l'Archimage</div>
+                <div class="w">Requiert Couture (300)</div>
+                <div class="r">Recette non possédée par VXV</div>
+              </div>
+            </div>
+            <figcaption><span class="example-tag">Exemple</span> · <b>Au survol d'une recette</b> : en vert si un membre la connaît, en rouge sinon.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="journal">
+      <header>
+        <p class="eyebrow">Journal</p>
+        <h3>La caisse et le journal des officiers</h3>
+      </header>
+      <div class="split wide-fig">
+        <div class="prose">
+          <p>Au comptoir, tout l'or et toutes les décisions de la guilde, ouverts à tous.</p>
+          <h4>Page de gauche : la caisse</h4>
+          <ul>
+            <li>Le solde, les entrées et les sorties de la saison.</li>
+            <li>Entrées : la part des paris (10 %), les dons des membres (le plus généreux devient Sugar Daddy).</li>
+            <li>Sorties : les plans (blueprints) nécessaires à la guilde, l'effort de guilde (quêtes légendaires comme la Lame-tonnerre), les récompenses des quêtes de la semaine et des événements ponctuels.</li>
+            <li>Un mouvement ne s'efface jamais : une erreur se corrige par un autre mouvement.</li>
+          </ul>
+          <h4>Page de droite : le journal des officiers</h4>
+          <p>Chaque action d'officier, avec qui, quand et <strong>le motif</strong>. Filtres par catégorie : loots, caisse, quêtes, paris, raid. Personne ne peut l'effacer, pas même le GM.</p>
+        </div>
+        <figure class="fig">
+          <div class="frame"><img src="/guide/captures/journal.jpg" alt="L'onglet Journal : la caisse à gauche avec solde, entrées et sorties ; le journal des officiers à droite avec motifs" width="1600" height="1088" loading="lazy"></div>
+          <figcaption><span class="example-tag">Exemple</span> · <b>L'onglet Journal</b> : la caisse à gauche, le journal des officiers à droite.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================================================== PART VII -->
+    <div class="part-head" id="partie-aide">
+      <p class="num">Partie VII</p>
+      <h2>Aide-mémoire</h2>
+      <p>Les commandes, les réponses aux questions courantes et les mots de la guilde.</p>
+    </div>
+
+    <section class="sec" id="commandes">
+      <header>
+        <p class="eyebrow">Commandes</p>
+        <h3>Toutes les commandes</h3>
+      </header>
+      <div class="two">
+        <div class="stack">
+          <h4>Sur Discord</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Commande</th><th>Pour</th></tr></thead>
+              <tbody>
+                <tr><td><code>/vxv_main</code></td><td>lier ton personnage principal (<a href="https://discord.com/channels/1182711022398746684/1556034264179548180" target="_blank" rel="noopener">salon de liaison</a>)</td></tr>
+                <tr><td><code>/vxv_reroll</code></td><td>lier un autre de tes personnages</td></tr>
+                <tr><td><code>/vxv_raid</code></td><td><span class="gold-t">officiers</span> · créer une soirée de raid</td></tr>
+                <tr><td><code>/vxv_pvp</code></td><td><span class="gold-t">officiers</span> · créer une sortie PvP</td></tr>
+                <tr><td><code>/vxv_pari</code></td><td><span class="gold-t">officiers</span> · ouvrir un pari</td></tr>
+                <tr><td><code>/vxv_mission</code></td><td><span class="gold-t">officiers</span> · publier la quête de la semaine</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small muted">Le reste se fait avec les boutons des messages du bot : S'inscrire, Miser, Retirer ma mise, Parier, Voir sur le site.</p>
+        </div>
+        <div class="stack">
+          <h4>En jeu</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Commande</th><th>Pour</th></tr></thead>
+              <tbody>
+                <tr><td><code>/vxv</code></td><td>ouvrir ou fermer la fenêtre (dernier mode utilisé)</td></tr>
+                <tr><td><code>/vxv aide</code></td><td>lister les commandes</td></tr>
+                <tr><td><code>/vxv rejoindre</code></td><td>demander une invitation au raid ouvert par un officier</td></tr>
+                <tr><td><code>/vxv alerte</code></td><td>couper ou remettre l'alerte du prochain boss</td></tr>
+                <tr><td><code>/vxv butin</code></td><td>afficher le butin du dernier boss</td></tr>
+                <tr><td><code>/vxv ping</code></td><td>vérifier qui reçoit les messages de VXV</td></tr>
+                <tr><td><code>/vxv liste</code></td><td>exporter la liste de guilde (import réservé aux officiers)</td></tr>
+                <tr><td><code>/vxv inviter</code></td><td><span class="gold-t">officiers</span> · inviter tous les inscrits attendus connectés</td></tr>
+                <tr><td><code>/vxv importer</code></td><td><span class="gold-t">officiers</span> · charger les données copiées depuis le site</td></tr>
+                <tr><td><code>/vxv journal</code></td><td><span class="gold-t">officiers</span> · exporter le journal du raid</td></tr>
+                <tr><td><code>/reload</code></td><td>charger les données apportées par le compagnon</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="ou-trouver">
+      <header>
+        <p class="eyebrow">Repères</p>
+        <h3>Où trouver quoi</h3>
+      </header>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Je veux…</th><th>Sur Discord</th><th>Sur le site</th><th>En jeu</th></tr></thead>
+          <tbody>
+            <tr><td>lier un personnage</td><td><code>/vxv_main</code>, <code>/vxv_reroll</code></td><td>Personnages</td><td>—</td></tr>
+            <tr><td>m'inscrire à un raid</td><td>bouton S'inscrire</td><td>Raid › l'événement</td><td>onglet Raid</td></tr>
+            <tr><td>choisir mes SR</td><td>—</td><td>Raid › l'événement › Mes SR</td><td>onglet Raid</td></tr>
+            <tr><td>voir qui a eu quoi</td><td>récap du lendemain</td><td>Historique</td><td>onglet Raid › Derniers loots</td></tr>
+            <tr><td>m'inscrire à une sortie PvP</td><td>bouton S'inscrire</td><td>PvP › Événements</td><td>onglet PvP › Événements</td></tr>
+            <tr><td>défier en duel</td><td>—</td><td>PvP › Duels</td><td>onglet PvP › Duels</td></tr>
+            <tr><td>parier</td><td>bouton Miser</td><td>Le Dé Pipé</td><td>Le Dé Pipé › Paris</td></tr>
+            <tr><td>lancer un deathroll</td><td>—</td><td>voir les parties : Le Dé Pipé › Deathroll</td><td>Le Dé Pipé › Deathroll</td></tr>
+            <tr><td>suivre la quête</td><td>message de la quête</td><td>Quêtes</td><td>onglet Quêtes</td></tr>
+            <tr><td>voir les classements</td><td>—</td><td>Ranking</td><td>onglet Ranking</td></tr>
+            <tr><td>trouver un artisan</td><td>—</td><td>Artisans</td><td>onglet Artisans</td></tr>
+            <tr><td>lire la caisse et le journal</td><td>—</td><td>Journal</td><td>onglet Journal</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec" id="faq">
+      <header>
+        <p class="eyebrow">Dépannage</p>
+        <h3>Questions courantes</h3>
+      </header>
+      <div class="faq">
+        <details>
+          <summary>Je ne vois pas le dernier raid (ou mes SR) dans l'addon.</summary>
+          <div><p>Les données du site arrivent dans le jeu par un officier connecté, ou par ton compagnon. Avec le compagnon, tape <code>/reload</code> : il prépare les données toutes les 5 minutes. Sans lui, attends qu'un officier se connecte : son addon partage les données à toute la guilde.</p></div>
+        </details>
+        <details>
+          <summary>Mon inscription faite en jeu reste « en attente ».</summary>
+          <div><p>Le jeu ne va pas sur Internet. Ton changement part au site avec ton compagnon (au <code>/reload</code> ou à la déconnexion), ou par un officier équipé qui le relaie. Une fois confirmé, il apparaît partout ; s'il est refusé (SR verrouillées, rôle manquant…), l'addon te le dit.</p></div>
+        </details>
+        <details>
+          <summary>Le bot refuse mon inscription.</summary>
+          <div><p>L'événement est sans doute réservé à un rôle Discord que tu n'as pas (Raideur R1, par exemple). Demande-le à un officier : dès qu'il te l'a donné, l'inscription passe. Vérifie aussi que ton personnage est lié (<code>/vxv_main</code>).</p></div>
+        </details>
+        <details>
+          <summary>Je n'ai pas reçu d'invitation en cliquant sur Rejoindre le raid.</summary>
+          <div><p>Seul un personnage inscrit présent ou en retard, ton main, est invité tout seul. Sur un reroll, au banc ou sans inscription, ta demande part à l'officier qui t'invite à la main. Si l'officier semble déconnecté, l'addon te le dit : réessaie ou demande en jeu.</p></div>
+        </details>
+        <details>
+          <summary>Je ne peux plus parier ni lancer de deathroll.</summary>
+          <div><p>Tu as une dette, d'un pari perdu non payé ou d'un deathroll perdu. Règle-la auprès du trésorier (ou du gagnant pour un deathroll, qui confirme le paiement) et tout se débloque.</p></div>
+        </details>
+        <details>
+          <summary>Mon titre ou ma place n'a pas changé.</summary>
+          <div><p>Les titres sont recalculés chaque mercredi matin, sur toute la saison. Les classements suivent les données arrivées sur le site : un raid, une quête ou un deathroll comptent une fois enregistrés.</p></div>
+        </details>
+        <details>
+          <summary>L'alerte du prochain boss me gêne.</summary>
+          <div><p>Tape <code>/vxv alerte</code> pour la couper, et de nouveau pour la remettre.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <section class="sec" id="glossaire">
+      <header>
+        <p class="eyebrow">Les mots de la guilde</p>
+        <h3>Glossaire</h3>
+      </header>
+      <dl class="gloss table-wrap" style="box-shadow:0 0 0 2px var(--line)">
+        <dt>SR</dt><dd>Soft reserve : l'objet que tu réserves pour une soirée. S'il tombe, seuls ceux qui l'ont réservé jouent pour lui.</dd>
+        <dt>SR+</dt><dd>Le bonus de patience : +10 par soirée passée présent avec la SR sans obtenir l'objet, jusqu'à +50.</dd>
+        <dt>Roll</dt><dd>Le jet de dé du jeu, <code>/roll</code> (1 à 100). Le plus haut l'emporte.</dd>
+        <dt>Loot council</dt><dd>L'organisation attribue l'objet elle-même, sans roll : pour les objets exclus des SR. Toujours inscrit au journal.</dd>
+        <dt>Main, reroll</dt><dd>Ton personnage principal, et tes autres personnages.</dd>
+        <dt>Maître du butin</dt><dd>Le joueur qui distribue le loot du raid ; l'addon applique les règles pour lui.</dd>
+        <dt>Deathroll</dt><dd>Duel au dé : chacun roll de 0 au résultat précédent ; le premier qui fait 0 perd la mise.</dd>
+        <dt>Elo</dt><dd>La cote des duels : tout le monde part de 0, chaque duel la fait bouger selon le niveau de l'adversaire.</dd>
+        <dt>po</dt><dd>Pièce d'or. Mises, gains et caisse se comptent en po entières.</dd>
+        <dt>Compagnon</dt><dd>La petite application pour Windows et Mac qui fait le lien entre le jeu et le site.</dd>
+        <dt>/reload</dt><dd>Recharge l'interface du jeu : c'est à ce moment que l'addon lit les données du compagnon et lui laisse ce que tu as fait.</dd>
+        <dt>Saison</dt><dd>Une période lancée par un officier, sur laquelle se calculent titres et classements de saison.</dd>
+      </dl>
+    </section>
+
+    <footer class="footer">
+      <p><strong>VXV · Guide du membre.</strong> Les exemples utilisent des données fictives : noms de joueurs, montants et classements inventés pour l'illustration.</p>
+      <p>Une question qui n'est pas dans ce guide ? Demande à un officier sur Discord.</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+// The deathroll of the addon's Le Dé Pipé › Deathroll screen: the challenged rolls first, each from 0 to the previous
+// result, the first 0 loses. The digits scroll ever slower before stopping on the roll.
+(() => {
+  const root = document.getElementById("drs");
+  if (!root) return;
+  const NAMES = ["Ulric", "Morgane"];
+  const COLORS = ["#0070DD", "#8788EE"];
+  const START = 1000;
+  const STEPS = [55, 55, 60, 65, 75, 85, 100, 120, 145, 175, 210, 260];
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (id) => document.getElementById(id);
+  const players = [...root.querySelectorAll(".drs-player")];
+  let timers = [];
+  let state;
+
+  const reset = () => {
+    timers.forEach(clearTimeout);
+    timers = [];
+    state = { range: START, turn: 1, shown: START, rolling: false, history: [], loser: null };
+    render();
+  };
+
+  function render() {
+    const done = state.loser !== null;
+    const heat = Math.min(1, Math.max(0, 1 - Math.log(Math.max(1, state.range)) / Math.log(START)));
+    const mix = (from, to) => Math.round(from + (to - from) * heat);
+    root.style.setProperty("--drs-bg", `rgb(${mix(26, 104)}, ${mix(14, 12)}, ${mix(46, 28)})`);
+    players.forEach((player, index) => {
+      player.classList.toggle("turn", !done && state.turn === index);
+      player.classList.toggle("waiting", !done && state.turn !== index);
+      player.classList.toggle("lost", done && state.loser === index);
+      player.querySelector(".drs-stamp").hidden = !(done && state.loser === index);
+      player.querySelector(".drs-win").hidden = !(done && state.loser !== index);
+    });
+    $("drs-die").className = "drs-die" + (state.rolling ? " rolling" : done ? " lost" : "");
+    const number = $("drs-number");
+    number.textContent = String(state.shown);
+    number.className = "drs-number" + (done ? " lost" : heat > 0.7 ? " hot" : "");
+    const name = NAMES[state.turn];
+    $("drs-status").textContent = done
+      ? `${NAMES[state.loser]} a fait 0. ${NAMES[1 - state.loser]} remporte la mise.`
+      : state.rolling
+        ? `${name} roll 0 – ${state.range}…`
+        : `À ${name} de roll · plage 0 – ${state.range}`;
+    const roll = $("drs-roll");
+    roll.hidden = done;
+    roll.disabled = state.rolling;
+    roll.textContent = state.rolling ? "Tirage…" : `Roll 0 – ${state.range}`;
+    $("drs-again").hidden = !done;
+    const history = $("drs-history");
+    history.replaceChildren(
+      ...state.history.slice(-8).map((entry) => {
+        const chip = document.createElement("span");
+        const who = document.createElement("b");
+        who.style.color = COLORS[entry.player];
+        who.textContent = NAMES[entry.player];
+        chip.append(who, ` ${entry.result} / ${entry.range}`);
+        return chip;
+      }),
+    );
+  }
+
+  function roll() {
+    if (state.rolling || state.loser !== null) return;
+    const range = state.range;
+    const random = () => Math.floor(Math.random() * (range + 1));
+    state.rolling = true;
+    render();
+    let at = 0;
+    if (!reduced) {
+      for (const step of STEPS) {
+        at += step;
+        timers.push(setTimeout(() => { state.shown = random(); render(); }, at));
+      }
+    }
+    timers.push(setTimeout(() => {
+      const result = random();
+      state.history.push({ player: state.turn, result, range });
+      state.shown = result;
+      state.rolling = false;
+      state.range = result;
+      if (result === 0) state.loser = state.turn;
+      else state.turn = 1 - state.turn;
+      render();
+    }, reduced ? 0 : at + 320));
+  }
+
+  $("drs-roll").addEventListener("click", roll);
+  $("drs-again").addEventListener("click", reset);
+  reset();
+})();
+</script>
+</body>
+</html>

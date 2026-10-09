@@ -1,5 +1,6 @@
 # Prose and generated or game files are not formatted.
 *.md
+apps/web/public/guide/
 *.lua
 dist/
 apps/companion/release/
