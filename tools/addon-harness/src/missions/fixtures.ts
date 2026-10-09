@@ -48,6 +48,7 @@ export const GUILD_QUESTS: AddonMissionsFacts = {
       averagePosition: 1.5,
     },
   ],
+  changes: [],
   exportedAt: EXPORTED,
 };
 

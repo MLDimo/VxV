@@ -83,6 +83,11 @@ function Theme.ClassColored(name, token, dimmed)
     return "|cff" .. (dimmed and dim(hex) or hex) .. name .. "|r"
 end
 
+--- The name in the color of its class darkened toward the parchment's ink, to be read on parchment (§7.4).
+function Theme.ParchmentClassColored(name, token)
+    return "|cff" .. (Tokens.classColorsOnParchment[token] or Tokens.unknownClassColorOnParchment) .. name .. "|r"
+end
+
 --- Starts loading the font files when the addon loads: the client loads them in the background, and a font set
 --- before it is ready stays blank (measured on 5 October).
 function Theme.Preload()

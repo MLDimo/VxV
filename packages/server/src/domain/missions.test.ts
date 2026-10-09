@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
-  defaultEnd,
-  hallOfFame,
-  missionRewards,
-  missionScores,
-  newMissionRefusal,
   type CounterReading,
+  missionEnd,
+  endedAgo,
+  hallOfFame,
+  missionPitch,
+  missionProgress,
+  missionRewards,
   type MissionScore,
+  missionScores,
+  mostOf,
+  newMissionRefusal,
 } from "./missions.ts";
 
 const START = new Date("2026-10-06T00:00:00Z");
@@ -107,6 +111,42 @@ describe("missions", () => {
     expect(newMissionRefusal({ ...mission, endsAt: new Date("2026-12-31T00:00:00Z") }, at(5))).toMatch(/31 jours/);
     expect(newMissionRefusal(mission, at(14))).toMatch(/à venir/);
     expect(newMissionRefusal({ ...mission, type: "greyKills" as "fishing" }, at(5))).toMatch(/type/);
-    expect(defaultEnd(START)).toEqual(END);
+    expect(missionEnd(START)).toEqual(END);
+  });
+});
+
+describe("the quest's parchment", () => {
+  it("writes what counts, with the elision before a vowel or a mute h", () => {
+    expect(mostOf("pêches réussies")).toBe("le plus de pêches réussies");
+    expect(mostOf("herbes cueillies")).toBe("le plus d'herbes cueillies");
+    expect(missionPitch("herbalism")).toMatch(/^Qui fera le plus d'herbes cueillies d'ici la fin/);
+  });
+
+  it("tells a member how far they are from the podium, a tie going to the first to reach the score", () => {
+    const scores = [412, 338, 251, 164, 90].map((score, index) => ({ memberId: `m${String(index + 1)}`, score }));
+    expect(missionProgress(scores, "m5", "pêches réussies")).toEqual({
+      place: 5,
+      text: "Encore 162 pêches réussies pour monter sur le podium",
+    });
+    expect(missionProgress(scores, "m2", "pêches réussies")).toEqual({
+      place: 2,
+      text: "Sur le podium : encore 75 pêches réussies pour la 1re place",
+    });
+    expect(missionProgress(scores, "m1", "pêches réussies")).toEqual({
+      place: 1,
+      text: "En tête, avec 74 pêches réussies d'avance",
+    });
+    expect(missionProgress(scores, "nobody", "pêches réussies").place).toBeUndefined();
+  });
+
+  it("says how long ago a quest ended", () => {
+    const now = new Date("2026-10-20T12:00:00Z");
+    const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    expect([daysAgo(2), daysAgo(8), daysAgo(15), daysAgo(22)].map((endsAt) => endedAgo(endsAt, now))).toEqual([
+      "Cette semaine",
+      "Semaine dernière",
+      "Il y a 2 semaines",
+      "Il y a 3 semaines",
+    ]);
   });
 });

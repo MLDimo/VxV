@@ -77,6 +77,7 @@ describe("formatAddonPvp", () => {
           eventId: undefined,
           betId: undefined,
           duelId: "d1",
+          missionId: undefined,
           author: "Thom Leboss",
           accepted: true,
           message: "Défi relevé.",

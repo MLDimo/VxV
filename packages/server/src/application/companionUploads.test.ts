@@ -46,6 +46,8 @@ describe("companion uploads", () => {
       remind: async () => {},
       recap: async () => {},
     };
+    const missions = createMissions({ unitOfWork, clock });
+    const missionAnnouncements = { announceQuietly: async () => true };
     uploads = createCompanionUploads({
       roster: createRoster({ unitOfWork }),
       raidLogs: createRaidLogs({ unitOfWork, announcer, clock }),
@@ -60,6 +62,8 @@ describe("companion uploads", () => {
         bets: createBets({ unitOfWork, clock }),
         betAnnouncements: { announceQuietly: async () => true },
         announcements: { announceQuietly: async () => true },
+        missions,
+        missionAnnouncements,
         duels: createDuels({
           unitOfWork,
           clock,
@@ -67,8 +71,8 @@ describe("companion uploads", () => {
           betAnnouncements: { announceQuietly: async () => true },
         }),
       }),
-      missions: createMissions({ unitOfWork, clock }),
-      missionAnnouncements: { announceQuietly: async () => true },
+      missions,
+      missionAnnouncements,
       artisans: createArtisans({ unitOfWork }),
       deathrolls: createDeathrolls({ unitOfWork, clock, announcer: { announce: async () => {} } }),
       bossFights: createBossFights({ unitOfWork, clock }),

@@ -235,6 +235,71 @@
   }
 }
 
+/* The quests' board (§7.4): a parchment's frame and pin, the guild's seal, a quest's stamp, the cells of the rewards. */
+@utility quest-sheet {
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    0 0 0 4px var(--color-copper),
+    inset 0 0 30px rgba(120, 80, 30, 0.35);
+}
+
+@utility quest-pin {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: var(--color-amethyst);
+  box-shadow:
+    0 0 0 2px var(--color-ink),
+    inset -2px -2px 0 var(--color-amethyst-shade),
+    inset 2px 2px 0 var(--color-amethyst-light);
+}
+
+@utility quest-seal {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 72px;
+  height: 72px;
+  border: 3px solid var(--color-seal);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 3px rgba(243, 231, 201, 0.9),
+    inset 0 0 0 5px var(--color-seal);
+  color: var(--color-seal);
+  transform: rotate(-14deg);
+  opacity: 0.82;
+  mix-blend-mode: multiply;
+  mask-image: radial-gradient(circle at 30% 70%, #000 55%, rgba(0, 0, 0, 0.75) 70%, #000 85%);
+}
+
+@utility quest-stamp {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 2px 6px;
+  border: 2px solid var(--color-ink-loss);
+  color: var(--color-ink-loss);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  transform: rotate(-10deg);
+}
+
+@utility quest-prize {
+  flex: 1;
+  padding: 6px 8px;
+  text-align: center;
+  background: rgba(90, 60, 30, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(90, 60, 30, 0.4);
+}
+
 /* Parchment (§2.2), and the ruled page of the accounts book (§7.7). */
 @utility parchment {
   background: radial-gradient(circle at 30% 20%, #f3e7c9, #e2cfa3 70%, #cdb581);

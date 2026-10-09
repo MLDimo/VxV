@@ -1,8 +1,9 @@
-import { addonHead, line, seconds, text, type AddonReaders } from "./addonText.ts";
+import { addonHead, flag, line, seconds, text, type AddonReaders } from "./addonText.ts";
+import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { HallOfFameEntry, Mission, MissionRewardRecord, MissionScore } from "./missions.ts";
 
 /** First line of the missions' data for the addon (contract with VXV_Missions); the number is the format version. */
-export const ADDON_MISSIONS_HEADER = "VXV-QUETES-1";
+export const ADDON_MISSIONS_HEADER = "VXV-QUETES-2";
 
 /** How many places of each ranking, and of the hall of fame, the addon shows. */
 export const ADDON_RANKED_PLACES = 10;
@@ -10,6 +11,8 @@ export const ADDON_RANKED_PLACES = 10;
 export interface AddonMissionsFacts extends AddonReaders {
   missions: readonly { mission: Mission; scores: readonly MissionScore[]; rewards: readonly MissionRewardRecord[] }[];
   hallOfFame: readonly HallOfFameEntry[];
+  /** What became of the quests published in game, in the order received. */
+  changes: readonly GameChangeOutcome[];
 }
 
 /**
@@ -19,6 +22,7 @@ export interface AddonMissionsFacts extends AddonReaders {
  * R;mission id;member id;member;class token, empty without main;score;reached (Unix seconds) (the first, in order)
  * W;mission id;place;member;amount;1 when handed over (the rewards of a validated mission)
  * F;member;class token, empty without main;missions won;gains;mean place (the hall of fame, in order)
+ * C;change id;1 when done;message (the answers to the quests published in game)
  * The addon parses the lines in this order.
  */
 export function formatAddonMissions(facts: AddonMissionsFacts): string {
@@ -64,5 +68,6 @@ export function formatAddonMissions(facts: AddonMissionsFacts): string {
           entry.averagePosition.toFixed(1),
         ),
       ),
+    ...facts.changes.map((change) => line("C", change.id, flag(change.accepted), text(change.message))),
   ].join("\n");
 }

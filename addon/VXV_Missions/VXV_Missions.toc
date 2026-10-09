@@ -5,15 +5,23 @@
 ## Version: @project-version@
 ## Dependencies: VXV_Core
 
-# The missions as the website exports them (VXV-QUETES), how they travel in the guild, and the game's counters.
+# The missions as the website exports them (VXV-QUETES), how they travel in the guild, the game's counters, and the
+# quests an officer publishes in game.
 Gathering.lua
 Counters.lua
 QuestsData.lua
 Quests.lua
 Readings.lua
+Changes.lua
 
-# Interface: the Quêtes screen and card, the reduced mode.
+# Interface: the Quêtes screen (parchments, the quest's sheet, the small cards, the hall of fame), the publishing
+# window, the card and the reduced mode.
+UI\Parchment.lua
 UI\QuestsView.lua
+UI\QuestSheet.lua
+UI\QuestCards.lua
+UI\HallOfFame.lua
+UI\QuestDialog.lua
 UI\QuestsTab.lua
 UI\QuestsCompact.lua
 

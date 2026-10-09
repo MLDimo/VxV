@@ -268,6 +268,7 @@ describe("the PvP place in game", () => {
           eventId: undefined,
           betId: undefined,
           duelId: "d2",
+          missionId: undefined,
           author: "Thom Leboss",
           accepted: true,
           message: "Défi relevé.",

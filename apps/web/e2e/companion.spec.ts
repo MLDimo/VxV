@@ -60,7 +60,7 @@ test("the companion brings the next event to the addon, as an officer would past
   // The bets come along, for Le Dé Pipé in game (P11.8).
   expect(paris.text.split("\n")[0]).toBe("VXV-PARIS-1");
   // And the missions, for Les Quêtes in game (P12.8).
-  expect(quetes.text.split("\n")[0]).toBe("VXV-QUETES-1");
+  expect(quetes.text.split("\n")[0]).toBe("VXV-QUETES-2");
   // And the titles of the week, for the game's displays (P13.3).
   expect(titres.text.split("\n")[0]).toBe("VXV-TITRES-1");
   // And the PvP: the outings, the duels and their ranking, for the PvP tab in game.

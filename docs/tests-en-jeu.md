@@ -25,7 +25,7 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | Butin | Un raid réel enregistré sans saisie manuelle (répétition possible en donjon avec un maître du butin avant la fin de la bêta) |
 | PvP | Un événement PvP créé en jeu par un officier, les fanions de l'Elo dans l'onglet Duels, un défi lancé en jeu à sa cible et relevé par le défié, le pari du duel misé par un tiers, le résultat réglé |
 | Paris | Un pari réel mené jusqu'au versement des gains |
-| Missions | Une mission d'une semaine menée jusqu'au classement |
+| Missions | Une mission d'une semaine menée jusqu'au classement ; l'onglet Quêtes comparé à `docs/design/captures/quetes.jpg` (parchemins, sceau, tampons, pointillés répétés par `SetTexture(…, "REPEAT")`, non mesuré) ; une quête publiée en jeu par un officier, annoncée sur Discord |
 | Titres | Une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu par un membre sans compagnon |
 | Artisans | Une recette apprise apparaît chez un autre membre après la synchro |
 | Deathroll | Une partie complète jouée aux boutons entre deux membres, chaque roll de 0 au résultat précédent (le jeu accepte-t-il un `/roll` à partir de 0 ?) jusqu'au premier 0, la dette chez le perdant |

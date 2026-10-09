@@ -89,7 +89,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   pour une récolte, `Gathering.lua`), victoires honorables (`GetPVPLifetimeStats`). Score : ce que gagnent les
   compteurs de tous les personnages liés du membre pendant la mission ; à égalité, le premier à l'atteindre. Compteurs
   lus à la connexion puis chaque minute hors combat. Résultat validé par un officier ; récompense 70 / 20 / 10 % versée
-  par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct.
+  par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct. Écran Quêtes comme la
+  maquette `AddonMissions.html` : quête épinglée sur son parchemin (sceau VXV, lots, cinq premiers, progression jusqu'au
+  podium par `missionProgress`), À venir, Terminées sous leur tampon, Hall of fame et zone officier ; en jeu, images
+  dans `VXV_Missions/Media`, et « Publier une quête » comme `/vxv_mission` (type aux flèches, titre sinon celui du type,
+  récompense, jours depuis la publication en jeu, motif), envoyée au site comme changement fait en jeu.
 - **Titres** (`VXV_Titles` ; règles dans `domain/titles.ts`) : chaque titre va au membre en tête de sa règle sur la
   saison (à égalité, le premier à l'atteindre ; sans score positif, à personne), réattribué chaque mercredi à 5 h UTC,
   avec l'historique, un rôle Discord « ◆ <titre> » et l'annonce de la semaine (salon des titres,
@@ -144,7 +148,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`apps/web/public/images/tavernes/<id>.jpg`, `VXV_Core/Media/Tavernes/<id>.png`) ; le site la choisit par
   `tavernPicture`, l'addon par `TavernPicture`, d'après les jours que `npm run generate` écrit dans `Tokens.lua`.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), jusque sur Discord par la couleur des rôles de
-  classe (`classRole`, rendue par le bot à un rôle d'une autre couleur), et ces couleurs ne servent à rien d'autre.
+  classe (`classRole`, rendue par le bot à un rôle d'une autre couleur), et ces couleurs ne servent à rien d'autre. Sur
+  parchemin, la même couleur foncée à l'encre du parchemin pour rester lisible (`CLASS_COLORS_ON_PARCHMENT`, 30 %).
 - Avatars : portraits de la charte choisis par race, classe et sexe du personnage principal (transmis par l'addon), avec repli.
 - Le site est réservé aux membres : un visiteur ne voit que la page de connexion.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
@@ -223,7 +228,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-RAID-3` (événement) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
 | `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Core/Core/EventRoles.lua` |
 | `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
-| `VXV-QUETES-1` | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
+| `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV_Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV_Artisans/ArtisansData.lua` |
 | `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV_Deathroll/DeathrollData.lua` |

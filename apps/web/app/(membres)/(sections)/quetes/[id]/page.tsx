@@ -28,7 +28,7 @@ export default async function MissionPage({ params }: { params: Promise<{ id: st
         </Link>
       </ScreenHeader>
       <div className="mt-8">
-        <MissionCard view={view} member={member} now={new Date()} />
+        <MissionCard view={view} member={member} />
       </div>
       {scores.length > 5 && (
         <Panel title="Classement complet" className="mt-8">

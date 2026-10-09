@@ -5,6 +5,7 @@ VXV.RegisterModule({
     name = "Quêtes",
     Enable = function(data)
         ns.QuestsData.Restore(data)
+        ns.Changes.Restore(data)
         ns.Gathering.Restore(data)
         ns.Readings.Restore(data)
         ns.Readings.Start()

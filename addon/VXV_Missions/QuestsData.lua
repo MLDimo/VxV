@@ -4,13 +4,14 @@ local function class(token)
     return token ~= "" and token or nil
 end
 
---- The missions as the website exports them (contract VXV-QUETES-1, packages/server/src/domain/addonMissions.ts),
---- brought by the player's companion or passed on by an officer's addon (the core's site data).
+--- The missions as the website exports them (contract VXV-QUETES-2, packages/server/src/domain/addonMissions.ts),
+--- brought by the player's companion or passed on by an officer's addon (the core's site data), with the answers to
+--- the quests published in game.
 ns.QuestsData = VXV.SiteData({
     name = "quetes",
-    header = "VXV-QUETES-1",
+    header = "VXV-QUETES-2",
     New = function()
-        return { missions = {}, byId = {}, hallOfFame = {} }
+        return { missions = {}, byId = {}, hallOfFame = {}, results = {} }
     end,
     lines = {
         Q = { 7, function(data, f)
@@ -46,6 +47,11 @@ ns.QuestsData = VXV.SiteData({
             data.hallOfFame[#data.hallOfFame + 1] = { name = f[1], class = class(f[2]), wins = wins, gains = gains,
                 position = position }
             return wins ~= nil and gains ~= nil and position ~= nil
+        end },
+        -- C;change id;1 when done;message
+        C = { 3, function(data, f)
+            data.results[f[1]] = { accepted = f[2] == "1", message = f[3] }
+            return true
         end },
     },
 })

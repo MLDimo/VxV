@@ -12,6 +12,8 @@ VXV = {
     --- A message in the chat, under the VXV prefix; and (value, singular, plural) for "3 invitations".
     Print = ns.Chat.Print,
     Count = ns.Util.Count,
+    --- (seconds): a time left, "2 j 04 h", "4 h 05", "12 min".
+    Remaining = ns.Util.Remaining,
     --- Gold pieces as the website writes them: Format(1000) "1 000 po", Signed(-120) "−120 po", SignedNumber(310)
     --- "+310", Number, Odds, Share.
     Gold = ns.Gold,
