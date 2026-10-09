@@ -9,8 +9,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 /**
- * The only page a visitor sees: the charter, without any of the guild's data. "suite" is the page the visitor was
- * going to, shown once signed in.
+ * The page a visitor sees, with the member guide (/guide, open to all): the charter, without any of the guild's data.
+ * "suite" is the page the visitor was going to, shown once signed in.
  */
 export default async function SignInPage({
   searchParams,
@@ -30,6 +30,9 @@ export default async function SignInPage({
         className="button-pixel mt-8"
       >
         Connexion Discord
+      </a>
+      <a href="/guide" className="mt-6 inline-block text-amethyst underline">
+        Lire le guide du membre
       </a>
     </EmblemPage>
   );

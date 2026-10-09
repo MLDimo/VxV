@@ -152,7 +152,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   classe (`classRole`, rendue par le bot à un rôle d'une autre couleur), et ces couleurs ne servent à rien d'autre. Sur
   parchemin, la même couleur foncée à l'encre du parchemin pour rester lisible (`CLASS_COLORS_ON_PARCHMENT`, 30 %).
 - Avatars : portraits de la charte choisis par race, classe et sexe du personnage principal (transmis par l'addon), avec repli.
-- Le site est réservé aux membres : un visiteur ne voit que la page de connexion.
+- Le site est réservé aux membres : un visiteur ne voit que la page de connexion et le guide du membre, public
+  (décision du propriétaire du 9 octobre) : `/guide`, page autonome `apps/web/public/guide/index.html` (polices et
+  images du site, émojis du bot et captures de la charte copiés à côté), tenue à jour avec les fonctionnalités.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
 - Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll.
 - Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.

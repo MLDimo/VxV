@@ -7,6 +7,22 @@ test("an anonymous visitor is asked to sign in with Discord", async ({ page }) =
   await expect(page.getByRole("link", { name: "Connexion Discord" })).toBeVisible();
 });
 
+test("anyone reads the member guide, without signing in", async ({ page }) => {
+  await page.goto("/connexion");
+  await page.getByRole("link", { name: "Lire le guide du membre" }).click();
+  await expect(page).toHaveURL(/\/guide$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Le guide de la taverne");
+  // Its pictures come from the website: the guild's logo, the bot's emojis, the charter's captures.
+  for (const picture of [
+    page.locator('img[src="/images/logo.jpg"]').first(),
+    page.locator('img[src^="/guide/emojis/"]').first(),
+    page.locator('img[src^="/guide/captures/"]').first(),
+  ]) {
+    await picture.scrollIntoViewIfNeeded();
+    await expect.poll(() => picture.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+  }
+});
+
 test("a member reaches the tavern but not the officer pages", async ({ page, context }) => {
   await signInAs(context, "member");
   await page.goto("/");
