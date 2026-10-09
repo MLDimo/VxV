@@ -11,7 +11,7 @@ import { Field, Options, ReasonField } from "./Field";
 export function TitleGiveForm({ members }: { members: readonly { memberId: string; name: string }[] }) {
   const [state, action, pending] = useActionState(giveTitle, IDLE);
   return (
-    <form action={action} className="mt-4 grid gap-4 sm:grid-cols-2">
+    <form action={action} aria-label="Donner un titre de la semaine" className="mt-4 grid gap-4 sm:grid-cols-2">
       <Field label="Titre">
         <select name="titleId" required className="field">
           <Options options={OFFICER_TITLES.map((title) => [title.id, title.name] as const)} />

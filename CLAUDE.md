@@ -99,7 +99,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   des packs et éteint en sortant s'il l'a allumé (`VXV_Raid/CombatLogging.lua`) ; le site garde le relevé le plus
   complet de chaque combat et retrouve les joueurs par prénom parmi les présents du journal du raid
   (`domain/bossFights.ts`). Un titre dont la mesure peut manquer des données (`OFFICER_TITLES`) se donne aussi par un
-  officier sur Ranking › Titres, pour la semaine affichée, avec motif (`title.give`) ; le mercredi le recalcule. En
+  officier sur Ranking › Titres, pour la semaine affichée, avec motif (`title.give`) ; le mercredi le recalcule.
+  Titres faits main (`domain/customTitles.ts`, table `custom_titles`) : un officier les crée sur Ranking › Titres
+  (nom, membre, motif affiché avec le titre) jusqu'au reset du mercredi ou pour une durée indéterminée, et les retire
+  avec motif (`title.custom`, `title.takeBack`) ; rôle Discord, annonce du mercredi et lignes `T` de l'addon comme les
+  autres, jamais comptés dans le classement des titres. En
   jeu : une ligne dans l'infobulle d'un membre, ses titres avant ses messages dans le canal de guilde et après son nom
   dans la liste de guilde ; un nouveau titre ne demande pas de mise à jour de l'addon.
 - **Artisans** (`VXV_Artisans` ; site `/artisans`) : niveaux des métiers relus à chaque connexion, recettes apprises à

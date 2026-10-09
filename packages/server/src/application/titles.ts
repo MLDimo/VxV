@@ -1,7 +1,8 @@
 import { healingReceivedInRaid, parseBossFight } from "../domain/bossFights.ts";
 import { fullName } from "../domain/characters.ts";
+import { customTitleRefusal, type CustomTitle, type NewCustomTitle } from "../domain/customTitles.ts";
 import { duelOutcomes } from "../domain/duels.ts";
-import type { TitleGiveRecord } from "../domain/journal.ts";
+import type { CustomTitleRecord, TitleGiveRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
 import {
@@ -134,6 +135,19 @@ export function createTitles({
     }
   }
 
+  /** A title made by hand's Discord role, given or taken back; never failing the title. */
+  async function customRole(title: Pick<CustomTitle, "name" | "discordId">, change: "add" | "remove") {
+    try {
+      if (change === "add") {
+        await guild.addRole(title.discordId, titleRole(title.name));
+      } else {
+        await guild.removeRole(title.discordId, titleRole(title.name));
+      }
+    } catch (error) {
+      console.error("Discord custom title role update failed", error);
+    }
+  }
+
   return {
     /**
      * The week's reassignment (P13.2), each Wednesday at reset: the titles go to the members ahead over the season,
@@ -150,19 +164,36 @@ export function createTitles({
         }
         await repositories.titles.saveWeek(week, awardTitles(await titleFacts(repositories)), now);
         const [current] = byWeek(await repositories.titles.listLatestWeeks(1));
-        return { previous: latest?.holders ?? [], current: current?.week === week ? current.holders : [] };
+        return {
+          previous: latest?.holders ?? [],
+          current: current?.week === week ? current.holders : [],
+          // The titles made by hand until the reset end with it; the others stay.
+          ended: await repositories.customTitles.endUntilReset(now),
+          custom: await repositories.customTitles.listHeld(),
+        };
       });
       if (outcome === undefined) {
         return false;
       }
       await updateRoles(outcome.previous, outcome.current);
+      for (const title of outcome.ended) {
+        await customRole(title, "remove");
+      }
       try {
         await announcer.announce({
           week,
-          holders: TITLES.map((title) => {
-            const holder = outcome.current.find((candidate) => candidate.titleId === title.id);
-            return { title: title.name, rule: title.rule, holder: holder?.memberName, score: holder?.score ?? 0 };
-          }),
+          holders: [
+            ...TITLES.map((title) => {
+              const holder = outcome.current.find((candidate) => candidate.titleId === title.id);
+              return { title: title.name, rule: title.rule, holder: holder?.memberName, score: holder?.score ?? 0 };
+            }),
+            ...outcome.custom.map((title) => ({
+              title: title.name,
+              rule: title.reason,
+              holder: title.memberName,
+              score: 0,
+            })),
+          ],
         });
       } catch (error) {
         console.error("Discord titles announcement failed", error);
@@ -211,6 +242,76 @@ export function createTitles({
         change.before === undefined ? [] : [change.before],
         change.after === undefined ? [] : [change.after],
       );
+    },
+
+    /**
+     * An officer makes a title by hand and gives it to a member, with the reason shown with it, until the next
+     * Wednesday's reset or until an officer takes it back. The Discord role follows at once.
+     */
+    async giveCustom(officer: Member, title: NewCustomTitle, reason: string): Promise<void> {
+      const motive = checkOfficerAction(officer, reason);
+      const name = title.name.trim();
+      const refusal = customTitleRefusal(name);
+      if (refusal !== undefined) {
+        throw new ValidationError(refusal);
+      }
+      const given = await unitOfWork.run(async (repositories) => {
+        if ((await repositories.members.findById(title.memberId)) === undefined) {
+          throw new ValidationError("Ce membre n'existe pas.");
+        }
+        const held = await repositories.customTitles.listHeld();
+        const same = (candidate: CustomTitle) =>
+          candidate.memberId === title.memberId && candidate.name.toLowerCase() === name.toLowerCase();
+        if (held.some(same)) {
+          throw new ValidationError("Ce membre porte déjà ce titre.");
+        }
+        await repositories.customTitles.create({ ...title, name }, motive, clock());
+        const created = (await repositories.customTitles.listHeld()).find(same);
+        if (created === undefined) {
+          throw new Error("The title made by hand was not saved.");
+        }
+        const record: CustomTitleRecord = { title: name, holder: created.memberName, untilReset: title.untilReset };
+        await repositories.journal.record({
+          actorId: officer.id,
+          action: "title.custom",
+          entity: "customTitle",
+          entityId: created.id,
+          before: null,
+          after: record,
+          reason: motive,
+        });
+        return created;
+      });
+      await customRole(given, "add");
+    },
+
+    /** An officer takes back a title made by hand, with a reason; the Discord role goes with it. */
+    async takeBackCustom(officer: Member, titleId: string, reason: string): Promise<void> {
+      const motive = checkOfficerAction(officer, reason);
+      const taken = await unitOfWork.run(async (repositories) => {
+        const title = await repositories.customTitles.findHeld(titleId);
+        if (title === undefined) {
+          throw new ValidationError("Ce titre n'est plus porté.");
+        }
+        await repositories.customTitles.end(title.id, clock());
+        const record: CustomTitleRecord = { title: title.name, holder: title.memberName, untilReset: title.untilReset };
+        await repositories.journal.record({
+          actorId: officer.id,
+          action: "title.takeBack",
+          entity: "customTitle",
+          entityId: title.id,
+          before: record,
+          after: null,
+          reason: motive,
+        });
+        return title;
+      });
+      await customRole(taken, "remove");
+    },
+
+    /** The titles made by hand held now, the latest given first. */
+    async customTitles(): Promise<CustomTitle[]> {
+      return unitOfWork.run(({ customTitles }) => customTitles.listHeld());
     },
 
     /** The latest weeks' holders, the latest first, for the website and the addon. */

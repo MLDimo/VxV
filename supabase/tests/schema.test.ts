@@ -374,6 +374,23 @@ describe("initial schema", () => {
       await expect(award(await insertMember(database, "2"), "gamblingKing", 200)).rejects.toThrow(/title_awards_pkey/);
       await expect(award(member, "debtKing", 0)).rejects.toThrow(/title_awards_score_check/);
     });
+
+    it("keeps a title made by hand named, with its reason, held once at a time by a member", async () => {
+      const member = await insertMember(database, "1");
+      const make = (name: string, reason = "Raid") =>
+        database.query<{ id: string }>(
+          `insert into custom_titles (name, reason, member_id, until_reset, given_at)
+           values ($1, $2, $3, false, now()) returning id`,
+          [name, reason, member],
+        );
+      const [held] = (await make("Sauveur du raid")).rows;
+      await expect(make(" ")).rejects.toThrow(/custom_titles_name/);
+      await expect(make("Mascotte", " ")).rejects.toThrow(/custom_titles_reason/);
+      await expect(make("SAUVEUR DU RAID")).rejects.toThrow(/custom_titles_held/);
+      // Ended, it can be given again.
+      await database.query("update custom_titles set ended_at = now() where id = $1", [held?.id]);
+      await make("Sauveur du raid");
+    });
   });
 
   describe("boss fights", () => {

@@ -14,7 +14,7 @@ const character = (firstName: string, lastName: string, memberId: string): Chara
 });
 
 describe("titles for the addon", () => {
-  it("writes every title of the week, with its holder or nobody, after the head of every bundle's data", () => {
+  it("writes every title of the week, with its holder or nobody, then those made by hand, after the head", () => {
     const vorn = character("Vorn", "Cendrelune", "m-vorn");
     const lines = formatAddonTitles({
       officers: [vorn],
@@ -29,6 +29,16 @@ describe("titles for the addon", () => {
         },
         { titleId: "wellFed", memberId: "m-sira", memberName: "Sira Ventargent", memberClass: undefined, score: 3 },
       ],
+      custom: [
+        {
+          id: "t1",
+          name: "Sauveur du raid",
+          reason: "A tenu Onyxia seul",
+          memberId: "m-sira",
+          memberName: "Sira Ventargent",
+          memberClass: undefined,
+        },
+      ],
       exportedAt: new Date("2026-10-07T05:00:00Z"),
     }).split("\n");
     expect(lines.slice(0, 5)).toEqual([
@@ -38,7 +48,9 @@ describe("titles for the addon", () => {
       "M;m-vorn;Vorn Cendrelune",
       "M;m-sira;Sira Ventargent",
     ]);
-    expect(lines.slice(5)).toHaveLength(TITLES.length);
+    expect(lines.slice(5)).toHaveLength(TITLES.length + 1);
+    // A title made by hand: its reason as its rule, no score.
+    expect(lines.at(-1)).toBe("T;custom-t1;Sauveur du raid;A tenu Onyxia seul;m-sira;Sira Ventargent;;0");
     expect(lines).toContain(
       "T;wellFed;Bien gras;Le plus d'objets reçus en raid sur la saison.;m-sira;Sira Ventargent;;3",
     );

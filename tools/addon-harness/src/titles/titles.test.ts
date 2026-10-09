@@ -15,6 +15,7 @@ const WEEK: AddonTitlesFacts = {
     character("Thom", "Leboss", "m-thom"),
     { ...character("Thom", "Reroll", "m-thom"), isMain: false },
   ],
+  custom: [],
   holders: [
     { titleId: "gamblingKing", memberId: "m-thom", memberName: "Thom Leboss", memberClass: "PRIEST", score: 300 },
     { titleId: "sugarDaddy", memberId: "m-thom", memberName: "Thom Leboss", memberClass: "PRIEST", score: 500 },

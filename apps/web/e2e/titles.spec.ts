@@ -65,7 +65,7 @@ test("an officer gives Princesse for the week: the Ranking shows her holder, Dis
 }) => {
   await signInAs(context, "officer");
   await page.goto("/ranking/titres");
-  const form = page.getByRole("region", { name: "Officiers · titres à donner" });
+  const form = page.getByRole("form", { name: "Donner un titre de la semaine" });
   await form.getByRole("combobox", { name: "Titre" }).selectOption({ label: "Princesse" });
   await form.getByRole("combobox", { name: "Membre" }).selectOption({ label: "Dune Sable" });
   await form.getByLabel("Motif (visible dans le journal)").fill("Tous les soins du raid");
@@ -76,4 +76,38 @@ test("an officer gives Princesse for the week: the Ranking shows her holder, Dis
   expect((await discordMemberState(request, "500")).roles).toContain("◆ Princesse");
   await page.goto("/journal");
   await expect(page.getByText("Princesse : Dune Sable")).toBeVisible();
+});
+
+test("an officer makes a title by hand: the Ranking shows it, Discord gives the role, until an officer takes it back", async ({
+  page,
+  context,
+  request,
+}) => {
+  await signInAs(context, "officer");
+  await page.goto("/ranking/titres");
+  const form = page.getByRole("form", { name: "Créer un titre" });
+  await form.getByLabel("Nom du titre").fill("Sauveur du raid");
+  await form.getByRole("combobox", { name: "Membre" }).selectOption({ label: "Dune Sable" });
+  await form
+    .getByRole("combobox", { name: "Durée" })
+    .selectOption({ label: "Durée indéterminée (jusqu'à ce qu'un officier le retire)" });
+  await form.getByLabel("Pourquoi, affiché avec le titre (visible dans le journal)").fill("A tenu Onyxia seul");
+  await form.getByRole("button", { name: "Créer le titre" }).click();
+  await expect(form.getByText("Titre donné.")).toBeVisible();
+  const made = page
+    .getByRole("region", { name: "Titres faits main" })
+    .getByRole("article")
+    .filter({ hasText: "◆ Sauveur du raid" });
+  await expect(made).toContainText("Dune Sable");
+  await expect(made).toContainText("A tenu Onyxia seul");
+  await expect(made).toContainText("pour une durée indéterminée");
+  expect((await discordMemberState(request, "500")).roles).toContain("◆ Sauveur du raid");
+
+  const takeBack = made.getByRole("form", { name: "Retirer Sauveur du raid" });
+  await takeBack.getByLabel("Motif du retrait (visible dans le journal)").fill("Fin de l'exploit");
+  await takeBack.getByRole("button", { name: "Retirer le titre" }).click();
+  await expect(page.getByRole("region", { name: "Titres faits main" })).toHaveCount(0);
+  expect((await discordMemberState(request, "500")).roles).not.toContain("◆ Sauveur du raid");
+  await page.goto("/journal");
+  await expect(page.getByText("Sauveur du raid : repris à Dune Sable")).toBeVisible();
 });
