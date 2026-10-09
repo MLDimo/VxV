@@ -1,7 +1,7 @@
 import type { AnnouncedMission } from "@vxv/server";
 import { colorValue, COLORS } from "@vxv/design";
 import { formatGold, formatPlace } from "@vxv/server/domain/labels";
-import { MISSION_TYPE_LABELS, missionRewards, REWARD_SHARES } from "@vxv/server/domain/missions";
+import { MISSION_TYPE_LABELS, missionRewards, mostOf, REWARD_SHARES } from "@vxv/server/domain/missions";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
 import { emoji } from "./emojis.ts";
@@ -47,7 +47,7 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
         title: `${emoji("quete")} ${mission.title}`,
         url: missionUrl(siteUrl, mission.id),
         description:
-          `${labels.name} : le plus de ${labels.counts}, du ${timestamp(mission.startsAt, "D")} au ` +
+          `${labels.name} : ${mostOf(labels.counts)}, du ${timestamp(mission.startsAt, "D")} au ` +
           `${timestamp(mission.endsAt, "D")}\n${statusLine(announced)}`,
         color: EMBED_COLOR,
         fields: [

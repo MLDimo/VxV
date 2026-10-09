@@ -1,6 +1,12 @@
 import { COMPACT_PLACES, PLACES, TAVERN, TAVERN_CARDS } from "./places.ts";
 import { ADDON_SEASON_YEARS, SEASONS } from "./seasons.ts";
-import { CLASS_COLORS, COLORS, UNKNOWN_CLASS_COLOR } from "./tokens.ts";
+import {
+  CLASS_COLORS,
+  CLASS_COLORS_ON_PARCHMENT,
+  COLORS,
+  UNKNOWN_CLASS_COLOR,
+  UNKNOWN_CLASS_COLOR_ON_PARCHMENT,
+} from "./tokens.ts";
 
 const CHANNEL = 255;
 
@@ -65,6 +71,12 @@ export function renderLua(): string {
     ),
     "    },",
     `    unknownClassColor = ${luaString(UNKNOWN_CLASS_COLOR.slice(1).toLowerCase())},`,
+    "    classColorsOnParchment = {",
+    ...Object.entries(CLASS_COLORS_ON_PARCHMENT).map(
+      ([token, value]) => `        ${token} = ${luaString(value.slice(1).toLowerCase())},`,
+    ),
+    "    },",
+    `    unknownClassColorOnParchment = ${luaString(UNKNOWN_CLASS_COLOR_ON_PARCHMENT.slice(1).toLowerCase())},`,
     `    tavern = { width = ${String(TAVERN.width)}, height = ${String(TAVERN.height)} },`,
     "    lights = {",
     ...TAVERN.lights.flatMap((light) => [

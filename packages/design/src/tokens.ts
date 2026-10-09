@@ -40,6 +40,11 @@ export const COLORS = {
   parchment: "#F8E7C0",
   "old-paper": "#D9C39A",
   "ink-brown": "#3A2614",
+  // The quests' parchment (§7.4): its titles, its text, its notes, and the ink of the guild's seal
+  "parchment-ink": "#2A1A0C",
+  "parchment-text": "#4A3220",
+  "parchment-muted": "#6B4A2A",
+  seal: "#6A22C8",
   ember: "#FFA03C",
   neon: "#FF5AC8",
   // Le Dé Pipé (§7.2): the felt of the gaming table, from its lit centre to its edge
@@ -82,6 +87,29 @@ export const CLASS_COLORS: Readonly<Record<string, string>> = {
 
 /** A class token this version does not know is written in the secondary text color. */
 export const UNKNOWN_CLASS_COLOR = COLORS.muted;
+
+/** How much of its class's color a name keeps on parchment, the rest being the parchment's ink (contrast 4:1 at least). */
+const ON_PARCHMENT = 0.3;
+const HEX = 16;
+
+/** A color mixed with another: share of the first, the rest of the second ("#RRGGBB"). */
+function mix(color: string, other: string, share: number): string {
+  const channel = (hex: string, index: number) => Number.parseInt(hex.slice(1 + 2 * index, 3 + 2 * index), HEX);
+  return `#${[0, 1, 2]
+    .map((index) =>
+      Math.round(channel(color, index) * share + channel(other, index) * (1 - share))
+        .toString(HEX)
+        .padStart(2, "0"),
+    )
+    .join("")
+    .toUpperCase()}`;
+}
+
+/** Class colors on parchment (§7.4): each darkened with the parchment's ink, so that names stay readable on it. */
+export const CLASS_COLORS_ON_PARCHMENT: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(CLASS_COLORS).map(([token, color]) => [token, mix(color, COLORS["parchment-ink"], ON_PARCHMENT)]),
+);
+export const UNKNOWN_CLASS_COLOR_ON_PARCHMENT = COLORS["parchment-muted"];
 
 /** A color ("#A35CFF") as a number, as Discord takes it for a message's embed or a role. */
 export function colorValue(hex: string): number {

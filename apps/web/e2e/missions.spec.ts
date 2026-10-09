@@ -79,7 +79,10 @@ test.describe.serial("missions", () => {
     await expect(ranking.getByRole("listitem").nth(0)).toContainText("52");
     await expect(ranking.getByRole("listitem").nth(1)).toContainText("Ciel Gris");
     await expect(ranking.getByRole("listitem").nth(1)).toContainText("40");
-    await expect(page.getByRole("region", { name: TITLE }).getByText(/^Ta progression : rien encore/)).toBeVisible();
+    // The member has no score yet: their progress says so, without a place.
+    const quest = page.getByRole("region", { name: TITLE });
+    await expect(quest.getByText("Ta progression")).toBeVisible();
+    await expect(quest.getByText("Rien encore : l'addon VXV relève ton compteur en jeu.")).toBeVisible();
 
     const message = (await discordMessages(request)).find((candidate) =>
       JSON.stringify(candidate.body).includes(`/quetes/${missionId}"`),

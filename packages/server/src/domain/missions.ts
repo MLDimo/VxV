@@ -230,3 +230,59 @@ export interface MissionRewardRecord extends MissionReward {
   memberClass: string | undefined;
   paidAt: Date | undefined;
 }
+
+/** "le plus de pêches réussies", "le plus d'herbes cueillies". */
+export function mostOf(counts: string): string {
+  return /^[aeiouyhéèê]/i.test(counts) ? `le plus d'${counts}` : `le plus de ${counts}`;
+}
+
+/** What the guild rewards, as the quest's parchment tells it. */
+export function missionPitch(type: MissionType): string {
+  return (
+    `Qui fera ${mostOf(MISSION_TYPE_LABELS[type].counts)} d'ici la fin remporte la récompense : ` +
+    "main et rerolls additionnés, d'après les compteurs du jeu."
+  );
+}
+
+/** The places on the podium, rewarded. */
+export const PODIUM = REWARD_SHARES.length;
+
+/** Where a member stands in a mission: their place (none without a score) and how far from the place above. */
+export interface MissionProgress {
+  place: number | undefined;
+  text: string;
+}
+
+/** The member's progress: ahead, on the podium, or how much more to climb on it (a tie goes to the first to reach). */
+export function missionProgress(
+  scores: readonly Pick<MissionScore, "memberId" | "score">[],
+  memberId: string,
+  counts: string,
+): MissionProgress {
+  const index = scores.findIndex((score) => score.memberId === memberId);
+  const mine = scores[index];
+  if (mine === undefined || mine.score <= 0) {
+    return { place: undefined, text: "Rien encore : l'addon VXV relève ton compteur en jeu." };
+  }
+  const place = index + 1;
+  const toPass = (above: number) => `${String(above - mine.score + 1)} ${counts}`;
+  if (place === 1) {
+    const second = scores[1]?.score ?? 0;
+    return { place, text: `En tête, avec ${String(mine.score - second)} ${counts} d'avance` };
+  }
+  if (place <= PODIUM) {
+    return { place, text: `Sur le podium : encore ${toPass(scores[0]?.score ?? 0)} pour la 1re place` };
+  }
+  return { place, text: `Encore ${toPass(scores[PODIUM - 1]?.score ?? 0)} pour monter sur le podium` };
+}
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** How long ago a mission ended: "Cette semaine", "Semaine dernière", "Il y a 3 semaines". */
+export function endedAgo(endsAt: Date, now: Date): string {
+  const weeks = Math.floor((now.getTime() - endsAt.getTime()) / WEEK_MS);
+  if (weeks <= 0) {
+    return "Cette semaine";
+  }
+  return weeks === 1 ? "Semaine dernière" : `Il y a ${String(weeks)} semaines`;
+}
