@@ -1,7 +1,9 @@
+import { eloRatings, type DuelOutcome } from "./duels.ts";
+
 /**
  * The guild's titles (P13): each week, each title goes to the member ahead on its rule over the season (since its
- * start, or since always without one). A tie goes to the first to reach the score. A new title is a new rule here,
- * without any update of the addon.
+ * start, or since always without one), the duels' Elo counting every duel. A tie goes to the first to reach the score.
+ * A new title is a new rule here, without any update of the addon.
  */
 
 export const TITLES = [
@@ -29,6 +31,7 @@ export const TITLES = [
     name: "Princesse",
     rule: "Le plus de soins reçus sur les boss tués en raid VXV sur la saison (journal de combat).",
   },
+  { id: "grandDuelist", name: "Grand duelliste", rule: "En tête du classement Elo des duels." },
 ] as const;
 
 export type TitleId = (typeof TITLES)[number]["id"];
@@ -75,6 +78,8 @@ export interface TitleFacts {
   donations: Tally;
   /** The deathrolls ended during the season, by the members who won and lost them. */
   deathrolls: readonly { winnerId: string; loserId: string; stake: number; endedAt: Date }[];
+  /** Every duel played, since always, as the Elo board counts them. */
+  duels: readonly DuelOutcome[];
 }
 
 /** Each member's total of the amounts, reached at their latest one. */
@@ -89,6 +94,22 @@ function totals(entries: Tally): TitleScore[] {
     });
   }
   return [...byMember.values()];
+}
+
+/** Each duelist's Elo rating, rounded as the board shows it, reached at their last duel. */
+function eloScores(duels: readonly DuelOutcome[]): TitleScore[] {
+  const lastDuel = new Map<string, Date>();
+  for (const duel of duels) {
+    for (const memberId of [duel.winnerId, duel.loserId]) {
+      const known = lastDuel.get(memberId);
+      lastDuel.set(memberId, known === undefined || duel.playedAt > known ? duel.playedAt : known);
+    }
+  }
+  return eloRatings(duels).map(({ memberId, rating }) => ({
+    memberId,
+    score: Math.round(rating),
+    reachedAt: lastDuel.get(memberId) ?? new Date(0),
+  }));
 }
 
 /** The member ahead: the best positive score, the first to reach it in a tie; undefined when nobody scored. */
@@ -125,6 +146,7 @@ function scoresByTitle(facts: TitleFacts): Record<TitleId, TitleScore[]> {
     cheater: deathrolls,
     loser: deathrolls.map((net) => ({ ...net, score: -net.score })),
     princess: totals(facts.healingReceived),
+    grandDuelist: eloScores(facts.duels),
   };
 }
 

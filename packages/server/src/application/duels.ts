@@ -4,6 +4,7 @@ import {
   answerRefusal,
   cancelRefusal,
   duelFeats,
+  duelOutcomes,
   duelStatus,
   eloRatings,
   newDuelRefusal,
@@ -286,11 +287,7 @@ export function createDuels({
         duels: await stored.listAll(),
         looks: await members.listLooks(),
       }));
-      const outcomes = duels.flatMap((duel) =>
-        duel.winnerId === undefined || duel.playedAt === undefined
-          ? []
-          : [{ winnerId: duel.winnerId, loserId: opponentOf(duel, duel.winnerId), playedAt: duel.playedAt }],
-      );
+      const outcomes = duelOutcomes(duels);
       return {
         lines: eloRatings(outcomes).map((line, index) => ({
           rank: index + 1,

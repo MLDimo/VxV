@@ -19,6 +19,7 @@ const TITLE_NAMES = [
   "Il cheat c'est sûr",
   "Loser",
   "Princesse",
+  "Grand duelliste",
 ];
 
 test("each Wednesday the titles are given once: the Ranking shows them, Discord announces them and gives the roles", async ({

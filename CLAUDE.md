@@ -93,7 +93,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - **Titres** (`VXV_Titles` ; règles dans `domain/titles.ts`) : chaque titre va au membre en tête de sa règle sur la
   saison (à égalité, le premier à l'atteindre ; sans score positif, à personne), réattribué chaque mercredi à 5 h UTC,
   avec l'historique, un rôle Discord « ◆ <titre> » et l'annonce de la semaine (salon des titres,
-  `DISCORD_TITLES_CHANNEL_ID`, salon des raids sans lui). Princesse : soins reçus sur les boss
+  `DISCORD_TITLES_CHANNEL_ID`, salon des raids sans lui). Grand duelliste : le premier de l'Elo des duels (tous les
+  duels, comme le classement), s'il a une cote positive. Princesse : soins reçus sur les boss
   tués en raid VXV, lus dans le journal de combat, que l'addon allume avec son mode avancé dans l'instance d'un raid
   des packs et éteint en sortant s'il l'a allumé (`VXV_Raid/CombatLogging.lua`) ; le site garde le relevé le plus
   complet de chaque combat et retrouve les joueurs par prénom parmi les présents du journal du raid
