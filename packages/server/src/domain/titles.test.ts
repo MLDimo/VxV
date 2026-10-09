@@ -13,6 +13,7 @@ const NOTHING: TitleFacts = {
   raised: [],
   donations: [],
   deathrolls: [],
+  duels: [],
 };
 
 describe("titles", () => {
@@ -58,6 +59,7 @@ describe("titles", () => {
         { winnerId: "ulric", loserId: "brann", stake: 800, endedAt: at(3) },
         { winnerId: "brann", loserId: "ulric", stake: 200, endedAt: at(4) },
       ],
+      duels: [{ winnerId: "thessa", loserId: "sira", playedAt: at(3) }],
     });
     expect(awards).toEqual([
       { titleId: "gamblingKing", memberId: "vorn", score: 300 },
@@ -72,7 +74,21 @@ describe("titles", () => {
       { titleId: "cheater", memberId: "ulric", score: 600 },
       { titleId: "loser", memberId: "brann", score: 600 },
       { titleId: "princess", memberId: "vorn", score: 105000 },
+      { titleId: "grandDuelist", memberId: "thessa", score: 10 },
     ]);
+  });
+
+  it("gives the Grand duelliste to the Elo's first, if their rating is positive", () => {
+    const grandDuelist = (duels: TitleFacts["duels"]) =>
+      awardTitles({ ...NOTHING, duels }).find((award) => award.titleId === "grandDuelist");
+    // Thessa beats Sira (+10), then Vorn, at 0, beats the stronger Thessa: +10.3 for him, Thessa back near 0.
+    expect(
+      grandDuelist([
+        { winnerId: "thessa", loserId: "sira", playedAt: at(2) },
+        { winnerId: "vorn", loserId: "thessa", playedAt: at(3) },
+      ]),
+    ).toEqual({ titleId: "grandDuelist", memberId: "vorn", score: 10 });
+    expect(grandDuelist([])).toBeUndefined();
   });
 
   it("gives a title nobody scored on to nobody: no winner without a gain, no debt king without a loss", () => {

@@ -1,5 +1,6 @@
 import { healingReceivedInRaid, parseBossFight } from "../domain/bossFights.ts";
 import { fullName } from "../domain/characters.ts";
+import { duelOutcomes } from "../domain/duels.ts";
 import type { TitleGiveRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import { parseRaidLog, type RaidLog } from "../domain/raidLog.ts";
@@ -77,6 +78,7 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
       const ranked = rankedDeathroll(game);
       return ranked === undefined || !inSeason(ranked.endedAt) ? [] : [ranked];
     }),
+    duels: duelOutcomes(await repositories.duels.listAll()),
     donations: (await repositories.cash.listAll()).flatMap((movement) =>
       movement.kind === "donation" && movement.memberId !== undefined && inSeason(movement.occurredAt)
         ? [{ memberId: movement.memberId, amount: movement.amount, at: movement.occurredAt }]

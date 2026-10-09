@@ -146,6 +146,15 @@ export interface DuelOutcome {
   playedAt: Date;
 }
 
+/** The duels played among these: who won, who lost, and when. */
+export function duelOutcomes(duels: readonly Duel[]): DuelOutcome[] {
+  return duels.flatMap((duel) =>
+    duel.winnerId === undefined || duel.playedAt === undefined
+      ? []
+      : [{ winnerId: duel.winnerId, loserId: opponentOf(duel, duel.winnerId), playedAt: duel.playedAt }],
+  );
+}
+
 export interface EloRating {
   memberId: string;
   /** Unrounded: the website and the addon round it. */
