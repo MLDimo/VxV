@@ -49,8 +49,8 @@ describe("ranking", () => {
     ranking = createRanking({ unitOfWork, clock: () => now });
     journal = createJournal({ unitOfWork });
     officer = await createMember(test.sql, "officer", "Officier");
-    vorn = await createMember(test.sql, "member", "Vorn");
-    thessa = await createMember(test.sql, "member", "Thessa");
+    vorn = await createMember(test.sql, "confirmed", "Vorn");
+    thessa = await createMember(test.sql, "confirmed", "Thessa");
     sql = test.sql;
   });
 

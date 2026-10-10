@@ -16,6 +16,7 @@ import {
 import { DUELIST_STAKE, isDuelist } from "../domain/duels.ts";
 import type { BetCreationRecord, BetEndRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
+import { canGamble, GAMBLE_REFUSAL } from "../domain/permissions.ts";
 import { debtRefusal, memberDebt } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
@@ -184,6 +185,9 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
         const duel = await repositories.duels.findByBet(bet.id);
         if (duel !== undefined && isDuelist(duel, member.id)) {
           throw new ValidationError(DUELIST_STAKE);
+        }
+        if (!canGamble(member.roles)) {
+          throw new ValidationError(GAMBLE_REFUSAL);
         }
         const debt = await memberDebt(repositories, member.id);
         if (debt > 0) {

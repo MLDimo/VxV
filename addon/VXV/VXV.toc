@@ -146,6 +146,7 @@ Deathroll\DeathrollData.lua
 Deathroll\Rules.lua
 Deathroll\Games.lua
 Deathroll\Debts.lua
+Deathroll\Newcomers.lua
 Deathroll\Duels.lua
 
 # Interface: the duel's window, Le Dé Pipé's Deathroll tab.

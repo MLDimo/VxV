@@ -12,6 +12,7 @@ const environment = {
   DISCORD_GUILD_ID: "222",
   DISCORD_LINK_CHANNEL_ID: "333",
   DISCORD_RAID_CHANNEL_ID: "444",
+  DISCORD_ROLE_CONFIRMED: "5",
   DISCORD_ROLE_TREASURER: "2",
   DISCORD_ROLE_OFFICER: "3",
   DISCORD_ROLE_GM: "4",
@@ -38,7 +39,7 @@ describe("parseConfig", () => {
         pvpChannelId: "444",
         duelsChannelId: "444",
         deathrollsChannelId: "444",
-        roles: { treasurer: "2", officer: "3", gm: "4" },
+        roles: { confirmed: "5", treasurer: "2", officer: "3", gm: "4" },
       },
     });
   });

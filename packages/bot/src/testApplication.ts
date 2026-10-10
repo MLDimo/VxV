@@ -10,7 +10,12 @@ import { createDiscordRaidAnnouncer } from "./raidAnnouncer.ts";
 import { createFakeDiscord, createTestDatabase, type FakeDiscord } from "@vxv/server/testing";
 import { vi } from "vitest";
 
-export const TEST_ROLES: DiscordRoleMapping = { treasurer: "treasurer-role", officer: "officer-role", gm: "gm-role" };
+export const TEST_ROLES: DiscordRoleMapping = {
+  confirmed: "confirmed-role",
+  treasurer: "treasurer-role",
+  officer: "officer-role",
+  gm: "gm-role",
+};
 
 /** Discord user who owns the test server: no bot may rename them. */
 export const SERVER_OWNER = "owner";

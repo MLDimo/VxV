@@ -35,7 +35,7 @@ describe("titles", () => {
 
   /** A member with their main character, as Discord knows them. */
   async function memberWithMain(name: string): Promise<Member> {
-    const member = await createMember(sql, "member", name.split(" ")[0]);
+    const member = await createMember(sql, "confirmed", name.split(" ")[0]);
     const [main] = await createGuildCharacters(sql, name);
     await characterRepository(sql).link(main.id, member.id);
     await characterRepository(sql).setMain(member.id, main.id);

@@ -1,5 +1,8 @@
-/** Guild roles, from the lowest to the highest rank. A member may hold several: an officer can also be treasurer. */
-export const MEMBER_ROLES = ["member", "treasurer", "officer", "gm"] as const;
+/**
+ * Guild roles, from the lowest to the highest rank. A member may hold several: an officer can also be treasurer.
+ * Confirmed: the guild's Discord role « Membre », given to a newcomer once the guild knows them.
+ */
+export const MEMBER_ROLES = ["member", "confirmed", "treasurer", "officer", "gm"] as const;
 
 export type MemberRole = (typeof MEMBER_ROLES)[number];
 

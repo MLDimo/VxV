@@ -44,9 +44,9 @@ describe("deathrolls", () => {
       clock,
       announcer: { announce: async (played) => void announced.push(played) },
     });
-    thom = await createMember(sql, "member", "Thom");
-    vorn = await createMember(sql, "member", "Vorn");
-    sira = await createMember(sql, "member", "Sira");
+    thom = await createMember(sql, "confirmed", "Thom");
+    vorn = await createMember(sql, "confirmed", "Vorn");
+    sira = await createMember(sql, "confirmed", "Sira");
     const characters = await createGuildCharacters(sql, "Thom Leboss", "Vorn Cendrelune", "Sira Ventargent");
     for (const [index, member] of [thom, vorn, sira].entries()) {
       await characterRepository(sql).link(characters[index]?.id ?? "", member.id);
@@ -102,9 +102,22 @@ describe("deathrolls", () => {
     await deathrolls.recordFromGame(thom, [game("g4", 500)]);
     const text = await createAddonDeathrolls({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
     const lines = text.split("\n");
-    expect(lines[0]).toBe("VXV-DEATHROLLS-1");
+    expect(lines[0]).toBe("VXV-DEATHROLLS-2");
     expect(lines).toContain(`X;${vorn.id}`);
     expect(lines).toContain(`D;g4;${vorn.id};Vorn Cendrelune;${thom.id};Thom Leboss;500;${String(ACCEPTED + 120)}`);
     expect(lines).toContain(`H;g4;Thom Leboss;Vorn Cendrelune;500;${String(ACCEPTED + 120)}`);
+  });
+
+  it("leaves aside the stake of a member without the role « Membre », and tells the addon who they are", async () => {
+    const newcomer = await createMember(sql, "member", "Nox");
+    const [nox] = await createGuildCharacters(sql, "Nox Ombre");
+    await characterRepository(sql).link(nox.id, newcomer.id);
+    await deathrolls.recordFromGame(thom, [
+      game("g5", 300, ["B;Nox Ombre;Thom Leboss;100", "B;Sira Ventargent;Thom Leboss;40"]),
+    ]);
+    const [view] = await createBets({ unitOfWork: createUnitOfWork(sql), clock }).list();
+    expect(view?.stakes.map((stake) => stake.memberId)).toEqual([sira.id]);
+    const text = await createAddonDeathrolls({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
+    expect(text.split("\n").filter((line) => line.startsWith("N;"))).toEqual([`N;${newcomer.id}`]);
   });
 });

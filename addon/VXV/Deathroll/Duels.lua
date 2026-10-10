@@ -6,7 +6,7 @@ local ns = select(2, ...).Deathroll
 local Duels = {}
 ns.Duels = Duels
 
-local Debts, Games, Rules = ns.Debts, ns.Games, ns.Rules
+local Debts, Games, Newcomers, Rules = ns.Debts, ns.Games, ns.Newcomers, ns.Rules
 
 local CHALLENGE, ANSWER, START = "deathroll.challenge", "deathroll.answer", "deathroll.start"
 local BET, ROLL, PAID = "deathroll.bet", "deathroll.roll", "deathroll.paid"
@@ -14,6 +14,7 @@ local BET, ROLL, PAID = "deathroll.bet", "deathroll.roll", "deathroll.paid"
 local CHALLENGE_SECONDS = 60
 local DEFAULT_START = 1000
 Duels.DEFAULT_START = DEFAULT_START
+local NEWCOMER = "Paris et deathroll sont réservés au rôle Membre sur Discord."
 
 local challenges = {}
 local sent = 0
@@ -39,6 +40,12 @@ function Duels.Challenge(target, stake, start)
     if Debts.Barred(target) then
         return target .. " a une dette : pas de deathroll avant qu'elle soit réglée."
     end
+    if Newcomers.Is(me) then
+        return NEWCOMER
+    end
+    if Newcomers.Is(target) then
+        return target .. " n'a pas le rôle Membre sur Discord : pas de deathroll."
+    end
     sent = sent + 1
     local id = table.concat({ me, time(), sent }, "#")
     challenges[id] = { target = target, stake = stake, start = start }
@@ -58,6 +65,11 @@ VXV.OnMessage(CHALLENGE, function(payload, sender)
     if Debts.Barred(VXV.PlayerName()) then
         Duels.Answer(challenge, false)
         VXV.Print(sender .. " te défie au deathroll, mais ta dette t'en empêche : règle-la d'abord.")
+        return
+    end
+    if Newcomers.Is(VXV.PlayerName()) then
+        Duels.Answer(challenge, false)
+        VXV.Print(sender .. " te défie au deathroll. " .. NEWCOMER)
         return
     end
     VXV.Emit("deathroll.challenged", challenge)
@@ -109,6 +121,9 @@ function Duels.Bet(id, choice, amount)
     if Debts.Barred(me) then
         return "Tu as une dette (paris ou deathroll) : règle-la pour parier de nouveau."
     end
+    if Newcomers.Is(me) then
+        return NEWCOMER
+    end
     if wholeNumber(amount) == nil then
         return "Mise d'au moins 1 po."
     end
@@ -117,7 +132,7 @@ function Duels.Bet(id, choice, amount)
 end
 
 VXV.OnMessage(BET, function(payload, sender)
-    if type(payload) == "table" and not Debts.Barred(sender) then
+    if type(payload) == "table" and not Debts.Barred(sender) and not Newcomers.Is(sender) then
         Games.AddBet(payload.id, sender, payload.choice, payload.amount)
     end
 end)

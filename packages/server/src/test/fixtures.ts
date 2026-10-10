@@ -12,9 +12,14 @@ import type { SqlClient } from "../infrastructure/sql.ts";
 export const TEST_GUILD_ID = "guild";
 export const testGuild = createDiscordGuild({ token: "token", guildId: TEST_GUILD_ID });
 
-/** Saves a member as a Discord sign-in would. */
-export function createMember(sql: SqlClient, role: MemberRole, name = `${role}-member`): Promise<Member> {
-  return memberRepository(sql).saveFromDiscord({ discordId: `discord-${name}`, discordName: name }, [role]);
+/** Saves a member as a Discord sign-in would, with this role and the others given. */
+export function createMember(
+  sql: SqlClient,
+  role: MemberRole,
+  name = `${role}-member`,
+  others: readonly MemberRole[] = [],
+): Promise<Member> {
+  return memberRepository(sql).saveFromDiscord({ discordId: `discord-${name}`, discordName: name }, [role, ...others]);
 }
 
 /** Adds guild characters named "Prénom Nom" and returns them, one per name, in the given order. */

@@ -88,7 +88,8 @@ son secret et attendre quelques minutes avant de déployer : le « Session poole
   puis reporter son nouvel identifiant.
 - Serveur : le rôle du bot au-dessus des rôles des membres et des rôles de titre « ◆ … » (il ne modifie que ce qui est
   en dessous de lui ; personne ne renomme le propriétaire). Tout membre du serveur est membre de la guilde ; le GM
-  porte un rôle « GM ».
+  porte un rôle « GM ». Le rôle « Membre » (`DISCORD_ROLE_CONFIRMED`) ouvre paris et deathroll : un nouveau venu ne
+  l'a pas tant que la guilde ne le lui donne pas.
 - Tâches planifiées de Vercel (`apps/web/vercel.json`), protégées par `CRON_SECRET` : récap des raids à 7 h UTC,
   rappels des raids à 8 h UTC, titres de la semaine le mercredi à 5 h UTC. Plus fréquentes que ce que permet l'offre
   gratuite de Vercel (une fois par jour) : la base de production les appelle (`supabase/schedules.sql`, pg_cron et
