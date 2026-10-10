@@ -33,6 +33,9 @@ Extrait réel de `salle-des-thanes.json` :
 
 Règles vérifiées : champs obligatoires et sans faute de frappe, au moins un boss par raid et un objet par boss, identifiants uniques entre tous les raids, et un même objet toujours sous le même nom.
 
+Le type des objets (tissu, mailles, dague, arme à deux mains…) ne s'écrit pas ici : l'addon de chaque membre le lit
+dans le jeu et l'envoie au site par le compagnon, qui en déduit les classes qui peuvent les équiper.
+
 ## Fichiers actuels
 
 - `salle-des-thanes.json` : donjon de la bêta, relevé en jeu le 2026-10-02 (un objet confirmé par boss). Il sert à valider la chaîne de données en attendant les tables de butin d'Onyxia, du Mont Hyjal et des Profondeurs des tertres (ouverture le 9 décembre).

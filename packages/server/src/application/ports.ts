@@ -7,6 +7,7 @@ import type { Appearance, Character } from "../domain/characters.ts";
 import type { EventKind, GuildEvent, PlannedEvent, RaidSummary } from "../domain/events.ts";
 import type { GameChangeOutcome } from "../domain/gameChanges.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
+import type { ItemKindReading } from "../domain/itemKinds.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { ReminderTarget } from "../domain/reminders.ts";
@@ -154,6 +155,12 @@ export interface SignupRepository {
   /** When the member's sign-up and its soft reserves last changed, or undefined without sign-up. */
   changedAt(eventId: string, memberId: string): Promise<{ signup: Date; reserves: Date | undefined } | undefined>;
   delete(eventId: string, characterId: string): Promise<void>;
+}
+
+/** What the game says of the raids' items, as an addon read it. */
+export interface ItemRepository {
+  /** Keeps the kinds of the known items not read yet; returns how many were new. */
+  saveKinds(readings: readonly ItemKindReading[]): Promise<number>;
 }
 
 export interface BossLootRepository {
@@ -508,6 +515,7 @@ export interface Repositories {
   events: EventRepository;
   signups: SignupRepository;
   bossLoot: BossLootRepository;
+  items: ItemRepository;
   lootHistory: LootHistoryRepository;
   softReserves: SoftReserveRepository;
   exclusions: ExclusionRepository;

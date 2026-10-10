@@ -3,7 +3,8 @@ local _, ns = ...
 --- The rules of attribution (plan 6.3), from the event's data and the group alone. An item excluded from soft
 --- reserves goes to the loot council; a single reserver in the group gets it without a roll; several reservers roll
 --- among themselves, with their SR+ bonus; without a reserver in the group, everybody rolls. Reservers absent from
---- the group are left out. Rolls are 1-100, one per player; a tie is rolled again between the tied players.
+--- the group are left out, and so are, from a free roll, the players whose class may not equip the item. Rolls are
+--- 1-100, one per player; a tie is rolled again between the tied players.
 local Attribution = {}
 ns.Attribution = Attribution
 
@@ -29,7 +30,8 @@ function Attribution.Plan(event, itemId, inGroup)
 end
 
 --- Whether the roll counts in the round, or why not. The round holds bonuses (name -> SR+ bonus) of the players
---- allowed to roll, or nil when every member of the group may; inGroup; and rolled, who rolled already.
+--- allowed to roll, or nil when every member of the group may; inGroup; unfit, the members whose class may not equip
+--- the item; and rolled, who rolled already.
 function Attribution.Judge(round, roll)
     if roll.low ~= ROLL_MIN or roll.high ~= ROLL_MAX then
         return false, "pas 1-100"
@@ -42,6 +44,9 @@ function Attribution.Judge(round, roll)
     end
     if round.bonuses == nil and not round.inGroup[roll.name] then
         return false, "hors du groupe"
+    end
+    if round.bonuses == nil and round.unfit[roll.name] then
+        return false, "ne peut pas l'équiper"
     end
     return true
 end

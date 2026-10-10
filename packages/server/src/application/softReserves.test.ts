@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Character } from "../domain/characters.ts";
 import type { Member } from "../domain/members.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
+import { itemRepository } from "../infrastructure/postgres/items.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import {
@@ -140,6 +141,21 @@ describe("soft reserves", () => {
     await expect(softReserves.setMine(me, eventId, ["20", "21"])).rejects.toThrow("Vous avez droit à 1 SR au plus.");
     await expect(softReserves.setMine(me, eventId, ["999"])).rejects.toBeInstanceOf(ValidationError);
     expect((await board(me)).items.filter((item) => item.mine)).toEqual([]);
+  });
+
+  it("refuses an item the class of the signed-up character may not equip, once the game told what it is", async () => {
+    await signUp(me, deja);
+    await softReserves.setMine(me, eventId, ["21"]);
+    // The game reads the bag as plate: a rogue may not wear it.
+    await itemRepository(sql).saveKinds([{ itemId: 21, itemClass: 4, itemSubclass: 4, equipSlot: "INVTYPE_WAIST" }]);
+    await expect(softReserves.setMine(me, eventId, ["21"])).rejects.toThrow(
+      "Un voleur ne peut pas équiper « Sac en peau ».",
+    );
+    expect((await board(me)).items.find((item) => item.itemId === 21)?.kind).toEqual({
+      itemClass: 4,
+      itemSubclass: 4,
+      equipSlot: "INVTYPE_WAIST",
+    });
   });
 
   it("drops the soft reserves when the member brings another character", async () => {

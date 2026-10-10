@@ -32,14 +32,18 @@ async function requireEvent(repositories: Repositories, eventId: string): Promis
   return event;
 }
 
-/** Checks the chosen items against the event's loot, exclusions and allowance; returns the item ids. */
-async function checkChoice(repositories: Repositories, event: GuildEvent, itemIds: readonly string[]) {
+/**
+ * Checks the chosen items against the event's loot, exclusions, the class of the sign-up's character and the
+ * allowance; returns the item ids.
+ */
+async function checkChoice(repositories: Repositories, event: GuildEvent, signup: Signup, itemIds: readonly string[]) {
   const loot = await repositories.bossLoot.listForRaids(event.raids.map((raid) => raid.id));
   const excluded = await repositories.exclusions.listByEvent(event.id);
   const check = checkSoftReserveChoice(itemIds, {
     allowance: event.softReservesPerPlayer,
-    lootItemIds: new Set(loot.map((item) => item.itemId)),
+    loot,
     excludedItemIds: excluded,
+    characterClass: signup.characterClass,
   });
   if (!check.valid) {
     throw new ValidationError(check.refusal);
@@ -102,7 +106,7 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
         if (changed?.reserves !== undefined && changed.reserves.getTime() > changedAt.getTime()) {
           throw new ValidationError(OLDER_THAN_WEBSITE);
         }
-        const { itemIds: checked } = await checkChoice(repositories, event, itemIds);
+        const { itemIds: checked } = await checkChoice(repositories, event, signup, itemIds);
         await repositories.softReserves.replaceForCharacter(event.id, signup.characterId, checked, changedAt);
       });
     },
@@ -124,7 +128,7 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
         if (signup === undefined) {
           throw new ValidationError("Ce personnage n'est pas inscrit à l'événement.");
         }
-        const { itemIds: checked, loot } = await checkChoice(repositories, event, itemIds);
+        const { itemIds: checked, loot } = await checkChoice(repositories, event, signup, itemIds);
         const nameOf = (itemId: number) => loot.find((item) => item.itemId === itemId)?.name ?? String(itemId);
         const before = (await repositories.softReserves.listByEvent(event.id))
           .filter((reserve) => reserve.characterId === characterId)

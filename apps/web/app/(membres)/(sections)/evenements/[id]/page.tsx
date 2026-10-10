@@ -67,7 +67,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           eventId={event.id}
           items={board.items}
           allowance={board.allowance}
-          signedUp={mine !== undefined}
+          characterClass={mine?.characterClass}
           locked={board.locked}
           lockLabel={formatDateTime(board.lockAt)}
         />
@@ -101,7 +101,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           <SoftReserveOverrideForm
             eventId={event.id}
             items={board.items}
-            players={eventSignups.map(({ characterId, characterName }) => ({ characterId, characterName }))}
+            players={eventSignups.map(({ characterId, characterName, characterClass }) => ({
+              characterId,
+              characterName,
+              characterClass,
+            }))}
           />
         </section>
       )}

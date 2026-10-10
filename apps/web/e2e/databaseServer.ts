@@ -82,6 +82,7 @@ const newcomer = await signIn("300", "Nouveau Membre");
 const leavingMember = await signIn("400", "Membre Sortant");
 const lockedMember = await signIn("500", "Membre Verrouillé");
 const discordMember = await signIn("600", "Membre Discord");
+const priest = await signIn("800", "Membre Prêtre");
 
 await app.roster.importRoster(officer.member, ["VXV-ROSTER-1", ...SEED_ROSTER].join("\n"), "Liste de départ des tests");
 async function seedCharacter(firstName: string) {
@@ -249,6 +250,35 @@ await app.missions.recordReadings(officer.member, [
   { name: "Ciel Gris", type: "honorableKills", value: 25, at: new Date(missionStart.getTime() + 1000) },
 ]);
 
+// What the game says of La salle des Thanes' items, as a member's addon sends it through the companion: the bracers
+// are cloth, the fang a dagger, the boots mail and the leggings leather. A priest wears the first two only.
+await app.companionUploads.receive(officer.member, {
+  roster: undefined,
+  raidLogs: [],
+  characters: [],
+  changes: [],
+  counters: [],
+  texts: {
+    objets: [
+      [
+        "VXV-OBJETS-1",
+        `I;${String(BRASSARDS)};4;1;INVTYPE_WRIST`,
+        "I;271095;2;15;INVTYPE_WEAPON",
+        `I;${String(BOTTINES)};4;3;INVTYPE_FEET`,
+        `I;${String(JAMBIERES)};4;2;INVTYPE_LEGS`,
+      ].join("\n"),
+    ],
+  },
+});
+const fleurLunaire = await seedCharacter("Fleur");
+await app.characters.link(priest.member, fleurLunaire.id, true);
+await app.signups.signUp(priest.member, softReserveEventId, {
+  characterId: fleurLunaire.id,
+  role: "healer",
+  spec: "Sacré",
+  status: "present",
+});
+
 const seed: E2ESeed = {
   sessions: {
     officer: officer.token,
@@ -257,6 +287,7 @@ const seed: E2ESeed = {
     leavingMember: leavingMember.token,
     lockedMember: lockedMember.token,
     discordMember: discordMember.token,
+    priest: priest.token,
   },
   signupEventId,
   reservedEventId,

@@ -47,6 +47,8 @@ const PROFESSIONS_KIND = "metiers";
 const DEATHROLL_KIND = "deathroll";
 /** The kind of text the bosses killed come as, read by the companion in the combat log (since 1.4). */
 const BOSS_FIGHT_KIND = "combat";
+/** The kind of text the raids' items come as, read in game (addon/VXV_Raid). */
+const ITEMS_KIND = "objets";
 
 /** The use cases an upload goes through, each checking the member's rights. */
 interface CompanionUploadDependencies {
@@ -65,6 +67,7 @@ interface CompanionUploadDependencies {
   artisans: { recordFromGame(sender: Member, texts: readonly string[]): Promise<number> };
   deathrolls: { recordFromGame(sender: Member, texts: readonly string[]): Promise<string[]> };
   bossFights: { recordFromCompanion(sender: Member, texts: readonly string[]): Promise<number> };
+  items: { recordKindsFromGame(texts: readonly string[]): Promise<number> };
 }
 
 /** "3 changements faits en jeu : 2 acceptés, 1 refusé." */
@@ -115,6 +118,7 @@ export function createCompanionUploads({
   artisans,
   deathrolls,
   bossFights,
+  items,
 }: CompanionUploadDependencies) {
   /** Keeps the new readings; the running missions' rankings on Discord follow them. */
   async function recordCounters(member: Member, readings: readonly GameCounterReading[]): Promise<string> {
@@ -161,6 +165,17 @@ export function createCompanionUploads({
           await described(async () => {
             const kept = await bossFights.recordFromCompanion(member, fights);
             return kept > 0 ? `Combats de boss : ${count(kept, "nouveau", "nouveaux")}.` : "Combats de boss à jour.";
+          }),
+        );
+      }
+      const itemKinds = upload.texts[ITEMS_KIND] ?? [];
+      if (itemKinds.length > 0) {
+        report.texts.push(
+          await described(async () => {
+            const known = await items.recordKindsFromGame(itemKinds);
+            return known > 0
+              ? `Objets des raids : ${count(known, "nouveau", "nouveaux")}.`
+              : "Objets des raids à jour.";
           }),
         );
       }

@@ -7,6 +7,7 @@ const item = (itemId: number, raidName: string, bossName: string): BoardItem => 
   name: `Objet ${itemId}`,
   raidName,
   bossName,
+  kind: undefined,
   reservedBy: [],
   alreadyOwnedBy: 0,
   excluded: false,

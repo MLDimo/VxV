@@ -35,6 +35,7 @@ function item(itemId: number, name: string, extra: Partial<BoardItem> = {}): Boa
     name,
     raidName: "Onyxia",
     bossName: "Onyxia",
+    kind: undefined,
     reservedBy: [],
     alreadyOwnedBy: 0,
     excluded: false,
@@ -62,7 +63,15 @@ const facts: AddonEventFacts = {
     signup("c-alt", "Ciel Gris", { characterClass: "WARRIOR", role: "tank", spec: "Protection", status: "bench" }),
   ],
   board: [
-    item(10, "Cape de la gardienne", { bossName: "Gardienne" }),
+    // A cloak suits every class; a two-handed sword, three of them, reserved or not.
+    item(10, "Cape de la gardienne", {
+      bossName: "Gardienne",
+      kind: { itemClass: 4, itemSubclass: 1, equipSlot: "INVTYPE_CLOAK" },
+    }),
+    item(11, "Lame de la gardienne", {
+      bossName: "Gardienne",
+      kind: { itemClass: 2, itemSubclass: 8, equipSlot: "INVTYPE_2HWEAPON" },
+    }),
     item(20, "Tête d'Onyxia", {
       reservedBy: [
         { characterId: "c-thom", characterName: "Thom Leboss", characterClass: "PRIEST", bonus: 20 },
@@ -120,7 +129,7 @@ const facts: AddonEventFacts = {
 };
 
 describe("formatAddonEvent", () => {
-  it("writes the event, its officers, the reserved or excluded items, the sign-ups, the journal and the changes", () => {
+  it("writes the event, its officers, the reserved or excluded items, who may equip the items, the sign-ups, the journal and the changes", () => {
     expect(formatAddonEvent(facts).split("\n")).toEqual([
       ADDON_EVENT_HEADER,
       "E;e1;1796932800;1796931900;2;Onyxia + Mont Hyjal;onyxia,mont-hyjal;Réservé à Raideur R1",
@@ -128,6 +137,7 @@ describe("formatAddonEvent", () => {
       "I;20;Tête d'Onyxia;Onyxia;0",
       "I;21;Sac en peau;Onyxia;0",
       "I;30;Écaille;Onyxia;1",
+      "W;11;WARRIOR,PALADIN,HUNTER",
       "S;Thom Leboss;PRIEST;healer;present;0;Sacré;20:20,21:0",
       "S;Ciel Gris;WARRIOR;tank;bench;1;Protection;20:0",
       "J;1796839200;Officier;Objet exclu des SR : « Écaille » (Onyxia + Mont Hyjal, 10/12/2026 21:00);Pour le tank, principal",

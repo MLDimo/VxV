@@ -47,13 +47,35 @@ local function excluded(event)
     return set
 end
 
+--- The class of the player's character: its sign-up's, else the game's.
+local function playerClass(event, player)
+    local signup = EventData.SignupOf(event, player)
+    if signup ~= nil and signup.class ~= "" then
+        return signup.class
+    end
+    local _, class = UnitClass("player")
+    return not VXV.IsSecret(class) and class or nil
+end
+
+--- The loot of the event's raids the player's character may equip.
+local function equippable(event, player)
+    local class, items = playerClass(event, player), {}
+    for _, item in ipairs(Raids.Loot(event.raidIds)) do
+        if EventData.CanEquip(event, item.itemId, class) then
+            items[#items + 1] = item
+        end
+    end
+    return items
+end
+
 --- True when the player may choose reserves: signed up (or waiting for it), before the lock.
 function Choices.CanReserve(event, player)
     return event ~= nil and time() < RaidData.LockAt(event)
         and (EventData.SignupOf(event, player) ~= nil or Changes.Pending("signup") ~= nil)
 end
 
---- "Mes SR": the loot of the event's raids, excluded items left aside, within the allowance.
+--- "Mes SR": the loot of the event's raids the player's character may equip, excluded items left aside, within the
+--- allowance.
 function Choices.Reserves()
     local event, player = RaidData.Current(), VXV.PlayerName()
     if not Choices.CanReserve(event, player) then
@@ -62,7 +84,7 @@ function Choices.Reserves()
     local allowance = event.softReservesPerPlayer
     ItemChoice.Open({
         title = "Mes SR",
-        items = Raids.Loot(event.raidIds),
+        items = equippable(event, player),
         chosen = myReserves(event, player),
         limit = allowance,
         disabled = excluded(event),

@@ -97,7 +97,7 @@ end
 VXV.On("loot.dropped", LootPanel.Show)
 VXV.On("loot.distribution", function()
     local _, shown = Distribution.State()
-    if shown ~= nil then
+    if shown ~= nil and not shown.quiet then
         LootPanel.Show()
     else
         refresh()

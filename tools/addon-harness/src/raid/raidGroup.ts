@@ -9,6 +9,7 @@ export const LINKS = {
   tete: 'ItemLink(20, "Tête d\'Onyxia")',
   sac: 'ItemLink(21, "Sac en peau")',
   ecaille: 'ItemLink(30, "Écaille d\'Onyxia")',
+  baton: 'ItemLink(40, "Bâton du dragon")',
   cape: 'ItemLink(99, "Cape inconnue")',
 };
 

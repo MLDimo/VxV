@@ -109,6 +109,23 @@ describe("changes made in game", () => {
     expect(client(PENDING)).toEqual([expect.objectContaining({ kind: "reserves", itemIds: [21, 40] })]);
   });
 
+  it("leaves out of the soft reserves the items the character's class may not equip", () => {
+    // Ðéjà Vu, a rogue, signed up: no staff for a rogue, as the website said with the event.
+    const { client } = startRaid({ written: companionFiles({ raid: websiteText() }) });
+    client(ONYXIA_PACK);
+    client(OPEN_RAID);
+    client(click("VXV_Window", "Choisir"));
+    const texts = client(`
+      local texts = {}
+      FindWidget(VXV_ItemChoice, function(widget)
+          if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      end)
+      return texts
+    `) as string[];
+    expect(texts).toContain("|cfff2c94c[x] |r|cfff2c94cSac en peau|r");
+    expect(texts.some((text) => text.includes("Bâton du dragon"))).toBe(false);
+  });
+
   it("lets an officer exclude items, with the reason the journal keeps", () => {
     const { client } = startRaid({ written: companionFiles({ raid: websiteText() }) });
     client(ONYXIA_PACK);

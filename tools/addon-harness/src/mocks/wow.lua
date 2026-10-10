@@ -367,7 +367,7 @@ Counters = { honorableKills = 0, statistics = {} }
 function GetPVPLifetimeStats() return Counters.honorableKills, 0, 0 end
 function GetStatistic(id) return Counters.statistics[id] or "--" end
 
---- Items the client has in its cache: { [item id] = { name, classID, subclassID } }; nil for any other.
+--- Items the client has in its cache: { [item id] = { name, classID, subclassID, equipLoc } }; nil for any other.
 ItemInfo = {}
 C_Item = {
     GetItemInfo = function(link)
@@ -375,7 +375,7 @@ C_Item = {
         if info == nil then
             return nil
         end
-        return info.name, link, 1, 1, 1, "", "", 20, "", 0, 0, info.classID, info.subclassID
+        return info.name, link, 1, 1, 1, "", "", 20, info.equipLoc or "", 0, 0, info.classID, info.subclassID
     end,
 }
 
@@ -610,10 +610,18 @@ function GuildRowShows(name)
     return text
 end
 
---- The player's class: localized name, token and id.
+--- The classes of the group's other members, by name, set by the tests.
+GroupClasses = {}
+
+--- A unit's class: localized name, token and id (the player's, or a member's of GroupClasses).
 function UnitClass(unit)
-    if unit == "player" then
+    local name = unit ~= "player" and GetUnitName(unit) or Player.name
+    if name == Player.name then
         return "Voleur", Player.class, 4
+    end
+    local class = GroupClasses[name or ""]
+    if class ~= nil then
+        return class, class, 0
     end
 end
 -- Professions (phase 0, T10), set by the tests: { { id, name, level, max, recipes = { [id] = { name, learned } } } },

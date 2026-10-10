@@ -25,6 +25,7 @@ function item(itemId: number, name: string, extra: Partial<BoardItem>): BoardIte
     name,
     raidName: "Onyxia",
     bossName: "Onyxia",
+    kind: undefined,
     reservedBy: [],
     alreadyOwnedBy: 0,
     excluded: false,
@@ -64,6 +65,8 @@ export const ONYXIA_NIGHT: AddonEventFacts = {
     }),
     item(21, "Sac en peau", { reservedBy: [reserver("c-deja", "Ðéjà Vu", "ROGUE", 10)] }),
     item(30, "Écaille d'Onyxia", { excluded: true }),
+    // A staff, as an addon read it in game: no rogue wields it.
+    item(40, "Bâton du dragon", { kind: { itemClass: 2, itemSubclass: 10, equipSlot: "INVTYPE_2HWEAPON" } }),
   ],
   officers: [
     {

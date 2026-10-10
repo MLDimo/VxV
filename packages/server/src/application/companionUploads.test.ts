@@ -2,6 +2,7 @@ import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Member } from "../domain/members.ts";
 import { bossFightRepository } from "../infrastructure/postgres/bossFights.ts";
+import { bossLootRepository } from "../infrastructure/postgres/bossLoot.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
@@ -22,6 +23,7 @@ import { createBossFights } from "./bossFights.ts";
 import { createMissions } from "./missions.ts";
 import { createArtisans } from "./artisans.ts";
 import { createDeathrolls } from "./deathrolls.ts";
+import { createItems } from "./items.ts";
 
 const ROSTER = "VXV-ROSTER-1\nÐéjà;Vu;ROGUE\nThom;Leboss;PRIEST";
 const CAPTURED_AT = new Date("2026-12-10T23:30:00Z");
@@ -76,6 +78,7 @@ describe("companion uploads", () => {
       artisans: createArtisans({ unitOfWork }),
       deathrolls: createDeathrolls({ unitOfWork, clock, announcer: { announce: async () => {} } }),
       bossFights: createBossFights({ unitOfWork, clock }),
+      items: createItems({ unitOfWork }),
     });
     officer = await createMember(sql, "officer", "Officier");
     await createRaidWithLoot(sql);
@@ -158,6 +161,34 @@ describe("companion uploads", () => {
     expect((await uploads.receive(officer, only([professions("Thom Leboss")]))).texts).toEqual(["Métiers à jour."]);
     expect((await uploads.receive(officer, only([professions("Ðéjà Vu")]))).texts).toEqual(["Métiers : 1 mis à jour."]);
     expect((await uploads.receive(member, only(["VXV-METIERS-1\nP;x"]))).texts).toEqual(["Ligne 2 illisible."]);
+  });
+
+  it("keeps what the game says of the raids' items, the first reading of each", async () => {
+    const member = await createMember(sql, "member", "Membre");
+    const only = (lines: string[]) =>
+      upload({
+        roster: undefined,
+        raidLogs: [],
+        characters: [],
+        texts: { objets: [["VXV-OBJETS-1", ...lines].join("\n")] },
+      });
+    // The cape is a cloak, the bag read as leather; item 99 drops in none of the raids.
+    const read = await uploads.receive(
+      member,
+      only(["I;10;4;1;INVTYPE_CLOAK", "I;21;4;2;INVTYPE_WAIST", "I;99;2;15;INVTYPE_WEAPON"]),
+    );
+    expect(read.texts).toEqual(["Objets des raids : 2 nouveaux."]);
+    expect((await uploads.receive(member, only(["I;21;4;4;INVTYPE_WAIST"]))).texts).toEqual([
+      "Objets des raids à jour.",
+    ]);
+    const loot = await bossLootRepository(sql).listForRaids(["onyxia"]);
+    expect(loot.find((item) => item.itemId === 21)?.kind).toEqual({
+      itemClass: 4,
+      itemSubclass: 2,
+      equipSlot: "INVTYPE_WAIST",
+    });
+    expect(loot.find((item) => item.itemId === 20)?.kind).toBeUndefined();
+    expect((await uploads.receive(member, only(["I;x"]))).texts).toEqual(["Ligne 2 illisible."]);
   });
 
   it("keeps each boss killed once, the most complete record of the companions who sent it", async () => {

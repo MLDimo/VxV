@@ -47,6 +47,7 @@ export const SEED_ROSTER = [
   "Ciel;Gris;WARRIOR",
   "Dune;Sable;HUNTER",
   "Éole;Vent;DRUID",
+  "Fleur;Lunaire;PRIEST",
 ];
 
 /** Session tokens of the prepared members. */
@@ -62,6 +63,8 @@ export interface E2ESessions {
   lockedMember: string;
   /** Member who links Éole Vent through the bot (Discord user 600). */
   discordMember: string;
+  /** Member whose main is Fleur Lunaire, a priest, signed up to the soft reserve event. */
+  priest: string;
 }
 
 /** What the database server prepared, written for the tests to read. */

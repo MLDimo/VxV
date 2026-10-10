@@ -12,7 +12,7 @@ test("an officer copies the event's data for the addon: officers, sign-ups, soft
   await signInAs(context, "officer");
   await page.goto(eventPage());
   const lines = (await page.getByLabel(EXPORT_LABEL).inputValue()).split("\n");
-  expect(lines[0]).toBe("VXV-RAID-3");
+  expect(lines[0]).toBe("VXV-RAID-4");
   expect(lines[1]).toMatch(/;Ouvert à tous$/);
   expect(lines).toContain("O;Ciel Gris");
   expect(lines).toContain("I;271096;Brassards brindecieux;Faldrim Courbenclume;0");
