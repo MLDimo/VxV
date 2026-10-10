@@ -112,7 +112,7 @@ describe("Raid screen", () => {
     expect(texts(view.me)).toEqual([DEJA, "Voleur · DPS · main", "Spécialisation : Combat", "Statut : Présent"]);
     expect(texts(view.myReserves)).toEqual([
       EPIC("Sac en peau") + BONUS(10),
-      MUTED("SR+ : +10 par raid sans l'objet si tu le re-SR (max +50)."),
+      MUTED("SR+ : +10 par raid sans l'objet si tu le re-SR (max +30)."),
     ]);
     expect(view.myReserves[0]?.tooltip).toEqual({ title: "Sac en peau", lines: ["Boss : Onyxia"] });
   });

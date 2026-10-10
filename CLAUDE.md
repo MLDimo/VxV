@@ -35,7 +35,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   jeu, la liste des rôles vient du compagnon d'un officier, sans relais dans la guilde (socle, `VXV.EventRoles`). SR+ (`domain/softReserves.ts`), par personnage et par objet
   réservé : en remontant ses événements précédents, +10 quand il était présent, avait réservé l'objet et ne l'a pas
   obtenu ; neutre s'il était absent ou si l'événement n'avait pas le raid de l'objet ; arrêt à l'objet obtenu ou à une
-  présence sans l'avoir réservé ; plafond +50. Conflits : le site fait foi, et la modification la plus récente gagne
+  présence sans l'avoir réservé ; plafond +30. Conflits : le site fait foi, et la modification la plus récente gagne
   avant le verrouillage (un changement fait en jeu porte l'heure du jeu, ramenée à celle du site si elle la dépasse).
   En jeu : inscrits (icône de rôle, couleur de classe), mes SR, SR du raid avec SR+, invitations (Rejoindre invite les
   inscrits attendus avec leur personnage principal, Inviter tout le roster, passage en raid à la première

@@ -151,7 +151,7 @@ function RaidView.MyReserves(event, player)
         rows[1] = row("line", "Aucune SR.")
     end
     append(rows, changes)
-    rows[#rows + 1] = row("line", Theme.Colored("SR+ : +10 par raid sans l'objet si tu le re-SR (max +50).", "muted"))
+    rows[#rows + 1] = row("line", Theme.Colored("SR+ : +10 par raid sans l'objet si tu le re-SR (max +30).", "muted"))
     return rows
 end
 

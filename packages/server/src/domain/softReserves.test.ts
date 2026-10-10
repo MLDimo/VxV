@@ -87,7 +87,7 @@ describe("softReserveBonus", () => {
     ["no previous event", [], 0],
     ["one reserve not obtained", [MISSED], 10],
     ["three in a row", [MISSED, MISSED, MISSED], 30],
-    ["capped at +50", Array<PastEventForItem>(7).fill(MISSED), 50],
+    ["capped at +30", Array<PastEventForItem>(7).fill(MISSED), 30],
     ["an absence is neutral", [MISSED, ABSENT, MISSED], 20],
     ["an event without the item's raid is neutral", [MISSED, OTHER_RAID, MISSED], 20],
     ["getting the item ends the streak", [MISSED, OBTAINED, MISSED], 10],

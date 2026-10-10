@@ -58,7 +58,7 @@ describe("reduced mode: Raid", () => {
         "Le prochain boss et son butin s'affichent dans l'instance du raid.",
         "Mes SR",
         `${EPIC("Sac en peau")} |cfff2c94cSR+ 10|r`,
-        "|cffa49bbdSR+ : +10 par raid sans l'objet si tu le re-SR (max +50).|r",
+        "|cffa49bbdSR+ : +10 par raid sans l'objet si tu le re-SR (max +30).|r",
       ],
       footer: ["Raid : 0 / 2", "Données du 10/12 19:45"],
     });

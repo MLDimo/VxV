@@ -24,7 +24,7 @@ export interface Reserver {
 
 /** SR+: each previous raid where the character, present, reserved the item without getting it adds a step. */
 export const SOFT_RESERVE_BONUS_STEP = 10;
-export const SOFT_RESERVE_BONUS_CAP = 50;
+export const SOFT_RESERVE_BONUS_CAP = 30;
 
 /** What happened to a character, for one item, at a previous event. */
 export interface PastEventForItem {
