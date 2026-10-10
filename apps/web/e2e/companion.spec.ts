@@ -27,7 +27,7 @@ test("a member links the companion, which then acts for them until unlinked", as
   expect(member.name).toBe("Membre Test");
   const authorization = { Authorization: `Bearer ${token}` };
   const me = await request.get("/api/compagnon/moi", { headers: authorization });
-  expect(await me.json()).toEqual({ name: "Membre Test", roles: ["member"] });
+  expect(await me.json()).toEqual({ name: "Membre Test", roles: ["member", "confirmed"] });
 
   expect((await request.delete("/api/compagnon/jeton", { headers: authorization })).status()).toBe(204);
   const afterwards = await request.get("/api/compagnon/moi", { headers: authorization });

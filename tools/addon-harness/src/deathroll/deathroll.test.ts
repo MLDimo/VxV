@@ -142,6 +142,7 @@ describe("the deathroll in game (P15)", () => {
       officers: [],
       characters: [vorn],
       barred: ["m-vorn"],
+      newcomers: [],
       games: [],
       exportedAt: new Date("2026-12-10T07:00:00Z"),
     });
@@ -150,6 +151,38 @@ describe("the deathroll in game (P15)", () => {
       "Vorn Cendrelune a une dette : pas de deathroll avant qu'elle soit réglée.",
     );
     expect(errors()).toEqual([]);
+  });
+
+  it("keeps the members without the role Membre on Discord out of the deathrolls, either way", () => {
+    const character = (firstName: string, lastName: string, memberId: string): Character => ({
+      id: memberId,
+      firstName,
+      lastName,
+      characterClass: "WARRIOR",
+      memberId,
+      isMain: true,
+      inGuild: true,
+    });
+    const text = formatAddonDeathrolls({
+      officers: [],
+      characters: [character("Thom", "Leboss", "m-thom"), character("Vorn", "Cendrelune", "m-vorn")],
+      barred: [],
+      newcomers: ["m-vorn"],
+      games: [],
+      exportedAt: new Date("2026-12-10T07:00:00Z"),
+    });
+    const challenge = (playerName: string, target: string) => {
+      const { bundles, errors } = startCore({
+        written: companionFiles({ deathroll: text }),
+        bundles: BUNDLES,
+        playerName,
+      });
+      const answer = bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${target}", "10", "100")`);
+      expect(errors()).toEqual([]);
+      return answer;
+    };
+    expect(challenge(THOM, VORN)).toBe("Vorn Cendrelune n'a pas le rôle Membre sur Discord : pas de deathroll.");
+    expect(challenge(VORN, THOM)).toBe("Paris et deathroll sont réservés au rôle Membre sur Discord.");
   });
 
   it("shows Le Dé Pipé's two tabs, Paris then Deathroll", () => {

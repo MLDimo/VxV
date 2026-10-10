@@ -1,18 +1,24 @@
 local ns = select(2, ...).Deathroll
 
---- The deathrolls as the website exports them (contract VXV-DEATHROLLS-1,
+--- The deathrolls as the website exports them (contract VXV-DEATHROLLS-2,
 --- packages/server/src/domain/addonDeathrolls.ts), brought by the player's companion or passed on by an officer's
---- addon: the members in debt, the games not paid yet and the latest games.
+--- addon: the members in debt, those without the role « Membre » on Discord, the games not paid yet and the latest
+--- games.
 local DeathrollData = VXV.SiteData({
     name = "deathroll",
-    header = "VXV-DEATHROLLS-1",
+    header = "VXV-DEATHROLLS-2",
     New = function()
-        return { barred = {}, unpaid = {}, latest = {} }
+        return { barred = {}, newcomers = {}, unpaid = {}, latest = {} }
     end,
     lines = {
         -- X;member id
         X = { 1, function(data, f)
             data.barred[f[1]] = true
+            return true
+        end },
+        -- N;member id
+        N = { 1, function(data, f)
+            data.newcomers[f[1]] = true
             return true
         end },
         -- D;game id;loser's member id;loser;winner's member id;winner;stake;ended

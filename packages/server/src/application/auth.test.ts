@@ -5,7 +5,7 @@ import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import { createTestDatabase } from "../testing.ts";
 import { createAuth, SESSION_DURATION_MS, type Auth } from "./auth.ts";
 
-const discordRoles: DiscordRoleMapping = { treasurer: "t", officer: "officer-role", gm: "g" };
+const discordRoles: DiscordRoleMapping = { confirmed: "c", treasurer: "t", officer: "officer-role", gm: "g" };
 const identity = { discordId: "123", discordName: "Déjà" };
 
 describe("auth", () => {

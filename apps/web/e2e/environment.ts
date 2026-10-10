@@ -10,7 +10,7 @@ export const FAKE_DISCORD_URL = `http://127.0.0.1:${FAKE_DISCORD_PORT}`;
 export const WEB_PORT = 3200;
 export const SEED_FILE = join(tmpdir(), "vxv-e2e-seed.json");
 
-export const DISCORD_ROLES = { treasurer: "11", officer: "12", gm: "13" } as const;
+export const DISCORD_ROLES = { confirmed: "10", treasurer: "11", officer: "12", gm: "13" } as const;
 /** A role of the guild's Discord server an event may be reserved to. */
 export const RAIDER_ROLE = "Raideur R1";
 
@@ -35,6 +35,7 @@ export const WEB_ENVIRONMENT = {
   DISCORD_PVP_CHANNEL_ID: "25",
   DISCORD_DUELS_CHANNEL_ID: "26",
   DISCORD_DEATHROLLS_CHANNEL_ID: "27",
+  DISCORD_ROLE_CONFIRMED: DISCORD_ROLES.confirmed,
   DISCORD_ROLE_TREASURER: DISCORD_ROLES.treasurer,
   DISCORD_ROLE_OFFICER: DISCORD_ROLES.officer,
   DISCORD_ROLE_GM: DISCORD_ROLES.gm,

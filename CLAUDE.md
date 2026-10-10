@@ -100,7 +100,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   l'organisation : 10 % de la cagnotte, jamais plus que les mises perdantes ; gains au prorata des mises, arrondis à la
   po inférieure, le reste à la caisse (`domain/bets.ts`). Résultat ou annulation par un officier. Seul le trésorier
   note l'or qui change de mains (`/paris/tresorerie`) ; une mise perdue non payée devient une dette, et toute dette
-  (paris ou deathroll, `application/debts.ts`) bloque paris et deathrolls. Caisse de la guilde en ajout seul (part des
+  (paris ou deathroll, `application/debts.ts`) bloque paris et deathrolls. Paris et deathroll sont réservés au rôle
+  Discord « Membre » (décision du propriétaire du 10 octobre : un nouveau venu n'apporte pas d'or issu du RMT, qui
+  ferait bannir d'autres joueurs) : rôle `confirmed` (`DISCORD_ROLE_CONFIRMED`, `canGamble`), sans lequel le site
+  refuse la mise et écarte les paris d'un deathroll, et l'addon refuse défis et paris (lignes `N`) ; relu comme les
+  autres rôles (connexion au site, chaque clic sur Discord, toutes les heures par le compagnon). Caisse de la guilde en ajout seul (part des
   paris, dons, dépenses, récompenses ; une erreur se corrige par un autre mouvement), sur la page gauche du Journal.
   Saisons lancées par un officier. Message Discord de chaque pari à jour à chaque mise, boutons « Miser » et « Retirer
   ma mise ».
@@ -140,7 +144,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   non possédée par VXV » en rouge, le nom après « : » comparé sans accents ni casse ; rien sur les livres.
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
   connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde et une minute de paris (pas les joueurs,
-  pas un membre endetté) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,
+  pas un membre endetté ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,
   fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel animée et synchronisée chez toute la guilde. Partie finie envoyée au site, qui la
   vérifie, crée et règle le pari de la guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du
   gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
@@ -199,14 +203,14 @@ La table complète est dans le README. Règles :
 
 ## Principes non négociables
 
-- **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
+- **DRY, SOLID, KISS, YAGNI, SRP** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
 - **Un seul addon, des parties indépendantes** : un dossier `VXV`, une case à cocher dans la liste des addons du jeu
   (demande du propriétaire). Chaque fonctionnalité est une partie, dans son dossier, avec son espace de noms privé
   (`Core`, `Sync`, `Raid`, `Paris`, `Deathroll`, `Missions`, `Titles`, `Artisans`, `Ranking`, `PvP`), et ne dépend que
   du socle (`Core`).
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
-- Droits contrôlés par le serveur, jamais par l'addon ni le compagnon. Rôles cumulables (officier, trésorier, GM) ; seul le trésorier a les droits de trésorerie ; tout membre du serveur Discord est membre de la guilde.
+- Droits contrôlés par le serveur, jamais par l'addon ni le compagnon. Rôles cumulables (Membre, officier, trésorier, GM) ; seul le trésorier a les droits de trésorerie ; tout membre du serveur Discord est membre de la guilde, mais seul le rôle Discord « Membre » ouvre paris et deathroll.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
 - Nouveau raid = nouvelles données (JSON), jamais de modification de code.
 - Membres : zéro effort. Installer l'addon suffit. L'addon n'est ouvert à la guilde qu'une fois tout terminé.
@@ -265,7 +269,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV/Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV/Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV/Artisans/ArtisansData.lua` |
-| `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV/Deathroll/DeathrollData.lua` |
+| `VXV-DEATHROLLS-2` (bloqués : dettes et sans le rôle Membre ; dettes, dernières parties) | site → addon | `domain/addonDeathrolls.ts` | `VXV/Deathroll/DeathrollData.lua` |
 | `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV/Ranking/RankingData.lua` |
 | `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV/PvP/PvpData.lua` |
 

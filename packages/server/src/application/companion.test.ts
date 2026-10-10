@@ -16,7 +16,7 @@ import {
 } from "./companion.ts";
 import { ValidationError } from "./errors.ts";
 
-const discordRoles: DiscordRoleMapping = { treasurer: "t", officer: "officer-role", gm: "g" };
+const discordRoles: DiscordRoleMapping = { confirmed: "c", treasurer: "t", officer: "officer-role", gm: "g" };
 
 /** What the companion keeps secret, and what it sends first. */
 function pkce() {

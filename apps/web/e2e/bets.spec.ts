@@ -1,6 +1,6 @@
 import { buttonClick, formSubmission, type TestActor } from "@vxv/bot/testing";
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
-import { WEB_ENVIRONMENT } from "./environment";
+import { DISCORD_ROLES, WEB_ENVIRONMENT } from "./environment";
 import { discordMessages, postSigned } from "./fakeDiscord";
 import { signInAs } from "./sessions";
 
@@ -11,6 +11,7 @@ const DISCORD_BETTOR: TestActor = {
   userId: "700",
   name: "Parieur Discord",
   channelId: WEB_ENVIRONMENT.DISCORD_BETS_CHANNEL_ID,
+  roleIds: [DISCORD_ROLES.confirmed],
 };
 
 /** The bet's message the bot published, found by the link to the bet it carries. */

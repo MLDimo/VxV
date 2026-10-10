@@ -2,6 +2,7 @@ import type { PGliteInterface } from "@vxv/database/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DiscordMessage } from "../domain/bets.ts";
 import type { Member } from "../domain/members.ts";
+import { GAMBLE_REFUSAL } from "../domain/permissions.ts";
 import { characterRepository } from "../infrastructure/postgres/characters.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
@@ -39,8 +40,9 @@ describe("bets", () => {
     const unitOfWork = createUnitOfWork(sql);
     bets = createBets({ unitOfWork, clock: () => now });
     journal = createJournal({ unitOfWork });
-    officer = await createMember(sql, "officer", "Officier");
-    member = await createMember(sql, "member", "Membre");
+    // An officer bets too, with the role « Membre » on Discord.
+    officer = await createMember(sql, "officer", "Officier", ["confirmed"]);
+    member = await createMember(sql, "confirmed", "Membre");
   });
 
   afterEach(async () => {
@@ -121,6 +123,13 @@ describe("bets", () => {
     await expect(bets.stake(member, betId, await choiceId(betId, "Un tank"), 10)).rejects.toThrow(/fermé/);
   });
 
+  it("refuses the stake of a member without the guild's Discord role « Membre »", async () => {
+    const betId = await open();
+    const newcomer = await createMember(sql, "member", "Nouveau");
+    await expect(bets.stake(newcomer, betId, await choiceId(betId, "Un tank"), 50)).rejects.toThrow(GAMBLE_REFUSAL);
+    expect((await bets.find(betId))?.stakes).toEqual([]);
+  });
+
   it("lets a member take their stake back until it is paid", async () => {
     const betId = await open();
     const tank = await choiceId(betId, "Un tank");
@@ -141,7 +150,7 @@ describe("bets", () => {
 
     beforeEach(async () => {
       treasurer = await createMember(sql, "treasurer", "Trésorier");
-      thom = await createMember(sql, "member", "Thom");
+      thom = await createMember(sql, "confirmed", "Thom");
       const unitOfWork = createUnitOfWork(sql);
       cash = createCash({ unitOfWork, clock: () => now });
       treasury = createTreasury({ unitOfWork, clock: () => now });
@@ -149,7 +158,7 @@ describe("bets", () => {
 
     /** Four stakes: 50 and 25 po on the tank, 100 on the heal, 33 on the DPS. */
     async function placeStakes(betId: string) {
-      const dps = await createMember(sql, "member", "Dps");
+      const dps = await createMember(sql, "confirmed", "Dps");
       await bets.stake(member, betId, await choiceId(betId, "Un tank"), 50);
       await bets.stake(thom, betId, await choiceId(betId, "Un tank"), 25);
       await bets.stake(officer, betId, await choiceId(betId, "Un heal"), 100);

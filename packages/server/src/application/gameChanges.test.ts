@@ -83,7 +83,7 @@ describe("changes made in game", () => {
       }),
     });
     officer = await createMember(sql, "officer", "Officier");
-    member = await createMember(sql, "member", "Membre");
+    member = await createMember(sql, "confirmed", "Membre");
     const [deja, thom] = await createGuildCharacters(sql, "Ðéjà Vu", "Thom Leboss");
     const characters = characterRepository(sql);
     await characters.link(deja.id, officer.id);

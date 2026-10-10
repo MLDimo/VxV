@@ -17,8 +17,13 @@ import { emoji } from "./emojis.ts";
 import { BETS_CHANNEL, createTestApplication, SITE_URL, TEST_ROLES } from "./testApplication.ts";
 import { buttonClick, formSubmission, slashCommand, type TestActor } from "./testing.ts";
 
-const OFFICER: TestActor = { userId: "100", name: "Officier", roleIds: [TEST_ROLES.officer], channelId: "anywhere" };
-const MEMBER: TestActor = { userId: "200", name: "Membre", channelId: BETS_CHANNEL };
+const OFFICER: TestActor = {
+  userId: "100",
+  name: "Officier",
+  roleIds: [TEST_ROLES.officer, TEST_ROLES.confirmed],
+  channelId: "anywhere",
+};
+const MEMBER: TestActor = { userId: "200", name: "Membre", roleIds: [TEST_ROLES.confirmed], channelId: BETS_CHANNEL };
 const NEXT_YEAR = new Date().getUTCFullYear() + 1;
 const BET = {
   titre: "Qui meurt en premier sur le boss 10 ?",

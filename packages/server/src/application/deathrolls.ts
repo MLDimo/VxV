@@ -9,7 +9,7 @@ import {
   type DeathrollGame,
 } from "../domain/deathrolls.ts";
 import type { Member } from "../domain/members.ts";
-import { canManageRaids } from "../domain/permissions.ts";
+import { canGamble, canManageRaids } from "../domain/permissions.ts";
 import { settleBet } from "./bets.ts";
 import { loserOf, memberDebt, winnerOf } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
@@ -36,7 +36,7 @@ export function view(game: StoredDeathroll): DeathrollView {
   return { game, winner: winnerOf(game), loser: loserOf(game) };
 }
 
-/** The guild's stake on a player of the game, from a member who is neither player nor in debt. */
+/** The guild's stakes on a player of the game, from the members with the role « Membre », neither player nor in debt. */
 async function placeBets(
   repositories: Repositories,
   game: DeathrollGame,
@@ -46,10 +46,13 @@ async function placeBets(
   now: Date,
 ): Promise<string | undefined> {
   const playing = new Set([players.challenger.memberId, players.challenged.memberId]);
+  const gamblers = new Set(
+    (await repositories.members.listAll()).filter((member) => canGamble(member.roles)).map((member) => member.id),
+  );
   const stakes = new Map<string, { choice: string; amount: number }>();
   for (const bet of deathrollBets(game)) {
     const memberId = byName.get(bet.bettor)?.memberId;
-    if (memberId === undefined || playing.has(memberId) || stakes.has(memberId)) {
+    if (memberId === undefined || playing.has(memberId) || stakes.has(memberId) || !gamblers.has(memberId)) {
       continue;
     }
     if ((await memberDebt(repositories, memberId)) === 0) {

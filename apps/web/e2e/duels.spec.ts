@@ -27,7 +27,10 @@ test.describe.serial("duels", () => {
     expect(message?.body.content).toBe("<@100>, Dune Sable te défie en duel !");
   });
 
-  test("the challenged member takes it up: the guild bets on it, the duelists do not", async ({ page, context }) => {
+  test("the challenged member takes it up: the guild bets on it, the duelists and the newcomers do not", async ({
+    page,
+    context,
+  }) => {
     await signInAs(context, "officer");
     await page.goto("/pvp/duels");
     const duel = page.getByRole("listitem", { name: DUEL });
@@ -40,7 +43,15 @@ test.describe.serial("duels", () => {
     await page.getByRole("button", { name: "Miser" }).click();
     await expect(page.getByRole("status")).toContainText("Les joueurs d'un duel ne parient pas dessus.");
 
+    // Without the role « Membre » on Discord, a newcomer does not bet; a member with it does.
     await signInAs(context, "newcomer");
+    await page.reload();
+    await page.getByRole("radio", { name: "Dune Sable" }).check();
+    await page.getByLabel("Mise (po)").fill("30");
+    await page.getByRole("button", { name: "Miser" }).click();
+    await expect(page.getByRole("status")).toContainText("Paris et deathroll sont réservés au rôle Membre sur Discord");
+
+    await signInAs(context, "member");
     await page.reload();
     await page.getByRole("radio", { name: "Dune Sable" }).check();
     await page.getByLabel("Mise (po)").fill("30");

@@ -40,7 +40,7 @@ describe("duels", () => {
 
   /** A member whose main is this character, as the website shows them. */
   async function memberWithMain(name: string): Promise<Member> {
-    const member = await createMember(sql, "member", name);
+    const member = await createMember(sql, "confirmed", name);
     const [main] = await createGuildCharacters(sql, name);
     await characterRepository(sql).link(main.id, member.id);
     await characterRepository(sql).setMain(member.id, main.id);

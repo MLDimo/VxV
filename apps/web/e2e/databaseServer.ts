@@ -77,7 +77,7 @@ const signIn = (discordId: string, discordName: string, ...roles: (keyof typeof 
   );
 // Roles are cumulative: the test officer is also treasurer.
 const officer = await signIn("100", "Officier Test", "officer", "treasurer");
-const member = await signIn("200", "Membre Test");
+const member = await signIn("200", "Membre Test", "confirmed");
 const newcomer = await signIn("300", "Nouveau Membre");
 const leavingMember = await signIn("400", "Membre Sortant");
 const lockedMember = await signIn("500", "Membre Verrouillé");

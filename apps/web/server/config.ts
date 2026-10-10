@@ -26,6 +26,7 @@ const environmentSchema = z.object({
   // Optional too: without their own channel, the duels go to the PvP channel, the deathrolls to the bets'.
   DISCORD_DUELS_CHANNEL_ID: discordId.optional(),
   DISCORD_DEATHROLLS_CHANNEL_ID: discordId.optional(),
+  DISCORD_ROLE_CONFIRMED: discordId,
   DISCORD_ROLE_TREASURER: discordId,
   DISCORD_ROLE_OFFICER: discordId,
   DISCORD_ROLE_GM: discordId,
@@ -94,6 +95,7 @@ export function parseConfig(environment: Record<string, string | undefined>): We
       deathrollsChannelId:
         env.DISCORD_DEATHROLLS_CHANNEL_ID ?? env.DISCORD_BETS_CHANNEL_ID ?? env.DISCORD_RAID_CHANNEL_ID,
       roles: {
+        confirmed: env.DISCORD_ROLE_CONFIRMED,
         treasurer: env.DISCORD_ROLE_TREASURER,
         officer: env.DISCORD_ROLE_OFFICER,
         gm: env.DISCORD_ROLE_GM,
