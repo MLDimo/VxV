@@ -17,6 +17,8 @@ local RESEND_GAP_SECONDS = 60
 local ID_RANDOM = 999999
 local WAITING_COMPANION = "Changement enregistré : ton compagnon l'enverra au site au prochain /reload."
 local WAITING_RELAY = "Changement enregistré : un officier équipé du compagnon VXV le relaiera au site."
+-- The website's refusal of the player's change; what it accepted shows in its data, without a message.
+local REFUSED = "Site VXV, changement refusé : %s"
 -- Lists in a change: their items are kept as numbers or as strings.
 local LISTS = { numbers = tonumber, strings = tostring }
 
@@ -145,12 +147,16 @@ function PendingChanges.Create(options)
         return saved.pending
     end
 
-    --- The website answered a change (by id): no outbox keeps it any more. Returns the player's change it settled,
-    --- or nil when it was another player's (relayed) or already settled.
-    function changes.Settle(id)
+    --- The website answered a change (by id; result = { accepted, message }): no outbox keeps it any more, and the
+    --- player learns a refusal of theirs. Returns the player's change it settled, or nil when it was another player's
+    --- (relayed) or already settled.
+    function changes.Settle(id, result)
         local change = saved.pending[id]
         saved.pending[id] = nil
         Bus.Emit("sync.put", OUTBOX, id, nil)
+        if change ~= nil and not result.accepted then
+            Chat.Print(REFUSED:format(result.message))
+        end
         return change
     end
 

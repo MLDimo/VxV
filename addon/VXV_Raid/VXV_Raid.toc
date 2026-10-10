@@ -13,8 +13,6 @@ Group.lua
 Reserves.lua
 Attribution.lua
 Changes.lua
-Notices.lua
-Freshness.lua
 Invitations.lua
 BossLoot.lua
 Distribution.lua

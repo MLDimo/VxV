@@ -291,7 +291,7 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
       ],
     });
     started.quests.run(`local _, ns = ... ns.QuestsData.Receive(${JSON.stringify(answered)}, "Ðéjà Vu")`);
-    expect(client("return Printed")).toContain(`|cff14b8a6VXV|r Site VXV : ${message}`);
+    expect(JSON.stringify(client("return Printed"))).not.toContain("Site VXV");
     expect(client(PENDING)).toEqual({});
     expect(errors()).toEqual([]);
   });

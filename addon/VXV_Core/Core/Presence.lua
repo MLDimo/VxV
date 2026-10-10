@@ -1,17 +1,17 @@
 local _, ns = ...
 
 --- Who is connected with VXV, and with which version: each addon announces itself to the guild at login and
---- answers the others' announces privately. A member running an older version is told to update, once.
+--- answers the others' announces privately. A member running an older version sees it under the Taverne, not in the
+--- chat; so does one whose companion is newer than the addon ("presence.outdated").
 local Presence = {}
 ns.Presence = Presence
 
-local Bus, Chat, Comm, Names = ns.Bus, ns.Chat, ns.Comm, ns.Names
+local Bus, Comm, Names = ns.Bus, ns.Comm, ns.Names
 
 local HELLO = "hello"
-local UPDATE_NOTICE = "Une nouvelle version de VXV existe (%s) : mets l'addon à jour pour profiter de tout."
 
 local versions = {}
-local updateNoticeShown = false
+local outdated = false
 
 --- Major, minor and patch numbers of a version such as "1.2.0-beta.1", and whether it is a pre-release.
 local function parse(version)
@@ -41,15 +41,22 @@ Comm.On(HELLO, function(payload, sender)
         return
     end
     versions[sender] = tostring(payload.version)
-    if not updateNoticeShown and Presence.IsNewer(payload.version, ns.VERSION) then
-        updateNoticeShown = true
-        Chat.Print(UPDATE_NOTICE:format(tostring(payload.version)))
-    end
+    outdated = outdated or Presence.IsNewer(payload.version, ns.VERSION)
     if not payload.reply and sender ~= Names.OfUnit("player") then
         Comm.Whisper(HELLO, { version = ns.VERSION, reply = true }, sender)
     end
     Bus.Emit("presence.changed")
 end)
+
+Bus.On("presence.outdated", function()
+    outdated = true
+    Bus.Emit("presence.changed")
+end)
+
+--- True when a newer version of the addon exists: another member runs it, or the companion expects it.
+function Presence.Outdated()
+    return outdated
+end
 
 --- Tells the guild this player is connected with VXV.
 function Presence.Announce()

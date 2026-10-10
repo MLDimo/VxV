@@ -7,7 +7,6 @@ import { EXPORTED, GUILD_READERS } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
 const BUNDLES = ["VXV_PvP", "VXV_Sync"];
-const PREFIX = "|cff14b8a6VXV|r ";
 const SATURDAY = new Date("2026-12-12T20:00:00Z");
 const duel = (id: string, challengerId: string, opponentId: string, overrides: Partial<Duel> = {}): Duel => ({
   id,
@@ -285,7 +284,7 @@ describe("the PvP place in game", () => {
     loadedBundle(started, "VXV_PvP").run(
       `local _, ns = ... ns.PvpData.Receive(${JSON.stringify(answered.replace("Thom Leboss#1#1", id))}, "Ðéjà Vu")`,
     );
-    expect(client("return Printed")).toContain(`${PREFIX}Site VXV : Défi relevé.`);
+    expect(JSON.stringify(client("return Printed"))).not.toContain("Site VXV");
     expect(client(PENDING)).toEqual({});
     expect(errors()).toEqual([]);
   });

@@ -11,8 +11,6 @@ ns.Changes = Changes
 
 local PvpData = ns.PvpData
 
-local DONE = "Site VXV : %s"
-local REFUSED = "Site VXV, refusé : %s"
 local FIELDS = {
     signup = { eventId = "string", role = "string", spec = "string", status = "string" },
     pvpEvent = { title = "string", date = "string", time = "string", roleId = "string", reason = "string" },
@@ -55,12 +53,10 @@ function Changes.Pending(kind, id)
     return found
 end
 
--- The PvP data bring the website's answers: the player learns them, and no outbox keeps those changes.
+-- The PvP data bring the website's answers: no outbox keeps those changes, and the player learns a refusal.
 VXV.On("pvp.updated", function(data)
     for id, result in pairs(data.results) do
-        if changes.Settle(id) ~= nil then
-            VXV.Print((result.accepted and DONE or REFUSED):format(result.message))
-        end
+        changes.Settle(id, result)
     end
     VXV.Emit("pvp.changes")
 end)

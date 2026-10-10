@@ -84,7 +84,7 @@ describe("Le Dé Pipé in game (P11.8)", () => {
     });
     paris.run(`local _, ns = ... ns.BetsData.FromCompanion(${JSON.stringify(answered)})`);
     expect(outbox(client)).toEqual([]);
-    expect(client("return Printed")).toContain(`${PREFIX}Site VXV : Mise enregistrée.`);
+    expect(JSON.stringify(client("return Printed"))).not.toContain("Site VXV");
     expect(errors()).toEqual([]);
   });
 
@@ -138,7 +138,7 @@ describe("Le Dé Pipé in game (P11.8)", () => {
     });
     paris.run(`local _, ns = ... ns.BetsData.FromCompanion(${JSON.stringify(answered)})`);
     expect(outbox(client)).toEqual([]);
-    expect(client("return Printed")).toContain(`${PREFIX}Site VXV : ${message}`);
+    expect(JSON.stringify(client("return Printed"))).not.toContain("Site VXV");
     expect(errors()).toEqual([]);
   });
 

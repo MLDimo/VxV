@@ -197,7 +197,9 @@ end
 
 local function showOnline()
     local names = Presence.Online()
-    online.label:SetText(string.format("VXV %s · Connectés avec VXV (%d)", ns.VERSION, #names))
+    local version = Presence.Outdated() and Theme.Colored(ns.VERSION .. " · mise à jour disponible", "gold")
+        or ns.VERSION
+    online.label:SetText(string.format("VXV %s · Connectés avec VXV (%d)", version, #names))
     online.names = names
 end
 

@@ -16,6 +16,7 @@ local ROLE_COUNTS = { tank = "tanks", healer = "heals", dps = "DPS" }
 -- Tags of the loot methods (§7.1): SR violet, SR+ gold, free roll green, loot council sakura.
 local METHOD_TAGS = { soft_reserve = "epic", soft_reserve_plus = "gold", free_roll = "gain", loot_council = "sakura" }
 local LAST_LOOTS = 10
+local STALE = "Données d'avant le verrouillage : recharge-les"
 
 local row = VXV.RowList.Row
 
@@ -96,6 +97,8 @@ function RaidView.Header(event, sender, now)
     local _, expected = RaidView.ExpectedByRole(event)
     local lockAt = RaidData.LockAt(event)
     local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. VXV.Remaining(lockAt - now))
+    -- An officer whose data predate the lock would pass on reserves that may still change: they load newer ones.
+    local stale = now >= lockAt and event.exportedAt < lockAt and RaidData.IsOfficer(VXV.PlayerName())
     local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
         or ("données du compagnon, du " .. Labels.DateTime(event.exportedAt))
     return {
@@ -106,7 +109,7 @@ function RaidView.Header(event, sender, now)
         badges = {
             { text = event.audience, color = "amethyst" },
             { text = VXV.Count(expected, "attendu"), color = "gain" },
-            { text = lock, color = "gold" },
+            { text = stale and STALE or lock, color = stale and "loss" or "gold" },
         },
     }
 end
