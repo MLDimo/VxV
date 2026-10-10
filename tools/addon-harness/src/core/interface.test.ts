@@ -225,6 +225,8 @@ describe("VXV_Core interface", () => {
 
   it("frames the tavern on the place behind each screen, very dark under a veil", () => {
     const { client } = startCore();
+    // 14 December 2026 at noon: no holiday, the tavern of every day.
+    client("Clock.epoch = 1797249600 - Clock.now");
     client('SlashCmdList.VXV("")');
     client(`${TAB("Quêtes")}:Run("OnClick")`);
     const [picture, veil] = client(`

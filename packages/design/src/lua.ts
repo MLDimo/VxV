@@ -45,8 +45,9 @@ function seasonLines(): string[] {
   const lines: string[] = [];
   for (let year = ADDON_SEASON_YEARS.first; year <= ADDON_SEASON_YEARS.last; year += 1) {
     for (const season of SEASONS) {
-      const [first, last] = season.days(year);
-      lines.push(`        { id = ${luaString(season.id)}, from = ${days(first)}, to = ${days(last)} },`);
+      for (const [first, last] of season.periods(year)) {
+        lines.push(`        { id = ${luaString(season.id)}, from = ${days(first)}, to = ${days(last)} },`);
+      }
     }
   }
   return lines;
