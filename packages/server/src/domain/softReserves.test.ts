@@ -4,6 +4,7 @@ import {
   buildBoard,
   checkSoftReserveChoice,
   reserveKey,
+  reusableReserves,
   softReserveBonus,
   softReservesLockAt,
   type LootItem,
@@ -47,6 +48,12 @@ describe("checkSoftReserveChoice", () => {
 
   it("refuses more items than the allowance", () => {
     expect(refusalOf(["1", "2"], 1)).toBe("Vous avez droit à 1 SR au plus.");
+  });
+
+  it("offers again the last raid's reserves still allowed, within the allowance", () => {
+    expect(reusableReserves([2, 1, 3, 9], { ...context, characterClass: "PRIEST" })).toEqual([1]);
+    expect(reusableReserves([2, 1, 3, 9], context)).toEqual([2, 1]);
+    expect(reusableReserves([2, 1], { ...context, allowance: 1 })).toEqual([2]);
   });
 
   it("refuses an item the character's class may not equip", () => {

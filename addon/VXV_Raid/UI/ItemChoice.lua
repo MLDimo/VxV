@@ -12,12 +12,13 @@ local Theme = VXV.Theme
 
 local WIDTH, HEIGHT = 440, 500
 local FOOTER_HEIGHT, FIELD_PADDING, BUTTON_WIDTH, BUTTON_HEIGHT = 92, 6, 160, 30
+local REUSE_WIDTH, PROBLEM_SIZE = 230, 13
 local REASON_LETTERS = 200
 local OVER_ALLOWANCE = "Tu as droit à %s."
 local NO_REASON = "Le motif est obligatoire : il apparaîtra dans le journal."
 local NO_LOOT = "Les données de ce raid manquent : mets l'addon VXV à jour."
 
-local frame, list, counter, reasonHolder, reasonBox, problem
+local frame, list, counter, reasonHolder, reasonBox, problem, reuseButton
 local options, chosen
 
 local function count()
@@ -71,6 +72,22 @@ function render(keepScroll)
     counter:SetText(options.counter(count()))
 end
 
+--- Chooses again the items of the reuse, those offered and open.
+local function reuse()
+    local offered = {}
+    for _, item in ipairs(options.items) do
+        offered[item.itemId] = not options.disabled[item.itemId]
+    end
+    chosen = {}
+    for _, itemId in ipairs(options.reuse.itemIds) do
+        if offered[itemId] then
+            chosen[itemId] = true
+        end
+    end
+    problem:SetText("")
+    render(true)
+end
+
 local function send()
     local reason = (reasonBox:GetText() or ""):match("^%s*(.-)%s*$")
     if options.reasonNeeded and reason == "" then
@@ -92,15 +109,18 @@ local function build()
     counter:SetPoint("TOPLEFT", listArea, "BOTTOMLEFT", 0, -FIELD_PADDING)
     reasonHolder, reasonBox = Theme.Field(body, body:GetWidth(), REASON_LETTERS)
     reasonHolder:SetPoint("BOTTOMLEFT", 0, BUTTON_HEIGHT + 2 * FIELD_PADDING)
-    problem = Theme.Text(body, "text", 13, "loss")
-    problem:SetPoint("BOTTOMLEFT", 0, (BUTTON_HEIGHT - 13) / 2)
+    problem = Theme.Text(body, "text", PROBLEM_SIZE, "loss")
     local button = Theme.Button(body, "pixel", "Envoyer", BUTTON_WIDTH, BUTTON_HEIGHT)
     button:SetPoint("BOTTOMRIGHT")
     button:SetScript("OnClick", send)
+    reuseButton = Theme.Button(body, "wood", "", REUSE_WIDTH, BUTTON_HEIGHT)
+    reuseButton:SetPoint("BOTTOMLEFT")
+    reuseButton:SetScript("OnClick", reuse)
 end
 
 --- Opens the choice: { title, items = { itemId, name, boss }, chosen = set of item ids, limit (or nil),
---- disabled = set of item ids, disabledLabel, counter(count) = its text, reasonNeeded, onSend(chosen, reason) }.
+--- disabled = set of item ids, disabledLabel, counter(count) = its text, reasonNeeded, onSend(chosen, reason),
+--- reuse = { label, itemIds } (a button that chooses these items again) or nil }.
 function ItemChoice.Open(choice)
     if frame == nil then
         build()
@@ -112,6 +132,12 @@ function ItemChoice.Open(choice)
     end
     frame.title:SetText(choice.title)
     reasonHolder:SetShown(choice.reasonNeeded == true)
+    reuseButton:SetShown(choice.reuse ~= nil)
+    reuseButton:SetText(choice.reuse and choice.reuse.label or "")
+    -- Beside the button that sends, or above it when the reuse's button holds the left.
+    problem:ClearAllPoints()
+    problem:SetPoint("BOTTOMLEFT", 0, choice.reuse and (BUTTON_HEIGHT + FIELD_PADDING)
+        or (BUTTON_HEIGHT - PROBLEM_SIZE) / 2)
     reasonBox:SetText("")
     problem:SetText("")
     render(false)

@@ -62,6 +62,8 @@ const facts: AddonEventFacts = {
     signup("c-thom", "Thom Leboss"),
     signup("c-alt", "Ciel Gris", { characterClass: "WARRIOR", role: "tank", spec: "Protection", status: "bench" }),
   ],
+  // Thom Leboss reserved the head, the sword a priest may not wield, and an item of another raid.
+  previousReserves: new Map([["c-thom", [20, 11, 99]]]),
   board: [
     // A cloak suits every class; a two-handed sword, three of them, reserved or not.
     item(10, "Cape de la gardienne", {
@@ -140,6 +142,7 @@ describe("formatAddonEvent", () => {
       "W;11;WARRIOR,PALADIN,HUNTER",
       "S;Thom Leboss;PRIEST;healer;present;0;Sacré;20:20,21:0",
       "S;Ciel Gris;WARRIOR;tank;bench;1;Protection;20:0",
+      "U;Thom Leboss;20",
       "J;1796839200;Officier;Objet exclu des SR : « Écaille » (Onyxia + Mont Hyjal, 10/12/2026 21:00);Pour le tank, principal",
       "C;Thom Leboss#1796900000#42;1;SR enregistrées.",
       "C;Ciel Gris#1796900100#7;0;Refusé, trop tard",

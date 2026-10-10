@@ -278,6 +278,24 @@ await app.signups.signUp(priest.member, softReserveEventId, {
   spec: "Sacré",
   status: "present",
 });
+// The priest's previous night on La salle des Thanes, two days before: the fang reserved, to reuse.
+const reuseEventId = await app.events.createEvent(
+  officer.member,
+  {
+    startsAt: new Date("2031-01-20T20:00:00Z"),
+    raidIds: ["salle-des-thanes"],
+    softReservesPerPlayer: 1,
+    roleId: EVERYBODY,
+  },
+  "Événement des tests de réutilisation des SR",
+);
+await app.signups.signUp(priest.member, reuseEventId, {
+  characterId: fleurLunaire.id,
+  role: "healer",
+  spec: "Sacré",
+  status: "present",
+});
+await app.softReserves.setMine(priest.member, reuseEventId, ["271095"]);
 
 const seed: E2ESeed = {
   sessions: {

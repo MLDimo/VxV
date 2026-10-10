@@ -1,6 +1,6 @@
 local _, ns = ...
 
---- The event's data as the website exports it for the addon: contract VXV-RAID-4, described line by line in
+--- The event's data as the website exports it for the addon: contract VXV-RAID-5, described line by line in
 --- packages/server/src/domain/addonExport.ts; read by the core's site data (RaidData.lua).
 local EventData = {}
 ns.EventData = EventData
@@ -27,7 +27,7 @@ end
 --- and each kind of line with its number of fields and how it adds to the event (the officers' O lines are the
 --- core's).
 EventData.FORMAT = {
-    header = "VXV-RAID-4",
+    header = "VXV-RAID-5",
     wrong = "Ce texte n'est pas une donnée d'événement : copie-la depuis la page de l'événement sur le site.",
     New = function()
         return { items = {}, itemOrder = {}, wearers = {}, signups = {}, journal = {}, results = {} }
@@ -66,6 +66,18 @@ EventData.FORMAT = {
         S = { 7, function(event, f)
             event.signups[#event.signups + 1] = { name = f[1], class = f[2], role = f[3], status = f[4],
                 reroll = f[5] == FLAG_ON, spec = f[6], reserves = reserves(f[7]) }
+            return true
+        end },
+        -- U;character;the item ids of its last raid's reserves it may reuse
+        U = { 2, function(event, f)
+            local signup = EventData.SignupOf(event, f[1])
+            if signup == nil then
+                return false
+            end
+            signup.reusable = {}
+            for _, itemId in ipairs(split(f[2])) do
+                signup.reusable[#signup.reusable + 1] = tonumber(itemId)
+            end
             return true
         end },
         -- J;time;actor;summary;reason

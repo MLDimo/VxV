@@ -68,6 +68,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           items={board.items}
           allowance={board.allowance}
           characterClass={mine?.characterClass}
+          reusable={board.reusable}
           locked={board.locked}
           lockLabel={formatDateTime(board.lockAt)}
         />

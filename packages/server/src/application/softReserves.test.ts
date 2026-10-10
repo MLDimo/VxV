@@ -135,6 +135,28 @@ describe("soft reserves", () => {
     expect(bonuses).toEqual({ "Ðéjà Vu": 10, "Eole Hermes": 0 });
   });
 
+  it("offers to reuse the reserves of the last raid on the same raids, but the items obtained", async () => {
+    now = new Date("2026-10-01T12:00:00Z");
+    await sql.query("insert into raids (id, name, instance_id) values ('mont-hyjal', 'Mont Hyjal', 534)");
+    const reserveAt = async (startsAt: string, raidIds: string[], itemIds: string[]) => {
+      const past = await createEvent(sql, me, new Date(startsAt), raidIds);
+      await sql.query("update events set soft_reserves_per_player = 2 where id = $1", [past]);
+      await signups.signUp(me, past, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
+      await softReserves.setMine(me, past, itemIds);
+      return past;
+    };
+    await reserveAt("2026-11-01T20:00:00Z", ["onyxia"], ["10"]);
+    const last = await reserveAt("2026-11-08T20:00:00Z", ["onyxia"], ["20", "21"]);
+    // A later night on other raids does not count; the bag was obtained.
+    await reserveAt("2026-11-15T20:00:00Z", ["onyxia", "mont-hyjal"], ["10"]);
+    await recordLoot(sql, { eventId: last, encounterId: 2, itemId: 21, characterId: deja.id });
+
+    now = new Date("2026-12-01T12:00:00Z");
+    expect((await board(me)).reusable).toEqual([]);
+    await signUp(me, deja);
+    expect((await board(me)).reusable).toEqual([20]);
+  });
+
   it("refuses soft reserves without sign-up, beyond the allowance or outside the loot", async () => {
     await expect(softReserves.setMine(me, eventId, ["20"])).rejects.toThrow(/Inscrivez-vous/);
     await signUp(me, deja);

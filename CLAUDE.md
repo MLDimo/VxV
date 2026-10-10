@@ -33,7 +33,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`VXV_Raid/ItemKinds.lua`, `C_Item.GetItemInfo`, relu toutes les 10 s tant qu'un objet manque au cache) et les envoie
   par le compagnon (`VXV-OBJETS-1`) ; le site garde la première lecture de chaque objet, refuse une SR impossible,
   ne propose pas la case, et dit à l'addon qui peut porter chaque objet (lignes `W`). Un objet pas encore lu, une
-  cape, une bague ou un jeton vont à toutes les classes. Chaque événement est réservé à un rôle Discord choisi à la création
+  cape, une bague ou un jeton vont à toutes les classes. « Réutiliser mes SR précédentes » (site et jeu, demande du
+  propriétaire du 10 octobre) recoche en un clic les SR du personnage à sa dernière soirée sur les mêmes raids, moins
+  les objets qu'il a obtenus et ceux qui ne passent plus (exclus, inéquipables, au-delà du nombre de SR) :
+  `listPrevious`, `reusableReserves`, lignes `U` pour l'addon ; le joueur enregistre ensuite comme d'habitude. Chaque événement est réservé à un rôle Discord choisi à la création
   (`domain/eventRoles.ts`) : tout rôle du serveur sauf ceux de Discord (bots, boosters) et de VXV (classes, titres), ou
   @everyone pour tout le monde ; nom gardé tel qu'à la création, affiché partout, mentionné sans notification sur
   Discord. Seuls ses membres s'inscrivent : rôles du joueur lus sur Discord à sa première inscription (un rôle donné à
@@ -236,7 +239,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV_Deathroll/Games.lua` | `domain/deathrolls.ts` |
 | `VXV-OBJETS-1` (catégorie, sous-catégorie et emplacement des objets des raids) | addon → site | `VXV_Raid/ItemKinds.lua` | `domain/itemKinds.ts` |
 | `VXV-COMBAT-1` (boss tués, soins reçus) | compagnon → site | `apps/companion/src/domain/combatLog.ts` | `domain/bossFights.ts` |
-| `VXV-RAID-4` (événement, qui peut porter chaque objet compris) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
+| `VXV-RAID-5` (événement, qui peut porter chaque objet et SR réutilisables compris) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
 | `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Core/Core/EventRoles.lua` |
 | `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
 | `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |

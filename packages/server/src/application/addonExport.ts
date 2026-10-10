@@ -27,10 +27,12 @@ export function createAddonExport({ unitOfWork, clock }: { unitOfWork: UnitOfWor
     const journal = await repositories.journal.listForEvent(event.id);
     const since = new Date(clock().getTime() - CREATION_ANSWERS_MS);
     const changes = await repositories.gameChanges.listForEvent(event.id, since);
+    const previousReserves = await repositories.softReserves.listPrevious(event.id);
     return formatAddonEvent({
       event,
       signups,
       board,
+      previousReserves,
       officers: (await addonReaders(repositories)).officers,
       mainCharacterIds: new Set(characters.filter((character) => character.isMain).map((character) => character.id)),
       journal,

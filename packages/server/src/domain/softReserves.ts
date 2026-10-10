@@ -90,18 +90,21 @@ function refuse(refusal: string): SoftReserveCheck {
   return { valid: false, refusal };
 }
 
+/** What a character's soft reserves for an event must respect. */
+export interface SoftReserveChoiceContext {
+  allowance: number;
+  loot: readonly LootItem[];
+  excludedItemIds: ReadonlySet<number>;
+  characterClass: string;
+}
+
 /**
  * Validates the item ids chosen in a form for a character: known loot of the event, not excluded, that its class
  * may equip, within the allowance.
  */
 export function checkSoftReserveChoice(
   rawItemIds: readonly string[],
-  context: {
-    allowance: number;
-    loot: readonly LootItem[];
-    excludedItemIds: ReadonlySet<number>;
-    characterClass: string;
-  },
+  context: SoftReserveChoiceContext,
 ): SoftReserveCheck {
   const itemIds = [...new Set(rawItemIds.map(Number))];
   const byId = new Map(context.loot.map((item) => [item.itemId, item]));
@@ -120,6 +123,30 @@ export function checkSoftReserveChoice(
     return refuse(`Vous avez droit à ${context.allowance} SR au plus.`);
   }
   return { valid: true, itemIds };
+}
+
+/**
+ * The soft reserves a character may reuse from its last raid on the same raids (owner's request of 10 October): those
+ * still allowed today (the event's loot, not excluded, that its class may equip), within the allowance.
+ */
+export function reusableReserves(previous: readonly number[], context: SoftReserveChoiceContext): number[] {
+  return previous
+    .filter((itemId) => checkSoftReserveChoice([String(itemId)], { ...context, allowance: 1 }).valid)
+    .slice(0, context.allowance);
+}
+
+/** The context of a character's choice, from the event's board as everyone sees it. */
+export function choiceContextOf(
+  board: readonly BoardItem[],
+  allowance: number,
+  characterClass: string,
+): SoftReserveChoiceContext {
+  return {
+    allowance,
+    loot: board,
+    excludedItemIds: new Set(board.filter((item) => item.excluded).map((item) => item.itemId)),
+    characterClass,
+  };
 }
 
 export interface BoardFacts {

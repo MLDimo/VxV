@@ -46,5 +46,38 @@ export function softReserveRepository(sql: SqlClient): SoftReserveRepository {
     async deleteForItem(eventId, itemId) {
       await sql.query("delete from soft_reserves where event_id = $1 and item_id = $2", [eventId, itemId]);
     },
+
+    async listPrevious(eventId) {
+      const rows = await sql.query<{ character_id: string; item_id: number }>(
+        `with raids_of as (
+           select event_id, array_agg(raid_id order by raid_id) as raids from event_raids group by event_id
+         ),
+         latest as (
+           select distinct on (signups.character_id) signups.character_id, past.id as event_id
+           from signups
+           join events as current on current.id = signups.event_id
+           join raids_of as current_raids on current_raids.event_id = current.id
+           join events as past on past.starts_at < current.starts_at
+           join raids_of as past_raids on past_raids.event_id = past.id and past_raids.raids = current_raids.raids
+           where signups.event_id = $1
+             and exists (select 1 from soft_reserves
+                         where soft_reserves.event_id = past.id and soft_reserves.character_id = signups.character_id)
+           order by signups.character_id, past.starts_at desc, past.id
+         )
+         select latest.character_id, soft_reserves.item_id
+         from latest
+         join soft_reserves on soft_reserves.event_id = latest.event_id
+                           and soft_reserves.character_id = latest.character_id
+         where not exists (select 1 from loots
+                           where loots.character_id = latest.character_id and loots.item_id = soft_reserves.item_id)
+         order by latest.character_id, soft_reserves.created_at, soft_reserves.item_id`,
+        [eventId],
+      );
+      const previous = new Map<string, number[]>();
+      for (const row of rows) {
+        previous.set(row.character_id, [...(previous.get(row.character_id) ?? []), row.item_id]);
+      }
+      return previous;
+    },
   };
 }
