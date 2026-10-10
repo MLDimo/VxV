@@ -1,6 +1,6 @@
 local _, ns = ...
 
---- The event's data as the website exports it for the addon: contract VXV-RAID-3, described line by line in
+--- The event's data as the website exports it for the addon: contract VXV-RAID-4, described line by line in
 --- packages/server/src/domain/addonExport.ts; read by the core's site data (RaidData.lua).
 local EventData = {}
 ns.EventData = EventData
@@ -27,10 +27,10 @@ end
 --- and each kind of line with its number of fields and how it adds to the event (the officers' O lines are the
 --- core's).
 EventData.FORMAT = {
-    header = "VXV-RAID-3",
+    header = "VXV-RAID-4",
     wrong = "Ce texte n'est pas une donnée d'événement : copie-la depuis la page de l'événement sur le site.",
     New = function()
-        return { items = {}, itemOrder = {}, signups = {}, journal = {}, results = {} }
+        return { items = {}, itemOrder = {}, wearers = {}, signups = {}, journal = {}, results = {} }
     end,
     lines = {
         -- E;id;start;export;soft reserves per player;title;raid ids;who may sign up
@@ -48,6 +48,18 @@ EventData.FORMAT = {
             end
             event.items[id] = { id = id, name = f[2], boss = f[3], excluded = f[4] == FLAG_ON }
             event.itemOrder[#event.itemOrder + 1] = id
+            return true
+        end },
+        -- W;item id;the class tokens that may equip it
+        W = { 2, function(event, f)
+            local id = tonumber(f[1])
+            if id == nil then
+                return false
+            end
+            event.wearers[id] = {}
+            for _, class in ipairs(split(f[2])) do
+                event.wearers[id][class] = true
+            end
             return true
         end },
         -- S;character;class;role;status;1 for a reroll;spec;reserves
@@ -72,6 +84,13 @@ EventData.FORMAT = {
         end },
     },
 }
+
+--- Whether a character of this class may equip the item, as the website knows it: every class may when the
+--- website does not restrict the item, or when the class is unknown.
+function EventData.CanEquip(event, itemId, class)
+    local wearers = event and event.wearers[itemId]
+    return wearers == nil or class == nil or wearers[class] == true
+end
 
 --- The sign-up of the character named "Prénom Nom", or nil.
 function EventData.SignupOf(event, name)

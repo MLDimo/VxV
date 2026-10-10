@@ -27,7 +27,13 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - **Raid et SR** (`VXV_Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
-  Discord. Le nombre de SR est fixé à la création. Chaque événement est réservé à un rôle Discord choisi à la création
+  Discord. Le nombre de SR est fixé à la création. Seuls les objets que la classe du personnage inscrit peut équiper se
+  réservent (décision du propriétaire du 10 octobre, règles de Classic au niveau 60, `domain/equipment.ts`) : l'addon
+  de chaque membre lit dans le jeu la catégorie, la sous-catégorie et l'emplacement des objets des packs
+  (`VXV_Raid/ItemKinds.lua`, `C_Item.GetItemInfo`, relu toutes les 10 s tant qu'un objet manque au cache) et les envoie
+  par le compagnon (`VXV-OBJETS-1`) ; le site garde la première lecture de chaque objet, refuse une SR impossible,
+  ne propose pas la case, et dit à l'addon qui peut porter chaque objet (lignes `W`). Un objet pas encore lu, une
+  cape, une bague ou un jeton vont à toutes les classes. Chaque événement est réservé à un rôle Discord choisi à la création
   (`domain/eventRoles.ts`) : tout rôle du serveur sauf ceux de Discord (bots, boosters) et de VXV (classes, titres), ou
   @everyone pour tout le monde ; nom gardé tel qu'à la création, affiché partout, mentionné sans notification sur
   Discord. Seuls ses membres s'inscrivent : rôles du joueur lus sur Discord à sa première inscription (un rôle donné à
@@ -41,7 +47,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   inscrits attendus avec leur personnage principal, Inviter tout le roster, passage en raid à la première
   acceptation).
 - **Butin et journal** (`VXV_Raid`) : quand le maître du butin ouvre le corps, tout le raid voit le butin et ses SR.
-  Attribution : une SR, sans roll ; plusieurs, roll entre elles avec le SR+ ; aucune, roll libre ; objet exclu, loot
+  Attribution : une SR, sans roll ; plusieurs, roll entre elles avec le SR+ ; aucune, roll libre, réservé aux classes
+  qui peuvent équiper l'objet (les autres n'ont pas la fenêtre de roll, et leur jet ne compte pas) ; objet exclu, loot
   council. Rolls suivis en direct, annonces dans le canal du groupe, don d'un clic. Journal du raid diffusé par le
   maître du butin : boss tués, présents, morts, objets, dégâts et soins du compteur du jeu sur chaque boss tué
   (`Meter.lua`), résurrections acceptées (`Raised.lua`) ; envoyé par le compagnon ou exporté (`/vxv journal`), importé
@@ -227,8 +234,9 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-LOG-2` (journal d'un raid) | addon → site | `VXV_Raid/RaidLog.lua` | `domain/raidLog.ts` |
 | `VXV-METIERS-1` (métiers d'un personnage) | addon → site | `VXV_Artisans/Website.lua` | `domain/artisans.ts` |
 | `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV_Deathroll/Games.lua` | `domain/deathrolls.ts` |
+| `VXV-OBJETS-1` (catégorie, sous-catégorie et emplacement des objets des raids) | addon → site | `VXV_Raid/ItemKinds.lua` | `domain/itemKinds.ts` |
 | `VXV-COMBAT-1` (boss tués, soins reçus) | compagnon → site | `apps/companion/src/domain/combatLog.ts` | `domain/bossFights.ts` |
-| `VXV-RAID-3` (événement) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
+| `VXV-RAID-4` (événement, qui peut porter chaque objet compris) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
 | `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Core/Core/EventRoles.lua` |
 | `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
 | `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |

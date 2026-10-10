@@ -31,6 +31,20 @@ test.describe.serial("soft reserves", () => {
     await expect(itemRow(page, "Brassards brindecieux")).toContainText("Ciel Gris");
   });
 
+  test("a priest reserves among the items a priest may equip: no box on mail nor leather", async ({
+    page,
+    context,
+  }) => {
+    await signInAs(context, "priest");
+    await page.goto(eventPage());
+    await expect(myBox(page, "Croc de Magmatus")).toBeEnabled();
+    await expect(myBox(page, "Brassards brindecieux")).toBeEnabled();
+    for (const name of ["Bottines du golem protecteur", "Jambières de Dirgehammer"]) {
+      await expect(myBox(page, name)).toHaveCount(0);
+      await expect(itemRow(page, name)).toContainText("ne s'équipe pas avec ta classe");
+    }
+  });
+
   test("a member who is not signed up sees the reserves but cannot reserve", async ({ page, context }) => {
     await signInAs(context, "member");
     await page.goto(eventPage());

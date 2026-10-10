@@ -52,7 +52,7 @@ test("the companion brings the next event to the addon, as an officer would past
   // The soonest event is the one starting 10 minutes after the seed.
   expect(raid.title).toBe("La salle des Thanes");
   expect(raid.text.split("\n").slice(0, 2)).toEqual([
-    "VXV-RAID-3",
+    "VXV-RAID-4",
     expect.stringMatching(`^E;${readSeed().lockedEventId};`),
   ]);
   // The roles an event may be reserved to serve the officers only, who create events in game.

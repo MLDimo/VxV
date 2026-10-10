@@ -24,6 +24,7 @@ import { createEvents } from "./application/events.ts";
 import { createExclusions } from "./application/exclusions.ts";
 import { createGameChanges } from "./application/gameChanges.ts";
 import { createHistory } from "./application/history.ts";
+import { createItems } from "./application/items.ts";
 import { createJournal } from "./application/journal.ts";
 import { createRaidAnnouncements } from "./application/raidAnnouncements.ts";
 import { createMissionAnnouncements } from "./application/missionAnnouncements.ts";
@@ -129,6 +130,7 @@ export function createApplication({
       artisans,
       deathrolls,
       bossFights: createBossFights({ unitOfWork, clock }),
+      items: createItems({ unitOfWork }),
     }),
     roster,
     characters,

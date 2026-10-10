@@ -1,6 +1,7 @@
 import { fullName, type Character } from "./characters.ts";
 import { eventAudience } from "./eventRoles.ts";
 import type { GuildEvent } from "./events.ts";
+import { equipClasses } from "./equipment.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { JournalEntry } from "./journal.ts";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "./journalDescriptions.ts";
@@ -10,7 +11,7 @@ import { flag, line, seconds, text } from "./addonText.ts";
 import type { BoardItem } from "./softReserves.ts";
 
 /** First line of an event exported for the addon (contract with VXV_Raid); the number is the format version. */
-export const ADDON_EVENT_HEADER = "VXV-RAID-3";
+export const ADDON_EVENT_HEADER = "VXV-RAID-4";
 
 export interface AddonEventFacts {
   event: GuildEvent;
@@ -33,6 +34,7 @@ export interface AddonEventFacts {
  *   up (eventAudience)
  * O;officer character
  * I;item id;item name;boss;1 when excluded from SR
+ * W;item id;the class tokens that may equip it, separated by commas (an item without this line suits every class)
  * S;character;class token;role;status;1 for a reroll;spec;item id:SR+ bonus,…
  * J;time (Unix seconds);officer;what changed;reason
  * C;change id;1 when done, 0 when refused;message
@@ -63,6 +65,10 @@ export function formatAddonEvent(facts: AddonEventFacts): string {
     ...board
       .filter((item) => item.excluded || item.reservedBy.length > 0)
       .map((item) => line("I", item.itemId, text(item.name), text(item.bossName), flag(item.excluded))),
+    ...board.flatMap((item) => {
+      const classes = equipClasses(item.kind);
+      return classes === undefined ? [] : [line("W", item.itemId, classes.join(","))];
+    }),
     ...facts.signups.map((signup) =>
       line(
         "S",

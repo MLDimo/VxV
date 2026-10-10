@@ -38,6 +38,18 @@ function Group.Names()
     return names
 end
 
+--- The class token of each member of the group, by name ("ROGUE"); a member whose class the client hides is left out.
+function Group.Classes()
+    local classes = {}
+    for _, member in ipairs(Group.Members()) do
+        local _, class = UnitClass(member.unit)
+        if not VXV.IsSecret(class) and type(class) == "string" then
+            classes[member.name] = class
+        end
+    end
+    return classes
+end
+
 --- The group's leader, "Prénom Nom", or nil outside a group.
 function Group.Leader()
     for _, member in ipairs(Group.Members()) do

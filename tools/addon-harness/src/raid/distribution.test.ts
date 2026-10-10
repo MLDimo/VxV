@@ -5,6 +5,7 @@ import { killAndOpen, link, LINKS, OFFICER, PANEL_ROWS, raidWithData, settle, ty
 const TETE = link(20, "Tête d'Onyxia");
 const CAPE = link(99, "Cape inconnue");
 const ECAILLE = link(30, "Écaille d'Onyxia");
+const BATON = link(40, "Bâton du dragon");
 /** A muted text (§2.1: secondary text color). */
 const GREY = (text: string) => `|cffa49bbd${text}|r`;
 
@@ -108,6 +109,31 @@ describe("attributing an item", () => {
     settle(guild);
     expect(chat(guild)).toContain(`[VXV] ${CAPE} : Thom Leboss gagne (70).`);
     expect(lastRow(guild, OFFICER)).toBe("Gagnant : Thom Leboss (roll libre)");
+  });
+
+  it("keeps a free roll to the classes that may equip the item: no panel and no roll for the others", () => {
+    const guild = raidWithData([OFFICER, "Thom Leboss", "Aube Claire"]);
+    guild.player("Thom Leboss").client('Player.class = "PRIEST"');
+    guild.player(OFFICER).client('GroupClasses = { ["Thom Leboss"] = "PRIEST", ["Aube Claire"] = "ROGUE" }');
+    killAndOpen(guild, [LINKS.baton]);
+    for (const name of ["Thom Leboss", "Aube Claire"]) {
+      guild.player(name).client("VXV_LootPanel:Hide()");
+    }
+    pick(guild, "Bâton");
+    expect(chat(guild)).toContain(
+      `[VXV] ${BATON} : aucune SR, roll libre pour les classes qui peuvent l'équiper (30 s).`,
+    );
+    // The priest's panel opens to roll; the rogue's stays closed, and says why if opened.
+    expect(guild.player("Thom Leboss").client("return VXV_LootPanel.shown")).toBe(true);
+    expect(guild.player("Aube Claire").client("return VXV_LootPanel.shown")).toBe(false);
+    guild.player("Aube Claire").client('SlashCmdList.VXV("butin")');
+    expect(lastRow(guild, "Aube Claire")).toBe("Ta classe ne peut pas équiper cet objet : pas de roll pour toi.");
+    expect(buttonShown(guild, "Aube Claire", "Roll (1-100)")).toBe(false);
+
+    rolls(guild, ["Aube Claire", 99], ["Thom Leboss", 40]);
+    expect(rows(guild, OFFICER)).toContain(GREY("Aube Claire : 99 (ne peut pas l'équiper)"));
+    settle(guild);
+    expect(chat(guild)).toContain(`[VXV] ${BATON} : Thom Leboss gagne (40).`);
   });
 
   it("leaves an excluded item to the loot council: the master looter picks the winner", () => {

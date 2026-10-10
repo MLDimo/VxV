@@ -3,6 +3,7 @@ import type { SqlClient } from "../sql.ts";
 import { betRepository, stakeRepository } from "./bets.ts";
 import { bossFightRepository } from "./bossFights.ts";
 import { bossLootRepository } from "./bossLoot.ts";
+import { itemRepository } from "./items.ts";
 import { cashRepository } from "./cash.ts";
 import { characterRepository } from "./characters.ts";
 import { companionRepository } from "./companion.ts";
@@ -38,6 +39,7 @@ function createRepositories(sql: SqlClient): Repositories {
     events: eventRepository(sql),
     signups: signupRepository(sql),
     bossLoot: bossLootRepository(sql),
+    items: itemRepository(sql),
     lootHistory: lootHistoryRepository(sql),
     softReserves: softReserveRepository(sql),
     exclusions: exclusionRepository(sql),

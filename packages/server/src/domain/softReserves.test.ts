@@ -11,10 +11,23 @@ import {
   type SoftReserve,
 } from "./softReserves.ts";
 
-const context = { allowance: 2, lootItemIds: new Set([1, 2, 3]), excludedItemIds: new Set([3]) };
+const LEATHER = { itemClass: 4, itemSubclass: 2, equipSlot: "INVTYPE_LEGS" };
+const lootItem = (itemId: number, name: string, kind?: LootItem["kind"]): LootItem => ({
+  itemId,
+  name,
+  raidName: "Thanes",
+  bossName: "Durgen",
+  kind,
+});
+const context = {
+  allowance: 2,
+  loot: [lootItem(1, "Croc de Magmatus"), lootItem(2, "Jambières de Dirgehammer", LEATHER), lootItem(3, "Cape")],
+  excludedItemIds: new Set([3]),
+  characterClass: "ROGUE",
+};
 
-function refusalOf(itemIds: string[], allowance = 2): string | undefined {
-  const check = checkSoftReserveChoice(itemIds, { ...context, allowance });
+function refusalOf(itemIds: string[], allowance = 2, characterClass = "ROGUE"): string | undefined {
+  const check = checkSoftReserveChoice(itemIds, { ...context, allowance, characterClass });
   return check.valid ? undefined : check.refusal;
 }
 
@@ -35,6 +48,11 @@ describe("checkSoftReserveChoice", () => {
   it("refuses more items than the allowance", () => {
     expect(refusalOf(["1", "2"], 1)).toBe("Vous avez droit à 1 SR au plus.");
   });
+
+  it("refuses an item the character's class may not equip", () => {
+    expect(refusalOf(["2"], 2, "PRIEST")).toBe("Un prêtre ne peut pas équiper « Jambières de Dirgehammer ».");
+    expect(refusalOf(["1"], 2, "PRIEST")).toBeUndefined();
+  });
 });
 
 /** Present at a previous raid with the item, reserved it and did not get it. */
@@ -42,8 +60,8 @@ const MISSED: PastEventForItem = { dropsItem: true, present: true, reserved: tru
 
 describe("buildBoard", () => {
   const loot: LootItem[] = [
-    { itemId: 1, name: "Croc de Magmatus", raidName: "Thanes", bossName: "Infurnus" },
-    { itemId: 2, name: "Brassards brindecieux", raidName: "Thanes", bossName: "Faldrim" },
+    { itemId: 1, name: "Croc de Magmatus", raidName: "Thanes", bossName: "Infurnus", kind: undefined },
+    { itemId: 2, name: "Brassards brindecieux", raidName: "Thanes", bossName: "Faldrim", kind: undefined },
   ];
   const reserve = (itemId: number, characterId: string, characterName: string): SoftReserve => ({
     itemId,

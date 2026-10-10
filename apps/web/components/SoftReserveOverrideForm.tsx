@@ -1,6 +1,7 @@
 "use client";
 
 import type { BoardItem } from "@vxv/server";
+import { canEquip } from "@vxv/server/domain/equipment";
 import { useActionState, useId, useState } from "react";
 import { overrideSoftReserves } from "@/app/actions/softReserves";
 import { ActionMessages } from "./ActionMessages";
@@ -10,9 +11,13 @@ import { Options, ReasonField } from "./Field";
 interface SignedUpCharacter {
   characterId: string;
   characterName: string;
+  characterClass: string;
 }
 
-/** Officers set a signed-up player's soft reserves, even after the lock, with a reason. */
+/**
+ * Officers set a signed-up player's soft reserves, even after the lock, with a reason, among the items the player's
+ * class may equip.
+ */
 export function SoftReserveOverrideForm({
   eventId,
   items,
@@ -24,6 +29,7 @@ export function SoftReserveOverrideForm({
 }) {
   const [state, action, pending] = useActionState(overrideSoftReserves, IDLE);
   const [characterId, setCharacterId] = useState(players[0]?.characterId ?? "");
+  const characterClass = players.find((player) => player.characterId === characterId)?.characterClass;
   const playerFieldId = useId();
   if (players.length === 0) {
     return <p className="mt-2 text-sm text-muted">Personne n&apos;est encore inscrit.</p>;
@@ -49,17 +55,19 @@ export function SoftReserveOverrideForm({
       <fieldset key={characterId}>
         <legend className="text-sm text-lavender">Ses SR</legend>
         <div className="mt-2 grid gap-1 sm:grid-cols-2">
-          {items.map((item) => (
-            <label key={item.itemId} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="itemIds"
-                value={item.itemId}
-                defaultChecked={item.reservedBy.some((reserver) => reserver.characterId === characterId)}
-              />
-              {item.name}
-            </label>
-          ))}
+          {items
+            .filter((item) => canEquip(characterClass, item.kind))
+            .map((item) => (
+              <label key={item.itemId} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="itemIds"
+                  value={item.itemId}
+                  defaultChecked={item.reservedBy.some((reserver) => reserver.characterId === characterId)}
+                />
+                {item.name}
+              </label>
+            ))}
         </div>
       </fieldset>
       <ReasonField label="Motif de la correction" />

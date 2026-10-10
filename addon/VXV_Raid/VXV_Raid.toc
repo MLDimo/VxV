@@ -22,6 +22,7 @@ RaidLog.lua
 Meter.lua
 Raised.lua
 Raids.lua
+ItemKinds.lua
 
 # Where the player stands (P8), and the game's combat log switched on in the raids (T11).
 Place.lua

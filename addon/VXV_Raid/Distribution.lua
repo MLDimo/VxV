@@ -6,7 +6,8 @@ local _, ns = ...
 local Distribution = {}
 ns.Distribution = Distribution
 
-local Attribution, BossLoot, Group, RaidData = ns.Attribution, ns.BossLoot, ns.Group, ns.RaidData
+local Attribution, BossLoot, EventData, Group, RaidData = ns.Attribution, ns.BossLoot, ns.EventData, ns.Group,
+    ns.RaidData
 
 local START, FINISH = "loot.start", "loot.finish"
 local ROLL_SECONDS = 30
@@ -16,6 +17,7 @@ local MAX_CANDIDATES = 40
 -- Announcements in the group's channel (plan 6.5).
 local SAY_RESERVED = "%s : SR de %s. Eux seuls roll (30 s)."
 local SAY_FREE = "%s : aucune SR, tout le monde peut roll (30 s)."
+local SAY_FREE_WEARERS = "%s : aucune SR, roll libre pour les classes qui peuvent l'équiper (30 s)."
 local SAY_DIRECT = "%s : SR de %s, attribué sans roll."
 local SAY_COUNCIL = "%s : pas de roll, attribué par l'organisation (loot council)."
 local SAY_WINNER = "%s : %s gagne (%s)."
@@ -27,6 +29,7 @@ local TELL_RESERVED = "Tu as une SR : fais ton roll."
 local TELL_BONUS = " Ton SR+ ajoute %d."
 local TELL_RESERVED_OTHERS = "Objet SR par %s : tu ne peux pas roll."
 local TELL_FREE = "Aucune SR : tu peux roll."
+local TELL_UNFIT = "Ta classe ne peut pas équiper cet objet : pas de roll pour toi."
 local TELL_TIE = "Égalité : relance ton roll."
 local TELL_TIE_OTHERS = "Égalité entre %s : eux seuls relancent."
 local TELL_COUNCIL = "Ce loot n'est pas disponible au roll : l'organisation l'attribue (loot council)."
@@ -38,7 +41,7 @@ local CANNOT_RECEIVE = "%s ne peut pas recevoir l'objet : rouvre le corps, ou v�
 
 -- The master looter's attribution: { item, plan, round, result = { winner, method } }.
 local active
--- What every member sees: { link, message, canRoll, rolled }.
+-- What every member sees: { link, message, canRoll, rolled, quiet (nothing to do: the panel does not open) }.
 local shown
 local roundNumber = 0
 
@@ -75,9 +78,21 @@ local function broadcastStart(eligible, tie)
     }, Group.Channel())
 end
 
+--- The group's members whose class may not equip the item.
+local function unfit(itemId)
+    local event, names = RaidData.Current(), {}
+    for name, class in pairs(Group.Classes()) do
+        if not EventData.CanEquip(event, itemId, class) then
+            names[name] = true
+        end
+    end
+    return names
+end
+
 local finishRound
 
---- Opens a roll window: players lists who may roll { name, bonus }, or nil for every member of the group.
+--- Opens a roll window: players lists who may roll { name, bonus }, or nil for every member of the group whose
+--- class may equip the item.
 local function startRound(players, tie)
     roundNumber = roundNumber + 1
     local number, bonuses = roundNumber, nil
@@ -87,7 +102,8 @@ local function startRound(players, tie)
             bonuses[player.name] = player.bonus
         end
     end
-    active.round = { bonuses = bonuses, inGroup = Group.Names(), rolled = {}, rolls = {} }
+    active.round = { bonuses = bonuses, inGroup = Group.Names(), unfit = unfit(active.item.itemId), rolled = {},
+        rolls = {} }
     broadcastStart(players, tie)
     C_Timer.After(ROLL_SECONDS, function()
         if active ~= nil and roundNumber == number then
@@ -162,7 +178,7 @@ function Distribution.Start(item)
         startRound(plan.reservers)
         return
     else
-        say(SAY_FREE)
+        say(next(unfit(item.itemId)) == nil and SAY_FREE or SAY_FREE_WEARERS)
         startRound(nil)
         return
     end
@@ -248,13 +264,23 @@ local function playerNames(players)
     return table.concat(names, ", ")
 end
 
---- The member's message and whether they may roll.
+--- Whether the player's class may equip the item, as the event's data say.
+local function canEquip(itemId)
+    local _, class = UnitClass("player")
+    return EventData.CanEquip(RaidData.Current(), itemId, not VXV.IsSecret(class) and class or nil)
+end
+
+--- The member's message, whether they may roll, and whether there is nothing for them to do (a free roll on an item
+--- their class may not equip: the panel does not open).
 local function tell(payload, me)
     if payload.mode == "council" then
         return TELL_COUNCIL, false
     elseif payload.mode == "direct" then
         return payload.winner == me and TELL_DIRECT_ME or TELL_DIRECT_OTHER:format(tostring(payload.winner)), false
     elseif type(payload.eligible) ~= "table" then
+        if not canEquip(payload.itemId) then
+            return TELL_UNFIT, false, true
+        end
         return TELL_FREE, true
     end
     local mine = find(payload.eligible, me)
@@ -275,8 +301,8 @@ VXV.OnMessage(START, function(payload, sender)
     if type(payload) ~= "table" or type(payload.link) ~= "string" or not fromMasterLooter(sender) then
         return
     end
-    local message, canRoll = tell(payload, VXV.PlayerName())
-    shown = { link = payload.link, message = message, canRoll = canRoll, rolled = false }
+    local message, canRoll, quiet = tell(payload, VXV.PlayerName())
+    shown = { link = payload.link, message = message, canRoll = canRoll, rolled = false, quiet = quiet }
     changed()
 end)
 

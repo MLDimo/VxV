@@ -12,6 +12,7 @@ VXV.RegisterModule({
         ns.Freshness.Start()
         ns.KillSharing.Start()
         ns.Place.Start()
+        ns.ItemKinds.Start()
     end,
     tab = {
         place = "raid",

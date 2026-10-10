@@ -1,9 +1,14 @@
+import { classLabel } from "./characterClasses.ts";
+import { canEquip, type ItemKind } from "./equipment.ts";
+
 /** An item that a boss of the event's raids can drop. */
 export interface LootItem {
   itemId: number;
   name: string;
   raidName: string;
   bossName: string;
+  /** What the game says of it, once an addon read it: who may equip it. */
+  kind: ItemKind | undefined;
 }
 
 /** A soft reserve made with the character of a sign-up. */
@@ -85,17 +90,31 @@ function refuse(refusal: string): SoftReserveCheck {
   return { valid: false, refusal };
 }
 
-/** Validates the item ids chosen in a form: known loot of the event, not excluded, within the allowance. */
+/**
+ * Validates the item ids chosen in a form for a character: known loot of the event, not excluded, that its class
+ * may equip, within the allowance.
+ */
 export function checkSoftReserveChoice(
   rawItemIds: readonly string[],
-  context: { allowance: number; lootItemIds: ReadonlySet<number>; excludedItemIds: ReadonlySet<number> },
+  context: {
+    allowance: number;
+    loot: readonly LootItem[];
+    excludedItemIds: ReadonlySet<number>;
+    characterClass: string;
+  },
 ): SoftReserveCheck {
   const itemIds = [...new Set(rawItemIds.map(Number))];
-  if (itemIds.some((itemId) => !context.lootItemIds.has(itemId))) {
+  const byId = new Map(context.loot.map((item) => [item.itemId, item]));
+  const chosen = itemIds.map((itemId) => byId.get(itemId));
+  if (chosen.some((item) => item === undefined)) {
     return refuse("Un des objets choisis ne tombe pas dans les raids de cet événement.");
   }
   if (itemIds.some((itemId) => context.excludedItemIds.has(itemId))) {
     return refuse("Un des objets choisis a été exclu des SR par les officiers.");
+  }
+  const unfit = chosen.find((item) => item !== undefined && !canEquip(context.characterClass, item.kind));
+  if (unfit !== undefined) {
+    return refuse(`Un ${classLabel(context.characterClass).toLowerCase()} ne peut pas équiper « ${unfit.name} ».`);
   }
   if (itemIds.length > context.allowance) {
     return refuse(`Vous avez droit à ${context.allowance} SR au plus.`);
