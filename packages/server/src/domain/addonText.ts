@@ -36,7 +36,7 @@ export interface AddonReaders {
 }
 
 /**
- * The lines every bundle's data start with (contract with addon/VXV_Core/Core/SiteData.lua): the header, then
+ * The lines every bundle's data start with (contract with addon/VXV/Core/Core/SiteData.lua): the header, then
  * P;export (Unix seconds), O;officer character, M;member id;character of the member.
  */
 export function addonHead(header: string, { officers, characters, exportedAt }: AddonReaders): string[] {

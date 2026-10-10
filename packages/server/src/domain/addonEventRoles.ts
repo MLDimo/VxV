@@ -1,7 +1,7 @@
 import { addonHead, line, text, type AddonReaders } from "./addonText.ts";
 import type { EventRoleChoice } from "./eventRoles.ts";
 
-/** First line of the roles an event may be reserved to, for the addon (contract with VXV_Raid); its format version. */
+/** First line of the roles an event may be reserved to, for the addon (contract with VXV/Raid); its format version. */
 export const ADDON_EVENT_ROLES_HEADER = "VXV-ROLES-1";
 
 /**

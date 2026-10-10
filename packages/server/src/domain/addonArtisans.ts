@@ -1,7 +1,7 @@
 import { addonHead, line, seconds, text, type AddonReaders } from "./addonText.ts";
 import type { Recipe } from "./artisans.ts";
 
-/** First line of the artisans directory for the addon (contract with VXV_Artisans); the number is its version. */
+/** First line of the artisans directory for the addon (contract with VXV/Artisans); the number is its version. */
 export const ADDON_ARTISANS_HEADER = "VXV-ARTISANS-1";
 
 const RECIPE_SEPARATOR = ",";

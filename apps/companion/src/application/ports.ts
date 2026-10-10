@@ -105,9 +105,9 @@ export interface LogFile extends SavedFile {
 
 /** The game's files the companion reads and writes, in one version of the game. */
 export interface GameFiles {
-  /** Writes the inbox of VXV_Sync; false when the addon has no VXV_Sync yet (an older version). */
+  /** Writes the inbox of the addon's Sync part; false without the addon VXV (absent, or the bundles of before). */
   writeInbox(installation: string, content: string): Promise<boolean>;
-  /** VXV_Sync's saved data of every account of this version of the game. */
+  /** The addon's saved data (SavedVariables/VXV.lua) of every account of this version of the game. */
   savedFiles(installation: string): Promise<SavedFile[]>;
   read(path: string): Promise<Uint8Array>;
   /** The combat logs of this version of the game (Logs/WoWCombatLog-*.txt). */

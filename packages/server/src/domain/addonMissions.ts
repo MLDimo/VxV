@@ -2,7 +2,7 @@ import { addonHead, flag, line, seconds, text, type AddonReaders } from "./addon
 import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { HallOfFameEntry, Mission, MissionRewardRecord, MissionScore } from "./missions.ts";
 
-/** First line of the missions' data for the addon (contract with VXV_Missions); the number is the format version. */
+/** First line of the missions' data for the addon (contract with VXV/Missions); the number is the format version. */
 export const ADDON_MISSIONS_HEADER = "VXV-QUETES-2";
 
 /** How many places of each ranking, and of the hall of fame, the addon shows. */

@@ -1,4 +1,4 @@
--- Generic mock of the WoW Forever client (Lua 5.1 API on fengari's Lua 5.3), for VXV_Core.
+-- Generic mock of the WoW Forever client (Lua 5.1 API on fengari's Lua 5.3), for VXV.
 -- Chat output is silenced unless VXV_VERBOSE=1. Tests drive it through Fire and read ReportedErrors.
 --- What the addon printed in the chat, for the tests.
 Printed = {}

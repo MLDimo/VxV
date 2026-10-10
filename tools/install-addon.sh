@@ -19,6 +19,14 @@ fi
 cd "$repository"
 npm run --silent generate
 npm run --silent release:prepare -- "0.0.0-dev.$(date +%Y%m%d%H%M)"
+# The folders of the versions before the single addon (October 2026): VXV replaces them all.
+shopt -s nullglob
+for legacy in "$addons_dir"/VXV_{Core,Sync,Raid,Paris,Deathroll,Missions,Titles,Artisans,Ranking,PvP} \
+  "$addons_dir"/VXV_Data_*; do
+  [[ -e "$legacy" ]] || continue
+  rm -rf "$legacy"
+  echo "$(basename "$legacy") retiré (remplacé par VXV)"
+done
 for bundle in dist/release/VXV/*/; do
   name="$(basename "$bundle")"
   rsync -a --delete --exclude '._*' --exclude '.DS_Store' "$bundle" "$addons_dir/$name/"

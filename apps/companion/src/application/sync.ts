@@ -10,7 +10,7 @@ export interface SyncReport {
   at: Date;
   /** The next event brought to the game, if any. */
   raid: { title: string; startsAt: string } | undefined;
-  /** Versions of the game whose addon has no VXV_Sync yet: the addon must be updated there. */
+  /** Versions of the game whose addon is not the single VXV yet: the addon must be updated there. */
   outdated: string[];
   /** What the website made of the data sent, in French; empty when nothing new was sent. */
   sent: string[];

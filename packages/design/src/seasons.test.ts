@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ADDON_SEASON_YEARS, easter, parisDay, seasonOn, SEASONS } from "./seasons.ts";
 
 const SITE_PICTURES = new URL("../../../apps/web/public/images/tavernes/", import.meta.url);
-const ADDON_PICTURES = new URL("../../../addon/VXV_Core/Media/Tavernes/", import.meta.url);
+const ADDON_PICTURES = new URL("../../../addon/VXV/Core/Media/Tavernes/", import.meta.url);
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 describe("the tavern's holidays", () => {

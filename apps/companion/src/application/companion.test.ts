@@ -18,7 +18,7 @@ const NEXT_RAID = {
   startsAt: "2026-12-10T20:00:00.000Z",
 };
 const NOW = new Date("2026-12-10T19:45:00Z");
-/** VXV_Sync's saved data, as the game writes them. */
+/** The addon's saved data, as the game writes them. */
 const SAVED_DATA = [
   "VXV_SyncDB = {",
   '\t["version"] = 1,',
@@ -30,7 +30,7 @@ const SAVED_DATA = [
   "}",
 ].join("\n");
 const started: Companion[] = [];
-const TOC = "Interface/AddOns/VXV_Core/VXV_Core.toc";
+const TOC = "Interface/AddOns/VXV/VXV.toc";
 
 /** A Mac whose disk holds these files. */
 function disk(...files: string[]): FolderReader {
@@ -51,7 +51,7 @@ function setUp(overrides: Partial<CompanionDependencies> = {}, savedToken?: stri
   let saved: Settings = { gameFolder: undefined, launchAtLogin: true };
   let token = savedToken;
   const inboxes = new Map<string, string>();
-  /** VXV_Sync's saved data, by file: its Lua text, and when the game wrote it. */
+  /** The addon's saved data, by file: its Lua text, and when the game wrote it. */
   const savedData = new Map<string, { text: string; modifiedAt: number }>();
   /** The game's combat logs, by file. */
   const combatLogs = new Map<string, Uint8Array>();
@@ -259,7 +259,7 @@ describe("companion", () => {
     it("takes an officer's saved data to the website once, then what the game saves again", async () => {
       vi.useFakeTimers();
       const { companion, site, savedData } = setUp({}, "saved-token");
-      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: SAVED_DATA, modifiedAt: 1 });
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV.lua", { text: SAVED_DATA, modifiedAt: 1 });
       await companion.start();
       expect(site.upload).toHaveBeenCalledWith("saved-token", {
         roster: { text: "VXV-ROSTER-1\nÐéjà;Vu;ROGUE", capturedAt: 1796904000 },
@@ -274,7 +274,7 @@ describe("companion", () => {
         messages: ["Liste de guilde à jour.", "Journal du raid importé."],
       });
       // A /reload: the game writes the same data again, plus the record of a second raid.
-      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", {
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV.lua", {
         text: SAVED_DATA.replace('["e1"]', '["e2"] = "VXV-LOG-2\\nR;e2;1;2",\n\t\t["e1"]'),
         modifiedAt: 2,
       });
@@ -299,16 +299,16 @@ describe("companion", () => {
           `\t["texts"] = { ["metiers"] = { ["Thom Leboss"] = "VXV-METIERS-1\\nP;129;Secourisme;${String(level)}" } },`,
           "}",
         ].join("\n");
-      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: professions(22), modifiedAt: 1 });
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV.lua", { text: professions(22), modifiedAt: 1 });
       await companion.start();
       expect(vi.mocked(site.upload).mock.calls[0]?.[1].texts).toEqual({
         metiers: { "Thom Leboss": "VXV-METIERS-1\nP;129;Secourisme;22" },
       });
       // The same text saved again goes nowhere; a new level goes.
-      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: professions(22), modifiedAt: 2 });
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV.lua", { text: professions(22), modifiedAt: 2 });
       await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
       expect(site.upload).toHaveBeenCalledTimes(1);
-      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: professions(23), modifiedAt: 3 });
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV.lua", { text: professions(23), modifiedAt: 3 });
       await vi.advanceTimersByTimeAsync(WATCH_EVERY_MS);
       expect(vi.mocked(site.upload).mock.calls[1]?.[1].texts).toEqual({
         metiers: { "Thom Leboss": "VXV-METIERS-1\nP;129;Secourisme;23" },
@@ -345,7 +345,7 @@ describe("companion", () => {
     it("sends only the characters for a member", async () => {
       const { companion, site, savedData } = setUp({}, "saved-token");
       vi.mocked(site.me).mockResolvedValue({ name: "Thom", roles: ["member"] });
-      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV_Sync.lua", { text: SAVED_DATA, modifiedAt: 1 });
+      savedData.set("/wow/WTF/Account/A/SavedVariables/VXV.lua", { text: SAVED_DATA, modifiedAt: 1 });
       await companion.start();
       expect(site.upload).toHaveBeenCalledWith("saved-token", {
         raidLogs: [],

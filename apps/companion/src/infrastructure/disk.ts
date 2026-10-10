@@ -2,9 +2,9 @@ import { open, readdir, readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { GameFiles } from "../application/ports.ts";
-import { INBOX_FILE, SYNC_BUNDLE } from "../domain/inbox.ts";
+import { INBOX_FILE } from "../domain/inbox.ts";
 import { ACCOUNTS_FOLDER, OUTBOX_FILE } from "../domain/outbox.ts";
-import type { Computer, FolderReader } from "../domain/installations.ts";
+import { ADDON_TOC, type Computer, type FolderReader } from "../domain/installations.ts";
 import { exists, writeAtomically } from "./files.ts";
 
 const DRIVE_LETTERS = "CDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -40,11 +40,10 @@ export async function thisComputer(): Promise<Computer> {
 /** The game's files on the real disk. */
 export const diskGameFiles: GameFiles = {
   async writeInbox(installation, content) {
-    const bundle = join(installation, ...SYNC_BUNDLE);
-    if (!(await exists(join(bundle, "VXV_Sync.toc")))) {
+    if (!(await exists(join(installation, ...ADDON_TOC)))) {
       return false;
     }
-    await writeAtomically(join(bundle, ...INBOX_FILE), content);
+    await writeAtomically(join(installation, ...INBOX_FILE), content);
     return true;
   },
 

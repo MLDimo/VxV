@@ -13,7 +13,7 @@ function inventoried(): string[] {
 
 /**
  * Called in game without error, beyond the probe's inventory: by the probe (docs/phase-0/sessions, 2 and 3 October)
- * and by VXV_Core during the in-game validation of P4 (4 October).
+ * and by the addon's core during the in-game validation of P4 (4 October).
  */
 const USED_IN_GAME = [
   "CreateFrame",
@@ -52,7 +52,7 @@ const USED_IN_GAME = [
   "UnitRace",
   "UnitSex",
   // The game's damage meter (phase 0, T7, 3 October): both listed by "/vxvtest meter list"; a session read by its id
-  // after a boss killed, by VXV_Raid in the raid of 7 October.
+  // after a boss killed, by the addon's Raid part in the raid of 7 October.
   "C_DamageMeter.GetAvailableCombatSessions",
   "C_DamageMeter.GetCombatSessionFromID",
   // Showing a title (phase 0, T9, 3 October): a tooltip's line and the guild list's rows, called by the probe.

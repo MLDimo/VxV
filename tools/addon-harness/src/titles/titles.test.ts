@@ -5,7 +5,7 @@ import { startGuild } from "../guild.ts";
 import { character } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
-const BUNDLES = ["VXV_Titles", "VXV_Sync"];
+const BUNDLES = ["Titles", "Sync"];
 
 /** The titles of the week: Thom Leboss (main and reroll) is Roi du gambling and Sugar Daddy, Bien gras goes to nobody. */
 const WEEK: AddonTitlesFacts = {

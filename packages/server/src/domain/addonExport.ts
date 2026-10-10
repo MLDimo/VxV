@@ -10,7 +10,7 @@ import type { Signup } from "./signups.ts";
 import { flag, line, seconds, text } from "./addonText.ts";
 import { choiceContextOf, reusableReserves, type BoardItem } from "./softReserves.ts";
 
-/** First line of an event exported for the addon (contract with VXV_Raid); the number is the format version. */
+/** First line of an event exported for the addon (contract with VXV/Raid); the number is the format version. */
 export const ADDON_EVENT_HEADER = "VXV-RAID-5";
 
 export interface AddonEventFacts {

@@ -7,13 +7,10 @@ import { writeOutputFiles } from "./outputFile.ts";
 import { onyxia, salleDesThanes } from "./test/raids.ts";
 
 describe("generate", () => {
-  it("produces one pack per raid and one database script", () => {
+  it("produces the addon's raids' data and the database script", () => {
     expect(generate([onyxia, salleDesThanes]).map((file) => file.path)).toEqual([
-      "addon/VXV_Data_Onyxia/VXV_Data_Onyxia.toc",
-      "addon/VXV_Data_Onyxia/Data.lua",
-      "addon/VXV_Data_SalleDesThanes/VXV_Data_SalleDesThanes.toc",
-      "addon/VXV_Data_SalleDesThanes/Data.lua",
-      "database/raid-data.sql",
+      "addon/VXV/Data/Raids.lua",
+      "dist/generated/database/raid-data.sql",
     ]);
   });
 });

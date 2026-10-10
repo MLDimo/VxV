@@ -51,7 +51,7 @@ local function call(api, name, ...)
     logSession(label, result)
 end
 
---- The latest session's id, as VXV_Raid notes a boss's session at its kill (P13).
+--- The latest session's id, as VXV/Raid notes a boss's session at its kill (P13).
 local function latestSessionId(api)
     local ok, sessions = pcall(api.GetAvailableCombatSessions)
     local latest
@@ -81,7 +81,7 @@ local function read()
         for _, sessionType in pairs(sessionTypes) do
             call(api, "GetCombatSessionFromType", sessionType, meterTypes[meterTypeName])
         end
-        -- The last combat by its id: VXV_Raid reads each boss this way (P13).
+        -- The last combat by its id: VXV/Raid reads each boss this way (P13).
         if latest ~= nil then
             call(api, "GetCombatSessionFromID", latest, meterTypes[meterTypeName])
         end

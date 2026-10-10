@@ -224,7 +224,7 @@ describe("Le Dé Pipé in game (P11.8)", () => {
   });
 
   it("passes the bets on to the guild from an officer, who relays the stakes of a member without companion", () => {
-    const guild = startGuild(["Thom Leboss"], { bundles: ["VXV_Paris", "VXV_Sync"] });
+    const guild = startGuild(["Thom Leboss"], { bundles: ["Paris", "Sync"] });
     guild.join("Ðéjà Vu", { written: companionFiles({ paris: parisText() }) });
     for (let carried = 1; carried > 0;) {
       guild.advanceTime(5);

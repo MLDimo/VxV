@@ -41,13 +41,13 @@ interface CompanionUploadReport {
 }
 
 const OFFICERS_ONLY = "Réservé aux officiers.";
-/** The kind of text the artisans' professions come as (addon/VXV_Artisans). */
+/** The kind of text the artisans' professions come as (addon/VXV/Artisans). */
 const PROFESSIONS_KIND = "metiers";
-/** The kind of text the deathroll games come as (addon/VXV_Deathroll). */
+/** The kind of text the deathroll games come as (addon/VXV/Deathroll). */
 const DEATHROLL_KIND = "deathroll";
 /** The kind of text the bosses killed come as, read by the companion in the combat log (since 1.4). */
 const BOSS_FIGHT_KIND = "combat";
-/** The kind of text the raids' items come as, read in game (addon/VXV_Raid). */
+/** The kind of text the raids' items come as, read in game (addon/VXV/Raid). */
 const ITEMS_KIND = "objets";
 
 /** The use cases an upload goes through, each checking the member's rights. */

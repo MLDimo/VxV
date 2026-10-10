@@ -1,9 +1,9 @@
--- Lua lint configuration for every addon bundle (WoW runs Lua 5.1).
+-- Lua lint configuration for the addon and the probe (WoW runs Lua 5.1).
 std = "lua51"
 max_line_length = 120
 exclude_files = { "**/External/*.lua" }
 
--- Globals each addon is allowed to define.
+-- Globals the addon and the probe are allowed to define.
 globals = {
     "VXV_ProbeDB",
     "VXV_RaidData",

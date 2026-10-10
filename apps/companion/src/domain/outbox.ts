@@ -1,11 +1,11 @@
 import type { LuaData } from "@vxv/lua";
 
-/** Where the game saves what VXV_Sync keeps for the website, for each account of a version of the game. */
+/** Where the game saves what the addon's Sync part keeps for the website, for each account of a version of the game. */
 export const ACCOUNTS_FOLDER = ["WTF", "Account"];
-export const OUTBOX_FILE = ["SavedVariables", "VXV_Sync.lua"];
+export const OUTBOX_FILE = ["SavedVariables", "VXV.lua"];
 const OUTBOX_VARIABLE = "VXV_SyncDB";
 
-/** Format of the outbox written by addon/VXV_Sync/Outbox.lua: a newer one asks for the companion's update. */
+/** Format of the outbox written by addon/VXV/Sync/Outbox.lua: a newer one asks for the companion's update. */
 const OUTBOX_VERSION = 1;
 
 /** A character of the player as the game draws it. */
@@ -15,14 +15,14 @@ export interface CharacterLook {
   sex: number;
 }
 
-/** What the addon saved for the website (contract with addon/VXV_Sync/Outbox.lua). */
+/** What the addon saved for the website (contract with addon/VXV/Sync/Outbox.lua). */
 export interface Outbox {
   /** The guild's roster as VXV-ROSTER text, and when the addon read it (Unix seconds). */
   roster: { text: string; capturedAt: number } | undefined;
   /** Records of raids as VXV-LOG text. */
   raidLogs: string[];
   characters: CharacterLook[];
-  /** Changes made in game (addon/VXV_Raid/Changes.lua), as the website checks them: { id, kind, … }. */
+  /** Changes made in game (addon/VXV/Raid/Changes.lua), as the website checks them: { id, kind, … }. */
   changes: { id: string; [field: string]: unknown }[];
   /** The game counters the addon read (P12.4), the latest of each character and counter. */
   counters: CounterReading[];

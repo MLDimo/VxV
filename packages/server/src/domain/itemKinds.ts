@@ -1,7 +1,7 @@
 import type { ItemKind } from "./equipment.ts";
 import { readRecords, wholeNumber } from "./textFormat.ts";
 
-/** First line of the raids' items as the addon reads them in game (contract with VXV_Raid); the version follows. */
+/** First line of the raids' items as the addon reads them in game (contract with VXV/Raid); the version follows. */
 export const ITEM_KINDS_HEADER = "VXV-OBJETS-1";
 /** The game's equip slots ("INVTYPE_WRIST", "INVTYPE_2HWEAPON"): capitals, digits and underscores. */
 const EQUIP_SLOT = /^[A-Z0-9_]*$/;

@@ -3,7 +3,7 @@ import { startCore } from "../core.ts";
 import { websiteText } from "../raid/fixtures.ts";
 import { companionFiles } from "./fixtures.ts";
 
-const BUNDLES = ["VXV_Raid", "VXV_Sync"];
+const BUNDLES = ["Raid", "Sync"];
 const GUILD = `MockGuildMembers = {
   { name = "Ðéjà Vu", class = "ROGUE" },
   { name = "Thom Leboss", class = "PRIEST", online = false },

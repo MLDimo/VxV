@@ -26,7 +26,7 @@ const PICTURES = `
   FindWidget(VXV_Window, function(w) if w.path ~= nil and IsVisible(w) then paths[#paths + 1] = w.path end end)
   return paths
 `;
-const MEDIA = "Interface\\AddOns\\VXV_Missions\\Media\\";
+const MEDIA = "Interface\\AddOns\\VXV\\Missions\\Media\\";
 const PENDING = `
   local list = {}
   for _, change in pairs(VXV_DB.modules.quetes.pending) do list[#list + 1] = change end
@@ -233,7 +233,7 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
   });
 
   it("passes the quests on from an officer, who relays the counters of a member without companion", () => {
-    const guild = startGuild(["Thom Leboss"], { bundles: ["VXV_Missions", "VXV_Sync"] });
+    const guild = startGuild(["Thom Leboss"], { bundles: ["Missions", "Sync"] });
     guild.join("Ðéjà Vu", { written: companionFiles({ quetes: questsText() }) });
     for (let carried = 1; carried > 0;) {
       guild.advanceTime(5);

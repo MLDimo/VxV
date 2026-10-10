@@ -9,7 +9,7 @@ import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.t
 /** Every roll starts there, and who rolls it loses (owner's rule of 8 October). */
 export const DEATHROLL_LOSING_ROLL = 0;
 
-/** First line of a game sent by the addon (contract with VXV_Deathroll); the number is the format version. */
+/** First line of a game sent by the addon (contract with VXV/Deathroll); the number is the format version. */
 export const DEATHROLL_HEADER = "VXV-DEATHROLL-1";
 
 /** The stake from which a game is announced on Discord (P15.5). */

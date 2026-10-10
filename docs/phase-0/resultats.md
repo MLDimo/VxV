@@ -50,7 +50,7 @@ Conséquence pour la couche Compat : utiliser uniquement les espaces `C_*` moder
 | 0.5 | Liste de guilde : nom, classe, rang | 38 membres lus : « Prénom Nom » pour tous, classe (SHAMAN, ROGUE…), indice et nom du rang, niveau, en ligne. Une 2e demande moins de 10 s après la première ne déclenche pas de mise à jour. | ✅ | Export de la liste par l'addon des officiers faisable (P4.7, P2.4). Ne pas redemander la liste plus d'une fois toutes les 10 s. |
 | 0.6 | SavedVariables relues après /reload | Oui : chargements 1, 2, 3 enchaînés, journal conservé, bloc de 64 Ko relu intact | ✅ | Le bug de la bêta semble corrigé sur le build 70170. |
 | 0.6 | SavedVariables relues après redémarrage | Oui : chargement n° 4 après sortie complète du jeu, bloc de 64 Ko intact | ✅ | |
-| 0.6 | Fichier externe lu après /reload | Oui : 64 Ko écrits jeu ouvert, lus après /reload | ✅ | Valide la descente des données par le compagnon (bundle `VXV_Sync`). |
+| 0.6 | Fichier externe lu après /reload | Oui : 64 Ko écrits jeu ouvert, lus après /reload | ✅ | Valide la descente des données par le compagnon (partie `VXV/Sync` de l'addon). |
 | 0.6 | Taille maximale du fichier externe | 2 Mo lus sans erreur, après /reload et après redémarrage | ✅ | Largement suffisant pour les données de la guilde. |
 | 0.6 | Contournement seed | Inutile : les SavedVariables sont relues normalement | ✅ | Abandonné. |
 
@@ -78,7 +78,7 @@ propriétaire et journal de la sonde.
 | --- | --- | --- |
 | Textures TGA et PNG depuis le dossier de l'addon, filtrage `NEAREST` | Affichées, nettes | PNG, beaucoup plus léger (272 Ko contre 2,6 Mo en TGA RLE pour la taverne) |
 | Texture hors puissance de deux (d20 223 × 256) | Affichée, en TGA comme en PNG | La taverne reste en 1589 × 672, sans marge |
-| Texture répétée : `SetTexture(fichier, "REPEAT", "CLAMP")` et `SetTexCoord` au-delà de 1 (capture du 9 octobre) | Répétée sur toute la largeur : les pointillés de l'onglet Quêtes s'affichent | Lignes pointillées tirées d'un motif de 8 × 1 pixels (`VXV_Missions/Media/dash.png`) |
+| Texture répétée : `SetTexture(fichier, "REPEAT", "CLAMP")` et `SetTexCoord` au-delà de 1 (capture du 9 octobre) | Répétée sur toute la largeur : les pointillés de l'onglet Quêtes s'affichent | Lignes pointillées tirées d'un motif de 8 × 1 pixels (`VXV/Missions/Media/dash.png`) |
 | Polices TTF de l'addon (`FontString:SetFont`) | Chargées, mais en différé : le premier appel renvoie `false` le temps que le fichier se charge, les suivants `true` | Objets de police créés au chargement, réappliqués tant que le jeu répond `false` |
 | Alphabets : latin, cyrillique, chinois, coréen | Pixelify : latin, cyrillique sauf la majuscule « О » ; Manrope : latin et cyrillique ; ni l'une ni l'autre n'a le chinois ni le coréen ; la police du jeu affiche tout | Familles de polices ; le propriétaire préfère le rendu de la famille Pixelify mixte, malgré le « О » cyrillique manquant |
 | `CreateFontFamily` (nos polices pour le latin et le cyrillique, celles du jeu pour le reste) | Fonctionne : `Fonts\2002.TTF` (coréen), `Fonts\ARKai_T.ttf` (chinois simplifié), `Fonts\blei00d.TTF` (chinois traditionnel), lues par `GetFontObjectForAlphabet` | Famille Pixelify : Pixelify (latin et cyrillique), polices du jeu (chinois, coréen). Famille Manrope : Manrope (latin, cyrillique), polices du jeu |
@@ -107,12 +107,12 @@ pendant la partie.
 | T11 envois sans clic | Quels messages l'addon peut-il envoyer sans clic ? | Chuchotement à soi-même (« Ðéjà Vu » comme « Ðéjà-Vu ») et messages d'addon (chuchotement à soi, guilde) : oui. Canal privé (`JoinChannelByName` accepté sans clic) : envois refusés (`ADDON_ACTION_BLOCKED` pour les 9 premiers), 3 des 4 suivants arrivés 11 s plus tard. | ⚠️ | Canal privé inutilisable sans clic. |
 
 Raid du soir à 5 dans La salle des Thanes, VXV et le compagnon 1.4 ouverts (`Logs/WoWCombatLog-100726_225845.txt`, données
-sauvegardées de VXV_Raid) :
+sauvegardées de VXV/Raid) :
 
 | Test | Question | Résultat | Statut | Conséquence |
 | --- | --- | --- | --- | --- |
 | T11 rencontres de boss | Le journal de combat porte-t-il le début et la fin d'une rencontre de boss ? | Oui : `ENCOUNTER_START,3493,"Faldrim Courbenclume",1,5,3065` puis `ENCOUNTER_END,3493,"Faldrim Courbenclume",1,5,1,21464` (identifiant, nom, difficulté, taille du groupe, succès, durée en ms). Le lecteur du compagnon en tire le boss tué et les soins reçus pendant le combat (Pashi 310, Mirriah 94). | ✅ | Princesse et les boss tués lus en direct par le compagnon (`apps/companion/src/domain/combatLog.ts`). |
-| T7 lecture par identifiant | Le compteur se lit-il par l'identifiant de la session du boss, après le combat ? | Oui : en combat, `C_DamageMeter.GetCombatSessionFromID` rend la session, montants et noms secrets (sonde) ; hors combat, VXV_Raid l'a lue au boss tué avec les chiffres de chacun : dégâts de Ðéjà Vu 664, Wazz Tataz 411, Mirriah Belilou 373, Pashi Dewm 345 ; soins de Cataleya Odc 404. | ✅ | Titres de dégâts et de soins à partir du journal de raid (`VXV_Raid/Meter.lua`). |
+| T7 lecture par identifiant | Le compteur se lit-il par l'identifiant de la session du boss, après le combat ? | Oui : en combat, `C_DamageMeter.GetCombatSessionFromID` rend la session, montants et noms secrets (sonde) ; hors combat, VXV/Raid l'a lue au boss tué avec les chiffres de chacun : dégâts de Ðéjà Vu 664, Wazz Tataz 411, Mirriah Belilou 373, Pashi Dewm 345 ; soins de Cataleya Odc 404. | ✅ | Titres de dégâts et de soins à partir du journal de raid (`VXV/Raid/Meter.lua`). |
 
 Bilan : seul le journal de combat porte des données pendant la partie, et seulement du combat. Les SR, inscriptions,
 mises, deathrolls et changements faits en jeu restent portés par les données sauvegardées (`/reload` ou déconnexion).
@@ -131,6 +131,6 @@ La sonde laisse le mode avancé du journal de combat allumé (`advancedCombatLog
 
 Confirmée.
 
-- **Descente** (serveur vers jeu) : le compagnon écrit un fichier Lua dans le bundle `VXV_Sync`, lu au prochain `/reload` ou lancement. ✅ Confirmé jusqu'à 2 Mo.
+- **Descente** (serveur vers jeu) : le compagnon écrit un fichier Lua dans la partie `VXV/Sync` de l'addon, lu au prochain `/reload` ou lancement. ✅ Confirmé jusqu'à 2 Mo.
 - **Remontée** (jeu vers serveur) : le compagnon lit les SavedVariables, écrites à chaque `/reload` et à la déconnexion, et relues par le jeu au lancement suivant. ✅ Confirmé.
 - **Entre joueurs connectés** : messages addon sur GUILD, RAID et PARTY. ✅ Confirmé, avec les limites de la section 0.3.

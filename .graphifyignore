@@ -2,7 +2,7 @@
 package-lock.json
 # Generated from packages/design (npm run generate): the source is tokens.ts.
 packages/design/src/tokens.css
-addon/VXV_Core/UI/Tokens.lua
+addon/VXV/Core/UI/Tokens.lua
 # Probe logs from the game (phase 0): measurements, read in docs/phase-0/resultats.md.
 docs/phase-0/sessions/
 # Images, fonts and other binary media of the website, the addon and the design reference.

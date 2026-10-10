@@ -3,7 +3,7 @@ import { FOREVER_EVENTS } from "../forever.ts";
 import { startGuild } from "../guild.ts";
 import { importText, ONYXIA_NIGHT, startRaid, websiteText } from "./fixtures.ts";
 
-const RAID = { bundles: ["VXV_Raid"] };
+const RAID = { bundles: ["Raid"] };
 const PREFIX = "|cff14b8a6VXV|r ";
 const OFFICER = "Ðéjà Vu";
 const OPEN_RAID_TAB = `
@@ -67,7 +67,7 @@ describe("forming the raid", () => {
     const guild = openRaid();
     const late = guild.join("Lune Rousse");
     settle(guild);
-    expect(late.bundles.VXV_Raid?.run("local _, ns = ... return ns.Invitations.Leader()")).toBe(OFFICER);
+    expect(late.bundles.Raid?.run("local _, ns = ... return ns.Invitations.Leader()")).toBe(OFFICER);
     expect(printed(guild, "Lune Rousse")).toContain(
       `${PREFIX}Ðéjà Vu a ouvert les invitations : clique sur Rejoindre le raid dans l'onglet Raid, ou tape /vxv rejoindre.`,
     );
@@ -106,7 +106,7 @@ describe("forming the raid", () => {
       `${PREFIX}Les invitations ne sont pas encore ouvertes : un officier les ouvre depuis l'onglet Raid.`,
     );
 
-    guild.player(OFFICER).bundles.VXV_Raid?.run("local _, ns = ... ns.Invitations.Toggle()");
+    guild.player(OFFICER).bundles.Raid?.run("local _, ns = ... ns.Invitations.Toggle()");
     settle(guild);
     const thom = guild.player("Thom Leboss");
     thom.client('Group.members = { "Autre Joueur" }');
@@ -127,15 +127,13 @@ describe("forming the raid", () => {
     importText(guild.player(OFFICER).client, websiteText());
     settle(guild);
     const thom = guild.player("Thom Leboss");
-    thom.bundles.VXV_Raid?.run("local _, ns = ... ns.Invitations.Toggle()");
+    thom.bundles.Raid?.run("local _, ns = ... ns.Invitations.Toggle()");
     expect(printed(guild, "Thom Leboss")).toContain(
       `${PREFIX}Réservé aux officiers que le site nomme dans les données du raid.`,
     );
     thom.client('VXV.Broadcast("raid.open", { open = true })');
     settle(guild);
-    expect(guild.player(OFFICER).bundles.VXV_Raid?.run("local _, ns = ... return ns.Invitations.Leader()")).toBe(
-      undefined,
-    );
+    expect(guild.player(OFFICER).bundles.Raid?.run("local _, ns = ... return ns.Invitations.Leader()")).toBe(undefined);
   });
 });
 

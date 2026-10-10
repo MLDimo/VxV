@@ -2,7 +2,7 @@ import { addonHead, line, text, type AddonReaders } from "./addonText.ts";
 import type { RankingPeriod } from "./ranking.ts";
 import type { RankingCategory, RankingUnit } from "./rankingBoards.ts";
 
-/** First line of Ranking's data for the addon (contract with VXV_Ranking); the number is the format version. */
+/** First line of Ranking's data for the addon (contract with VXV/Ranking); the number is the format version. */
 export const ADDON_RANKING_HEADER = "VXV-RANKING-1";
 
 /** The first of each board the addon shows: the podium, then the others down to this place. */

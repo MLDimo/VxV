@@ -1,10 +1,10 @@
 import { toLuaLiteral } from "@vxv/lua";
+import { ADDON_FOLDER } from "./installations.ts";
 
-/** Where the companion writes for the addon, in a version of the game: the VXV_Sync bundle's inbox. */
-export const SYNC_BUNDLE = ["Interface", "AddOns", "VXV_Sync"];
-export const INBOX_FILE = ["External", "Inbox.lua"];
+/** Where the companion writes for the addon, in a version of the game: the inbox of its Sync part. */
+export const INBOX_FILE = [...ADDON_FOLDER, "Sync", "External", "Inbox.lua"];
 
-/** Format of the inbox, read by addon/VXV_Sync/Inbox.lua: a newer one makes the addon ask for its update. */
+/** Format of the inbox, read by addon/VXV/Sync/Companion.lua: a newer one makes the addon ask for its update. */
 const INBOX_VERSION = 1;
 
 const MS_PER_SECOND = 1000;
@@ -36,8 +36,8 @@ export function bundleTexts(download: Readonly<Record<string, unknown>>): Record
 }
 
 /**
- * The inbox as the Lua file the game reads at /reload (contract with addon/VXV_Sync/Inbox.lua). It goes into the
- * bundle's private namespace: no global.
+ * The inbox as the Lua file the game reads at /reload (contract with addon/VXV/Sync/Companion.lua). It goes into the
+ * Sync part's private namespace: no global.
  */
 export function renderInbox({ raid, bundles, writtenAt }: Inbox): string {
   const inbox = {
@@ -48,7 +48,7 @@ export function renderInbox({ raid, bundles, writtenAt }: Inbox): string {
   };
   return [
     "-- Written by the VXV companion at each synchronisation: do not edit, the next one replaces it.",
-    "local _, ns = ...",
+    "local ns = select(2, ...).Sync",
     `ns.Inbox = ${toLuaLiteral(inbox)}`,
     "",
   ].join("\n");

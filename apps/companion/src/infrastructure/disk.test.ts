@@ -15,17 +15,17 @@ describe("game files on the disk", () => {
     await rm(game, { recursive: true, force: true });
   });
 
-  it("writes the inbox into the VXV_Sync bundle of the game", async () => {
-    const bundle = join(game, "Interface", "AddOns", "VXV_Sync");
-    await mkdir(join(bundle, "External"), { recursive: true });
-    await writeFile(join(bundle, "VXV_Sync.toc"), "## Title: VXV Sync");
+  it("writes the inbox into the Sync part of the game's addon VXV", async () => {
+    const addon = join(game, "Interface", "AddOns", "VXV");
+    await mkdir(join(addon, "Sync", "External"), { recursive: true });
+    await writeFile(join(addon, "VXV.toc"), "## Title: VXV");
     expect(await diskGameFiles.writeInbox(game, "ns.Inbox = {}")).toBe(true);
-    expect(await readFile(join(bundle, "External", "Inbox.lua"), "utf8")).toBe("ns.Inbox = {}");
+    expect(await readFile(join(addon, "Sync", "External", "Inbox.lua"), "utf8")).toBe("ns.Inbox = {}");
   });
 
-  it("writes nothing for an addon without VXV_Sync", async () => {
+  it("writes nothing without the addon VXV (absent, or the bundles of before)", async () => {
     expect(await diskGameFiles.writeInbox(game, "ns.Inbox = {}")).toBe(false);
-    await expect(readFile(join(game, "Interface", "AddOns", "VXV_Sync", "External", "Inbox.lua"))).rejects.toThrow();
+    await expect(readFile(join(game, "Interface", "AddOns", "VXV", "Sync", "External", "Inbox.lua"))).rejects.toThrow();
   });
 
   it("finds the combat logs of the game and reads them from where the last reading stopped", async () => {
@@ -41,14 +41,14 @@ describe("game files on the disk", () => {
     expect(await diskGameFiles.combatLogs(join(game, "ailleurs"))).toEqual([]);
   });
 
-  it("finds VXV_Sync's saved data of every account, and reads them", async () => {
+  it("finds the addon's saved data of every account, and reads them", async () => {
     const saved = join(game, "WTF", "Account", "124804161#1", "SavedVariables");
     await mkdir(saved, { recursive: true });
     await mkdir(join(game, "WTF", "Account", "SANS_VXV", "SavedVariables"), { recursive: true });
-    await writeFile(join(saved, "VXV_Sync.lua"), "VXV_SyncDB = {}");
+    await writeFile(join(saved, "VXV.lua"), "VXV_SyncDB = {}");
     const files = await diskGameFiles.savedFiles(game);
-    expect(files).toEqual([{ path: join(saved, "VXV_Sync.lua"), modifiedAt: expect.any(Number) }]);
-    expect(new TextDecoder().decode(await diskGameFiles.read(join(saved, "VXV_Sync.lua")))).toBe("VXV_SyncDB = {}");
+    expect(files).toEqual([{ path: join(saved, "VXV.lua"), modifiedAt: expect.any(Number) }]);
+    expect(new TextDecoder().decode(await diskGameFiles.read(join(saved, "VXV.lua")))).toBe("VXV_SyncDB = {}");
     expect(await diskGameFiles.savedFiles(join(game, "ailleurs"))).toEqual([]);
   });
 });

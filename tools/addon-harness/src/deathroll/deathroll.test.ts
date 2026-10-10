@@ -6,7 +6,7 @@ import { startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
-const BUNDLES = ["VXV_Deathroll", "VXV_Sync"];
+const BUNDLES = ["Deathroll", "Sync"];
 const THOM = "Thom Leboss";
 const VORN = "Vorn Cendrelune";
 const SIRA = "Sira Ventargent";
@@ -47,12 +47,12 @@ function startTrio(): Guild {
 function challengeAndAccept(guild: Guild): string {
   const thom = guild.player(THOM);
   expect(
-    thom.bundles.VXV_Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${VORN}", "500", "1000")`),
+    thom.bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${VORN}", "500", "1000")`),
   ).toBeUndefined();
   settle(guild);
   guild.player(VORN).client(CLICK("VXV_DeathrollChallenge", "Accepter"));
   settle(guild, 1);
-  return guild.player(SIRA).bundles.VXV_Deathroll?.run(`local _, ns = ... return ns.Games.Live()[1].id`) as string;
+  return guild.player(SIRA).bundles.Deathroll?.run(`local _, ns = ... return ns.Games.Live()[1].id`) as string;
 }
 
 /** The player rolls with the button, and the game's server answers the roll in the chat. */
@@ -82,10 +82,10 @@ describe("the deathroll in game (P15)", () => {
     // Sira bets during the minute; a player may not.
     const sira = guild.player(SIRA);
     expect(
-      sira.bundles.VXV_Deathroll?.run(`local _, ns = ... return ns.Duels.Bet("${id}", "${THOM}", "100")`),
+      sira.bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Bet("${id}", "${THOM}", "100")`),
     ).toBeUndefined();
     expect(
-      guild.player(THOM).bundles.VXV_Deathroll?.run(`local _, ns = ... return ns.Duels.Bet("${id}", "${THOM}", "100")`),
+      guild.player(THOM).bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Bet("${id}", "${THOM}", "100")`),
     ).toBe("Les joueurs ne parient pas sur leur partie.");
     settle(guild, 1);
     // No roll during the minute of bets.
@@ -104,7 +104,7 @@ describe("the deathroll in game (P15)", () => {
     settle(guild, 1);
     roll(guild, VORN, 87, 0);
     for (const name of [THOM, VORN, SIRA]) {
-      const game = guild.player(name).bundles.VXV_Deathroll?.run(LAST_GAME(id)) as { rolls: unknown[] };
+      const game = guild.player(name).bundles.Deathroll?.run(LAST_GAME(id)) as { rolls: unknown[] };
       expect(game.rolls).toHaveLength(3);
     }
     guild.player(VORN).client("for _ = 1, 40 do AdvanceTime(0.1) VXV_DuelWindow:Run('OnUpdate', 0.1) end");
@@ -117,11 +117,9 @@ describe("the deathroll in game (P15)", () => {
     expect(sent.bets).toEqual([{ bettor: SIRA, choice: THOM, amount: 100 }]);
     // Vorn owes the stake: no new challenge until Thom confirms.
     expect(
-      guild
-        .player(VORN)
-        .bundles.VXV_Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${SIRA}", "10", "100")`),
+      guild.player(VORN).bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${SIRA}", "10", "100")`),
     ).toBe("Tu as une dette (paris ou deathroll) : règle-la pour jouer de nouveau.");
-    guild.player(THOM).bundles.VXV_Deathroll?.run(`local _, ns = ... ns.Duels.ConfirmPaid("${id}")`);
+    guild.player(THOM).bundles.Deathroll?.run(`local _, ns = ... ns.Duels.ConfirmPaid("${id}")`);
     settle(guild, 1);
     const paid = parseDeathroll(guild.player(THOM).client(`return VXV_SyncDB.texts.deathroll["${id}"]`) as string);
     expect(paid.paid?.by).toBe(THOM);
@@ -148,14 +146,14 @@ describe("the deathroll in game (P15)", () => {
       exportedAt: new Date("2026-12-10T07:00:00Z"),
     });
     const { bundles, errors } = startCore({ written: companionFiles({ deathroll: text }), bundles: BUNDLES });
-    expect(bundles.VXV_Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${VORN}", "10", "100")`)).toBe(
+    expect(bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${VORN}", "10", "100")`)).toBe(
       "Vorn Cendrelune a une dette : pas de deathroll avant qu'elle soit réglée.",
     );
     expect(errors()).toEqual([]);
   });
 
   it("shows Le Dé Pipé's two tabs, Paris then Deathroll", () => {
-    const { client } = startCore({ bundles: ["VXV_Deathroll", "VXV_Paris"] });
+    const { client } = startCore({ bundles: ["Deathroll", "Paris"] });
     client(`SlashCmdList.VXV("")
       FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Le Dé Pipé" end):Run("OnClick")`);
     const tabs = client(`

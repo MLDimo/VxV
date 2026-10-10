@@ -599,7 +599,7 @@ figure { margin: 0; min-width: 0; }
         <p class="lead">Tout ce que VXV fait pour la guilde, sur Discord, sur le site et dans le jeu. Tu y apprendras à t'inscrire aux raids, réserver ton loot, parier, relever les quêtes, porter des titres et trouver un artisan. Chaque fonctionnalité est montrée avec un exemple.</p>
         <div class="quick">
           <a href="#lier"><b>1 · Lier ton perso</b><span><code>/vxv_main</code> dans le salon de liaison, une seule fois</span></a>
-          <a href="#addon"><b>2 · Installer l'addon</b><span>quelques dossiers à copier dans AddOns</span></a>
+          <a href="#addon"><b>2 · Installer l'addon</b><span>un seul dossier à copier dans AddOns</span></a>
           <a href="#inscription"><b>3 · T'inscrire</b><span>au prochain raid, d'un clic</span></a>
         </div>
       </div>
@@ -839,11 +839,11 @@ figure { margin: 0; min-width: 0; }
         <div class="prose">
           <ol class="steps">
             <li><p>Récupère l'archive de l'addon VXV : le lien est donné sur le Discord de la guilde.</p></li>
-            <li><p>Ouvre-la : elle contient plusieurs dossiers <code>VXV_…</code>. Copie-les tous dans le dossier <code>Interface/AddOns</code> de WoW Forever.</p></li>
+            <li><p>Ouvre-la : elle contient un seul dossier, <code>VXV</code>. Copie-le dans le dossier <code>Interface/AddOns</code> de WoW Forever.</p></li>
             <li><p>Relance le jeu (un nouveau dossier d'addon demande un redémarrage, pas seulement un <code>/reload</code>), puis tape <code>/vxv</code>.</p></li>
           </ol>
-          <p>VXV est fait de plusieurs petits addons : un socle (<code>VXV_Core</code>) et un par lieu. Garde-les tous activés dans la liste des addons du jeu.</p>
-          <p>À chaque nouvelle version annoncée sur Discord, remplace les dossiers <code>VXV_…</code> par ceux de la nouvelle archive, puis relance le jeu.</p>
+          <p>Tous les lieux sont dans ce seul addon : une seule case à cocher dans la liste des addons du jeu.</p>
+          <p>À chaque nouvelle version annoncée sur Discord, remplace le dossier <code>VXV</code> par celui de la nouvelle archive, puis relance le jeu.</p>
           <div class="note">
             <b class="t">Réservé aux membres</b>
             <p>Hors de la guilde, l'addon reste muet : <em>« VXV est réservé aux membres de la guilde. »</em></p>
@@ -852,17 +852,13 @@ figure { margin: 0; min-width: 0; }
         <figure class="fig">
           <div class="panel" style="box-shadow: 0 0 0 3px var(--beam), 0 0 0 6px var(--wood-shade);">
             <h5>Interface/AddOns <small>WoW Forever</small></h5>
-            <div class="row"><span class="ivory">VXV_Core</span><span class="pill">le socle</span></div>
-            <div class="row"><span class="ivory">VXV_Raid</span><span class="muted small">raids, SR, butin</span></div>
-            <div class="row"><span class="ivory">VXV_PvP</span><span class="muted small">sorties et duels</span></div>
-            <div class="row"><span class="ivory">VXV_Paris · VXV_Deathroll</span><span class="muted small">Le Dé Pipé</span></div>
-            <div class="row"><span class="ivory">VXV_Missions</span><span class="muted small">quêtes</span></div>
-            <div class="row"><span class="ivory">VXV_Ranking · VXV_Titles</span><span class="muted small">classements, titres</span></div>
-            <div class="row"><span class="ivory">VXV_Artisans</span><span class="muted small">métiers</span></div>
-            <div class="row"><span class="ivory">VXV_Sync</span><span class="muted small">lien avec le compagnon</span></div>
-            <div class="row"><span class="ivory">VXV_Data_…</span><span class="muted small">un par raid : boss et loot</span></div>
+            <div class="row"><span class="ivory">VXV</span><span class="pill">une seule case</span></div>
+            <div class="row"><span class="muted small">Raid · PvP · Le Dé Pipé · Quêtes</span><span class="muted small">tous les lieux</span></div>
+            <div class="row"><span class="muted small">Ranking · Titres · Artisans</span><span class="muted small">compris</span></div>
+            <div class="row"><span class="muted small">boss et loot des raids</span><span class="muted small">compris</span></div>
+            <div class="row"><span class="muted small">lien avec le compagnon</span><span class="muted small">compris</span></div>
           </div>
-          <figcaption><span class="example-tag">Exemple</span> · <b>Les dossiers de l'addon.</b> Chaque lieu est un petit addon, tous appuyés sur le socle.</figcaption>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le dossier de l'addon.</b> Tous les lieux de la taverne dans un seul addon.</figcaption>
         </figure>
       </div>
     </section>

@@ -2,7 +2,7 @@ import { readLuaData } from "@vxv/lua";
 import { describe, expect, it } from "vitest";
 import { mergeOutboxes, readOutbox, textDigest } from "./outbox.ts";
 
-/** The file the game writes for VXV_Sync's saved data, as WoW formats it. */
+/** The file the game writes for the addon's saved data (VXV_SyncDB among them), as WoW formats it. */
 const SAVED = `
 VXV_SyncDB = {
 	["version"] = 1,
@@ -90,6 +90,12 @@ describe("outbox of the addon", () => {
     });
     expect(read("VXV_SyncDB = { version = 2 }")).toEqual({ kind: "newer" });
     expect(read("VXV_Other = 1")).toEqual({ kind: "none" });
+  });
+
+  it("finds its data among the addon's others, in the one file the game saves for VXV", () => {
+    expect(read("VXV_DB = { schemaVersion = 2 }\nVXV_SyncDB = { version = 1, raidLogs = { e1 = 3 } }")).toMatchObject({
+      kind: "read",
+    });
   });
 
   it("merges the accounts: the latest roster, every record, character and change", () => {
