@@ -3,22 +3,22 @@ import { basename, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { readTocFiles } from "../addon.ts";
 import { addonDirectories, luacheckRules } from "../conventions.ts";
-import { CORE_DIR, startCore } from "../core.ts";
+import { ADDON_DIR, startCore } from "../core.ts";
 import { foreverApi, LUA_ENVIRONMENT, OPTIONAL_API } from "../foreverApi.ts";
 import { globalReferences } from "../globalReads.ts";
 
 /** Compat's wrappers and their candidate functions, as written in Compat.lua. */
 function compatAliases(): [string, string[]][] {
-  const source = readFileSync(join(CORE_DIR, "Core/Compat.lua"), "utf8");
+  const source = readFileSync(join(ADDON_DIR, "Core/Core/Compat.lua"), "utf8");
   return [...source.matchAll(/^\s+(\w+) = \{ ((?:"[^"]+",? ?)+)\}/gm)].map((match) => [
     match[1] ?? "",
     [...(match[2] ?? "").matchAll(/"([^"]+)"/g)].map((candidate) => candidate[1] ?? ""),
   ]);
 }
 
-describe("Blizzard API of the bundles", () => {
-  const bundles = addonDirectories().filter((directory) => directory.includes("/addon/"));
-  it.each(bundles.map((directory) => [basename(directory), directory]))(
+describe("Blizzard API of the addon", () => {
+  const addons = addonDirectories().filter((directory) => directory.includes("/addon/"));
+  it.each(addons.map((directory) => [basename(directory), directory]))(
     "%s reads directly only what was measured on WoW Forever; the rest goes through Compat",
     (_, directory) => {
       const allowed = new Set([...LUA_ENVIRONMENT, ...foreverApi(), ...luacheckRules().allowedGlobals]);

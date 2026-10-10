@@ -5,7 +5,7 @@ import { addonReaders } from "./addonReaders.ts";
 import type { DuelBoard, DuelView } from "./duels.ts";
 import type { Clock, UnitOfWork } from "./ports.ts";
 
-/** The PvP as the companion hands it to the addon (VXV_PvP): the outings to come, the duels and their ranking. */
+/** The PvP as the companion hands it to the addon (VXV/PvP): the outings to come, the duels and their ranking. */
 export function createAddonPvp({
   unitOfWork,
   clock,

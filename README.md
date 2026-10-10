@@ -15,7 +15,7 @@ npm i -g npm@11  # npm 11 ou plus (npm 10 plante sur la résolution des dépenda
 npm install      # installe tous les espaces de travail
 npx playwright install chromium   # navigateur des tests de bout en bout, une fois
 npm run check    # formatage, lint, typage, tests unitaires et de bout en bout ; aussi lancé avant chaque push
-npm run generate # packs de l'addon et SQL des raids, depuis data/raids
+npm run generate # données des raids (addon et SQL) depuis data/raids, jetons de la charte
 npm run dev -w @vxv/web   # site en local sur http://localhost:3000
 VXV_SITE_URL=http://localhost:3000 npm start -w @vxv/companion   # compagnon relié au site local
 npm run package -w @vxv/companion   # installeur du compagnon pour la plateforme, dans apps/companion/release
@@ -36,14 +36,14 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `packages/raid-data` | Schéma et validation des données de raid (`@vxv/raid-data`) |
 | `packages/lua` | Données Lua 5.1 : écriture pour l'addon, lecture des SavedVariables du jeu sans les exécuter (`@vxv/lua`) |
 | `packages/design` | Jetons de la charte (couleurs, polices), thème du site et de l'addon générés (`@vxv/design`) |
-| `addon/` | Bundles Lua de l'addon (`VXV_Core`, `VXV_Raid`, `VXV_Sync`, `VXV_Paris`…) |
+| `addon/VXV` | L'addon, en un seul dossier : le socle (`Core`), une partie par lieu (`Raid`, `Paris`…), le lien avec le compagnon (`Sync`) et les données des raids (`Data`) |
 | `data/raids` | Source des données de raid en JSON, une par raid ([format](data/raids/README.md)) |
 | `supabase/` | Schéma, migrations et tests de la base (`@vxv/database`) |
-| `tools/data-generator` | Packs de l'addon et script SQL des raids dans `dist/generated` (`npm run generate`) |
-| `tools/addon-release` | Rassemble les dossiers de l'addon et inscrit la version (`npm run release:prepare -- v1.2.0`) |
-| `tools/addon-harness` | Banc d'essai des addons hors du jeu, sur un client simulé, et export du journal de la sonde (`npm run export:probe -- <fichier>`) |
+| `tools/data-generator` | Données des raids : `addon/VXV/Data/Raids.lua` et script SQL dans `dist/generated` (`npm run generate`) |
+| `tools/addon-release` | Copie l'addon à publier et inscrit la version (`npm run release:prepare -- v1.2.0`) |
+| `tools/addon-harness` | Banc d'essai de l'addon hors du jeu, sur un client simulé, et export du journal de la sonde (`npm run export:probe -- <fichier>`) |
 | `tools/VXV_Probe` | Sonde : addon de mesure sur WoW Forever, jamais distribué |
-| `tools/install-addon.sh` | Construit l'addon comme une publication (version de développement) et l'installe dans un client |
+| `tools/install-addon.sh` | Construit l'addon comme une publication (version de développement) et l'installe dans un client, à la place des anciens dossiers `VXV_…` |
 | `tools/install-probe.sh` | Copie la sonde dans le dossier AddOns d'un client |
 | `tools/deploy-database.sh` | Déploie la base : migrations puis données de raid |
 | `docs/` | Charte graphique, résultats de la sonde, tests à faire en jeu |
@@ -103,7 +103,7 @@ Une étiquette `v<version>` sur `main` lance la publication, après les tests :
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
-La CI génère les packs, crée l'archive `VXV-<version>.zip`, puis la publie sur GitHub. Une version avec un tiret, comme
+La CI crée l'archive `VXV-<version>.zip`, un seul dossier `VXV`, puis la publie sur GitHub. Une version avec un tiret, comme
 `v0.2.0-beta.1`, est publiée en bêta. Un lancement manuel du flux « Release addon » construit l'archive sans rien
 publier. L'envoi sur CurseForge et Wago s'active dès que leurs secrets et variables sont renseignés.
 

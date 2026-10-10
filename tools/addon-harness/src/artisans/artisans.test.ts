@@ -6,7 +6,7 @@ import { loadedBundle, startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
-const BUNDLES = ["VXV_Artisans", "VXV_Sync"];
+const BUNDLES = ["Artisans", "Sync"];
 /** Lua: Thom's professions, his first aid's window holding two learned recipes and one he has not learned. */
 const FIRST_AID = `
   Professions = {
@@ -107,11 +107,11 @@ describe("the artisans in game (P14)", () => {
     thom.client(OPEN(1));
     settle(guild);
     const ciel = guild.player("Ciel Gris");
-    expect(ciel.bundles.VXV_Artisans?.run(SEARCH("bandage"))).toEqual(["Bandage en lin : Thom Leboss 22"]);
+    expect(ciel.bundles.Artisans?.run(SEARCH("bandage"))).toEqual(["Bandage en lin : Thom Leboss 22"]);
     // Aube logs in after: she asks Thom's addon for what she misses.
     const aube = guild.join("Aube Claire", { bundles: BUNDLES });
     settle(guild);
-    expect(aube.bundles.VXV_Artisans?.run(SEARCH("potion"))).toEqual(["Potion de soins mineure : Thom Leboss 22"]);
+    expect(aube.bundles.Artisans?.run(SEARCH("potion"))).toEqual(["Potion de soins mineure : Thom Leboss 22"]);
     for (const player of guild.players) {
       expect(player.errors()).toEqual([]);
     }
@@ -179,7 +179,7 @@ describe("the artisans in game (P14)", () => {
       exportedAt: new Date("2026-12-10T07:00:00Z"),
     });
     const { bundles } = startCore({ written: companionFiles({ artisans: text }), bundles: BUNDLES });
-    expect(bundles.VXV_Artisans?.run(SEARCH("chemise"))).toEqual(["Chemise en lin brun : Sira Ventargent 150"]);
+    expect(bundles.Artisans?.run(SEARCH("chemise"))).toEqual(["Chemise en lin brun : Sira Ventargent 150"]);
   });
 
   it("says in a recipe's tooltip whether the guild knows it, in green or in red (owner's request of 7 October)", () => {
@@ -208,5 +208,5 @@ describe("the artisans in game (P14)", () => {
 function startArtisans() {
   const started = startCore({ playerName: "Thom Leboss", beforeLogin: true, bundles: BUNDLES });
   started.client(`${FIRST_AID} Fire("PLAYER_LOGIN")`);
-  return { ...started, artisans: loadedBundle(started, "VXV_Artisans") };
+  return { ...started, artisans: loadedBundle(started, "Artisans") };
 }

@@ -32,7 +32,7 @@ export function settle(guild: Guild, seconds = 30): void {
  * looter, and every other player stays out.
  */
 export function raidWithData(inRaid: readonly string[], outside: readonly string[] = []): Guild {
-  const guild = startGuild([...inRaid, ...outside], { bundles: ["VXV_Raid"] });
+  const guild = startGuild([...inRaid, ...outside], { bundles: ["Raid"] });
   settle(guild);
   importText(guild.player(OFFICER).client, websiteText());
   settle(guild);

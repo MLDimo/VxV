@@ -5,7 +5,7 @@ import type { GuildEvent } from "./events.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
 import type { Signup } from "./signups.ts";
 
-/** First line of the PvP data for the addon (contract with VXV_PvP); the number is the format version. */
+/** First line of the PvP data for the addon (contract with VXV/PvP); the number is the format version. */
 export const ADDON_PVP_HEADER = "VXV-PVP-2";
 
 /** The first of the Elo ranking the addon shows. */

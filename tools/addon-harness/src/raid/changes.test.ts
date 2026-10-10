@@ -4,7 +4,7 @@ import { companionFiles } from "../sync/fixtures.ts";
 import { ONYXIA_NIGHT, ONYXIA_PACK, RAIDER_ROLE, roleChoicesText, startRaid, websiteText } from "./fixtures.ts";
 
 const PREFIX = "|cff14b8a6VXV|r ";
-const BUNDLES = ["VXV_Raid", "VXV_Sync"];
+const BUNDLES = ["Raid", "Sync"];
 const PENDING = `
   local list = {}
   for _, change in pairs(VXV_DB.modules.raid.pending) do list[#list + 1] = change end
@@ -288,7 +288,7 @@ describe("relaying the changes of the members without the companion", () => {
     }
     guild
       .player("Thom Leboss")
-      .bundles.VXV_Raid?.run('local _, ns = ... ns.Changes.Submit({ kind = "reserves", itemIds = { 21 } })');
+      .bundles.Raid?.run('local _, ns = ... ns.Changes.Submit({ kind = "reserves", itemIds = { 21 } })');
     // A forged change, whose id is not the sender's, is not relayed.
     guild
       .player("Thom Leboss")

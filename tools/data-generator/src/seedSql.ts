@@ -1,7 +1,7 @@
 import type { Raid } from "@vxv/raid-data";
 import type { OutputFile } from "./outputFile.ts";
 
-export const SEED_SQL_PATH = "database/raid-data.sql";
+export const SEED_SQL_PATH = "dist/generated/database/raid-data.sql";
 
 function text(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;

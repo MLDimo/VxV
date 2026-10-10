@@ -13,7 +13,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 
 ## Fonctionnalités
 
-- **Socle `VXV_Core`** : modules, bus, stockage versionné, Compat ; fenêtre 1000×680 à un onglet par lieu (`/vxv`,
+- **Socle `VXV/Core`** : modules, bus, stockage versionné, Compat ; fenêtre 1000×680 à un onglet par lieu (`/vxv`,
   icône de minimap) et mode réduit 420×600 (`/vxv` rouvre le dernier mode) ; messages entre addons (morceaux de
   255 octets, file 10 + 1/s, pause pendant les boss, versions, présence, `/vxv ping`) ; filtre de guilde
   (`Core/Config.lua` : VXV sur Forever, THE DALIRANAS sur la bêta) ; export de la liste de guilde (`/vxv liste`) ;
@@ -29,13 +29,13 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   défis) ; ce qui arrive seul reste dans ses écrans : données chargées et modifications (Raid, Journal), données
   d'avant le verrouillage (badge du Raid pour un officier), mise à jour disponible (bas de la Taverne). Les annonces
   « [VXV] » des canaux de raid et de guilde restent visibles de tous.
-- **Raid et SR** (`VXV_Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
+- **Raid et SR** (`VXV/Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
   Discord. Le nombre de SR est fixé à la création. Seuls les objets que la classe du personnage inscrit peut équiper se
   réservent (décision du propriétaire du 10 octobre, règles de Classic au niveau 60, `domain/equipment.ts`) : l'addon
-  de chaque membre lit dans le jeu la catégorie, la sous-catégorie et l'emplacement des objets des packs
-  (`VXV_Raid/ItemKinds.lua`, `C_Item.GetItemInfo`, relu toutes les 10 s tant qu'un objet manque au cache) et les envoie
+  de chaque membre lit dans le jeu la catégorie, la sous-catégorie et l'emplacement des objets des raids
+  (`VXV/Raid/ItemKinds.lua`, `C_Item.GetItemInfo`, relu toutes les 10 s tant qu'un objet manque au cache) et les envoie
   par le compagnon (`VXV-OBJETS-1`) ; le site garde la première lecture de chaque objet, refuse une SR impossible,
   ne propose pas la case, et dit à l'addon qui peut porter chaque objet (lignes `W`). Un objet pas encore lu, une
   cape, une bague ou un jeton vont à toutes les classes. « Réutiliser mes SR précédentes » (site et jeu, demande du
@@ -59,7 +59,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   En jeu : inscrits (icône de rôle, couleur de classe), mes SR, SR du raid avec SR+, invitations (Rejoindre invite les
   inscrits attendus avec leur personnage principal, Inviter tout le roster, passage en raid à la première
   acceptation).
-- **Butin et journal** (`VXV_Raid`) : quand le maître du butin ouvre le corps, tout le raid voit le butin et ses SR.
+- **Butin et journal** (`VXV/Raid`) : quand le maître du butin ouvre le corps, tout le raid voit le butin et ses SR.
   Attribution : une SR, sans roll ; plusieurs, roll entre elles avec le SR+ ; aucune, roll libre, réservé aux classes
   qui peuvent équiper l'objet (les autres n'ont pas la fenêtre de roll, et leur jet ne compte pas) ; objet exclu, loot
   council. Rolls suivis en direct, annonces dans le canal du groupe, don d'un clic. Journal du raid diffusé par le
@@ -67,7 +67,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`Meter.lua`), résurrections acceptées (`Raised.lua`) ; envoyé par le compagnon ou exporté (`/vxv journal`), importé
   sur le site, corrigé par un officier avec motif. Tous les loots sont gardés avec leur mode (SR, SR+, roll libre,
   loot council) ; présences et loots nourrissent le SR+. Récap Discord de chaque raid le lendemain.
-- **PvP** (site `/pvp`, bot, `VXV_PvP`) : deux onglets, Événements et Duels, sur le site comme en jeu. Événements
+- **PvP** (site `/pvp`, bot, `VXV/PvP`) : deux onglets, Événements et Duels, sur le site comme en jeu. Événements
   PvP créés par un officier (site, `/vxv_pvp`, en jeu) comme les soirées de raid, avec un titre à la place des raids
   et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes inscriptions et rappels, message
   dans le salon PvP (`DISCORD_PVP_CHANNEL_ID`, salon des raids sans lui), page `/pvp/evenements/<id>`. Duels
@@ -82,19 +82,19 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   joueur). En jeu : défier sa cible ou un « Prénom Nom », relever, refuser, reconnaître sa défaite, annuler ; le
   résultat d'un duel du joueur est lu dans le canal système avec les formats du jeu (`DUEL_WINNER_KNOCKOUT`,
   `DUEL_WINNER_RETREAT`, par `Compat.Resolve`, non mesurés) et envoyé au site, qui garde le premier.
-- **Prochain boss** (`VXV_Raid`) : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre du
-  pack) ; ailleurs, le premier boss debout des raids de l'événement ; un joueur arrivé en retard apprend du maître du
+- **Prochain boss** (`VXV/Raid`) : dans l'instance d'un raid, son premier boss pas encore tué à l'événement (ordre des
+  données du raid) ; ailleurs, le premier boss debout des raids de l'événement ; un joueur arrivé en retard apprend du maître du
   butin (ou du chef) les boss tués. Panneau en tête des SR du raid et dans le mode réduit ; alerte (message au milieu
   de l'écran, son de l'avertissement de raid) une fois par boss où le joueur a une SR, désactivable (`/vxv alerte`).
   Position relue toutes les 5 s (`Place.lua`, événement `raid.place`).
 - **Compagnon** (`apps/companion`, Electron, Windows et Mac) : liaison au compte en un clic (navigateur, PKCE, jeton
   haché côté site, rôles relus sur Discord chaque heure) ; mises à jour depuis `MLDimo/vxv-compagnon`. Toutes les
-  5 minutes, il écrit les données du site dans la boîte de réception de `VXV_Sync`, lue au `/reload` ; après chaque
+  5 minutes, il écrit les données du site dans la boîte de réception de `VXV/Sync`, lue au `/reload` ; après chaque
   `/reload` ou déconnexion, il envoie au site ce que l'addon a rangé dans `VXV_SyncDB`. Dans les raids, il lit le
   journal de combat au fil de l'eau et envoie chaque boss tué. Rien d'autre ne passe du jeu au compagnon sans
   `/reload`, et pas de bouton ni de commande qui recharge l'interface (décision du propriétaire). Un nouveau lieu ne demande pas de nouvelle
   version : il recopie toute donnée de bundle que le site fournit et envoie tous les textes de `VXV_SyncDB.texts`.
-- **Paris** (`VXV_Paris`, Le Dé Pipé › Paris ; site `/paris`) : ouverts par un officier (site, `/vxv_pari`, « Ouvrir un
+- **Paris** (`VXV/Paris`, Le Dé Pipé › Paris ; site `/paris`) : ouverts par un officier (site, `/vxv_pari`, « Ouvrir un
   pari » en jeu, `UI/BetDialog.lua`), de 2 à 10 choix avec une heure de fermeture. Pièces d'or entières ; une mise par
   membre et par pari, modifiable ou retirable jusqu'à la fermeture tant qu'elle n'est pas notée payée. Part de
   l'organisation : 10 % de la cagnotte, jamais plus que les mises perdantes ; gains au prorata des mises, arrondis à la
@@ -104,7 +104,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   paris, dons, dépenses, récompenses ; une erreur se corrige par un autre mouvement), sur la page gauche du Journal.
   Saisons lancées par un officier. Message Discord de chaque pari à jour à chaque mise, boutons « Miser » et « Retirer
   ma mise ».
-- **Missions** (`VXV_Missions`, Quêtes ; site `/quetes`, `/vxv_mission`) : pêche (statistique 1456), herboristerie,
+- **Missions** (`VXV/Missions`, Quêtes ; site `/quetes`, `/vxv_mission`) : pêche (statistique 1456), herboristerie,
   minage et dépeçage (le jeu ne les compte pas : une fenêtre de butin avec une herbe, un minerai ou un cuir compte
   pour une récolte, `Gathering.lua`), victoires honorables (`GetPVPLifetimeStats`). Score : ce que gagnent les
   compteurs de tous les personnages liés du membre pendant la mission ; à égalité, le premier à l'atteindre. Compteurs
@@ -112,15 +112,15 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct. Écran Quêtes comme la
   maquette `AddonMissions.html` : quête épinglée sur son parchemin (sceau VXV, lots, cinq premiers, progression jusqu'au
   podium par `missionProgress`), À venir, Terminées sous leur tampon, Hall of fame et zone officier ; en jeu, images
-  dans `VXV_Missions/Media`, et « Publier une quête » comme `/vxv_mission` (type aux flèches, titre sinon celui du type,
+  dans `VXV/Missions/Media`, et « Publier une quête » comme `/vxv_mission` (type aux flèches, titre sinon celui du type,
   récompense, jours depuis la publication en jeu, motif), envoyée au site comme changement fait en jeu.
-- **Titres** (`VXV_Titles` ; règles dans `domain/titles.ts`) : chaque titre va au membre en tête de sa règle sur la
+- **Titres** (`VXV/Titles` ; règles dans `domain/titles.ts`) : chaque titre va au membre en tête de sa règle sur la
   saison (à égalité, le premier à l'atteindre ; sans score positif, à personne), réattribué chaque mercredi à 5 h UTC,
   avec l'historique, un rôle Discord « ◆ <titre> » et l'annonce de la semaine (salon des titres,
   `DISCORD_TITLES_CHANNEL_ID`, salon des raids sans lui). Grand duelliste : le premier de l'Elo des duels (tous les
   duels, comme le classement), s'il a une cote positive. Princesse : soins reçus sur les boss
   tués en raid VXV, lus dans le journal de combat, que l'addon allume avec son mode avancé dans l'instance d'un raid
-  des packs et éteint en sortant s'il l'a allumé (`VXV_Raid/CombatLogging.lua`) ; le site garde le relevé le plus
+  connu et éteint en sortant s'il l'a allumé (`VXV/Raid/CombatLogging.lua`) ; le site garde le relevé le plus
   complet de chaque combat et retrouve les joueurs par prénom parmi les présents du journal du raid
   (`domain/bossFights.ts`). Un titre dont la mesure peut manquer des données (`OFFICER_TITLES`) se donne aussi par un
   officier sur Ranking › Titres, pour la semaine affichée, avec motif (`title.give`) ; le mercredi le recalcule.
@@ -130,7 +130,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   autres, jamais comptés dans le classement des titres. En
   jeu : une ligne dans l'infobulle d'un membre, ses titres avant ses messages dans le canal de guilde et après son nom
   dans la liste de guilde ; un nouveau titre ne demande pas de mise à jour de l'addon.
-- **Artisans** (`VXV_Artisans` ; site `/artisans`) : niveaux des métiers relus à chaque connexion, recettes apprises à
+- **Artisans** (`VXV/Artisans` ; site `/artisans`) : niveaux des métiers relus à chaque connexion, recettes apprises à
   l'ouverture de la fenêtre du métier, pour chaque personnage du compte (seulement les métiers du joueur, au niveau de
   sa liste). La lecture la plus récente gagne ; un niveau relu sans ses recettes garde les recettes connues. Partage
   dans la guilde : chaque addon dit ses métiers quand ils changent et, à la connexion, la liste de ce qu'il a ; il
@@ -138,14 +138,14 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   fabriquer… ? » sans accents ni casse. L'annuaire du site n'arrive que par le compagnon (trop gros pour le relais des
   officiers). Infobulle d'un objet de recette (`RecipeItems.lua`) : « Recette possédée par VXV » en vert ou « Recette
   non possédée par VXV » en rouge, le nom après « : » comparé sans accents ni casse ; rien sur les livres.
-- **Deathroll** (`VXV_Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
+- **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
   connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde et une minute de paris (pas les joueurs,
   pas un membre endetté) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,
   fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel animée et synchronisée chez toute la guilde. Partie finie envoyée au site, qui la
   vérifie, crée et règle le pari de la guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du
   gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
   (`DISCORD_DEATHROLLS_CHANNEL_ID`, salon des paris sans lui).
-- **Ranking** (`VXV_Ranking` ; site `/ranking`) : Paris et Deathroll au gain net, Quêtes aux points de places (3, 2 et
+- **Ranking** (`VXV/Ranking` ; site `/ranking`) : Paris et Deathroll au gain net, Quêtes aux points de places (3, 2 et
   1 par quête validée), Titres aux semaines détenues (`domain/rankingBoards.ts`, égalités départagées par le nom), par
   période (toujours, mois, saison). Fanions des trois premiers, trois records, suite du classement, position du joueur
   en bas, comme la capture `docs/design/captures/ranking.jpg`. Le jeu ne fait pas tourner les cadres : pas de
@@ -154,7 +154,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 ## Design (charte « La Taverne »)
 
 - Référence : `docs/design/VXV_Design_Spec.md`, maquettes HTML (valeurs CSS de référence) et captures (rendu attendu).
-- Jetons dans `packages/design/src/tokens.ts`, seule source des couleurs et des polices. `npm run generate` écrit `tokens.css` (thème Tailwind du site) et `VXV_Core/UI/Tokens.lua` ; un test vérifie que les fichiers générés sont à jour.
+- Jetons dans `packages/design/src/tokens.ts`, seule source des couleurs et des polices. `npm run generate` écrit `tokens.css` (thème Tailwind du site) et `VXV/Core/UI/Tokens.lua` ; un test vérifie que les fichiers générés sont à jour.
 - Pixel art : aucun arrondi (retirés du thème), reliefs en anneaux d'ombres pleines, survol prune et or, zones officier à liseré or.
 - Pixelify Sans pour les titres, onglets, plaques, boutons et gros chiffres ; Manrope pour le texte, noms de joueurs compris.
   Dans nos fichiers de Pixelify Sans (site et addon), le 2, le 5, le C et le c sont redessinés sur sa grille : base
@@ -167,7 +167,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   France) : Voile d'hiver, De l'amour dans l'air, Jardin des nobles (semaine de Pâques), solstice d'été, Fête des
   Brasseurs, Sanssaint, et chaque mois la Foire de Sombrelune (la semaine du premier dimanche, qui cède la place
   aux autres fêtes). Chaque fête a son image, aux mêmes dimensions et avec les lieux aux mêmes places
-  (`apps/web/public/images/tavernes/<id>.jpg`, `VXV_Core/Media/Tavernes/<id>.png`) ; le site la choisit par
+  (`apps/web/public/images/tavernes/<id>.jpg`, `VXV/Core/Media/Tavernes/<id>.png`) ; le site la choisit par
   `tavernPicture`, l'addon par `TavernPicture`, d'après les jours que `npm run generate` écrit dans `Tokens.lua`.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), jusque sur Discord par la couleur des rôles de
   classe (`classRole`, rendue par le bot à un rôle d'une autre couleur), et ces couleurs ne servent à rien d'autre. Sur
@@ -178,7 +178,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   images du site, émojis du bot et captures de la charte copiés à côté), tenue à jour avec les fonctionnalités.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
 - Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll.
-- Dégradés et lueurs en petites images PNG (`VXV_Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
+- Dégradés et lueurs en petites images PNG (`VXV/Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus.
 - Bot Discord : couleurs des messages tirées des jetons (raids améthyste, Le Dé Pipé sakura, Quêtes vert, titres or,
   PvP rouge) ; icônes en émojis de l'application (`packages/bot/emojis`, écrits par identifiant par
@@ -194,14 +194,17 @@ Dépôt unique, espaces de travail npm (`apps/*`, `packages/*`, outils), Node 22
 La table complète est dans le README. Règles :
 
 - Un dossier n'est créé que quand il a du contenu (YAGNI).
-- `apps/` contient les applications déployées, `packages/` le code TypeScript partagé, `addon/` les bundles Lua.
+- `apps/` contient les applications déployées, `packages/` le code TypeScript partagé, `addon/VXV` l'addon.
 - Paquets nommés `@vxv/<nom>`. Une application ne dépend jamais d'une autre application, seulement de `packages/`.
 
 ## Principes non négociables
 
 - **DRY, SOLID, KISS, YAGNI** sur tout le code, sans exception.
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
-- **Bundles indépendants** : chaque fonctionnalité est un bundle (`VXV_Core`, `VXV_Raid`, `VXV_Data_<Raid>`, `VXV_Sync`, `VXV_Paris`, `VXV_Missions`, `VXV_Titles`, `VXV_Artisans`, `VXV_Deathroll`, `VXV_Ranking`, `VXV_PvP`) qui ne dépend que du socle.
+- **Un seul addon, des parties indépendantes** : un dossier `VXV`, une case à cocher dans la liste des addons du jeu
+  (demande du propriétaire). Chaque fonctionnalité est une partie, dans son dossier, avec son espace de noms privé
+  (`Core`, `Sync`, `Raid`, `Paris`, `Deathroll`, `Missions`, `Titles`, `Artisans`, `Ranking`, `PvP`), et ne dépend que
+  du socle (`Core`).
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon. Rôles cumulables (officier, trésorier, GM) ; seul le trésorier a les droits de trésorerie ; tout membre du serveur Discord est membre de la guilde.
 - Toute action d'officier passe par un journal non effaçable avec motif obligatoire.
@@ -218,13 +221,17 @@ La table complète est dans le README. Règles :
 - Flux GitHub : `tests.yml` (réutilisable, seul endroit où sont définis les tests) ; `ci.yml` (demandes de fusion et `main` : tests puis déploiement du site) ; `deploy-database.yml` ; `release-addon.yml` ; `release-companion.yml` (étiquettes `compagnon-v<semver>`, installeurs publiés dans `MLDimo/vxv-compagnon`). Tout déploiement dépend de `tests.yml`.
 - Versions de l'addon : étiquettes `v<semver>` sur `main` ; aucune n'est encore publiée.
 
-## Conventions Lua (addons)
+## Conventions Lua (addon)
 
 - Lua 5.1, `## Interface: 16001` (WoW Forever, API Mainline 12.x avec restrictions Midnight).
 - Code, noms et commentaires en anglais. Textes affichés aux joueurs en français.
-- Espace de noms privé `local ADDON_NAME, ns = ...`. Aucune globale hors SavedVariables, slash commands et fichiers `External/`.
-- `VXV_Core` expose une seule globale, `VXV` : l'API publique des bundles (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV_Core/Api.lua`. Les bundles ne voient rien d'autre du socle, et n'y ajoutent que ce qu'ils utilisent.
-- Packs de données `VXV_Data_<Raid>` : générés par `npm run generate` (jamais modifiés à la main) dans `dist/generated/addon`. Chacun enregistre son raid dans la globale partagée `VXV_RaidData[raidId]`, seul point de contact avec `VXV_Core`. Ils dépendent de `VXV_Core` et se chargent avec le jeu (quelques Ko chacun ; le chargement à la demande, `C_AddOns.LoadAddOn`, n'est pas mesuré sur Forever) ; `VXV_Raid` y trouve le raid de l'instance où se trouve le joueur.
+- Un espace de noms privé par partie, créé par `Namespaces.lua` : chaque fichier commence par
+  `local ns = select(2, ...).<Partie>` et ne voit que le sien (vérifié par le banc). Aucune globale hors SavedVariables,
+  slash commands, `VXV_RaidData` et fichiers `External/`.
+- Le socle expose une seule globale, `VXV` : l'API publique des parties (modules, bus interne, messages entre addons, événements du jeu, fenêtres, infobulle), décrite dans `addon/VXV/Core/Api.lua`. Les parties ne voient rien d'autre du socle, et n'y ajoutent que ce qu'elles utilisent.
+- Données des raids : `addon/VXV/Data/Raids.lua`, écrit par `npm run generate` depuis `data/raids` (jamais modifié à la
+  main, versionné : un test vérifie qu'il est à jour), chaque raid dans `VXV_RaidData[raidId]`, chargé avec le jeu ;
+  `VXV/Raid` y trouve le raid de l'instance où se trouve le joueur.
 - Données sauvegardées (`VXV_DB`) : numéro de schéma, et migrations appliquées au chargement ; une migration publiée ne change plus.
 - Un fichier = une responsabilité. Module exposé via `ns.<Module>` ; dépendances lues en tête de fichier (`local Util = ns.Util`).
 - Nommage : `PascalCase` pour modules et fonctions publiques, `camelCase` pour locales, `UPPER_SNAKE_CASE` pour constantes. Pas de nombre magique.
@@ -233,44 +240,46 @@ La table complète est dans le README. Règles :
 - Toute valeur venant du client peut être « secrète » : passer par `VXV.IsSecret` (`Util.IsSecret`) avant de comparer, concaténer ou stocker.
 - SavedVariables lues uniquement dans `ADDON_LOADED` de l'addon, jamais au chargement du fichier.
 - `ReloadUI()` est protégée sur Forever : demander au joueur de taper `/reload`.
-- Ordre de chargement dans le `.toc` : `Core` (outillage générique) puis modules métier puis `Bootstrap.lua` en dernier. Un nouveau dossier d'addon demande de relancer le jeu, pas seulement `/reload`.
+- Ordre de chargement dans `VXV.toc` : `Namespaces.lua`, le socle, les données des raids, puis chaque partie à la suite
+  (outillage, modules métier, interface, son `Bootstrap.lua` en dernier). Un nouveau fichier ou dossier demande de
+  relancer le jeu, pas seulement `/reload`.
 - La sonde `tools/VXV_Probe` passe `npm run check` avant `tools/install-probe.sh` ; le banc vérifie aussi ses lignes et ses globales.
 
 ## Formats échangés
 
 Textes en lignes : la première porte le format et sa version (tout changement de format incrémente le numéro), puis une
 ligne par enregistrement, son type en premier champ. Le détail de chaque ligne est dans le fichier qui l'écrit ou la lit
-(`domain/` est `packages/server/src/domain/`, les bundles sont dans `addon/`).
+(`domain/` est `packages/server/src/domain/`, l'addon est dans `addon/`).
 
 | Format | Sens | Écrit par | Lu par |
 | --- | --- | --- | --- |
-| `VXV-ROSTER-1` (`Prénom;Nom;CLASSE`, classe = jeton du jeu) | addon → site | `VXV_Core/Core/Roster.lua` (`/vxv liste`) | `domain/roster.ts` |
-| `VXV-LOG-2` (journal d'un raid) | addon → site | `VXV_Raid/RaidLog.lua` | `domain/raidLog.ts` |
-| `VXV-METIERS-1` (métiers d'un personnage) | addon → site | `VXV_Artisans/Website.lua` | `domain/artisans.ts` |
-| `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV_Deathroll/Games.lua` | `domain/deathrolls.ts` |
-| `VXV-OBJETS-1` (catégorie, sous-catégorie et emplacement des objets des raids) | addon → site | `VXV_Raid/ItemKinds.lua` | `domain/itemKinds.ts` |
+| `VXV-ROSTER-1` (`Prénom;Nom;CLASSE`, classe = jeton du jeu) | addon → site | `VXV/Core/Core/Roster.lua` (`/vxv liste`) | `domain/roster.ts` |
+| `VXV-LOG-2` (journal d'un raid) | addon → site | `VXV/Raid/RaidLog.lua` | `domain/raidLog.ts` |
+| `VXV-METIERS-1` (métiers d'un personnage) | addon → site | `VXV/Artisans/Website.lua` | `domain/artisans.ts` |
+| `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV/Deathroll/Games.lua` | `domain/deathrolls.ts` |
+| `VXV-OBJETS-1` (catégorie, sous-catégorie et emplacement des objets des raids) | addon → site | `VXV/Raid/ItemKinds.lua` | `domain/itemKinds.ts` |
 | `VXV-COMBAT-1` (boss tués, soins reçus) | compagnon → site | `apps/companion/src/domain/combatLog.ts` | `domain/bossFights.ts` |
-| `VXV-RAID-5` (événement, qui peut porter chaque objet et SR réutilisables compris) | site → addon | `domain/addonExport.ts` | `VXV_Raid/EventData.lua` |
-| `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV_Core/Core/EventRoles.lua` |
-| `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV_Paris/BetsData.lua` |
-| `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV_Missions/QuestsData.lua` |
-| `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV_Titles/TitlesData.lua` |
-| `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV_Artisans/ArtisansData.lua` |
-| `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV_Deathroll/DeathrollData.lua` |
-| `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV_Ranking/RankingData.lua` |
-| `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV_PvP/PvpData.lua` |
+| `VXV-RAID-5` (événement, qui peut porter chaque objet et SR réutilisables compris) | site → addon | `domain/addonExport.ts` | `VXV/Raid/EventData.lua` |
+| `VXV-ROLES-1` (rôles d'un événement, pour les officiers) | site → addon | `domain/addonEventRoles.ts` | `VXV/Core/Core/EventRoles.lua` |
+| `VXV-PARIS-1` | site → addon | `domain/addonBets.ts` | `VXV/Paris/BetsData.lua` |
+| `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV/Missions/QuestsData.lua` |
+| `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV/Titles/TitlesData.lua` |
+| `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV/Artisans/ArtisansData.lua` |
+| `VXV-DEATHROLLS-1` (bloqués, dettes, classement) | site → addon | `domain/addonDeathrolls.ts` | `VXV/Deathroll/DeathrollData.lua` |
+| `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV/Ranking/RankingData.lua` |
+| `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV/PvP/PvpData.lua` |
 
 - Vers le site : chaque texte se lit avec `domain/textFormat.ts` (lignes numérotées, un lecteur par type de ligne,
   `TextFormatError`).
 - Vers l'addon : chaque format commence par les mêmes lignes `P` (export), `O` (officiers) et `M` (personnages des
   membres, lus par `VXV.MemberOf`), écrites par `addonHead` (`domain/addonText.ts`), et porte les réponses aux
-  changements faits en jeu. `VXV.SiteData` (`VXV_Core/Core/SiteData.lua`) les lit, les garde, les prend du compagnon,
+  changements faits en jeu. `VXV.SiteData` (`VXV/Core/Core/SiteData.lua`) les lit, les garde, les prend du compagnon,
   du collage d'un officier (`/vxv importer`) et du relais des officiers (`Core/SharedData.lua`). Confiance entre
   addons : des données ne sont gardées que si leur expéditeur figure parmi les officiers nommés par le site, dans les
   nouvelles données comme dans celles déjà gardées.
-- Compagnon ↔ addon : il écrit `VXV_Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit
-  `VXV_SyncDB` sans l'exécuter (`@vxv/lua`) ; contrats dans `addon/VXV_Sync/Companion.lua` et `Outbox.lua`, et
-  `apps/companion/src/domain/inbox.ts` et `outbox.ts`. Les autres bundles passent par le bus du socle : `sync.inbox`
+- Compagnon ↔ addon : il écrit `VXV/Sync/External/Inbox.lua` (`ns.Inbox`, sans globale, format numéroté) et lit
+  `VXV_SyncDB` sans l'exécuter (`@vxv/lua`) ; contrats dans `addon/VXV/Sync/Companion.lua` et `Outbox.lua`, et
+  `apps/companion/src/domain/inbox.ts` et `outbox.ts`. Les autres parties passent par le bus du socle : `sync.inbox`
   (données apportées), `sync.put` (kind, clé, valeur à envoyer), `modules.started` (tous les modules démarrés) ; les
   textes à envoyer vont dans `VXV_SyncDB.texts`, par type puis clé (le site lit les types qu'il connaît).
 - Compagnon ↔ site : `apps/web/app/api/compagnon` (`jeton`, `moi`, `donnees`, `envoi`), jeton porteur.
@@ -290,11 +299,11 @@ Chaque famille d'erreur courante des addons est couverte par un test automatique
 | Objet pas encore en cache (`C_Item.GetItemInfo` renvoie nil) | Attente de `ITEM_DATA_LOAD_RESULT` | Simulateur renvoyant nil au premier appel |
 | Globales qui fuient ou écrasent une autre addon, remplacement de fonctions Blizzard (taint) | Espace de noms privé, `hooksecurefunc` seulement | Analyse statique des globales (luacheck ou équivalent) en CI |
 | Syntaxe hors Lua 5.1 | — | Analyse de syntaxe Lua 5.1 |
-| Messages addon trop longs, trop rapides ou pendant un boss | File d'envoi de VXV_Core | Tests de la file : découpage 255 octets, débit, verrou de rencontre |
+| Messages addon trop longs, trop rapides ou pendant un boss | File d'envoi du socle | Tests de la file : découpage 255 octets, débit, verrou de rencontre |
 | Troncature d'un nom accentué au milieu d'un caractère | Découpage UTF-8 sûr | Tests sur des noms comme « Ðéjà Vu » |
-| Ordre de chargement des bundles | Dépendances déclarées dans les `.toc` | Chargement des bundles dans l'ordre du client par le simulateur |
+| Ordre de chargement des parties | Un seul `.toc`, le socle en premier | Chargement de l'addon dans l'ordre du `.toc` par le simulateur |
 
-Outil : le banc d'essai `tools/addon-harness` (fengari + client simulé, tests Vitest) charge chaque addon comme le jeu, d'après son `.toc`, et porte ces scénarios.
+Outil : le banc d'essai `tools/addon-harness` (fengari + client simulé, tests Vitest) charge l'addon comme le jeu, d'après son `.toc` (le socle et les parties d'un test seulement), et porte ces scénarios.
 
 ## Architecture du serveur (`@vxv/server`)
 

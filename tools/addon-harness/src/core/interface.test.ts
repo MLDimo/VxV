@@ -29,7 +29,7 @@ const ICON_OFFSET = `
   return { math.floor(x + 0.5), math.floor(y + 0.5) }
 `;
 
-describe("VXV_Core interface", () => {
+describe("the core interface", () => {
   it("opens and closes the window with /vxv, on the Taverne, one tab per place, closable with Escape", () => {
     const { client } = startCore();
     expect(client(WINDOW)).toEqual({ exists: false });
@@ -210,7 +210,7 @@ describe("VXV_Core interface", () => {
     // 20 December 2026 at noon: the Voile d'hiver (packages/design/src/seasons.ts).
     client("Clock.epoch = 1797768000 - Clock.now");
     client('SlashCmdList.VXV("")');
-    const winterVeil = "Interface\\AddOns\\VXV_Core\\Media\\Tavernes\\voile-d-hiver.png";
+    const winterVeil = "Interface\\AddOns\\VXV\\Core\\Media\\Tavernes\\voile-d-hiver.png";
     const pictures = () =>
       client(`local paths = {}
         FindWidget(VXV_Window, function(widget)
@@ -237,7 +237,7 @@ describe("VXV_Core interface", () => {
       local picture, veil = content.children[1], content.children[2]
       return { { path = picture.path, alpha = picture.alpha, coords = picture.coords }, { path = veil.path } }
     `) as { path: string; alpha: number; coords: number[] }[];
-    expect(picture?.path).toBe("Interface\\AddOns\\VXV_Core\\Media\\taverne.png");
+    expect(picture?.path).toBe("Interface\\AddOns\\VXV\\Core\\Media\\taverne.png");
     expect(picture?.alpha).toBe(0.3);
     // Quêtes: background-position 22 % 45 %, the picture 2.5 times as wide as the 976 x 600 screen.
     const width = 976 * 2.5;
@@ -248,7 +248,7 @@ describe("VXV_Core interface", () => {
     picture?.coords.forEach((coord, index) => {
       expect(coord).toBeCloseTo(expected[index] ?? 0, 6);
     });
-    expect(veil?.path).toBe("Interface\\AddOns\\VXV_Core\\Media\\veil.png");
+    expect(veil?.path).toBe("Interface\\AddOns\\VXV\\Core\\Media\\veil.png");
   });
 
   describe("reduced mode", () => {
@@ -394,8 +394,8 @@ describe("theme", () => {
       file: string;
     }[];
     expect(members.map(({ alphabet, file }) => [alphabet, file])).toEqual([
-      ["roman", "Interface\\AddOns\\VXV_Core\\Media\\Fonts\\PixelifySans-SemiBold.ttf"],
-      ["russian", "Interface\\AddOns\\VXV_Core\\Media\\Fonts\\PixelifySans-SemiBold.ttf"],
+      ["roman", "Interface\\AddOns\\VXV\\Core\\Media\\Fonts\\PixelifySans-SemiBold.ttf"],
+      ["russian", "Interface\\AddOns\\VXV\\Core\\Media\\Fonts\\PixelifySans-SemiBold.ttf"],
       ["korean", "Fonts\\korean.ttf"],
       ["simplifiedchinese", "Fonts\\simplifiedchinese.ttf"],
       ["traditionalchinese", "Fonts\\traditionalchinese.ttf"],

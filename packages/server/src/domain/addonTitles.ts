@@ -2,7 +2,7 @@ import { addonHead, line, text, type AddonReaders } from "./addonText.ts";
 import type { CustomTitle } from "./customTitles.ts";
 import { TITLES } from "./titles.ts";
 
-/** First line of the titles' data for the addon (contract with VXV_Titles); the number is the format version. */
+/** First line of the titles' data for the addon (contract with VXV/Titles); the number is the format version. */
 export const ADDON_TITLES_HEADER = "VXV-TITRES-1";
 
 export interface AddonTitlesFacts extends AddonReaders {

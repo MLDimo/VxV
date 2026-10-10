@@ -17,7 +17,9 @@ export interface Computer {
 const GAME_FOLDER = "World of Warcraft";
 /** One folder per version of the game, such as _retail_ or _classic_beta_. */
 const VERSION_FOLDER = /^_[a-z_]+_$/;
-const ADDON_TOC = ["Interface", "AddOns", "VXV_Core", "VXV_Core.toc"];
+/** The addon in a version of the game: its folder, and its .toc. */
+export const ADDON_FOLDER = ["Interface", "AddOns", "VXV"];
+export const ADDON_TOC = [...ADDON_FOLDER, "VXV.toc"];
 /** Usual places of the game's folder under a Windows drive. */
 const WINDOWS_PARENTS = ["Program Files (x86)", "Program Files", "", "Games", "Jeux", "Battle.net"];
 /** And under a Mac volume. */

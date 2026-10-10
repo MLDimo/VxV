@@ -1,0 +1,35 @@
+local ns = select(2, ...).Raid
+
+VXV.RegisterModule({
+    id = "raid",
+    name = "Raid",
+    Enable = function(data)
+        ns.RaidData.Restore(data)
+        ns.RaidLog.Restore(data)
+        ns.Changes.Restore(data)
+        ns.BossAlert.Restore(data)
+        ns.CombatLogging.Restore(data)
+        ns.KillSharing.Start()
+        ns.Place.Start()
+        ns.ItemKinds.Start()
+    end,
+    tab = {
+        place = "raid",
+        Build = ns.RaidTab.Build,
+        Card = function()
+            return ns.RaidView.Card(ns.RaidData.Current())
+        end,
+        Compact = ns.RaidCompact.Build,
+    },
+})
+
+-- The Taverne's card follows the event's data.
+VXV.On("raid.updated", function()
+    VXV.Emit("tavern.changed")
+end)
+
+VXV.RegisterModule({
+    id = "journal",
+    name = "Journal",
+    tab = { place = "journal", Build = ns.JournalTab.Build },
+})

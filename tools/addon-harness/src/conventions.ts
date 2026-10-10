@@ -5,8 +5,8 @@ import { readTocFiles } from "./addon.ts";
 import type { LuaVm } from "./luaVm.ts";
 
 const REPOSITORY = new URL("../../../", import.meta.url);
-/** Third-party or generated code, outside our line length rule. */
-const FOREIGN_FOLDERS = ["External/", "Libs/"];
+/** Third-party or generated code (written by the companion, by npm run generate), outside our line length rule. */
+const FOREIGN_FOLDERS = ["External", "Libs", "Data"];
 
 /** The conventions of .luacheckrc, checked here since luacheck is not part of the toolchain. */
 export function luacheckRules(): { maxLineLength: number; allowedGlobals: Set<string> } {
@@ -19,11 +19,36 @@ export function luacheckRules(): { maxLineLength: number; allowedGlobals: Set<st
   };
 }
 
-/** Every addon of the repository: the phase 0 probe and the bundles of addon/. */
+/** Every addon of the repository: the phase 0 probe and the addons of addon/ (VXV). */
 export function addonDirectories(): string[] {
   const addonRoot = new URL("addon/", REPOSITORY).pathname;
-  const bundles = readdirSync(addonRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory());
-  return [new URL("tools/VXV_Probe", REPOSITORY).pathname, ...bundles.map((entry) => join(addonRoot, entry.name))];
+  const addons = readdirSync(addonRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory());
+  return [new URL("tools/VXV_Probe", REPOSITORY).pathname, ...addons.map((entry) => join(addonRoot, entry.name))];
+}
+
+/**
+ * The files of an addon made of parts that reach beyond their own: each file of a part (its first folder) takes that
+ * part's namespace, "local ns = select(2, ...).Raid", and no other; the other parts are only seen through the core's
+ * public API, the VXV global.
+ */
+export function namespaceProblems(addonDir: string): string[] {
+  return readTocFiles(addonDir).flatMap((file) => {
+    const [part, ...rest] = file.split("/");
+    if (rest.length === 0 || part === undefined || FOREIGN_FOLDERS.includes(part)) {
+      return [];
+    }
+    const code = readFileSync(join(addonDir, file), "utf8");
+    const taken = [...code.matchAll(/select\(2, \.\.\.\)\.(\w+)/g)].map((match) => match[1]);
+    // The file's own "...", read otherwise than for its part's namespace (or the addon's name).
+    const otherVarargs = code
+      .split("\n")
+      .filter((line) => /^local [\w, ]+ = \.\.\.$/.test(line) && line !== "local ADDON_NAME = ...");
+    const problems =
+      taken.length === 1 && taken[0] === part
+        ? []
+        : [`${file}: takes ${taken.join(", ") || "no"} namespace, not ${part}'s`];
+    return [...problems, ...otherVarargs.map((line) => `${file}: ${line}`)];
+  });
 }
 
 /** Problems of the addon's files: Lua 5.1 syntax everywhere, line length in our own code. */
@@ -37,7 +62,7 @@ export function sourceProblems(addonDir: string): string[] {
     } catch (error) {
       problems.push(`${file}: ${String(error)}`);
     }
-    if (FOREIGN_FOLDERS.some((folder) => file.startsWith(folder))) {
+    if (file.split("/").some((folder) => FOREIGN_FOLDERS.includes(folder))) {
       continue;
     }
     code.split("\n").forEach((line, index) => {

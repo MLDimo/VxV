@@ -73,13 +73,13 @@ export function parisText(facts: AddonBetsFacts = TAVERN_BETS): string {
   return formatAddonBets(facts);
 }
 
-/** VXV_Core, VXV_Paris and VXV_Sync on a mocked client, the companion having brought the bets. */
+/** The core, Paris and Sync on a mocked client, the companion having brought the bets. */
 export function startParis(options: CoreStart & { facts?: AddonBetsFacts; withRaid?: boolean } = {}) {
   const { facts, withRaid = false, ...core } = options;
   const started = startCore({
     written: companionFiles({ paris: parisText(facts) }),
     ...core,
-    bundles: withRaid ? ["VXV_Raid", "VXV_Paris", "VXV_Sync"] : ["VXV_Paris", "VXV_Sync"],
+    bundles: withRaid ? ["Raid", "Paris", "Sync"] : ["Paris", "Sync"],
   });
-  return { ...started, paris: loadedBundle(started, "VXV_Paris") };
+  return { ...started, paris: loadedBundle(started, "Paris") };
 }

@@ -178,7 +178,7 @@ describe("attributing an item", () => {
     expect(guild.player("Thom Leboss").client("return Rolled")).toEqual([{ low: 1, high: 100 }]);
     expect(buttonShown(guild, "Thom Leboss", "Roll (1-100)")).toBe(false);
 
-    guild.player(OFFICER).bundles.VXV_Raid?.run(`local _, ns = ... ns.Distribution.Start({ slot = 2, itemId = 20,
+    guild.player(OFFICER).bundles.Raid?.run(`local _, ns = ... ns.Distribution.Start({ slot = 2, itemId = 20,
         link = ${LINKS.tete} })`);
     expect(guild.player(OFFICER).client("return Printed")).toContain(
       "|cff14b8a6VXV|r Une attribution est déjà en cours : termine-la ou annule-la.",

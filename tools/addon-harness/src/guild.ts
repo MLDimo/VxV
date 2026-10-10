@@ -7,7 +7,7 @@ interface SentMessage {
   hex: string;
 }
 
-/** Several players, each on their own client with VXV_Core, and the server between them. */
+/** Several players, each on their own client with VXV, and the server between them. */
 export function startGuild(names: readonly string[], options: Omit<CoreStart, "playerName"> = {}) {
   const start = (name: string) => ({ name, ...startCore({ ...options, playerName: name }) });
   const players = names.map(start);

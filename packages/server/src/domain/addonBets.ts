@@ -3,7 +3,7 @@ import { standing, type Bet, type Stake } from "./bets.ts";
 import type { CashMovement, CashSummary } from "./cash.ts";
 import type { GameChangeOutcome } from "./gameChanges.ts";
 
-/** First line of the bets' data for the addon (contract with VXV_Paris); the number is the format version. */
+/** First line of the bets' data for the addon (contract with VXV/Paris); the number is the format version. */
 export const ADDON_BETS_HEADER = "VXV-PARIS-1";
 
 /** How many of the latest cash movements the addon shows. */

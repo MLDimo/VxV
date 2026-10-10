@@ -56,13 +56,13 @@ export function questsText(facts: AddonMissionsFacts = GUILD_QUESTS): string {
   return formatAddonMissions(facts);
 }
 
-/** VXV_Core, VXV_Missions and VXV_Sync on a mocked client, the companion having brought the quests. */
+/** The core, Missions and Sync on a mocked client, the companion having brought the quests. */
 export function startQuests(options: CoreStart & { facts?: AddonMissionsFacts } = {}) {
   const { facts, ...core } = options;
   const started = startCore({
     written: companionFiles({ quetes: questsText(facts) }),
     ...core,
-    bundles: ["VXV_Missions", "VXV_Sync"],
+    bundles: ["Missions", "Sync"],
   });
-  return { ...started, quests: loadedBundle(started, "VXV_Missions") };
+  return { ...started, quests: loadedBundle(started, "Missions") };
 }

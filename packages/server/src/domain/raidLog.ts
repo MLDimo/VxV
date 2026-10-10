@@ -2,7 +2,7 @@ import { fullName, type Character } from "./characters.ts";
 import { LOOT_METHODS, type LootMethod } from "./history.ts";
 import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.ts";
 
-/** First line of a raid's record exported by the addon (contract with VXV_Raid); the number is the format version. */
+/** First line of a raid's record exported by the addon (contract with VXV/Raid); the number is the format version. */
 export const RAID_LOG_HEADER = "VXV-LOG-2";
 
 export interface RaidLog {

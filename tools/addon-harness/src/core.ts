@@ -1,28 +1,31 @@
 import { createLuaVm, loadAddon, loadMock } from "./addon.ts";
+import type { LuaValue } from "./luaVm.ts";
 import { trackNewGlobals } from "./conventions.ts";
 
-export const CORE_DIR = new URL("../../../addon/VXV_Core", import.meta.url).pathname;
+/** The addon: the core and its parts, each in its folder of addon/VXV. */
+export const ADDON_DIR = new URL("../../../addon/VXV", import.meta.url).pathname;
+const ADDON_NAME = "VXV";
 
-/** Folder of a bundle of addon/, such as VXV_Raid. */
-function bundleDir(name: string): string {
-  return new URL(`../../../addon/${name}`, import.meta.url).pathname;
+/** A part of the addon loaded on the client: test code runs in its namespace. */
+export interface LoadedPart {
+  run(code: string): LuaValue;
 }
 
 export interface CoreStart {
-  /** What the game read from SavedVariables/VXV_Core.lua, as Lua code; nothing at the first installation. */
+  /** What the game read from SavedVariables/VXV.lua, as Lua code; nothing at the first installation. */
   savedVariables?: string;
   /** Stops before the player enters the world (PLAYER_LOGIN). */
   beforeLogin?: boolean;
   /** "Prénom Nom" of the player of this client. */
   playerName?: string;
   inGuild?: boolean;
-  /** Bundles loaded after VXV_Core, in this order, as the client does with their dependency on it. */
+  /** The parts of the addon loaded with its core ("Raid", "Sync"…), as the client loads the addon's files in order. */
   bundles?: readonly string[];
-  /** Files another program wrote in the addons' folders, by path ("VXV_Sync/External/Inbox.lua"). */
+  /** Files another program wrote in the addon's folder, by path ("VXV/Sync/External/Inbox.lua"). */
   written?: Readonly<Record<string, string>>;
 }
 
-/** VXV_Core loaded on the mocked client like the game does: files, ADDON_LOADED, then PLAYER_LOGIN. */
+/** The addon loaded on the mocked client like the game does: its files, ADDON_LOADED, then PLAYER_LOGIN. */
 export function startCore({
   savedVariables,
   beforeLogin = false,
@@ -42,21 +45,16 @@ export function startCore({
     vm.run(`VXV_DB = ${savedVariables}`, "SavedVariables");
   }
   const client = (code: string) => vm.run(code, "client");
-  const core = loadAddon(vm, CORE_DIR);
-  client('Fire("ADDON_LOADED", "VXV_Core")');
-  const loadedBundles = Object.fromEntries(
-    bundles.map((name) => {
-      const bundle = loadAddon(vm, bundleDir(name), written);
-      client(`Fire("ADDON_LOADED", ${JSON.stringify(name)})`);
-      return [name, bundle];
-    }),
-  );
+  const addon = loadAddon(vm, ADDON_DIR, { parts: ["Core", ...bundles], written });
+  client(`Fire("ADDON_LOADED", ${JSON.stringify(ADDON_NAME)})`);
+  const part = (name: string): LoadedPart => ({ run: (code) => addon.run(code, name) });
+  const loadedBundles = Object.fromEntries(bundles.map((name) => [name, part(name)]));
   if (!beforeLogin) {
     client('Fire("PLAYER_LOGIN")');
   }
   return {
-    core,
-    /** The loaded bundles by name, to run test code in their namespace. */
+    core: part("Core"),
+    /** The loaded parts by name, to run test code in their namespace. */
     bundles: loadedBundles,
     client,
     newGlobals,
@@ -69,7 +67,7 @@ export function startCore({
   };
 }
 
-/** A bundle the client loaded, to run test code in its namespace. */
+/** A part of the addon the client loaded, to run test code in its namespace. */
 export function loadedBundle(started: ReturnType<typeof startCore>, name: string) {
   const bundle = started.bundles[name];
   if (bundle === undefined) {

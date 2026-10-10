@@ -4,7 +4,7 @@ import { startCore } from "../core.ts";
 import { GUILD_READERS } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
-const BUNDLES = ["VXV_Ranking", "VXV_Sync"];
+const BUNDLES = ["Ranking", "Sync"];
 const member = (memberId: string, name: string, characterClass: string, avatar?: string, title?: string) => ({
   memberId,
   name,

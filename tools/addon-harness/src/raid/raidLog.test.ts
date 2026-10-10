@@ -99,7 +99,7 @@ describe("record of the raid", () => {
       deaths: { "Thom Leboss": 1 },
     };
     for (const name of [OFFICER, "Thom Leboss", "Aube Claire"]) {
-      expect(guild.player(name).bundles.VXV_Raid?.run(LOG)).toEqual(expected);
+      expect(guild.player(name).bundles.Raid?.run(LOG)).toEqual(expected);
     }
     for (const player of guild.players) {
       expect(player.errors()).toEqual([]);
@@ -176,7 +176,7 @@ describe("record of the raid", () => {
     settle(guild, 3);
     const officer = guild.player(OFFICER);
     // Secret during the combat: nothing read yet.
-    expect(officer.bundles.VXV_Raid?.run(TITLES_LOG)).toEqual({ meter: {}, raised: {} });
+    expect(officer.bundles.Raid?.run(TITLES_LOG)).toEqual({ meter: {}, raised: {} });
     for (const player of guild.players) {
       player.client("InCombat = false");
     }
@@ -185,7 +185,7 @@ describe("record of the raid", () => {
       player.client(KILL_WITH_METER(8, `["Thom Leboss"] = 250`, `["Aube Claire"] = 100`) + " InCombat = false");
     }
     settle(guild, 3);
-    expect(officer.bundles.VXV_Raid?.run(TITLES_LOG)).toEqual({
+    expect(officer.bundles.Raid?.run(TITLES_LOG)).toEqual({
       meter: {
         [OFFICER]: { damage: 1000, healing: 0 },
         "Thom Leboss": { damage: 750, healing: 0 },
@@ -224,11 +224,11 @@ describe("record of the raid", () => {
     thom.client('Dead["Thom Leboss"] = false Fire("PLAYER_UNGHOST")');
     settle(guild, 3);
     for (const name of [OFFICER, "Thom Leboss", "Aube Claire"]) {
-      expect(guild.player(name).bundles.VXV_Raid?.run(TITLES_LOG)).toEqual({ meter: {}, raised: { "Thom Leboss": 2 } });
+      expect(guild.player(name).bundles.Raid?.run(TITLES_LOG)).toEqual({ meter: {}, raised: { "Thom Leboss": 2 } });
     }
     const exported = guild
       .player(OFFICER)
-      .bundles.VXV_Raid?.run("local _, ns = ... return ns.RaidLog.Export(ns.RaidLog.Current())");
+      .bundles.Raid?.run("local _, ns = ... return ns.RaidLog.Export(ns.RaidLog.Current())");
     expect(parseRaidLog(exported as string).raised).toEqual([{ name: "Thom Leboss", count: 2 }]);
     expect(thom.errors()).toEqual([]);
   });
@@ -240,7 +240,7 @@ describe("record of the raid", () => {
         boss = "Onyxia", itemId = 20, link = ${LINKS.tete}, winner = "Aube Claire", method = "free_roll", at = 1 } },
         "RAID")`);
     settle(guild);
-    expect(guild.player("Thom Leboss").bundles.VXV_Raid?.run(LOG)).toMatchObject({ loots: {} });
+    expect(guild.player("Thom Leboss").bundles.Raid?.run(LOG)).toMatchObject({ loots: {} });
   });
 
   it("lists the previous raids after /reload, and keeps the 20 latest", () => {

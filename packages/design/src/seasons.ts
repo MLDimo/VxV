@@ -11,7 +11,7 @@ type MonthDay = readonly [month: number, day: number];
 type Period = readonly [first: string, last: string];
 
 export interface Season {
-  /** The picture's name: apps/web/public/images/tavernes/<id>.jpg, addon/VXV_Core/Media/Tavernes/<id>.png. */
+  /** The picture's name: apps/web/public/images/tavernes/<id>.jpg, addon/VXV/Core/Media/Tavernes/<id>.png. */
   id: "voile-d-hiver" | "amour" | "jardin-des-nobles" | "solstice" | "brasseurs" | "sanssaint" | "sombrelune";
   name: string;
   /** The holiday's periods starting in that year; one astride two years ends in the next. */

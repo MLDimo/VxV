@@ -19,7 +19,7 @@ function disk(...files: string[]): FolderReader {
   };
 }
 
-const TOC = "Interface/AddOns/VXV_Core/VXV_Core.toc";
+const TOC = "Interface/AddOns/VXV/VXV.toc";
 
 describe("game installations", () => {
   it("lists the usual folders of the game on Windows, drive by drive", () => {

@@ -2,7 +2,7 @@ import { getApplication } from "@/server/application";
 import { asCompanion } from "@/server/companionApi";
 
 /**
- * What the companion brings to the addon (VXV_Sync), for any member: the next event, then each bundle's data as
+ * What the companion brings to the addon (VXV/Sync), for any member: the next event, then each bundle's data as
  * { text } under its name (the field of the inbox the bundle reads); for an officer, the roles an event may be
  * reserved to.
  */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { LoadedAddon } from "../addon.ts";
+import type { LoadedPart } from "../core.ts";
 import { ONYXIA_NIGHT, RAIDER_ROLE, startRaid, websiteText } from "./fixtures.ts";
 
 const PREFIX = "|cff14b8a6VXV|r ";
@@ -43,7 +43,7 @@ interface View {
   raidReserves: Row[];
 }
 
-const viewOf = (raid: LoadedAddon) => raid.run(VIEW) as unknown as View;
+const viewOf = (raid: LoadedPart) => raid.run(VIEW) as unknown as View;
 const texts = (rows: Row[]) => rows.map((row) => row.text ?? `bar ${String(row.color)} ${String(row.share)}`);
 
 /** Opens /vxv on the Raid tab. */

@@ -4,7 +4,7 @@ import { startGuild } from "../guild.ts";
 import { ONYXIA_NIGHT, startRaid, websiteText } from "../raid/fixtures.ts";
 import { companionFiles } from "./fixtures.ts";
 
-const BUNDLES = ["VXV_Raid", "VXV_Sync"];
+const BUNDLES = ["Raid", "Sync"];
 const EVENT = `
   local _, ns = ...
   local event = ns.RaidData.Current()
@@ -20,10 +20,10 @@ function settle(guild: ReturnType<typeof startGuild>): void {
   }
 }
 
-describe("the companion's data in game (VXV_Sync)", () => {
+describe("the companion's data in game (Sync)", () => {
   it("changes nothing without the companion", () => {
     const { bundles, errors, client } = startCore({ bundles: BUNDLES });
-    expect(bundles.VXV_Raid?.run(EVENT)).toBeUndefined();
+    expect(bundles.Raid?.run(EVENT)).toBeUndefined();
     expect(client("return #Printed")).toBe(0);
     expect(errors()).toEqual([]);
   });
@@ -53,7 +53,7 @@ describe("the companion's data in game (VXV_Sync)", () => {
     guild.join("Ðéjà Vu", { written: companionFiles({ raid: websiteText() }) });
     settle(guild);
     for (const name of ["Thom Leboss", "Ciel Gris"]) {
-      expect(guild.player(name).bundles.VXV_Raid?.run(EVENT)).toEqual({
+      expect(guild.player(name).bundles.Raid?.run(EVENT)).toEqual({
         title: "Onyxia",
         exportedAt: 1796931900,
         sender: "Ðéjà Vu",

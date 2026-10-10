@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { startGuild } from "../guild.ts";
 import { importText, ONYXIA_NIGHT, websiteText } from "./fixtures.ts";
 
-const RAID = { bundles: ["VXV_Raid"] };
+const RAID = { bundles: ["Raid"] };
 const PREFIX = "|cff14b8a6VXV|r ";
 const EVENT = `
   local _, ns = ...
@@ -47,7 +47,7 @@ function night(changes: Partial<AddonEventFacts>): AddonEventFacts {
   return { ...ONYXIA_NIGHT, ...changes };
 }
 
-const eventOf = (guild: Guild, name: string) => guild.player(name).bundles.VXV_Raid?.run(EVENT);
+const eventOf = (guild: Guild, name: string) => guild.player(name).bundles.Raid?.run(EVENT);
 const printedBy = (guild: Guild, name: string) => guild.player(name).client("return Printed") as unknown as string[];
 
 describe("sharing the event in the guild", () => {
@@ -166,9 +166,7 @@ describe("sharing the event in the guild", () => {
     expect(
       guild
         .player("Thom Leboss")
-        .bundles.VXV_Raid?.run(
-          "local _, ns = ... local journal = ns.RaidData.Current().journal return journal[#journal]",
-        ),
+        .bundles.Raid?.run("local _, ns = ... local journal = ns.RaidData.Current().journal return journal[#journal]"),
     ).toMatchObject({
       actor: "Officier",
       summary:
@@ -186,7 +184,7 @@ describe("freshness of the officers' data", () => {
     const officer = guild.player("Ðéjà Vu");
     importText(officer.client, websiteText(night({ exportedAt: new Date("2026-12-10T11:00:00Z") })));
     const lockBadge = () =>
-      officer.bundles.VXV_Raid?.run(`local _, ns = ...
+      officer.bundles.Raid?.run(`local _, ns = ...
         local badges = ns.RaidView.Header(ns.RaidData.Current(), nil, time()).badges
         return badges[#badges].text`);
     expect(lockBadge()).toMatch(/^SR verrouillées dans /u);

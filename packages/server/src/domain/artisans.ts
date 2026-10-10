@@ -5,7 +5,7 @@ import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.t
  * and the known recipes when the player opens a profession's window.
  */
 
-/** First line of a character's professions sent by the addon (contract with VXV_Artisans); the version follows. */
+/** First line of a character's professions sent by the addon (contract with VXV/Artisans); the version follows. */
 export const PROFESSIONS_HEADER = "VXV-METIERS-1";
 
 export interface Recipe {

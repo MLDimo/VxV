@@ -6,7 +6,7 @@ import { loadedBundle, startCore } from "../core.ts";
 import { EXPORTED, GUILD_READERS } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
-const BUNDLES = ["VXV_PvP", "VXV_Sync"];
+const BUNDLES = ["PvP", "Sync"];
 const SATURDAY = new Date("2026-12-12T20:00:00Z");
 const duel = (id: string, challengerId: string, opponentId: string, overrides: Partial<Duel> = {}): Duel => ({
   id,
@@ -281,7 +281,7 @@ describe("the PvP place in game", () => {
     client(clickRow("Ciel Gris contre Thom Leboss"));
     client(click("VXV_DuelActions", "Relever le défi"));
     const id = client("local id = next(VXV_DB.modules.pvp.pending) return id") as string;
-    loadedBundle(started, "VXV_PvP").run(
+    loadedBundle(started, "PvP").run(
       `local _, ns = ... ns.PvpData.Receive(${JSON.stringify(answered.replace("Thom Leboss#1#1", id))}, "Ðéjà Vu")`,
     );
     expect(JSON.stringify(client("return Printed"))).not.toContain("Site VXV");

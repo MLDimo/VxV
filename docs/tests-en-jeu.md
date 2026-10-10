@@ -14,7 +14,7 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 
 | Mesure | Comment | Ce qui en dépend |
 | --- | --- | --- |
-| Message système d'un duel (`DUEL_WINNER_KNOCKOUT`, `DUEL_WINNER_RETREAT`) | Un `/duel` programmé sur le site entre deux membres avec VXV : le résultat doit partir au site ; sinon `/run print(DUEL_WINNER_KNOCKOUT)` et copier le message du chat | Résultat des duels lu en jeu (`VXV_PvP/DuelResults.lua`) ; sans lui, le perdant reconnaît sa défaite |
+| Message système d'un duel (`DUEL_WINNER_KNOCKOUT`, `DUEL_WINNER_RETREAT`) | Un `/duel` programmé sur le site entre deux membres avec VXV : le résultat doit partir au site ; sinon `/run print(DUEL_WINNER_KNOCKOUT)` et copier le message du chat | Résultat des duels lu en jeu (`VXV/PvP/DuelResults.lua`) ; sans lui, le perdant reconnaît sa défaite |
 | Inventaire de l'API sur le client de la sortie (4 novembre) | `/vxvtest api run`, puis `/reload` ; copier le journal dans `sessions/` | Liste des fonctions permises aux bundles (`tools/addon-harness/src/foreverApi.ts`) |
 
 ## Validations en jeu

@@ -16,21 +16,21 @@ const MAX_CHANGES = 200;
 const MAX_SOFT_RESERVES = 20;
 /** Five counters for each character of an account, and the relays of an officer. */
 const MAX_COUNTERS = 500;
-/** Each bundle's texts (addon/VXV_Sync/Outbox.lua): a few kinds, a text per character or game. */
+/** Each bundle's texts (addon/VXV/Sync/Outbox.lua): a few kinds, a text per character or game. */
 const MAX_TEXT_KINDS = 10;
 const MAX_TEXTS = 200;
 const MAX_KIND = 30;
 
 const changeBase = {
   id: z.string().min(1).max(160),
-  // A stake (VXV_Paris) is about a bet, not an event.
+  // A stake (VXV/Paris) is about a bet, not an event.
   eventId: z.string().max(60).default(""),
   author: z.string().max(100),
   // When the author made it in game (Unix seconds): the latest change wins.
   at: z.number().int().positive().optional(),
 };
 /**
- * A change made in game (the Changes.lua of VXV_Raid, VXV_Paris, VXV_PvP and VXV_Missions); one of a kind this
+ * A change made in game (the Changes.lua of VXV/Raid, VXV/Paris, VXV/PvP and VXV/Missions); one of a kind this
  * website does not know is left aside.
  */
 const changeSchema = z.discriminatedUnion("kind", [

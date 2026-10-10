@@ -1,6 +1,6 @@
 import { addonHead, line, seconds, type AddonReaders } from "./addonText.ts";
 
-/** First line of the deathrolls' data for the addon (contract with VXV_Deathroll); the number is its version. */
+/** First line of the deathrolls' data for the addon (contract with VXV/Deathroll); the number is its version. */
 export const ADDON_DEATHROLLS_HEADER = "VXV-DEATHROLLS-1";
 
 /** How many of the latest games the addon shows. */

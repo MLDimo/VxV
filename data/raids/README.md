@@ -1,7 +1,8 @@
 # Données des raids
 
 Un fichier JSON par raid. Ajouter un raid, c'est ajouter un fichier ici : aucun code à modifier.
-`npm run check` valide tous les fichiers ; le générateur en tire les packs de l'addon et les données de la base.
+`npm run check` valide tous les fichiers ; `npm run generate` en tire les données de l'addon
+(`addon/VXV/Data/Raids.lua`, à valider avec le JSON : un test vérifie qu'il est à jour) et celles de la base.
 
 ## Format
 

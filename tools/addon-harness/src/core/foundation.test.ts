@@ -3,7 +3,7 @@ import { luacheckRules } from "../conventions.ts";
 import { startCore } from "../core.ts";
 import { FOREVER_EVENTS } from "../forever.ts";
 
-describe("VXV_Core foundation", () => {
+describe("the core foundation", () => {
   describe("saved data", () => {
     it("starts empty at the first installation, with the current schema", () => {
       const { client } = startCore({ beforeLogin: true });

@@ -43,7 +43,6 @@ jobs:
 
       - name: Build the archive
         run: |
-          npm run generate
           npm run release:prepare -- "$VERSION"
           (cd dist/release/VXV && zip -qr "../VXV-$VERSION.zip" .)
 

@@ -1,0 +1,230 @@
+## Interface: 16001
+## Title: VXV
+## Notes: Outil de la guilde VXV : raids, soft reserves, loot, PvP, paris, deathroll, quêtes, titres, artisans et classement.
+## Author: VXV
+## Version: @project-version@
+## SavedVariables: VXV_DB, VXV_SyncDB
+
+# Each part of the addon gets its own private namespace (Namespaces.lua) and sees the others only through the
+# core's public API, the VXV global (Core/Api.lua).
+Namespaces.lua
+
+# ===== The core
+# Core: generic tooling, no feature logic.
+Core\Core\Version.lua
+Core\Core\Config.lua
+Core\Core\Util.lua
+Core\Core\Gold.lua
+Core\Core\Chat.lua
+Core\Core\Compat.lua
+Core\Core\Call.lua
+Core\Core\Events.lua
+Core\Core\Bus.lua
+Core\Core\Storage.lua
+Core\Core\Modules.lua
+Core\Core\Names.lua
+Core\Core\Guild.lua
+Core\Core\Roster.lua
+Core\Core\Serializer.lua
+Core\Core\SendQueue.lua
+Core\Core\Comm.lua
+Core\Core\GroupChat.lua
+Core\Core\Rolls.lua
+Core\Core\SignupLabels.lua
+Core\Core\Presence.lua
+Core\Core\SharedData.lua
+Core\Core\SiteData.lua
+Core\Core\PendingChanges.lua
+Core\Core\EventRoles.lua
+
+# Interface: the charter's theme, window, Taverne tab, /vxv, minimap icon.
+Core\UI\Tokens.lua
+Core\UI\Theme.lua
+Core\UI\TavernPicture.lua
+Core\UI\Tooltip.lua
+Core\UI\RowList.lua
+Core\UI\Screen.lua
+Core\UI\RankingBoard.lua
+Core\UI\PlaceWindow.lua
+Core\UI\Window.lua
+Core\UI\Dialog.lua
+Core\UI\SignupDialog.lua
+Core\UI\RoleStepper.lua
+Core\UI\TextWindow.lua
+Core\UI\TavernTab.lua
+Core\UI\CompactWindow.lua
+Core\UI\Windows.lua
+Core\UI\Slash.lua
+Core\UI\MinimapButton.lua
+Core\UI\Ping.lua
+Core\UI\RosterExport.lua
+
+# Public API of the parts, then start-up.
+Core\Api.lua
+Core\Bootstrap.lua
+
+# The raids' data, generated from data/raids by npm run generate (one table per raid in VXV_RaidData).
+Data\Raids.lua
+
+# ===== Sync
+# Written by the companion app on the player's computer, read by the game at each /reload or launch.
+Sync\External\Inbox.lua
+
+# What the companion brings to the game, and what it takes to the website.
+Sync\Companion.lua
+Sync\Outbox.lua
+Sync\Roster.lua
+Sync\Character.lua
+
+Sync\Bootstrap.lua
+
+# ===== Raid
+# The event's data, as the website exports it, and how they travel in the guild.
+Raid\Labels.lua
+Raid\EventData.lua
+Raid\RaidData.lua
+Raid\Group.lua
+Raid\Reserves.lua
+Raid\Attribution.lua
+Raid\Changes.lua
+Raid\Invitations.lua
+Raid\BossLoot.lua
+Raid\Distribution.lua
+Raid\RaidLog.lua
+Raid\Meter.lua
+Raid\Raised.lua
+Raid\Raids.lua
+Raid\ItemKinds.lua
+
+# Where the player stands (P8), and the game's combat log switched on in the raids (T11).
+Raid\Place.lua
+Raid\CombatLogging.lua
+
+# The next boss (P8): where the raid stands, the kills told to a late player, the alert and its message on screen.
+Raid\NextBoss.lua
+Raid\KillSharing.lua
+Raid\UI\AlertFrame.lua
+Raid\BossAlert.lua
+
+# Interface: the Raid and Journal screens, the reduced mode, the loot panel and the import and export of the data.
+Raid\UI\RaidView.lua
+Raid\UI\CompactView.lua
+Raid\UI\LootView.lua
+Raid\UI\JournalView.lua
+Raid\UI\Import.lua
+Raid\UI\SignupDialog.lua
+Raid\UI\ItemChoice.lua
+Raid\UI\Choices.lua
+Raid\UI\EventDialog.lua
+Raid\UI\LogExport.lua
+Raid\UI\RaidTab.lua
+Raid\UI\RaidCompact.lua
+Raid\UI\LootPanel.lua
+Raid\UI\JournalTab.lua
+
+Raid\Bootstrap.lua
+
+# ===== Paris
+# The bets as the website exports them (VXV-PARIS), how they travel in the guild, and the changes made in game.
+Paris\BetsData.lua
+Paris\Book.lua
+Paris\Bets.lua
+Paris\Changes.lua
+
+# Interface: Le Dé Pipé's screen and card, the reduced mode, the stake and bet dialogs.
+Paris\UI\DiceView.lua
+Paris\UI\StakeDialog.lua
+Paris\UI\BetDialog.lua
+Paris\UI\DiceTab.lua
+Paris\UI\DiceCompact.lua
+
+Paris\Bootstrap.lua
+
+# ===== Deathroll
+# The website's deathroll data (VXV-DEATHROLLS), the games and how they travel in the guild.
+Deathroll\DeathrollData.lua
+Deathroll\Rules.lua
+Deathroll\Games.lua
+Deathroll\Debts.lua
+Deathroll\Duels.lua
+
+# Interface: the duel's window, Le Dé Pipé's Deathroll tab.
+Deathroll\UI\DuelView.lua
+Deathroll\UI\DuelWindow.lua
+Deathroll\UI\ChallengeDialog.lua
+Deathroll\UI\DeathrollTab.lua
+
+Deathroll\Bootstrap.lua
+
+# ===== Missions
+# The missions as the website exports them (VXV-QUETES), how they travel in the guild, the game's counters, and the
+# quests an officer publishes in game.
+Missions\Gathering.lua
+Missions\Counters.lua
+Missions\QuestsData.lua
+Missions\Quests.lua
+Missions\Readings.lua
+Missions\Changes.lua
+
+# Interface: the Quêtes screen (parchments, the quest's sheet, the small cards, the hall of fame), the publishing
+# window, the card and the reduced mode.
+Missions\UI\Parchment.lua
+Missions\UI\QuestsView.lua
+Missions\UI\QuestSheet.lua
+Missions\UI\QuestCards.lua
+Missions\UI\HallOfFame.lua
+Missions\UI\QuestDialog.lua
+Missions\UI\QuestsTab.lua
+Missions\UI\QuestsCompact.lua
+
+Missions\Bootstrap.lua
+
+# ===== Titles
+# The titles as the website exports them (VXV-TITRES), and where the guild sees them in game.
+Titles\TitlesData.lua
+Titles\Titles.lua
+Titles\Display.lua
+
+Titles\Bootstrap.lua
+
+# ===== Artisans
+# The professions read in game, the directory the website exports (VXV-ARTISANS), and how they travel in the guild.
+Artisans\Text.lua
+Artisans\ArtisansData.lua
+Artisans\Directory.lua
+Artisans\RecipeItems.lua
+Artisans\Website.lua
+Artisans\Professions.lua
+Artisans\Sharing.lua
+
+# Interface: the Artisans screen; the recipes' tooltips are in RecipeItems.lua.
+Artisans\UI\ArtisansView.lua
+Artisans\UI\ArtisansTab.lua
+
+Artisans\Bootstrap.lua
+
+# ===== Ranking
+# The boards the website exports (VXV-RANKING), and what the screen shows of them.
+Ranking\RankingData.lua
+Ranking\RankingView.lua
+
+# Interface: the Ranking's screen, on the core's board, and its reduced mode.
+Ranking\UI\RankingTab.lua
+
+Ranking\Bootstrap.lua
+
+# ===== PvP
+# The PvP as the website exports it (VXV-PVP), the changes made in game and the duels' results the game shows.
+PvP\PvpData.lua
+PvP\Changes.lua
+PvP\DuelResults.lua
+
+# Interface: the dialogs of a challenge, of a duel's actions and of a new event, then the Événements and Duels tabs.
+PvP\UI\PvpView.lua
+PvP\UI\DuelDialog.lua
+PvP\UI\DuelActions.lua
+PvP\UI\OutingDialog.lua
+PvP\UI\EventsTab.lua
+PvP\UI\DuelsTab.lua
+
+PvP\Bootstrap.lua

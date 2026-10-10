@@ -17,9 +17,9 @@ interface GameChangeBase {
  * author's member, an officer's exclusion of an item, a raid night or a PvP outing an officer creates (date and time
  * as typed on Discord's /vxv_raid, the Discord role chosen among the website's), the member's stake on a bet,
  * placed, moved or taken back, a bet an officer opens (closing date and time as typed on Discord's /vxv_pari, owner's
- * decision of 7 October), and the duels (VXV_PvP): a challenge, its answer, its cancellation, the loser's concession
+ * decision of 7 October), and the duels (VXV/PvP): a challenge, its answer, its cancellation, the loser's concession
  * and the result the game showed ("Prénom Nom" of the winner and the loser), and a quest an officer publishes
- * (VXV_Missions, as Discord's /vxv_mission: its type, title or the type's, reward, days from when it was published).
+ * (VXV/Missions, as Discord's /vxv_mission: its type, title or the type's, reward, days from when it was published).
  */
 export type GameChange = GameChangeBase &
   (

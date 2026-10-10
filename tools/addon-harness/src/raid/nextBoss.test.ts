@@ -153,7 +153,7 @@ describe("a player who joins the raid late", () => {
     );
     settle(guild);
     const next = `local _, ns = ... return ns.NextBoss.Find(ns.RaidData.Current(), ns.RaidLog.Current().kills).boss.name`;
-    expect(late.bundles.VXV_Raid?.run(next)).toBe("Gardienne");
+    expect(late.bundles.Raid?.run(next)).toBe("Gardienne");
     expect(late.errors()).toEqual([]);
   });
 });

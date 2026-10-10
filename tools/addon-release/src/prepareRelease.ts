@@ -7,8 +7,8 @@ export const VERSION_PLACEHOLDER = "@project-version@";
 const STAMPED_EXTENSIONS = new Set([".toc", ".lua"]);
 
 interface ReleaseOptions {
-  /** Directories whose sub-folders are addon bundles (each holding a .toc of the same name). */
-  sources: readonly URL[];
+  /** Directory whose sub-folders are addons (each holding a .toc of the same name). */
+  source: URL;
   /** Release directory, emptied first; its content becomes the root of the archive. */
   target: URL;
   version: string;
@@ -37,7 +37,7 @@ async function copyStamped(from: URL, to: URL, version: string): Promise<void> {
 
 async function addonFolders(source: URL): Promise<string[]> {
   if (!(await exists(source))) {
-    throw new Error(`${source.pathname} does not exist: run npm run generate first`);
+    throw new Error(`${source.pathname} does not exist`);
   }
   const folders = (await readdir(source, { withFileTypes: true })).filter((entry) => entry.isDirectory());
   for (const folder of folders) {
@@ -48,21 +48,15 @@ async function addonFolders(source: URL): Promise<string[]> {
   return folders.map((folder) => folder.name);
 }
 
-/** Copies every addon bundle into the release directory with its version stamped; returns the bundle names. */
-export async function prepareRelease({ sources, target, version }: ReleaseOptions): Promise<string[]> {
+/** Copies every addon into the release directory with its version stamped; returns the addon names. */
+export async function prepareRelease({ source, target, version }: ReleaseOptions): Promise<string[]> {
   await rm(target, { recursive: true, force: true });
-  const released = new Set<string>();
-  for (const source of sources) {
-    for (const folder of await addonFolders(source)) {
-      if (released.has(folder)) {
-        throw new Error(`${folder} is provided twice`);
-      }
-      await copyStamped(new URL(`${folder}/`, source), new URL(`${folder}/`, target), version);
-      released.add(folder);
-    }
-  }
-  if (released.size === 0) {
+  const folders = await addonFolders(source);
+  if (folders.length === 0) {
     throw new Error("nothing to release: no addon folder found");
   }
-  return [...released].sort();
+  for (const folder of folders) {
+    await copyStamped(new URL(`${folder}/`, source), new URL(`${folder}/`, target), version);
+  }
+  return folders.sort();
 }

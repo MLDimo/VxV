@@ -54,13 +54,13 @@ function seasonLines(): string[] {
 }
 
 /**
- * The tokens for the addon (VXV_Core/UI/Tokens.lua): colors as { r, g, b, a }, class colors as RRGGBB for the
+ * The tokens for the addon (addon/VXV/Core/UI/Tokens.lua): colors as { r, g, b, a }, class colors as RRGGBB for the
  * |cff…|r codes, the tavern, its places, its cards and its holidays.
  */
 export function renderLua(): string {
   const lines = [
     "-- Generated from packages/design/src/tokens.ts, places.ts and seasons.ts by npm run generate: do not edit.",
-    "local _, ns = ...",
+    "local ns = select(2, ...).Core",
     "",
     "ns.Tokens = {",
     "    colors = {",
