@@ -1295,7 +1295,7 @@ figure { margin: 0; min-width: 0; }
           <ul>
             <li>Arrivé en retard ? L'addon apprend du maître du butin (ou du chef) les boss déjà tués.</li>
             <li><code>/vxv alerte</code> coupe ou remet l'alerte.</li>
-            <li><code>/vxv butin</code> affiche le butin du dernier boss.</li>
+            <li><code>/vxv butin</code>, ou le bouton <strong>Butin</strong> de l'écran Raid, affiche le butin du dernier boss.</li>
           </ul>
         </div>
         <figure class="fig">
@@ -1314,7 +1314,8 @@ figure { margin: 0; min-width: 0; }
       <header>
         <p class="eyebrow">Pendant le raid</p>
         <h3>L'attribution du butin</h3>
-        <p>Quand le maître du butin ouvre le corps, tout le raid voit le butin et ses SR. Il clique sur un objet ; l'addon applique les règles, annonce dans le canal du raid et suit les rolls en direct.</p>
+        <p>Quand le maître du butin ouvre le corps, la fenêtre <strong>Butin</strong> s'ouvre chez tout le raid, avec chaque objet et ses SR : personne n'a besoin d'aller cliquer sur le corps. Fermée, elle se rouvre par le bouton <strong>Butin</strong> de l'écran Raid ou par <code>/vxv butin</code>.</p>
+        <p>Le maître du butin choisit un objet, puis clique sur <strong>Lancer l'attribution</strong>. L'addon applique les règles, annonce dans le canal du raid, suit les rolls en direct et donne l'objet au gagnant. Chaque objet donné affiche son gagnant chez tout le raid, et le maître du butin garde le récapitulatif des rolls.</p>
       </header>
       <div class="table-wrap">
         <table>
@@ -1354,7 +1355,7 @@ figure { margin: 0; min-width: 0; }
                 <div class="row"><span><span class="c-mage" style="font-weight:700">Kaelys</span> : 94 <span class="muted small">(74 + SR+ 20)</span></span><span class="pill gold">SR+</span></div>
                 <div class="row"><span><span class="c-hunter" style="font-weight:700">Raka</span> : 88</span><span class="pill">SR</span></div>
                 <div class="row"><span><span class="c-warrior" style="font-weight:700">Vorn</span> : 99</span><span class="pill red">pas de SR</span></div>
-                <div class="btns"><span class="btn pixel">Donner à Kaelys</span></div>
+                <div class="row"><span>Gagnant : <span class="c-mage" style="font-weight:700">Kaelys</span></span><span class="pill gold">donné</span></div>
               </div>
               <div class="panel">
                 <p class="small">Ce que voit chaque joueur, selon son cas :</p>
@@ -1364,8 +1365,12 @@ figure { margin: 0; min-width: 0; }
               </div>
             </div>
           </div>
-          <figcaption><span class="example-tag">Exemple</span> · <b>Les rolls suivis en direct</b> par l'addon. Le jet de Vorn, sans SR, ne compte pas. Le maître du butin donne l'objet d'un clic.</figcaption>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Les rolls suivis en direct</b> par l'addon. Le jet de Vorn, sans SR, ne compte pas. À la fin des rolls, l'objet part tout seul à Kaelys.</figcaption>
         </figure>
+      </div>
+      <div class="note">
+        <b class="t">Faut-il garder le corps ouvert ?</b>
+        <p>Seulement au moment du don : le jeu ne donne un objet que le corps ouvert. Si le maître du butin l'a gardé ouvert, l'addon donne l'objet tout seul à la fin des rolls. Sinon, il rouvre le corps et clique sur <strong>Donner à…</strong>. Pendant les rolls, il peut bouger.</p>
       </div>
     </section>
 

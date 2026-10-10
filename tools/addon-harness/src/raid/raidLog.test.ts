@@ -79,11 +79,12 @@ function playOnyxia(): Guild {
   settle(guild, 3);
   killAndOpen(guild, [LINKS.tete, LINKS.cape]);
   const officer = guild.player(OFFICER);
+  // The head goes to its single reserver at once; the cape by the game's own menu.
   officer.client(`FindWidget(VXV_LootPanel, function(widget)
-      return widget.row and widget.row.start and widget.row.start.itemId == 20
+      return widget.row and widget.row.pick and widget.row.pick.itemId == 20
   end):Run("OnMouseUp")`);
+  officer.client(`FindButton(VXV_LootPanel, "Lancer l'attribution"):Run("OnClick")`);
   settle(guild, 1);
-  officer.client(`FindButton(VXV_LootPanel, "Donner à Thom Leboss"):Run("OnClick")`);
   officer.client("GiveMasterLoot(2, 3)");
   settle(guild);
   return guild;

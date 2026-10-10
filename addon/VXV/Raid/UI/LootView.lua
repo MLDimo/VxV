@@ -1,8 +1,8 @@
 local ns = select(2, ...).Raid
 
---- What the loot panel shows: each item the boss dropped with the soft reserves set on it, then the attribution in
---- progress: this member's message, and for the master looter the rolls, the winner or the loot council's choice.
---- Built from data alone.
+--- What the loot panel shows: each item the boss dropped with the soft reserves set on it, or who received it, then
+--- the attribution in progress: this member's message, and for the master looter the rolls, the winner or the loot
+--- council's choice; once given, the master looter's recap of it. Built from data alone.
 local LootView = {}
 ns.LootView = LootView
 
@@ -84,9 +84,15 @@ local function addMasterLooter(rows, active, inGroup)
     end
 end
 
+--- "donné à Thom Leboss (SR+)".
+local function givenText(given)
+    return "donné à " .. given.winner .. (given.method and (" (" .. Labels.Method(given.method) .. ")") or "")
+end
+
 --- Rows of the loot panel. The view holds drop, event, inGroup (names of the group's members), and the
---- attribution: active (the master looter's, or nil), shown (this member's message, or nil) and isMasterLooter.
---- Item rows carry start = item when the master looter may pick it; council rows carry give = name.
+--- attribution: active (the master looter's, or nil), shown (this member's message, or nil), last (the master
+--- looter's last attribution given, or nil), isMasterLooter and selected (the item the master looter chose).
+--- Item rows carry pick = item when the master looter may choose it; council rows carry give = name.
 function LootView.Rows(view)
     local drop, event, inGroup = view.drop, view.event, view.inGroup
     local rows = { { kind = "title", text = "Butin de " .. drop.boss } }
@@ -95,11 +101,13 @@ function LootView.Rows(view)
     end
     local canPick = view.isMasterLooter and view.active == nil
     if canPick then
-        rows[#rows + 1] = { kind = "line", text = "Clique sur un objet pour lancer son attribution." }
+        rows[#rows + 1] = { kind = "line", text = "Choisis un objet, puis lance son attribution." }
     end
     for _, item in ipairs(drop.items) do
-        rows[#rows + 1] = { kind = "line", text = item.link .. " : " .. status(event, item, inGroup), link = item.link,
-            start = canPick and item or nil }
+        local open = item.given == nil and item.slot ~= nil
+        local text = item.link .. " : " .. (item.given and givenText(item.given) or status(event, item, inGroup))
+        rows[#rows + 1] = { kind = "line", text = (item == view.selected and "▸ " or "") .. text, link = item.link,
+            pick = canPick and open and item or nil }
     end
     if view.shown ~= nil then
         rows[#rows + 1] = { kind = "header", text = "Attribution : " .. view.shown.link }
@@ -107,6 +115,9 @@ function LootView.Rows(view)
     end
     if view.active ~= nil then
         addMasterLooter(rows, view.active, inGroup)
+    elseif view.last ~= nil then
+        rows[#rows + 1] = { kind = "header", text = "Récapitulatif : " .. view.last.item.link }
+        addMasterLooter(rows, view.last, inGroup)
     end
     return rows
 end

@@ -23,6 +23,7 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | --- | --- |
 | Raid | Essai à deux joueurs au moins (données de l'événement, diffusion, invitations), puis un raid de 40 formé sans invitation manuelle |
 | Butin | Un raid réel enregistré sans saisie manuelle (répétition possible en donjon avec un maître du butin avant la fin de la bêta) |
+| Butin | En donjon, maître du butin : un objet choisi puis « Lancer l'attribution », donné tout seul au gagnant à la fin des rolls, corps ouvert ; puis un corps fermé pendant les rolls et rouvert : « Donner à… » donne le bon objet au bon joueur |
 | PvP | Un événement PvP créé en jeu par un officier, les fanions de l'Elo dans l'onglet Duels, un défi lancé en jeu à sa cible et relevé par le défié, le pari du duel misé par un tiers, le résultat réglé |
 | Paris | Un pari réel mené jusqu'au versement des gains |
 | Missions | Une mission d'une semaine menée jusqu'au classement |
