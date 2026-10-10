@@ -84,6 +84,21 @@ export function eventRepository(sql: SqlClient): EventRepository {
       await sql.query("update events set reminded_at = $2 where id = $1", [eventId, at]);
     },
 
+    async listSoftReservesToRemind(from, until) {
+      const rows = await sql.query<EventRow>(
+        `${SELECT_EVENTS} where events.starts_at > $1 and events.starts_at <= $2
+           and events.soft_reserves_reminded_at is null and events.kind = 'raid'
+           and events.soft_reserves_per_player > 0
+         group by events.id order by events.starts_at`,
+        [from, until],
+      );
+      return rows.map(toEvent);
+    },
+
+    async markSoftReservesReminded(eventId, at) {
+      await sql.query("update events set soft_reserves_reminded_at = $2 where id = $1", [eventId, at]);
+    },
+
     async isRecapPosted(eventId) {
       const rows = await sql.query<{ posted: boolean }>(
         "select recap_posted_at is not null as posted from events where id = $1",

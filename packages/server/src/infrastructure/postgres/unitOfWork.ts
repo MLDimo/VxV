@@ -4,6 +4,7 @@ import { betRepository, stakeRepository } from "./bets.ts";
 import { bossFightRepository } from "./bossFights.ts";
 import { bossLootRepository } from "./bossLoot.ts";
 import { itemRepository } from "./items.ts";
+import { schedulerRepository } from "./scheduler.ts";
 import { cashRepository } from "./cash.ts";
 import { characterRepository } from "./characters.ts";
 import { companionRepository } from "./companion.ts";
@@ -40,6 +41,7 @@ function createRepositories(sql: SqlClient): Repositories {
     signups: signupRepository(sql),
     bossLoot: bossLootRepository(sql),
     items: itemRepository(sql),
+    scheduler: schedulerRepository(sql),
     lootHistory: lootHistoryRepository(sql),
     softReserves: softReserveRepository(sql),
     exclusions: exclusionRepository(sql),

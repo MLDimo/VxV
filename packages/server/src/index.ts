@@ -118,7 +118,7 @@ export {
   type StakeStanding,
 } from "./domain/bets.ts";
 export type { RaidRecap } from "./domain/raidRecap.ts";
-export type { RaidReminder } from "./domain/reminders.ts";
+export type { RaidReminder, SoftReserveReminder } from "./domain/reminders.ts";
 export {
   createDiscordRest,
   DiscordApiError,

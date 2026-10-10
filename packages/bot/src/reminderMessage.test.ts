@@ -1,7 +1,7 @@
 import type { GuildEvent, RaidReminder } from "@vxv/server";
 import { describe, expect, it } from "vitest";
 import { emoji } from "./emojis.ts";
-import { reminderMessage } from "./reminderMessage.ts";
+import { reminderMessage, softReserveReminderMessage } from "./reminderMessage.ts";
 
 const event: GuildEvent = {
   id: "e",
@@ -33,5 +33,16 @@ describe("raid reminder message", () => {
     const message = reminderMessage({ event, expected: [], missingSoftReserves: [] }, "https://vxv.test");
     expect(message.content).toContain("Aucun inscrit pour l'instant");
     expect(message.allowed_mentions).toEqual({ users: [] });
+  });
+});
+
+describe("soft reserves' reminder message", () => {
+  it("kindly asks the members without soft reserves to choose them before the lock, pinging them only", () => {
+    expect(softReserveReminderMessage({ event, missing: ["2", "3"] }, "https://vxv.test")).toEqual({
+      content:
+        `${emoji("sr")} Petit rappel : **Onyxia** commence <t:${start}:R>. <@2> <@3>, pensez à choisir vos SR avant ` +
+        `leur verrouillage, <t:${lock}:t> : https://vxv.test/evenements/e`,
+      allowed_mentions: { users: ["2", "3"] },
+    });
   });
 });

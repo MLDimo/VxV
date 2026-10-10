@@ -1,4 +1,4 @@
-import type { RaidReminder } from "@vxv/server";
+import type { RaidReminder, SoftReserveReminder } from "@vxv/server";
 import { eventTitle } from "@vxv/server/domain/labels";
 import { softReservesLockAt } from "@vxv/server/domain/softReserves";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
@@ -27,4 +27,18 @@ export function reminderMessage(
     );
   }
   return { content: lines.join("\n"), allowed_mentions: { users: expected } };
+}
+
+/** The soft reserves' reminder, an hour before the raid: a kind word to the signed-up members who have none yet. */
+export function softReserveReminderMessage(
+  { event, missing }: SoftReserveReminder,
+  siteUrl: string,
+): RESTPostAPIChannelMessageJSONBody {
+  return {
+    content:
+      `${emoji("sr")} Petit rappel : **${eventTitle(event)}** commence ${timestamp(event.startsAt, "R")}. ` +
+      `${mentions(missing)}, pensez à choisir vos SR avant leur verrouillage, ` +
+      `${timestamp(softReservesLockAt(event.startsAt), "t")} : ${eventUrl(siteUrl, event)}`,
+    allowed_mentions: { users: missing },
+  };
 }
