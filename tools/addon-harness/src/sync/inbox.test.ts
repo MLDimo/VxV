@@ -5,7 +5,6 @@ import { ONYXIA_NIGHT, startRaid, websiteText } from "../raid/fixtures.ts";
 import { companionFiles } from "./fixtures.ts";
 
 const BUNDLES = ["VXV_Raid", "VXV_Sync"];
-const PREFIX = "|cff14b8a6VXV|r ";
 const EVENT = `
   local _, ns = ...
   local event = ns.RaidData.Current()
@@ -38,14 +37,13 @@ describe("the companion's data in game (VXV_Sync)", () => {
     expect(errors()).toEqual([]);
   });
 
-  it("tells the player, without any error, the raid their own companion brought", () => {
-    const { client, errors } = startRaid({
+  it("loads the raid the player's own companion brought, without any error nor a word in the chat", () => {
+    const { raid, client, errors } = startRaid({
       playerName: "Thom Leboss",
       written: companionFiles({ raid: websiteText() }),
     });
-    expect(client("return Printed")).toContain(
-      `${PREFIX}Raid chargé par ton compagnon VXV : Onyxia, le 10/12 20:00. Tape /vxv pour voir les inscrits et les SR.`,
-    );
+    expect(raid.run(EVENT)).toEqual({ title: "Onyxia", exportedAt: 1796931900, sender: "compagnon" });
+    expect(client("return Printed")).toEqual({});
     expect(errors()).toEqual([]);
   });
 
@@ -75,21 +73,13 @@ describe("the companion's data in game (VXV_Sync)", () => {
     expect(raid.run(EVENT)).toEqual({ title: "Onyxia", exportedAt: 1796932200, sender: "Ðéjà Vu" });
   });
 
-  it("asks to update the addon when the companion writes a newer format", () => {
+  it("asks to update the addon, under the Taverne, when the companion writes a newer format", () => {
     const { raid, client } = startRaid({ written: companionFiles({ version: 2, raid: websiteText() }) });
     expect(raid.run(EVENT)).toBeUndefined();
-    expect(client("return Printed")).toEqual([
-      `${PREFIX}Ton compagnon VXV est plus récent que l'addon : mets l'addon à jour pour profiter de ses données.`,
-    ]);
-  });
-
-  it("reminds an officer with the companion to type /reload when their data are stale", () => {
-    const stale = websiteText({ ...ONYXIA_NIGHT, exportedAt: new Date("2026-12-10T11:00:00Z") });
-    const guild = startGuild(["Ðéjà Vu"], { bundles: BUNDLES, written: companionFiles({ raid: stale }) });
-    guild.advanceTime(7 * 3600 + 35 * 60);
-    expect(guild.player("Ðéjà Vu").client("return Printed")).toContain(
-      `${PREFIX}SR verrouillées depuis le 10/12 19:30, mais tes données sont du 10/12 11:00 : tape /reload pour ` +
-        "charger celles du compagnon et envoyer les SR définitives à la guilde.",
-    );
+    expect(client("return Printed")).toEqual({});
+    expect(
+      client(`SlashCmdList.VXV("")
+        return FindWidget(VXV_Window, function(w) return tostring(w.text):find("Connectés avec VXV", 1, true) end).text`),
+    ).toContain("mise à jour disponible");
   });
 });

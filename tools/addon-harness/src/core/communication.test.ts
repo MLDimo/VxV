@@ -153,7 +153,7 @@ describe("presence", () => {
     }
   });
 
-  it("tells a member with an older version to update, once", () => {
+  it("tells a member with an older version to update, under the Taverne rather than in the chat", () => {
     const guild = startGuild(GUILD, { beforeLogin: true });
     for (const player of guild.players) {
       const version = player.name === "Eole Hermes" ? "1.1.0" : "1.0.0";
@@ -161,10 +161,12 @@ describe("presence", () => {
       player.client('Fire("PLAYER_LOGIN")');
     }
     guild.deliver();
-    const notices = (name: string) =>
-      guild.player(name).client("return Printed") as unknown as string[] | Record<string, never>;
-    expect(notices("Ðéjà Vu")).toEqual([expect.stringContaining("Une nouvelle version de VXV existe (1.1.0)")]);
-    expect(notices("Eole Hermes")).toEqual({});
+    const footer = (name: string) =>
+      guild.player(name).client(`SlashCmdList.VXV("")
+        return FindWidget(VXV_Window, function(w) return tostring(w.text):find("Connectés avec VXV", 1, true) end).text`);
+    expect(footer("Ðéjà Vu")).toContain("1.0.0 · mise à jour disponible");
+    expect(footer("Eole Hermes")).not.toContain("mise à jour disponible");
+    expect(guild.player("Ðéjà Vu").client("return Printed")).toEqual({});
   });
 
   it.each([

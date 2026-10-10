@@ -23,7 +23,12 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   événements PvP), la fenêtre « Mon inscription » (`VXV.OpenSignupDialog`, libellés `VXV.SignupLabels`), les rôles
   Discord apportés par le compagnon d'un officier (`VXV.EventRoles`, `Core/EventRoles.lua`) et leur choix aux
   flèches (`VXV.RoleStepper`) ; le tableau d'un classement à fanions, ses images et les portraits
-  (`VXV.RankingBoard`, `Media/`), pour le Ranking et les duels. Installation : `tools/install-addon.sh`.
+  (`VXV.RankingBoard`, `Media/`), pour le Ranking et les duels. Installation : `tools/install-addon.sh`. Chat
+  (décision du propriétaire du 10 octobre) : l'addon n'y écrit que les réponses aux commandes et aux clics du joueur,
+  les refus du site (`PendingChanges`, « Site VXV, changement refusé ») et les appels à agir (invitations du raid,
+  défis) ; ce qui arrive seul reste dans ses écrans : données chargées et modifications (Raid, Journal), données
+  d'avant le verrouillage (badge du Raid pour un officier), mise à jour disponible (bas de la Taverne). Les annonces
+  « [VXV] » des canaux de raid et de guilde restent visibles de tous.
 - **Raid et SR** (`VXV_Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur

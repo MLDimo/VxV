@@ -10,8 +10,6 @@ ns.Changes = Changes
 
 local RaidData = ns.RaidData
 
-local DONE = "Site VXV : %s"
-local REFUSED = "Site VXV, changement refusé : %s"
 -- The fields of each kind, with their type, kept from a change relayed by another player.
 local FIELDS = {
     signup = { eventId = "string", role = "string", spec = "string", status = "string" },
@@ -74,13 +72,12 @@ function Changes.Submit(fields)
     return changes.Submit(change) ~= nil
 end
 
--- The event's data bring the website's answers: the player learns them, and no outbox keeps those changes.
+-- The event's data bring the website's answers: no outbox keeps those changes, and the player learns a refusal.
 VXV.On("raid.updated", function(event)
     for id, result in pairs(event.results) do
-        local change = changes.Settle(id)
+        local change = changes.Settle(id, result)
         if change ~= nil then
             answers[change.kind] = { eventId = change.eventId, accepted = result.accepted, message = result.message }
-            VXV.Print((result.accepted and DONE or REFUSED):format(result.message))
         end
     end
     VXV.Emit("raid.changes")

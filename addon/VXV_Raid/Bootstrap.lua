@@ -9,7 +9,6 @@ VXV.RegisterModule({
         ns.Changes.Restore(data)
         ns.BossAlert.Restore(data)
         ns.CombatLogging.Restore(data)
-        ns.Freshness.Start()
         ns.KillSharing.Start()
         ns.Place.Start()
         ns.ItemKinds.Start()

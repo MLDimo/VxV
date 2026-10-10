@@ -9,8 +9,6 @@ ns.Changes = Changes
 
 local BetsData = ns.BetsData
 
-local DONE = "Site VXV : %s"
-local REFUSED = "Site VXV, refusé : %s"
 local FIELDS = {
     stake = { betId = "string", choiceId = "string", amount = "number" },
     withdraw = { betId = "string" },
@@ -83,15 +81,12 @@ function Changes.Openings()
     return openings
 end
 
--- The bets' data bring the website's answers: the player learns them, and no outbox keeps those changes.
+-- The bets' data bring the website's answers: no outbox keeps those changes, and the player learns a refusal.
 VXV.On("paris.updated", function(data)
     for id, result in pairs(data.results) do
-        local change = changes.Settle(id)
-        if change ~= nil then
-            if change.betId ~= nil then
-                answers[change.betId] = { accepted = result.accepted, message = result.message }
-            end
-            VXV.Print((result.accepted and DONE or REFUSED):format(result.message))
+        local change = changes.Settle(id, result)
+        if change ~= nil and change.betId ~= nil then
+            answers[change.betId] = { accepted = result.accepted, message = result.message }
         end
     end
     VXV.Emit("paris.changes")

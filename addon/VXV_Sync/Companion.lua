@@ -11,20 +11,19 @@ ns.Companion = Companion
 
 -- Inboxes of a newer format come from a companion more recent than this addon.
 local INBOX_VERSION = 1
-local NEWER = "Ton compagnon VXV est plus récent que l'addon : mets l'addon à jour pour profiter de ses données."
 
 --- True when the player's companion wrote the inbox: the outbox then collects what it takes to the website.
 function Companion.IsPresent()
     return type(ns.Inbox) == "table"
 end
 
---- Hands the inbox over to the bundles; a newer format asks for the addon's update instead.
+--- Hands the inbox over to the bundles; a newer format asks for the addon's update instead (under the Taverne).
 function Companion.Deliver()
     if not Companion.IsPresent() then
         return
     end
     if (tonumber(ns.Inbox.version) or 0) > INBOX_VERSION then
-        VXV.Print(NEWER)
+        VXV.Emit("presence.outdated")
         return
     end
     VXV.Emit("sync.inbox", ns.Inbox)

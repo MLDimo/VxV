@@ -58,9 +58,8 @@ describe("sharing the event in the guild", () => {
     settle(guild);
     for (const name of ["Thom Leboss", "Ciel Gris"]) {
       expect(eventOf(guild, name)).toEqual({ title: "Onyxia", exportedAt: 1796931900, signups: 3, sender: "Ðéjà Vu" });
-      expect(printedBy(guild, name)).toContain(
-        `${PREFIX}Raid chargé par Ðéjà Vu : Onyxia, le 10/12 20:00. Tape /vxv pour voir les inscrits et les SR.`,
-      );
+      // The data arrive without a word in the chat.
+      expect(guild.player(name).client("return Printed")).toEqual({});
     }
     expect(printedBy(guild, "Ðéjà Vu")).toContain(
       `${PREFIX}Données envoyées aux membres de la guilde connectés avec VXV.`,
@@ -134,7 +133,7 @@ describe("sharing the event in the guild", () => {
     expect(eventOf(guild, "Ðéjà Vu")).toMatchObject({ exportedAt: 1796931900, sender: "Ðéjà Vu" });
   });
 
-  it("warns the members of an officer's changes, with their reason", () => {
+  it("keeps an officer's changes, with their reason, for the Journal, without a word in the chat", () => {
     const guild = startGuild(["Ðéjà Vu", "Thom Leboss"], RAID);
     settle(guild);
     importText(guild.player("Ðéjà Vu").client, websiteText());
@@ -164,29 +163,37 @@ describe("sharing the event in the guild", () => {
     });
     importText(guild.player("Ðéjà Vu").client, websiteText(later));
     settle(guild);
-    expect(printedBy(guild, "Thom Leboss")).toContain(
-      `${PREFIX}|cffff8000Modification par Officier :|r SR corrigées par un officier : SR de Thom Leboss ` +
-        "(Onyxia, 10/12/2026 21:00) : avant « Sac en peau », après « Tête d'Onyxia » (motif : Échange demandé en vocal)",
-    );
-    expect(printedBy(guild, "Thom Leboss").filter((line) => line.includes("Modification par"))).toHaveLength(1);
+    expect(
+      guild
+        .player("Thom Leboss")
+        .bundles.VXV_Raid?.run(
+          "local _, ns = ... local journal = ns.RaidData.Current().journal return journal[#journal]",
+        ),
+    ).toMatchObject({
+      actor: "Officier",
+      summary:
+        "SR corrigées par un officier : SR de Thom Leboss (Onyxia, 10/12/2026 21:00) : avant « Sac en peau », après " +
+        "« Tête d'Onyxia »",
+      reason: "Échange demandé en vocal",
+    });
+    expect(JSON.stringify(guild.player("Thom Leboss").client("return Printed"))).not.toContain("Modification");
   });
 });
 
 describe("freshness of the officers' data", () => {
-  it("reminds an officer once when the soft reserves lock after their copy", () => {
+  it("shows an officer, on the Raid screen, that their copy predates the lock", () => {
     const guild = startGuild(["Ðéjà Vu"], RAID);
     const officer = guild.player("Ðéjà Vu");
     importText(officer.client, websiteText(night({ exportedAt: new Date("2026-12-10T11:00:00Z") })));
-    const stale = (printed: string[]) => printed.filter((line) => line.includes("SR verrouillées depuis"));
-    expect(stale(printedBy(guild, "Ðéjà Vu"))).toEqual([]);
+    const lockBadge = () =>
+      officer.bundles.VXV_Raid?.run(`local _, ns = ...
+        local badges = ns.RaidView.Header(ns.RaidData.Current(), nil, time()).badges
+        return badges[#badges].text`);
+    expect(lockBadge()).toMatch(/^SR verrouillées dans /u);
 
     // From 12:00 to 19:35: the lock passed at 19:30.
     guild.advanceTime(7 * 3600 + 35 * 60);
-    expect(stale(printedBy(guild, "Ðéjà Vu"))).toEqual([
-      `${PREFIX}SR verrouillées depuis le 10/12 19:30, mais tes données sont du 10/12 11:00 : recopie-les depuis ` +
-        "la page de l'événement sur le site (/vxv importer) pour envoyer les SR définitives à la guilde.",
-    ]);
-    guild.advanceTime(600);
-    expect(stale(printedBy(guild, "Ðéjà Vu"))).toHaveLength(1);
+    expect(lockBadge()).toBe("Données d'avant le verrouillage : recharge-les");
+    expect(JSON.stringify(officer.client("return Printed"))).not.toContain("SR verrouillées");
   });
 });

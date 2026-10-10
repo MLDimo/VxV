@@ -8,8 +8,6 @@ ns.Changes = Changes
 
 local QuestsData = ns.QuestsData
 
-local DONE = "Site VXV : %s"
-local REFUSED = "Site VXV, refusé : %s"
 local FIELDS = {
     mission = { type = "string", title = "string", reward = "number", days = "number", reason = "string" },
 }
@@ -33,11 +31,9 @@ function Changes.Publish(quest)
         days = quest.days, reason = quest.reason }) ~= nil
 end
 
--- The quests' data bring the website's answers: the player learns them, and no outbox keeps those changes.
+-- The quests' data bring the website's answers: no outbox keeps those changes, and the player learns a refusal.
 VXV.On("quetes.updated", function(data)
     for id, result in pairs(data.results) do
-        if changes.Settle(id) ~= nil then
-            VXV.Print((result.accepted and DONE or REFUSED):format(result.message))
-        end
+        changes.Settle(id, result)
     end
 end)
