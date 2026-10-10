@@ -13,13 +13,14 @@ import { groupByBoss } from "./softReserveGroups";
 
 /**
  * The event's loot with everyone's reserves; signed-up members tick their own within the allowance, among the items
- * their character's class may equip.
+ * their character's class may equip, or tick again in one click those of their last raid on the same raids.
  */
 export function SoftReserveBoardForm({
   eventId,
   items,
   allowance,
   characterClass,
+  reusable,
   locked,
   lockLabel,
 }: {
@@ -28,6 +29,8 @@ export function SoftReserveBoardForm({
   allowance: number;
   /** The class of the member's signed-up character; undefined without sign-up. */
   characterClass: string | undefined;
+  /** The reserves of the member's last raid on the same raids that are still allowed. */
+  reusable: number[];
   locked: boolean;
   /** When the soft reserves lock, already formatted in the guild's time zone. */
   lockLabel: string;
@@ -62,6 +65,11 @@ export function SoftReserveBoardForm({
             ? `Vous avez droit à ${softReserveCount(allowance)} : ${chosen.size} choisie(s).`
             : "Inscrivez-vous à l'événement pour choisir vos SR."}
         </p>
+      )}
+      {canReserve && reusable.length > 0 && (
+        <button type="button" onClick={() => setChosen(new Set(reusable))} className="button-wood mt-2">
+          Réutiliser mes SR précédentes
+        </button>
       )}
       <p className="text-xs text-muted">
         SR+ : +{SOFT_RESERVE_BONUS_STEP} au roll pour chaque raid précédent où le joueur était présent et avait réservé

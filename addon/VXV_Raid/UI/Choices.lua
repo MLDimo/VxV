@@ -75,13 +75,14 @@ function Choices.CanReserve(event, player)
 end
 
 --- "Mes SR": the loot of the event's raids the player's character may equip, excluded items left aside, within the
---- allowance.
+--- allowance; the reserves of the player's last raid on the same raids may be chosen again in one click.
 function Choices.Reserves()
     local event, player = RaidData.Current(), VXV.PlayerName()
     if not Choices.CanReserve(event, player) then
         return
     end
     local allowance = event.softReservesPerPlayer
+    local reusable = (EventData.SignupOf(event, player) or {}).reusable
     ItemChoice.Open({
         title = "Mes SR",
         items = equippable(event, player),
@@ -95,6 +96,7 @@ function Choices.Reserves()
         onSend = function(chosen)
             Changes.Submit({ kind = "reserves", itemIds = sortedIds(chosen) })
         end,
+        reuse = reusable and { label = "Réutiliser mes SR précédentes", itemIds = reusable } or nil,
     })
 end
 

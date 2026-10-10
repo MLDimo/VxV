@@ -8,15 +8,17 @@ import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "./journalDescriptio
 import { eventTitle } from "./labels.ts";
 import type { Signup } from "./signups.ts";
 import { flag, line, seconds, text } from "./addonText.ts";
-import type { BoardItem } from "./softReserves.ts";
+import { choiceContextOf, reusableReserves, type BoardItem } from "./softReserves.ts";
 
 /** First line of an event exported for the addon (contract with VXV_Raid); the number is the format version. */
-export const ADDON_EVENT_HEADER = "VXV-RAID-4";
+export const ADDON_EVENT_HEADER = "VXV-RAID-5";
 
 export interface AddonEventFacts {
   event: GuildEvent;
   signups: readonly Signup[];
   board: readonly BoardItem[];
+  /** Each signed-up character's reserves at its last raid on the same raids, those it obtained aside. */
+  previousReserves: ReadonlyMap<string, readonly number[]>;
   /** Characters of the officers and the guild master: the addon takes the event's data from them only. */
   officers: readonly Character[];
   /** Main characters: a sign-up with another character is a reroll, invited by hand. */
@@ -36,6 +38,7 @@ export interface AddonEventFacts {
  * I;item id;item name;boss;1 when excluded from SR
  * W;item id;the class tokens that may equip it, separated by commas (an item without this line suits every class)
  * S;character;class token;role;status;1 for a reroll;spec;item id:SR+ bonus,…
+ * U;character;the item ids of its last raid's reserves it may reuse, separated by commas
  * J;time (Unix seconds);officer;what changed;reason
  * C;change id;1 when done, 0 when refused;message
  * Items are those reserved or excluded: the raids' loot comes with the addon's data packs. The addon parses the
@@ -81,6 +84,13 @@ export function formatAddonEvent(facts: AddonEventFacts): string {
         reservesOf(signup.characterId).join(","),
       ),
     ),
+    ...facts.signups.flatMap((signup) => {
+      const reusable = reusableReserves(
+        facts.previousReserves.get(signup.characterId) ?? [],
+        choiceContextOf(board, event.softReservesPerPlayer, signup.characterClass),
+      );
+      return reusable.length === 0 ? [] : [line("U", signup.characterName, reusable.join(","))];
+    }),
     ...facts.journal.map((entry) =>
       line(
         "J",

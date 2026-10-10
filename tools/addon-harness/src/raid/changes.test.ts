@@ -109,6 +109,28 @@ describe("changes made in game", () => {
     expect(client(PENDING)).toEqual([expect.objectContaining({ kind: "reserves", itemIds: [21, 40] })]);
   });
 
+  it("chooses again in one click the reserves of the last night on the same raids", () => {
+    const { client } = member();
+    client(click("VXV_Window", "Choisir"));
+    client(click("VXV_ItemChoice", "Réutiliser mes SR précédentes"));
+    const texts = client(`
+      local texts = {}
+      FindWidget(VXV_ItemChoice, function(widget)
+          if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      end)
+      return texts
+    `) as string[];
+    expect(texts).toEqual(
+      expect.arrayContaining([
+        "[  ] |cffc58bffTête d'Onyxia|r",
+        "|cfff2c94c[x] |r|cfff2c94cSac en peau|r",
+        "|cfff2c94c[x] |r|cfff2c94cBâton du dragon|r",
+      ]),
+    );
+    client(click("VXV_ItemChoice", "Envoyer"));
+    expect(client(PENDING)).toEqual([expect.objectContaining({ kind: "reserves", itemIds: [21, 40] })]);
+  });
+
   it("leaves out of the soft reserves the items the character's class may not equip", () => {
     // Ðéjà Vu, a rogue, signed up: no staff for a rogue, as the website said with the event.
     const { client } = startRaid({ written: companionFiles({ raid: websiteText() }) });

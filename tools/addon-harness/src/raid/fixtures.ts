@@ -68,6 +68,8 @@ export const ONYXIA_NIGHT: AddonEventFacts = {
     // A staff, as an addon read it in game: no rogue wields it.
     item(40, "Bâton du dragon", { kind: { itemClass: 2, itemSubclass: 10, equipSlot: "INVTYPE_2HWEAPON" } }),
   ],
+  // Thom Leboss reserved the bag and the staff at his last night on Onyxia.
+  previousReserves: new Map([["c-thom", [21, 40]]]),
   officers: [
     {
       id: "c-deja",

@@ -1,6 +1,6 @@
 local _, ns = ...
 
---- The event shown in the Raid tab (VXV-RAID-4, EventData.lua): brought by the companion, loaded by an officer from
+--- The event shown in the Raid tab (VXV-RAID-5, EventData.lua): brought by the companion, loaded by an officer from
 --- the website's text, passed on to the guild by the officers, kept in the saved data with who sent it (the core's
 --- site data). The text names the officers; only their characters may send it.
 local EventData, Labels = ns.EventData, ns.Labels

@@ -188,6 +188,11 @@ export interface SoftReserveRepository {
   /** The character's soft reserves for the event become exactly these items, as changed at the given instant. */
   replaceForCharacter(eventId: string, characterId: string, itemIds: readonly number[], changedAt: Date): Promise<void>;
   deleteForItem(eventId: string, itemId: number): Promise<void>;
+  /**
+   * For each character signed up to the event, the items it reserved at its last earlier event on the same raids
+   * where it had reserves, but those it ever obtained; by character id.
+   */
+  listPrevious(eventId: string): Promise<Map<string, number[]>>;
 }
 
 export interface ExclusionRepository {

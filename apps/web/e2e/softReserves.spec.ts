@@ -53,4 +53,18 @@ test.describe.serial("soft reserves", () => {
     await expect(itemRow(page, "Brassards brindecieux")).toContainText("Ciel Gris");
     await expect(page.getByRole("button", { name: "Enregistrer mes SR" })).toHaveCount(0);
   });
+
+  test("the priest ticks again the reserves of their last night on the same raid, then saves them", async ({
+    page,
+    context,
+  }) => {
+    await signInAs(context, "priest");
+    await page.goto(eventPage());
+    await expect(myBox(page, "Croc de Magmatus")).not.toBeChecked();
+    await page.getByRole("button", { name: "Réutiliser mes SR précédentes" }).click();
+    await expect(myBox(page, "Croc de Magmatus")).toBeChecked();
+    await page.getByRole("button", { name: "Enregistrer mes SR" }).click();
+    await expect(page.getByRole("status")).toContainText("SR enregistrées.");
+    await expect(itemRow(page, "Croc de Magmatus")).toContainText("Fleur Lunaire");
+  });
 });

@@ -7,6 +7,8 @@ import {
   areSoftReservesLocked,
   buildBoard,
   checkSoftReserveChoice,
+  choiceContextOf,
+  reusableReserves,
   softReservesLockAt,
   type BoardItem,
 } from "../domain/softReserves.ts";
@@ -20,6 +22,8 @@ export interface SoftReserveBoard {
   items: BoardItem[];
   /** The viewer's sign-up: soft reserves are made with its character. */
   mySignup: Signup | undefined;
+  /** The soft reserves of the viewer's last raid on the same raids that they may reuse (none without sign-up). */
+  reusable: number[];
   lockAt: Date;
   locked: boolean;
 }
@@ -75,10 +79,19 @@ export function createSoftReserves({ unitOfWork, clock }: { unitOfWork: UnitOfWo
           return undefined;
         }
         const mySignup = await repositories.signups.findByMember(event.id, member.id);
+        const items = await loadBoardItems(repositories, event, mySignup?.characterId);
+        const previous = mySignup && (await repositories.softReserves.listPrevious(event.id)).get(mySignup.characterId);
         return {
           allowance: event.softReservesPerPlayer,
-          items: await loadBoardItems(repositories, event, mySignup?.characterId),
+          items,
           mySignup,
+          reusable:
+            mySignup === undefined
+              ? []
+              : reusableReserves(
+                  previous ?? [],
+                  choiceContextOf(items, event.softReservesPerPlayer, mySignup.characterClass),
+                ),
           lockAt: softReservesLockAt(event.startsAt),
           locked: areSoftReservesLocked(event.startsAt, clock()),
         };
