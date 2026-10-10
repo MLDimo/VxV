@@ -7,25 +7,33 @@
 /** A day of the year: month (1 to 12) and day. */
 type MonthDay = readonly [month: number, day: number];
 
+/** A holiday's first and last days ("YYYY-MM-DD"). */
+type Period = readonly [first: string, last: string];
+
 export interface Season {
   /** The picture's name: apps/web/public/images/tavernes/<id>.jpg, addon/VXV_Core/Media/Tavernes/<id>.png. */
-  id: "voile-d-hiver" | "amour" | "jardin-des-nobles" | "solstice" | "brasseurs" | "sanssaint";
+  id: "voile-d-hiver" | "amour" | "jardin-des-nobles" | "solstice" | "brasseurs" | "sanssaint" | "sombrelune";
   name: string;
-  /** The holiday's first and last days in that year ("YYYY-MM-DD"); one astride two years ends in the next. */
-  days: (year: number) => readonly [first: string, last: string];
+  /** The holiday's periods starting in that year; one astride two years ends in the next. */
+  periods: (year: number) => readonly Period[];
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const WEEK_DAYS = 7;
+const MONTHS = 12;
 const ISO_DAY_LENGTH = "YYYY-MM-DD".length;
 
 const isoDay = (date: Date) => date.toISOString().slice(0, ISO_DAY_LENGTH);
 const dayOf = (year: number, [month, day]: MonthDay) => new Date(Date.UTC(year, month - 1, day));
 
 /** The same days each year, the last in the next year when it comes before the first in the calendar. */
-function fixed(first: MonthDay, last: MonthDay): Season["days"] {
+function fixed(first: MonthDay, last: MonthDay): Season["periods"] {
   const astride = last[0] < first[0];
-  return (year) => [isoDay(dayOf(year, first)), isoDay(dayOf(astride ? year + 1 : year, last))];
+  return (year) => [[isoDay(dayOf(year, first)), isoDay(dayOf(astride ? year + 1 : year, last))]];
 }
+
+/** The week from a Sunday. */
+const weekFrom = (sunday: Date): Period => [isoDay(sunday), isoDay(new Date(sunday.getTime() + 6 * DAY_MS))];
 
 /** Easter Sunday in the Gregorian calendar (Meeus, Jones and Butcher's algorithm). */
 export function easter(year: number): Date {
@@ -41,18 +49,24 @@ export function easter(year: number): Date {
 }
 
 /** The week from Easter Sunday. */
-const easterWeek: Season["days"] = (year) => {
-  const sunday = easter(year);
-  return [isoDay(sunday), isoDay(new Date(sunday.getTime() + 6 * DAY_MS))];
-};
+const easterWeek: Season["periods"] = (year) => [weekFrom(easter(year))];
 
+/** The Darkmoon Faire, as in the game's calendar: the week from each month's first Sunday. */
+const monthlyFaire: Season["periods"] = (year) =>
+  Array.from({ length: MONTHS }, (_, month) => {
+    const first = dayOf(year, [month + 1, 1]);
+    return weekFrom(new Date(first.getTime() + ((WEEK_DAYS - first.getUTCDay()) % WEEK_DAYS) * DAY_MS));
+  });
+
+/** In this order: on a day of two holidays, the first wins (the Darkmoon Faire, each month, gives way to the others). */
 export const SEASONS: readonly Season[] = [
-  { id: "voile-d-hiver", name: "Voile d'hiver", days: fixed([12, 15], [1, 2]) },
-  { id: "amour", name: "De l'amour dans l'air", days: fixed([2, 7], [2, 20]) },
-  { id: "jardin-des-nobles", name: "Jardin des nobles", days: easterWeek },
-  { id: "solstice", name: "Fête du Feu du solstice d'été", days: fixed([6, 21], [7, 5]) },
-  { id: "brasseurs", name: "Fête des Brasseurs", days: fixed([9, 20], [10, 6]) },
-  { id: "sanssaint", name: "Sanssaint", days: fixed([10, 18], [11, 1]) },
+  { id: "voile-d-hiver", name: "Voile d'hiver", periods: fixed([12, 15], [1, 2]) },
+  { id: "amour", name: "De l'amour dans l'air", periods: fixed([2, 7], [2, 20]) },
+  { id: "jardin-des-nobles", name: "Jardin des nobles", periods: easterWeek },
+  { id: "solstice", name: "Fête du Feu du solstice d'été", periods: fixed([6, 21], [7, 5]) },
+  { id: "brasseurs", name: "Fête des Brasseurs", periods: fixed([9, 20], [10, 6]) },
+  { id: "sanssaint", name: "Sanssaint", periods: fixed([10, 18], [11, 1]) },
+  { id: "sombrelune", name: "Foire de Sombrelune", periods: monthlyFaire },
 ];
 
 /** The day of an instant in France ("YYYY-MM-DD"), where the guild plays. */
@@ -64,10 +78,7 @@ export function parisDay(instant: Date): string {
 export function seasonOn(day: string): Season | undefined {
   const year = Number(day.slice(0, "YYYY".length));
   return SEASONS.find((season) =>
-    [year - 1, year].some((start) => {
-      const [first, last] = season.days(start);
-      return first <= day && day <= last;
-    }),
+    [year - 1, year].some((start) => season.periods(start).some(([first, last]) => first <= day && day <= last)),
   );
 }
 

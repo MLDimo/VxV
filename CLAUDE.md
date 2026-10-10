@@ -155,7 +155,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
 - Taverne des fêtes de WoW, par date et selon le calendrier du jeu (`packages/design/src/seasons.ts`, jours de
   France) : Voile d'hiver, De l'amour dans l'air, Jardin des nobles (semaine de Pâques), solstice d'été, Fête des
-  Brasseurs, Sanssaint. Chaque fête a son image, aux mêmes dimensions et avec les lieux aux mêmes places
+  Brasseurs, Sanssaint, et chaque mois la Foire de Sombrelune (la semaine du premier dimanche, qui cède la place
+  aux autres fêtes). Chaque fête a son image, aux mêmes dimensions et avec les lieux aux mêmes places
   (`apps/web/public/images/tavernes/<id>.jpg`, `VXV_Core/Media/Tavernes/<id>.png`) ; le site la choisit par
   `tavernPicture`, l'addon par `TavernPicture`, d'après les jours que `npm run generate` écrit dans `Tokens.lua`.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), jusque sur Discord par la couleur des rôles de
