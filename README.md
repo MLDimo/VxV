@@ -90,7 +90,10 @@ son secret et attendre quelques minutes avant de déployer : le « Session poole
   en dessous de lui ; personne ne renomme le propriétaire). Tout membre du serveur est membre de la guilde ; le GM
   porte un rôle « GM ».
 - Tâches planifiées de Vercel (`apps/web/vercel.json`), protégées par `CRON_SECRET` : récap des raids à 7 h UTC,
-  rappels des raids à 8 h UTC, titres de la semaine le mercredi à 5 h UTC.
+  rappels des raids à 8 h UTC, titres de la semaine le mercredi à 5 h UTC. Plus fréquentes que ce que permet l'offre
+  gratuite de Vercel (une fois par jour) : la base de production les appelle (`supabase/schedules.sql`, pg_cron et
+  pg_net, installés par le déploiement de production de la base), avec le jeton de sa table `scheduler` que le site
+  lit aussi : le rappel des SR une heure avant chaque soirée, toutes les 5 minutes.
 
 ## Publier l'addon
 

@@ -2,7 +2,7 @@ import type { DiscordRestOptions, EventAnnouncer, EventKind } from "@vxv/server"
 import { discordChannel } from "./discordChannel.ts";
 import { raidMessage } from "./raidMessage.ts";
 import { recapMessage } from "./recapMessage.ts";
-import { reminderMessage } from "./reminderMessage.ts";
+import { reminderMessage, softReserveReminderMessage } from "./reminderMessage.ts";
 
 /**
  * The guild's raid channel: the raid nights' sign-up messages, the reminders and the end-of-raid recaps; and the PvP
@@ -25,6 +25,10 @@ export function createDiscordRaidAnnouncer({
 
     async remind(reminder) {
       await channels[reminder.event.kind].post(reminderMessage(reminder, siteUrl));
+    },
+
+    async remindSoftReserves(reminder) {
+      await channels.raid.post(softReserveReminderMessage(reminder, siteUrl));
     },
 
     async recap(recap) {

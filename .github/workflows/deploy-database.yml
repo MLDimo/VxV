@@ -52,3 +52,7 @@ jobs:
             exit 0
           fi
           tools/deploy-database.sh "$url"
+          # The website's frequent tasks run from the production database only (pg_cron and pg_net).
+          if [[ "$TARGET" == "production" ]]; then
+            psql "$url" --quiet -v ON_ERROR_STOP=1 -f supabase/schedules.sql
+          fi

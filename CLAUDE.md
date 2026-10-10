@@ -46,6 +46,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   obtenu ; neutre s'il était absent ou si l'événement n'avait pas le raid de l'objet ; arrêt à l'objet obtenu ou à une
   présence sans l'avoir réservé ; plafond +30. Conflits : le site fait foi, et la modification la plus récente gagne
   avant le verrouillage (un changement fait en jeu porte l'heure du jeu, ramenée à celle du site si elle la dépasse).
+  Une heure avant une soirée de raid, avant le verrouillage, le salon des raids appelle une fois les inscrits (sauf
+  absents) qui n'ont aucune SR : « Petit rappel… pensez à choisir vos SR » (demande du propriétaire du 10 octobre,
+  `sendSoftReservesDue`) ; la base de production appelle le site toutes les 5 minutes (`supabase/schedules.sql`,
+  pg_cron et pg_net, jeton de la table `scheduler`, `/api/cron/rappels-sr`) : Vercel gratuit ne planifie qu'une fois
+  par jour.
   En jeu : inscrits (icône de rôle, couleur de classe), mes SR, SR du raid avec SR+, invitations (Rejoindre invite les
   inscrits attendus avec leur personnage principal, Inviter tout le roster, passage en raid à la première
   acceptation).

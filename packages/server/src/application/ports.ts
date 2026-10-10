@@ -139,6 +139,9 @@ export interface EventRepository {
   /** Events starting after "from" and up to "until" that were not reminded yet, soonest first. */
   listToRemind(from: Date, until: Date): Promise<GuildEvent[]>;
   markReminded(eventId: string, at: Date): Promise<void>;
+  /** The raid nights with soft reserves starting in the window whose soft reserves' reminder was not sent yet. */
+  listSoftReservesToRemind(from: Date, until: Date): Promise<GuildEvent[]>;
+  markSoftReservesReminded(eventId: string, at: Date): Promise<void>;
   /** Whether the raid's recap was published on Discord already. */
   isRecapPosted(eventId: string): Promise<boolean>;
   markRecapPosted(eventId: string, at: Date): Promise<void>;
@@ -155,6 +158,11 @@ export interface SignupRepository {
   /** When the member's sign-up and its soft reserves last changed, or undefined without sign-up. */
   changedAt(eventId: string, memberId: string): Promise<{ signup: Date; reserves: Date | undefined } | undefined>;
   delete(eventId: string, characterId: string): Promise<void>;
+}
+
+/** The token the production database calls the website's frequent tasks with (supabase/schedules.sql). */
+export interface SchedulerRepository {
+  token(): Promise<string>;
 }
 
 /** What the game says of the raids' items, as an addon read it. */
@@ -521,6 +529,7 @@ export interface Repositories {
   signups: SignupRepository;
   bossLoot: BossLootRepository;
   items: ItemRepository;
+  scheduler: SchedulerRepository;
   lootHistory: LootHistoryRepository;
   softReserves: SoftReserveRepository;
   exclusions: ExclusionRepository;

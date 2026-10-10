@@ -4,7 +4,7 @@ import type { ServerRole } from "../domain/eventRoles.ts";
 import type { GuildEvent } from "../domain/events.ts";
 import type { Mission, MissionScore, MissionStatus } from "../domain/missions.ts";
 import type { RaidRecap } from "../domain/raidRecap.ts";
-import type { RaidReminder } from "../domain/reminders.ts";
+import type { RaidReminder, SoftReserveReminder } from "../domain/reminders.ts";
 import type { Signup } from "../domain/signups.ts";
 
 /** The application's ports to Discord, the bot's adapters: the guild's server and the channels it announces in. */
@@ -41,6 +41,8 @@ export interface EventAnnouncer {
   update(messageId: string, raid: AnnouncedEvent): Promise<boolean>;
   /** Reminds the signed-up members of the raid, in the raid channel. */
   remind(reminder: RaidReminder): Promise<void>;
+  /** Calls the signed-up members without soft reserves to choose them, in the raid channel. */
+  remindSoftReserves(reminder: SoftReserveReminder): Promise<void>;
   /** Publishes the end-of-raid recap, in the raid channel. */
   recap(recap: RaidRecap): Promise<void>;
 }

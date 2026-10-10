@@ -32,6 +32,7 @@ import { createMissions } from "./application/missions.ts";
 import { createRaidLogs } from "./application/raidLogs.ts";
 import { createRanking } from "./application/ranking.ts";
 import { createRaidReminders } from "./application/raidReminders.ts";
+import { createScheduler } from "./application/scheduler.ts";
 import { createRoster } from "./application/roster.ts";
 import { createSignups } from "./application/signups.ts";
 import { createSoftReserves } from "./application/softReserves.ts";
@@ -137,6 +138,7 @@ export function createApplication({
     discordProfiles: createDiscordProfiles({ unitOfWork, guild }),
     raidAnnouncements,
     raidReminders: createRaidReminders({ unitOfWork, announcer }),
+    scheduler: createScheduler({ unitOfWork }),
     events,
     signups,
     softReserves,
