@@ -2,7 +2,8 @@ local ns = select(2, ...).Raid
 
 --- Giving the boss's items (plan 6.2 to 6.6). The master looter picks an item; the addon applies the rules, tells
 --- each member what they may do, announces each step in the group's channel, follows the rolls, and gives the item
---- to the winner. Members only ever follow the master looter's addon.
+--- to the winner as soon as there is one, the corpse open (the owner saw the game's master loot work without a
+--- click). Members only ever follow the master looter's addon.
 local Distribution = {}
 ns.Distribution = Distribution
 
@@ -39,8 +40,9 @@ local TELL_WINNER = "%s gagne."
 local BUSY = "Une attribution est déjà en cours : termine-la ou annule-la."
 local CANNOT_RECEIVE = "%s ne peut pas recevoir l'objet : rouvre le corps, ou vérifie qu'il est assez près."
 
--- The master looter's attribution: { item, plan, round, result = { winner, method } }.
-local active
+-- The master looter's attribution: { item, plan, round, result = { winner, method } }; and the last one given, kept
+-- for its recap.
+local active, last
 -- What every member sees: { link, message, canRoll, rolled, quiet (nothing to do: the panel does not open) }.
 local shown
 local roundNumber = 0
@@ -136,6 +138,7 @@ finishRound = function()
         active.result = { winner = winner, method = Attribution.Method(active.plan.mode, round.bonuses and
             round.bonuses[winner]) }
         VXV.Broadcast(FINISH, { itemId = active.item.itemId, winner = winner }, Group.Channel())
+        Distribution.Give(winner)
     elseif #winners > 1 then
         local tied = {}
         for _, name in ipairs(winners) do
@@ -173,6 +176,7 @@ function Distribution.Start(item)
         active.result = { winner = reserver.name, method = Attribution.Method("direct", reserver.bonus) }
         say(SAY_DIRECT, withBonuses(plan.reservers))
         broadcastStart()
+        Distribution.Give(reserver.name)
     elseif plan.mode == "reserved" then
         say(SAY_RESERVED, withBonuses(plan.reservers))
         startRound(plan.reservers)
@@ -195,12 +199,18 @@ function Distribution.MethodFor(slot, winner)
 end
 
 local function finish(winner)
-    VXV.Broadcast(FINISH, { itemId = active.item.itemId, winner = winner, done = true }, Group.Channel())
+    local method = winner and Distribution.MethodFor(active.item.slot, winner)
+    VXV.Broadcast(FINISH, { itemId = active.item.itemId, index = active.item.index, winner = winner, method = method,
+        done = true }, Group.Channel())
+    if winner ~= nil then
+        active.result = { winner = winner, method = method }
+    end
+    last = winner and active or nil
     active = nil
     changed()
 end
 
---- The master looter gives the item to this player, through the game's master loot.
+--- The master looter gives the item to this player, through the game's master loot: the corpse must be open.
 function Distribution.Give(name)
     local slot = active and active.item.slot
     for index = 1, slot and MAX_CANDIDATES or 0 do
@@ -230,9 +240,10 @@ function Distribution.Roll()
     changed()
 end
 
---- The master looter's attribution, or nil; and what this member sees, or nil.
+--- The master looter's attribution, or nil; what this member sees, or nil; and the master looter's last attribution
+--- given, for its recap, or nil.
 function Distribution.State()
-    return active, shown
+    return active, shown, last
 end
 
 VXV.On("roll", function(roll)
@@ -306,13 +317,18 @@ VXV.OnMessage(START, function(payload, sender)
     changed()
 end)
 
+-- The winner told, then the item given (or the attribution cancelled): every member marks it, panel open or not.
 VXV.OnMessage(FINISH, function(payload, sender)
-    if type(payload) ~= "table" or shown == nil or not fromMasterLooter(sender) then
+    if type(payload) ~= "table" or not fromMasterLooter(sender) then
         return
     end
     if payload.done then
         shown = nil
-    elseif type(payload.winner) == "string" then
+        if type(payload.winner) == "string" and tonumber(payload.index) then
+            BossLoot.MarkGiven(tonumber(payload.index), payload.winner,
+                type(payload.method) == "string" and payload.method or nil)
+        end
+    elseif shown ~= nil and type(payload.winner) == "string" then
         shown.message, shown.canRoll = TELL_WINNER:format(payload.winner), false
     end
     changed()

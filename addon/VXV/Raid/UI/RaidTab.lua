@@ -1,13 +1,14 @@
 local ns = select(2, ...).Raid
 
 --- The Raid screen (§7.1): the head with its badges, then three columns: my sign-up and the officers' zone, the
---- composition and the raid's soft reserves, my soft reserves and the last loots.
+--- composition and the raid's soft reserves, my soft reserves and the last loots (with the boss's loot panel).
 local RaidTab = {}
 ns.RaidTab = RaidTab
 
 local BossAlert, Choices, EventData, Import = ns.BossAlert, ns.Choices, ns.EventData, ns.Import
 local EventDialog, Invitations = ns.EventDialog, ns.Invitations
-local LogExport, RaidData, RaidLog, RaidView = ns.LogExport, ns.RaidData, ns.RaidLog, ns.RaidView
+local LogExport, LootPanel, RaidData, RaidLog = ns.LogExport, ns.LootPanel, ns.RaidData, ns.RaidLog
+local RaidView = ns.RaidView
 local RowList, SignupDialog = VXV.RowList, ns.SignupDialog
 
 local Screen, Theme = VXV.Screen, VXV.Theme
@@ -140,8 +141,10 @@ function RaidTab.Build(frame)
     local myPanel, myBody = Theme.TitledPanel(content, x3, GRID_TOP, RIGHT, myHeight, "Mes SR")
     lists.myReserves = RowList.Create(myBody)
     buttons.reserves = Theme.TitleButton(myPanel, "Choisir", Choices.Reserves)
-    local _, lootsBody = Theme.TitledPanel(content, x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight, "Derniers loots")
+    local lootsPanel, lootsBody = Theme.TitledPanel(content, x3, GRID_TOP + myHeight + GAP, RIGHT, lootsHeight,
+        "Derniers loots")
     lists.loots = RowList.Create(lootsBody)
+    Theme.TitleButton(lootsPanel, "Butin", LootPanel.Show)
     -- What depends on the time (the lock, the start) is up to date each time the screen shows.
     Screen.Follow(content, render,
         { "raid.updated", "raid.invitations", "raid.log", "raid.changes", "raid.alert", "raid.place" })

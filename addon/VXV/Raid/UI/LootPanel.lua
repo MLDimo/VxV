@@ -1,7 +1,8 @@
 local ns = select(2, ...).Raid
 
---- The loot panel: opens for the whole group when the master looter opens the boss's corpse, then follows the
---- attribution: the member's roll button, and the master looter's buttons to give the item or cancel.
+--- The loot panel: opens for the whole group when the master looter opens the boss's corpse (and from the Raid screen
+--- or /vxv butin), then follows the attribution: the member's roll button, and the master looter's buttons to start
+--- the attribution of the item they chose, give it (when it could not be given at once) or cancel.
 local LootPanel = {}
 ns.LootPanel = LootPanel
 
@@ -12,12 +13,14 @@ local Theme = VXV.Theme
 
 local FRAME_NAME = "VXV_LootPanel"
 local WIDTH, HEIGHT = 480, 340
--- The buttons (§3): roll in gold, give in amethyst (the main action), cancel in wood.
-local BUTTON_HEIGHT, BUTTON_GAP = 28, 10
+-- The buttons (§3): roll in gold, launch and give in amethyst (the main action), cancel in wood.
+local BUTTON_HEIGHT, BUTTON_GAP, LAUNCH_WIDTH = 28, 10, 200
 local NO_LOOT = "Aucun butin de boss pour l'instant : il s'affiche quand le maître du butin ouvre le corps."
 
 local frame, list
 local buttons = {}
+-- The item the master looter chose, before starting its attribution.
+local selected
 
 local function create()
     local body
@@ -42,13 +45,24 @@ local function create()
         buttons[action.key] = button
         x = x + action.width + BUTTON_GAP
     end
+    -- In place of the others: no attribution is in progress when the master looter starts one.
+    buttons.launch = Theme.Button(body, "pixel", "Lancer l'attribution", LAUNCH_WIDTH, BUTTON_HEIGHT)
+    buttons.launch:SetPoint("BOTTOMLEFT")
+    buttons.launch:SetScript("OnClick", function()
+        local item = selected
+        selected = nil
+        Distribution.Start(item)
+    end)
 end
+
+local render
 
 local function withActions(rows)
     for _, row in ipairs(rows) do
-        if row.start ~= nil then
+        if row.pick ~= nil then
             row.onClick = function()
-                Distribution.Start(row.start)
+                selected = row.pick
+                render()
             end
         elseif row.give ~= nil then
             row.onClick = function()
@@ -59,16 +73,21 @@ local function withActions(rows)
     return rows
 end
 
-local function render()
+render = function()
     local drop = BossLoot.Current()
-    local active, shown = Distribution.State()
+    local active, shown, last = Distribution.State()
+    if selected ~= nil and (active ~= nil or selected.given ~= nil or selected.slot == nil) then
+        selected = nil
+    end
     local rows = drop and LootView.Rows({
         drop = drop,
         event = RaidData.Current(),
         inGroup = Group.Names(),
         active = active,
         shown = shown,
+        last = last,
         isMasterLooter = Distribution.IsMasterLooter(),
+        selected = selected,
     })
     list.SetRows(rows and withActions(rows) or { { kind = "line", text = NO_LOOT } })
     buttons.roll:SetShown(shown ~= nil and shown.canRoll and not shown.rolled)
@@ -77,6 +96,7 @@ local function render()
         buttons.give:SetText("Donner à " .. active.result.winner)
     end
     buttons.cancel:SetShown(active ~= nil)
+    buttons.launch:SetShown(selected ~= nil)
 end
 
 --- Shows the panel with the current loot.
@@ -94,7 +114,11 @@ local function refresh()
     end
 end
 
-VXV.On("loot.dropped", LootPanel.Show)
+VXV.On("loot.dropped", function()
+    selected = nil
+    LootPanel.Show()
+end)
+VXV.On("loot.given", refresh)
 VXV.On("loot.distribution", function()
     local _, shown = Distribution.State()
     if shown ~= nil and not shown.quiet then

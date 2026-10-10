@@ -447,7 +447,8 @@ end
 --- Master loot candidates of the open corpse, by index, and the items given: { slot, name }.
 LootCandidates = {}
 Given = {}
-function GetMasterLootCandidate(_, index) return LootCandidates[index] end
+-- Candidates for an item of the open corpse only.
+function GetMasterLootCandidate(slot, index) return CorpseLinks[slot] and LootCandidates[index] end
 function GiveMasterLoot(slot, index) Given[#Given + 1] = { slot = slot, name = LootCandidates[index] } end
 --- The game's damage meter: its combat sessions by id, set by the tests as { [meter type] = { [name] = amount } };
 --- names and amounts are secret in combat, as on Forever.

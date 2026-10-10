@@ -14,11 +14,12 @@ const chat = (guild: Guild) =>
   (guild.player(OFFICER).client("return ChatSent") as unknown as { text: string }[]).map((message) => message.text);
 const lastRow = (guild: Guild, name: string) => rows(guild, name).at(-1);
 
-/** The master looter clicks the item's row in the loot panel. */
+/** The master looter chooses the item's row in the loot panel, then starts its attribution. */
 function pick(guild: Guild, itemName: string): void {
   guild.player(OFFICER).client(`FindWidget(VXV_LootPanel, function(widget)
-      return widget.row and widget.row.start and widget.row.start.link:find(${JSON.stringify(itemName)}, 1, true)
+      return widget.row and widget.row.pick and widget.row.pick.link:find(${JSON.stringify(itemName)}, 1, true)
   end):Run("OnMouseUp")`);
+  guild.player(OFFICER).client(`FindButton(VXV_LootPanel, "Lancer l'attribution"):Run("OnClick")`);
   settle(guild, 1);
 }
 
@@ -41,18 +42,23 @@ const buttonShown = (guild: Guild, name: string, text: string) =>
 const given = (guild: Guild) => guild.player(OFFICER).client("return Given") as unknown as { name: string }[];
 
 describe("attributing an item", () => {
-  it("gives an item reserved by a single player of the raid without a roll", () => {
+  it("gives an item reserved by a single player of the raid at once, without a roll", () => {
     const guild = raidWithData([OFFICER, "Thom Leboss", "Aube Claire"], ["Ciel Gris"]);
     killAndOpen(guild, [LINKS.tete]);
+    // Chosen, the item waits for the master looter to start its attribution.
+    guild.player(OFFICER).client(`FindWidget(VXV_LootPanel, function(widget)
+        return widget.row and widget.row.pick
+    end):Run("OnMouseUp")`);
+    expect(rows(guild, OFFICER).some((row) => row.startsWith(`▸ ${TETE} : SR de `))).toBe(true);
+    expect(guild.player(OFFICER).client("return #Given")).toBe(0);
+
     pick(guild, "Tête");
     expect(chat(guild)).toContain(`[VXV] ${TETE} : SR de Thom Leboss (+20), attribué sans roll.`);
-    expect(lastRow(guild, "Thom Leboss")).toBe("Tu avais la seule SR : l'objet est pour toi.");
-    expect(lastRow(guild, "Aube Claire")).toBe("Objet SR par Thom Leboss : attribué sans roll.");
-    expect(lastRow(guild, OFFICER)).toBe("Gagnant : Thom Leboss (SR+)");
-
-    clickButton(guild, OFFICER, "Donner à Thom Leboss");
     expect(given(guild)).toEqual([{ slot: 1, name: "Thom Leboss" }]);
-    expect(rows(guild, "Aube Claire")).not.toContain("Objet SR par Thom Leboss : attribué sans roll.");
+    // Every member sees who received it; the master looter keeps the recap.
+    expect(rows(guild, "Aube Claire")).toContain(`${TETE} : donné à Thom Leboss (SR+)`);
+    expect(rows(guild, OFFICER).slice(-2)).toEqual([`Récapitulatif : ${TETE}`, "Gagnant : Thom Leboss (SR+)"]);
+    expect(buttonShown(guild, OFFICER, "Lancer l'attribution")).toBe(false);
     for (const player of guild.players) {
       expect(player.errors()).toEqual([]);
     }
@@ -87,9 +93,8 @@ describe("attributing an item", () => {
 
     settle(guild);
     expect(chat(guild)).toContain(`[VXV] ${TETE} : Thom Leboss gagne (80 + 20 = 100).`);
-    expect(lastRow(guild, "Aube Claire")).toBe("Thom Leboss gagne.");
-    clickButton(guild, OFFICER, "Donner à Thom Leboss");
     expect(given(guild)).toEqual([{ slot: 1, name: "Thom Leboss" }]);
+    expect(rows(guild, "Aube Claire")).toContain(`${TETE} : donné à Thom Leboss (SR+)`);
   });
 
   it("lets everybody roll an item without reserver, and rolls a tie again between the tied players", () => {
@@ -192,11 +197,35 @@ describe("attributing an item", () => {
     killAndOpen(guild, [LINKS.tete]);
     guild.player(OFFICER).client('LootCandidates = { "Ðéjà Vu" }');
     pick(guild, "Tête");
-    clickButton(guild, OFFICER, "Donner à Thom Leboss");
     expect(guild.player(OFFICER).client("return Printed")).toContain(
       "|cff14b8a6VXV|r Thom Leboss ne peut pas recevoir l'objet : rouvre le corps, ou vérifie qu'il est assez près.",
     );
     expect(guild.player(OFFICER).client("return #Given")).toBe(0);
+    expect(buttonShown(guild, OFFICER, "Donner à Thom Leboss")).toBe(true);
+  });
+
+  it("waits for the corpse closed during the rolls, and follows the items of a corpse opened again", () => {
+    const guild = raidWithData([OFFICER, "Thom Leboss", "Aube Claire"], ["Ciel Gris"]);
+    killAndOpen(guild, [LINKS.cape, LINKS.tete]);
+    pick(guild, "Cape");
+    rolls(guild, ["Aube Claire", 60]);
+    guild.player(OFFICER).client("CorpseLinks = {}");
+    settle(guild);
+    expect(guild.player(OFFICER).client("return Printed")).toContain(
+      "|cff14b8a6VXV|r Aube Claire ne peut pas recevoir l'objet : rouvre le corps, ou vérifie qu'il est assez près.",
+    );
+    guild.player(OFFICER).client(`CorpseLinks = { ${LINKS.cape}, ${LINKS.tete} } Fire("LOOT_OPENED")`);
+    clickButton(guild, OFFICER, "Donner à Aube Claire");
+    expect(given(guild)).toEqual([{ slot: 1, name: "Aube Claire" }]);
+    expect(rows(guild, "Thom Leboss")).toContain(`${CAPE} : donné à Aube Claire (roll libre)`);
+
+    // Opened again, the corpse holds the head alone, now its first item.
+    guild.player(OFFICER).client(`CorpseLinks = { ${LINKS.tete} } Fire("LOOT_OPENED")`);
+    pick(guild, "Tête");
+    expect(given(guild)).toEqual([
+      { slot: 1, name: "Aube Claire" },
+      { slot: 1, name: "Thom Leboss" },
+    ]);
   });
 });
 

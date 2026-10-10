@@ -59,10 +59,15 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   En jeu : inscrits (icône de rôle, couleur de classe), mes SR, SR du raid avec SR+, invitations (Rejoindre invite les
   inscrits attendus avec leur personnage principal, Inviter tout le roster, passage en raid à la première
   acceptation).
-- **Butin et journal** (`VXV/Raid`) : quand le maître du butin ouvre le corps, tout le raid voit le butin et ses SR.
-  Attribution : une SR, sans roll ; plusieurs, roll entre elles avec le SR+ ; aucune, roll libre, réservé aux classes
+- **Butin et journal** (`VXV/Raid`) : quand le maître du butin ouvre le corps, la fenêtre Butin s'ouvre chez tout le
+  raid avec chaque objet et ses SR (`LootPanel`, rouverte par le bouton « Butin » de l'écran Raid ou `/vxv butin`) ;
+  il choisit un objet, puis « Lancer l'attribution » (demande du propriétaire du 10 octobre). L'addon donne l'objet au
+  gagnant dès qu'il est connu, sans clic (`GiveMasterLoot`, vu fonctionner par le propriétaire), le corps ouvert ;
+  sinon un message, et « Donner à … » une fois le corps rouvert, ses objets renumérotés (`BossLoot`). Chaque objet
+  donné affiche son gagnant chez tout le raid ; le maître du butin garde le récapitulatif des rolls. Attribution : une
+  SR, sans roll ; plusieurs, roll entre elles avec le SR+ ; aucune, roll libre, réservé aux classes
   qui peuvent équiper l'objet (les autres n'ont pas la fenêtre de roll, et leur jet ne compte pas) ; objet exclu, loot
-  council. Rolls suivis en direct, annonces dans le canal du groupe, don d'un clic. Journal du raid diffusé par le
+  council. Rolls suivis en direct, annonces dans le canal du groupe. Journal du raid diffusé par le
   maître du butin : boss tués, présents, morts, objets, dégâts et soins du compteur du jeu sur chaque boss tué
   (`Meter.lua`), résurrections acceptées (`Raised.lua`) ; envoyé par le compagnon ou exporté (`/vxv journal`), importé
   sur le site, corrigé par un officier avec motif. Tous les loots sont gardés avec leur mode (SR, SR+, roll libre,
