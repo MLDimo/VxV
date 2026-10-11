@@ -238,7 +238,9 @@ local function addRequest(name, reason)
         end
     end
     requests[#requests + 1] = { name = name, reason = reason }
-    VXV.Print(REQUEST_NOTICE:format(name, reason))
+    VXV.AfterCombat(function()
+        VXV.Print(REQUEST_NOTICE:format(name, reason))
+    end)
     changed()
 end
 
@@ -275,7 +277,9 @@ end)
 local function follow(sender)
     if leader ~= sender then
         leader = sender
-        VXV.Print(OPEN_NOTICE:format(sender))
+        VXV.AfterCombat(function()
+            VXV.Print(OPEN_NOTICE:format(sender))
+        end)
         changed()
     end
 end

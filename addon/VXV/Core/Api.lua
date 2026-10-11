@@ -11,6 +11,9 @@ VXV = {
     RegisterCommand = ns.Slash.Register,
     --- A message in the chat, under the VXV prefix; and (value, singular, plural) for "3 invitations".
     Print = ns.Chat.Print,
+    --- (handler): runs it now, or once the player's fight is over. What comes on its own to the screen or the chat
+    --- waits for it; only the loot panel shows during a fight (see Core/Combat.lua).
+    AfterCombat = ns.Combat.After,
     Count = ns.Util.Count,
     --- (seconds): a time left, "2 j 04 h", "4 h 05", "12 min".
     Remaining = ns.Util.Remaining,

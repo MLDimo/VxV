@@ -18,6 +18,7 @@ Core\Core\Gold.lua
 Core\Core\Chat.lua
 Core\Core\Compat.lua
 Core\Core\Call.lua
+Core\Core\Combat.lua
 Core\Core\Events.lua
 Core\Core\Bus.lua
 Core\Core\Storage.lua

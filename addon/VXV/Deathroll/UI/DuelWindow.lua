@@ -192,15 +192,20 @@ VXV.On("deathroll.rolled", function(id)
     render()
 end)
 
--- The players see their game at once.
+-- The players see their game, the others hear of it: once the player's fight is over, while the game goes on.
 VXV.On("deathroll.started", function(id)
-    local game, me = Games.Find(id), VXV.PlayerName()
-    if game ~= nil and (me == game.challenger or me == game.challenged) then
-        DuelWindow.Show(id)
-    else
-        VXV.Print(("Deathroll : %s contre %s. Suis-le dans Le Dé Pipé › Deathroll."):format(game.challenger,
-            game.challenged))
-    end
+    VXV.AfterCombat(function()
+        local game, me = Games.Find(id), VXV.PlayerName()
+        if game == nil or Rules.Turn(game) == nil then
+            return
+        end
+        if me == game.challenger or me == game.challenged then
+            DuelWindow.Show(id)
+        else
+            VXV.Print(("Deathroll : %s contre %s. Suis-le dans Le Dé Pipé › Deathroll."):format(game.challenger,
+                game.challenged))
+        end
+    end)
 end)
 
 VXV.On("deathroll.updated", render)

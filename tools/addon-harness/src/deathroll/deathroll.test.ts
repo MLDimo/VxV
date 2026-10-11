@@ -128,6 +128,34 @@ describe("the deathroll in game (P15)", () => {
     }
   });
 
+  it("shows a challenge received during a fight once it is over, while there is time left to answer it", () => {
+    const guild = startTrio();
+    const shown = (name: string) =>
+      guild.player(name).client("return VXV_DeathrollChallenge ~= nil and VXV_DeathrollChallenge.shown == true");
+    const challenge = (target: string) =>
+      guild
+        .player(THOM)
+        .bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${target}", "10", "100")`);
+    guild.player(VORN).client("InCombat = true");
+    challenge(VORN);
+    settle(guild, 1);
+    expect(shown(VORN)).toBe(false);
+    guild.player(VORN).client("InCombat = false");
+    settle(guild, 1);
+    expect(shown(VORN)).toBe(true);
+    // A fight longer than the minute to answer: the challenge lapses unseen.
+    guild.player(SIRA).client("InCombat = true");
+    challenge(SIRA);
+    settle(guild, 1);
+    guild.advanceTime(70);
+    guild.player(SIRA).client("InCombat = false");
+    settle(guild, 1);
+    expect(shown(SIRA)).toBe(false);
+    for (const player of guild.players) {
+      expect(player.errors()).toEqual([]);
+    }
+  });
+
   it("refuses a challenge to a member the website says is in debt", () => {
     const vorn: Character = {
       id: "c1",

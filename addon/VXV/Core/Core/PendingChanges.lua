@@ -7,7 +7,7 @@ local ns = select(2, ...).Core
 local PendingChanges = {}
 ns.PendingChanges = PendingChanges
 
-local Bus, Chat, Comm, Names = ns.Bus, ns.Chat, ns.Comm, ns.Names
+local Bus, Chat, Combat, Comm, Names = ns.Bus, ns.Chat, ns.Combat, ns.Comm, ns.Names
 
 local OUTBOX = "changes"
 -- A change older than this without an answer is forgotten.
@@ -155,7 +155,9 @@ function PendingChanges.Create(options)
         saved.pending[id] = nil
         Bus.Emit("sync.put", OUTBOX, id, nil)
         if change ~= nil and not result.accepted then
-            Chat.Print(REFUSED:format(result.message))
+            Combat.After(function()
+                Chat.Print(REFUSED:format(result.message))
+            end)
         end
         return change
     end

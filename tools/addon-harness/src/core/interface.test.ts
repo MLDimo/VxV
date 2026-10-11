@@ -319,6 +319,20 @@ describe("the core interface", () => {
     expect(drawnAbove(strata[0], strata[2])).toBe(true);
   });
 
+  it("holds what comes on its own during the player's fight, then runs it in order once the fight is over", () => {
+    const { client, errors } = startCore();
+    client('Ran = {} VXV.AfterCombat(function() table.insert(Ran, "at once") end)');
+    expect(client("return Ran")).toEqual(["at once"]);
+    client(`Ran = {} InCombat = true
+      VXV.AfterCombat(function() table.insert(Ran, "first") end)
+      VXV.AfterCombat(function() table.insert(Ran, "second") end)
+      AdvanceTime(5)`);
+    expect(client("return #Ran")).toBe(0);
+    client("InCombat = false AdvanceTime(1)");
+    expect(client("return Ran")).toEqual(["first", "second"]);
+    expect(errors()).toEqual([]);
+  });
+
   it("opens in combat without any error: nothing in VXV's window is protected", () => {
     const { client, errors } = startCore();
     client("InCombat = true");

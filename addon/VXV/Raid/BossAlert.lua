@@ -54,8 +54,20 @@ local function check()
     VXV.Compat.PlaySound(RAID_WARNING_SOUND)
 end
 
+-- Once the player's fight is over: one check waits, however many times the place is read meanwhile.
+local waiting = false
+local function checkAfterCombat()
+    if not waiting then
+        waiting = true
+        VXV.AfterCombat(function()
+            waiting = false
+            check()
+        end)
+    end
+end
+
 -- When the player enters the raid's instance, at each kill and with the event's new data.
-VXV.On("raid.place", check)
-VXV.On("raid.log", check)
-VXV.On("raid.updated", check)
+VXV.On("raid.place", checkAfterCombat)
+VXV.On("raid.log", checkAfterCombat)
+VXV.On("raid.updated", checkAfterCombat)
 VXV.RegisterCommand("alerte", "activer ou désactiver l'alerte du prochain boss", BossAlert.Toggle)

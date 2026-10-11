@@ -91,6 +91,15 @@ describe("next boss", () => {
     expect(drawnAbove(client("return VXV_BossAlert.strata"), client("return VXV_Window.strata"))).toBe(true);
   });
 
+  it("waits for the end of the player's fight to alert", () => {
+    const { client } = thom();
+    client("InCombat = true Instance.id = 249 AdvanceTime(5)");
+    expect(client(ALERT)).toBe(false);
+    expect(client("return #SoundsPlayed")).toBe(0);
+    client("InCombat = false AdvanceTime(1)");
+    expect(client(ALERT)).toEqual(["Tu as une SR sur le prochain boss", "Onyxia · Tête d'Onyxia · SR+ 20"]);
+  });
+
   it("alerts once on a raid chaining two instances, at each boss where the player has a soft reserve", () => {
     const { client, errors } = thom();
     client("AdvanceTime(5)");
