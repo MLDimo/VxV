@@ -28,7 +28,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   les refus du site (`PendingChanges`, « Site VXV, changement refusé ») et les appels à agir (invitations du raid,
   défis) ; ce qui arrive seul reste dans ses écrans : données chargées et modifications (Raid, Journal), données
   d'avant le verrouillage (badge du Raid pour un officier), mise à jour disponible (bas de la Taverne). Les annonces
-  « [VXV] » des canaux de raid et de guilde restent visibles de tous.
+  « [VXV] » des canaux de raid et de guilde restent visibles de tous. En combat (décision du propriétaire du
+  11 octobre), seul le panneau Butin s'ouvre : ce qui arrive seul (défi et fenêtre d'un deathroll, alerte du prochain
+  boss, avis du chat comme un refus du site ou les invitations du raid) attend la fin du combat du joueur
+  (`VXV.AfterCombat`, `Core/Combat.lua`, `InCombatLockdown` relu chaque seconde : `PLAYER_REGEN_ENABLED` n'est pas
+  mesuré) ; un défi de deathroll n'apparaît que s'il reste du temps pour y répondre.
 - **Raid et SR** (`VXV/Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
   jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur

@@ -41,7 +41,8 @@ local function create()
     end)
 end
 
-VXV.On("deathroll.challenged", function(challenge)
+--- Shows the challenge for the seconds left to answer it.
+local function show(challenge, seconds)
     if frame == nil then
         create()
     end
@@ -49,10 +50,21 @@ VXV.On("deathroll.challenged", function(challenge)
     text:SetText(("%s te défie au deathroll pour %s, départ %d.\nLe défié roll le premier : c'est toi."):format(
         challenge.from, Gold.Format(challenge.stake), challenge.start))
     frame:Show()
-    C_Timer.After(ANSWER_SECONDS, function()
+    C_Timer.After(seconds, function()
         if shown == challenge then
             shown = nil
             frame:Hide()
+        end
+    end)
+end
+
+-- After the player's fight, for the time left: a challenge received during a long one lapses unseen.
+VXV.On("deathroll.challenged", function(challenge)
+    local receivedAt = GetTime()
+    VXV.AfterCombat(function()
+        local left = ANSWER_SECONDS - (GetTime() - receivedAt)
+        if left > 0 then
+            show(challenge, left)
         end
     end)
 end)

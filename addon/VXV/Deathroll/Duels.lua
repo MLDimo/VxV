@@ -64,12 +64,16 @@ VXV.OnMessage(CHALLENGE, function(payload, sender)
     local challenge = { id = payload.id, from = sender, stake = payload.stake, start = payload.start }
     if Debts.Barred(VXV.PlayerName()) then
         Duels.Answer(challenge, false)
-        VXV.Print(sender .. " te défie au deathroll, mais ta dette t'en empêche : règle-la d'abord.")
+        VXV.AfterCombat(function()
+            VXV.Print(sender .. " te défie au deathroll, mais ta dette t'en empêche : règle-la d'abord.")
+        end)
         return
     end
     if Newcomers.Is(VXV.PlayerName()) then
         Duels.Answer(challenge, false)
-        VXV.Print(sender .. " te défie au deathroll. " .. NEWCOMER)
+        VXV.AfterCombat(function()
+            VXV.Print(sender .. " te défie au deathroll. " .. NEWCOMER)
+        end)
         return
     end
     VXV.Emit("deathroll.challenged", challenge)
