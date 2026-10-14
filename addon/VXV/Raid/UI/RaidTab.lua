@@ -25,7 +25,7 @@ local content, header
 local lists, buttons, badges = {}, {}, nil
 local officerPanel
 -- The officers' buttons, top to bottom.
-local OFFICER_ACTIONS = { "import", "open", "inviteAll", "exclusions", "create", "export" }
+local OFFICER_ACTIONS = { "import", "open", "inviteAll", "finish", "exclusions", "create", "export" }
 
 local function renderHeader()
     local _, sender = RaidData.Text()
@@ -51,6 +51,7 @@ local function updateButtons()
     buttons.open:SetShown(isOfficer and (leader == nil or leader == player))
     buttons.open:SetText(leader == player and "Fermer les invitations" or "Ouvrir les invitations")
     buttons.inviteAll:SetShown(isOfficer)
+    buttons.finish:SetShown(isOfficer and RaidLog.Current() ~= nil and not RaidLog.IsClosed())
     buttons.export:SetShown(isOfficer)
     buttons.join:SetShown(leader ~= nil and leader ~= player)
     local top = 0
@@ -95,6 +96,7 @@ local function addOfficerPanel(x, y, height)
         import = { "Charger les données", Import.Open },
         open = { "Ouvrir les invitations", Invitations.Toggle },
         inviteAll = { "Inviter tout le roster", Invitations.InviteAll },
+        finish = { "Fin de raid", RaidLog.Close },
         exclusions = { "Exclure des objets", Choices.Exclusions },
         create = { "Créer un événement", EventDialog.Open },
         export = { "Exporter le journal du raid", LogExport.Open },

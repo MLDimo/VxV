@@ -50,7 +50,7 @@ describe("a character's professions from the addon", () => {
     } catch (error) {
       expect((error as TextFormatError).problems).toEqual(["Ligne 3 illisible.", "Ligne 4 illisible."]);
     }
-    expect(() => parseProfessions("VXV-LOG-2")).toThrow(/VXV-METIERS-1/);
+    expect(() => parseProfessions("VXV-LOG-3")).toThrow(/VXV-METIERS-1/);
     expect(() => parseProfessions(PROFESSIONS_HEADER)).toThrow(/ligne C manquante/);
   });
 });

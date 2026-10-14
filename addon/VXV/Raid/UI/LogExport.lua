@@ -1,6 +1,6 @@
 local ns = select(2, ...).Raid
 
---- The officers' export of the current raid's record for the website (VXV-LOG-2): the Raid screen's button and
+--- The officers' export of the current raid's record for the website (VXV-LOG-3): the Raid screen's button and
 --- /vxv journal.
 local LogExport = {}
 ns.LogExport = LogExport

@@ -75,7 +75,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   maître du butin : boss tués, présents, morts, objets, dégâts et soins du compteur du jeu sur chaque boss tué
   (`Meter.lua`), résurrections acceptées (`Raised.lua`) ; envoyé par le compagnon ou exporté (`/vxv journal`), importé
   sur le site, corrigé par un officier avec motif. Tous les loots sont gardés avec leur mode (SR, SR+, roll libre,
-  loot council) ; présences et loots nourrissent le SR+. Récap Discord de chaque raid le lendemain.
+  loot council) ; présences et loots nourrissent le SR+. Récap Discord à la fin du raid (demande du propriétaire du
+  14 octobre) : un officier clique « Fin de raid » (écran Raid), la fin va dans le journal de chaque membre (ligne `F`)
+  et le site publie le récap dès qu'un compagnon d'officier l'apporte (après un `/reload`) ; sans elle, le lendemain à
+  7 h UTC.
 - **PvP** (site `/pvp`, bot, `VXV/PvP`) : deux onglets, Événements et Duels, sur le site comme en jeu. Événements
   PvP créés par un officier (site, `/vxv_pvp`, en jeu) comme les soirées de raid, avec un titre à la place des raids
   et sans SR (`events.kind`, `domain/events.ts`) : même rôle Discord réservé, mêmes inscriptions et rappels, message
@@ -267,7 +270,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | Format | Sens | Écrit par | Lu par |
 | --- | --- | --- | --- |
 | `VXV-ROSTER-1` (`Prénom;Nom;CLASSE`, classe = jeton du jeu) | addon → site | `VXV/Core/Core/Roster.lua` (`/vxv liste`) | `domain/roster.ts` |
-| `VXV-LOG-2` (journal d'un raid) | addon → site | `VXV/Raid/RaidLog.lua` | `domain/raidLog.ts` |
+| `VXV-LOG-3` (journal d'un raid, fin de raid comprise) | addon → site | `VXV/Raid/RaidLog.lua` | `domain/raidLog.ts` |
 | `VXV-METIERS-1` (métiers d'un personnage) | addon → site | `VXV/Artisans/Website.lua` | `domain/artisans.ts` |
 | `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV/Deathroll/Games.lua` | `domain/deathrolls.ts` |
 | `VXV-OBJETS-1` (catégorie, sous-catégorie et emplacement des objets des raids) | addon → site | `VXV/Raid/ItemKinds.lua` | `domain/itemKinds.ts` |

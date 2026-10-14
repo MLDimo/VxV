@@ -17,7 +17,7 @@ const NOW = new Date("2026-12-11T09:00:00Z");
 
 function logOf(eventId: string, ...extra: string[]): string {
   return [
-    "VXV-LOG-2",
+    "VXV-LOG-3",
     `R;${eventId};1796936400;1796940720`,
     "K;2;1796940600",
     "P;Ðéjà Vu",
@@ -127,7 +127,7 @@ describe("raid logs", () => {
     const member = await createMember(sql, "member", "Membre");
     await expect(raidLogs.importLog(member, eventId, logOf(eventId), "Essai")).rejects.toThrow(ForbiddenError);
     await expect(raidLogs.importLog(officer, eventId, logOf("autre"), "Essai")).rejects.toThrow(ValidationError);
-    await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-2\nK;x;y", "Essai")).rejects.toThrow(TextFormatError);
+    await expect(raidLogs.importLog(officer, eventId, "VXV-LOG-3\nK;x;y", "Essai")).rejects.toThrow(TextFormatError);
   });
 
   describe("from the officers' companions", () => {
@@ -160,6 +160,24 @@ describe("raid logs", () => {
         }),
       ]);
       expect(await raidLogs.publishDueRecaps()).toBe(0);
+    });
+
+    it("publishes the recap as soon as a log says an officer ended the raid, from the most complete record", async () => {
+      const tonight = await createEvent(sql, officer, new Date(NOW.getTime() - 60 * 60 * 1000), ["onyxia"]);
+      await raidLogs.receiveFromCompanion(officer, logOf(tonight, "D;Ðéjà Vu;1", "A;Thom Leboss;1"));
+      expect(recaps).toHaveLength(0);
+      await raidLogs.receiveFromCompanion(officer, logOf(tonight, "F;1796941000"));
+      expect(recaps).toEqual([
+        expect.objectContaining({
+          event: expect.objectContaining({ id: tonight }),
+          deaths: [
+            { name: "Thom Leboss", count: 2 },
+            { name: "Ðéjà Vu", count: 1 },
+          ],
+        }),
+      ]);
+      await raidLogs.receiveFromCompanion(officer, logOf(tonight, "F;1796941000"));
+      expect(recaps).toHaveLength(1);
     });
 
     it("is reserved to the officers, for an event the website knows", async () => {

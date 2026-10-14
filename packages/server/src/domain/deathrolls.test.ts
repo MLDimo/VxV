@@ -48,7 +48,7 @@ describe("a deathroll from the addon", () => {
       TextFormatError,
     );
     expect(() => parseDeathroll(DEATHROLL_HEADER)).toThrow(/ligne G manquante/);
-    expect(() => parseDeathroll("VXV-LOG-2")).toThrow(/VXV-DEATHROLL-1/);
+    expect(() => parseDeathroll("VXV-LOG-3")).toThrow(/VXV-DEATHROLL-1/);
   });
 });
 

@@ -51,6 +51,11 @@ describe("parseRaidLog", () => {
     expect(log.raised).toEqual([{ name: "Ðéjà Vu", count: 2 }]);
   });
 
+  it("reads when an officer ended the raid, and nothing without it", () => {
+    expect(parseRaidLog(`${LOG}\nF;1796941000`).closedAt).toEqual(new Date("2026-12-10T22:16:40Z"));
+    expect(parseRaidLog(LOG).closedAt).toBeUndefined();
+  });
+
   it("lists every problem with its line number", () => {
     const broken = [RAID_LOG_HEADER, "R;e1;;", "L;1084;20;Thom Leboss;cadeau;1", "K;boss;1", "M;Thom Leboss;-5;0"].join(
       "\n",
@@ -65,7 +70,7 @@ describe("parseRaidLog", () => {
         "Ligne 5 illisible : recopiez le journal depuis l'addon.",
       ]);
     }
-    expect(() => parseRaidLog("VXV-ROSTER-1")).toThrow(/doit commencer par la ligne VXV-LOG-2/);
+    expect(() => parseRaidLog("VXV-ROSTER-1")).toThrow(/doit commencer par la ligne VXV-LOG-3/);
     expect(() => parseRaidLog(`${RAID_LOG_HEADER}\nP;Thom Leboss`)).toThrow(/ligne R manquante/);
   });
 });
