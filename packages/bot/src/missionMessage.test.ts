@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { missionResultsMessage } from "./missionMessage.ts";
 
 /** French typography keeps numbers and units together with no-break spaces. */
-const plain = (text: string | undefined) => text?.replace(/[  ]/gu, " ");
+const plain = (text: string | undefined) => text?.replace(/[\u00a0\u202f]/gu, " ");
 
 const score = (memberId: string, memberName: string, value: number) => ({
   memberId,
