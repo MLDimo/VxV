@@ -125,7 +125,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   pour une récolte, `Gathering.lua`), victoires honorables (`GetPVPLifetimeStats`). Score : ce que gagnent les
   compteurs de tous les personnages liés du membre pendant la mission ; à égalité, le premier à l'atteindre. Compteurs
   lus à la connexion puis chaque minute hors combat. Résultat validé par un officier ; récompense 70 / 20 / 10 % versée
-  par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct. Écran Quêtes comme la
+  par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct ; à la validation, les résultats (podium et récompenses)
+  dans un message à eux du salon des quêtes (`publishResults`, demande du propriétaire du 14 octobre). Écran Quêtes comme la
   maquette `AddonMissions.html` : quête épinglée sur son parchemin (sceau VXV, lots, cinq premiers, progression jusqu'au
   podium par `missionProgress`), À venir, Terminées sous leur tampon, Hall of fame et zone officier ; en jeu, images
   dans `VXV/Missions/Media`, et « Publier une quête » comme `/vxv_mission` (type aux flèches, titre sinon celui du type,

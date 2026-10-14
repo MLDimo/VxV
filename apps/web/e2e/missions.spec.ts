@@ -97,6 +97,7 @@ test.describe.serial("missions", () => {
   test("an officer validates an ended quest; the treasurer hands the reward over from the cash", async ({
     page,
     context,
+    request,
   }) => {
     const ended = `/quetes/${readSeed().endedMissionId}`;
     await signInAs(context, "member");
@@ -110,6 +111,12 @@ test.describe.serial("missions", () => {
     await page.getByRole("button", { name: "Valider le résultat" }).click();
     const rewards = page.getByRole("region", { name: "Récompenses" });
     await expect(rewards).toContainText("1er · Ciel Gris · 700 po · à verser");
+    // The results go to the quests' channel on Discord, in a message of their own.
+    const results = (await discordMessages(request)).find((candidate) =>
+      JSON.stringify(candidate.body).includes("Résultats · Le Chasseur de têtes"),
+    );
+    expect(results?.channelId).toBe(WEB_ENVIRONMENT.DISCORD_MISSIONS_CHANNEL_ID);
+    expect(JSON.stringify(results?.body)).toContain("1er Ciel Gris");
     await rewards.getByRole("button", { name: "Versée" }).click();
     await expect(page.getByRole("region", { name: "Récompenses" })).toContainText("700 po · versée");
     await expect(page.getByText("ACCOMPLIE", { exact: true })).toBeVisible();
