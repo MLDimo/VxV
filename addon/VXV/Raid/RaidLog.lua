@@ -3,14 +3,17 @@ local ns = select(2, ...).Raid
 --- The record of each raid, kept in the saved data by event (plan 6.7): bosses killed, players present at the
 --- kills, deaths during the encounters, and every item given. The master looter's addon records each give as
 --- it happens and sends it to the group: their record is the reference. Since P13, the game's damage meter over the
---- bosses killed (Meter.lua) and the resurrections accepted (Raised.lua). Exported for the website as VXV-LOG-2.
+--- bosses killed (Meter.lua) and the resurrections accepted (Raised.lua). An officer ends the raid (« Fin de raid »):
+--- the website publishes its recap as soon as the log comes, the end in it. Exported for the website as VXV-LOG-3.
 local RaidLog = {}
 ns.RaidLog = RaidLog
 
 local BossLoot, Distribution, Group, RaidData = ns.BossLoot, ns.Distribution, ns.Group, ns.RaidData
 
-local RECORDED = "loot.recorded"
-local HEADER = "VXV-LOG-2"
+local RECORDED, CLOSED = "loot.recorded", "raid.closed"
+local NOTHING_TO_CLOSE = "Aucun boss tué ni objet donné : rien à clore pour ce raid."
+local CLOSED_NOTICE = "Fin du raid notée : tape /reload, le compagnon envoie le journal et le récap part sur Discord."
+local HEADER = "VXV-LOG-3"
 local DEATH_CHECK_SECONDS = 1
 -- Older raids are forgotten: the website keeps them all.
 local MAX_LOGS = 20
@@ -219,6 +222,32 @@ VXV.OnMessage(RECORDED, function(payload, sender)
     })
 end)
 
+--- An officer ends the raid of the current event: every member's log keeps the end, and the website publishes the
+--- recap once a companion brings the log (after a /reload or a logout).
+function RaidLog.Close()
+    local log = RaidLog.Current()
+    if log == nil or not hasRecords(log) then
+        VXV.Print(NOTHING_TO_CLOSE)
+        return
+    end
+    VXV.Broadcast(CLOSED, { eventId = log.eventId, at = time() }, Group.Channel())
+    VXV.Print(CLOSED_NOTICE)
+end
+
+--- Whether an officer ended the current event's raid.
+function RaidLog.IsClosed()
+    local log = RaidLog.Current()
+    return log ~= nil and log.closedAt ~= nil
+end
+
+VXV.OnMessage(CLOSED, function(payload, sender)
+    local log = type(payload) == "table" and saved and saved.logs[tostring(payload.eventId)]
+    if log and log.closedAt == nil and tonumber(payload.at) and RaidData.IsOfficer(sender) then
+        log.closedAt = tonumber(payload.at)
+        changed(log)
+    end
+end)
+
 local function sortedNames(set)
     local names = {}
     for name in pairs(set) do
@@ -230,7 +259,8 @@ end
 
 --- The log as the website imports it, one record per line:
 --- R;event id;start (Unix seconds);end; K;encounter id;time; P;character present; L;encounter id;item id;
---- winner;method;time; D;character;deaths; M;character;damage;healing; A;character;resurrections accepted.
+--- winner;method;time; D;character;deaths; M;character;damage;healing; A;character;resurrections accepted;
+--- F;time the officer ended the raid.
 --- Any change of format increments the version.
 function RaidLog.Export(log)
     local lines = { HEADER, table.concat({ "R", log.eventId, log.startedAt or "", log.endedAt or "" }, ";") }
@@ -252,6 +282,9 @@ function RaidLog.Export(log)
     end
     for _, name in ipairs(sortedNames(log.raised)) do
         lines[#lines + 1] = table.concat({ "A", name, log.raised[name] }, ";")
+    end
+    if log.closedAt ~= nil then
+        lines[#lines + 1] = "F;" .. log.closedAt
     end
     return table.concat(lines, "\n")
 end

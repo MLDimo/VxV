@@ -3,7 +3,7 @@ import { LOOT_METHODS, type LootMethod } from "./history.ts";
 import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.ts";
 
 /** First line of a raid's record exported by the addon (contract with VXV/Raid); the number is the format version. */
-export const RAID_LOG_HEADER = "VXV-LOG-2";
+export const RAID_LOG_HEADER = "VXV-LOG-3";
 
 export interface RaidLog {
   eventId: string;
@@ -18,6 +18,8 @@ export interface RaidLog {
   meter: { name: string; damage: number; healing: number }[];
   /** The resurrections each character accepted during the raid (P13). */
   raised: { name: string; count: number }[];
+  /** When an officer ended the raid in game (« Fin de raid »): its recap goes out at once. */
+  closedAt: Date | undefined;
 }
 
 function isLootMethod(value: string | undefined): value is LootMethod {
@@ -27,7 +29,7 @@ function isLootMethod(value: string | undefined): value is LootMethod {
 /**
  * Reads the record line by line, reporting every problem with its line number:
  * R;event id;start (Unix seconds);end, K;encounter id;time, P;character, L;encounter id;item id;winner;method;time,
- * D;character;deaths, M;character;damage;healing and A;character;resurrections accepted.
+ * D;character;deaths, M;character;damage;healing, A;character;resurrections accepted and F;time the officer ended it.
  * Lines of an unknown kind are skipped.
  */
 export function parseRaidLog(text: string): RaidLog {
@@ -39,6 +41,7 @@ export function parseRaidLog(text: string): RaidLog {
     deaths: [],
     meter: [],
     raised: [],
+    closedAt: undefined,
   };
   readRecords(text, {
     header: RAID_LOG_HEADER,
@@ -48,6 +51,10 @@ export function parseRaidLog(text: string): RaidLog {
       R: ([eventId, startedAt, endedAt]) => {
         raid = eventId ? { eventId, startedAt: instant(startedAt), endedAt: instant(endedAt) } : undefined;
         return raid !== undefined;
+      },
+      F: ([closedAt]) => {
+        log.closedAt = instant(closedAt);
+        return log.closedAt !== undefined;
       },
       K: ([encounterId, killedAt]) => {
         const encounter = wholeNumber(encounterId);

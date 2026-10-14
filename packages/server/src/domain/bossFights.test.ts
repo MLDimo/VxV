@@ -17,7 +17,7 @@ describe("the bosses killed read in the combat log", () => {
     expect(fight).toMatchObject({ encounterId: 1084, name: "Onyxia", difficulty: 9, groupSize: 40 });
     expect(fight.endedAt).toEqual(new Date(ENDED * 1000));
     expect(totalHealing(fight)).toBe(191);
-    expect(() => parseBossFight("VXV-LOG-2\nR;e1;;")).toThrow(TextFormatError);
+    expect(() => parseBossFight("VXV-LOG-3\nR;e1;;")).toThrow(TextFormatError);
     expect(() => parseBossFight("VXV-COMBAT-1\nH;g;Ðéjà;1")).toThrow(/ligne F manquante/);
   });
 

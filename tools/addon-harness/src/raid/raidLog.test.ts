@@ -127,7 +127,7 @@ describe("record of the raid", () => {
     officer.client(`${EXPORT}:Run("OnClick")`);
     const exported = (officer.client("return VXV_TextWindow.editBox:GetText()") as string).split("\n");
     expect(exported).toEqual([
-      "VXV-LOG-2",
+      "VXV-LOG-3",
       expect.stringMatching(/^R;e1;\d+;\d+$/),
       expect.stringMatching(/^K;1084;\d+$/),
       "P;Aube Claire",
@@ -146,7 +146,7 @@ describe("record of the raid", () => {
     expect(thom.client(`return IsVisible(${EXPORT})`)).toBe(false);
   });
 
-  it("exports a log the website reads (contract VXV-LOG-2)", () => {
+  it("exports a log the website reads (contract VXV-LOG-3)", () => {
     const officer = playOnyxia().player(OFFICER);
     officer.client(`SlashCmdList.VXV("journal")`);
     const log = parseRaidLog(officer.client("return VXV_TextWindow.editBox:GetText()") as string);
@@ -161,6 +161,25 @@ describe("record of the raid", () => {
       deaths: [{ name: "Thom Leboss", count: 1 }],
     });
     expect(log.startedAt?.getTime()).toBeLessThanOrEqual(log.endedAt?.getTime() ?? 0);
+  });
+
+  it("ends the raid from an officer's Raid screen: every member's log keeps the end, which the website reads", () => {
+    const guild = playOnyxia();
+    const officer = guild.player(OFFICER);
+    const finish = 'FindButton(VXV_Window, "Fin de raid")';
+    officer.client(OPEN_TAB("Raid"));
+    officer.client(`${finish}:Run("OnClick")`);
+    settle(guild, 1);
+    expect(officer.client("return Printed")).toContain(
+      "|cff14b8a6VXV|r Fin du raid notée : tape /reload, le compagnon envoie le journal et le récap part sur Discord.",
+    );
+    for (const name of [OFFICER, "Thom Leboss", "Aube Claire"]) {
+      const text = guild
+        .player(name)
+        .bundles.Raid?.run("local _, ns = ... return ns.RaidLog.Export(ns.RaidLog.Current())") as string;
+      expect(parseRaidLog(text).closedAt).toBeInstanceOf(Date);
+    }
+    expect(officer.client(`return IsVisible(${finish})`)).toBe(false);
   });
 
   it("adds up the game's meter of each boss killed, read once out of combat, for the group's members", () => {

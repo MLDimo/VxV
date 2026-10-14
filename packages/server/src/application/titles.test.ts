@@ -91,7 +91,7 @@ describe("titles", () => {
     await raidLogRepository(sql).save(
       eventId,
       [
-        "VXV-LOG-2",
+        "VXV-LOG-3",
         `R;${eventId};1791144000;1791151200`,
         "K;1084;1791147600",
         "P;Vorn Cendrelune",

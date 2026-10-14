@@ -155,8 +155,9 @@ export function createRaidLogs({
 
     /**
      * The log an officer's companion sends after a /reload or a logout (P7.4), during the raid as after it. The same
-     * raid comes from several officers: only what is new is added and journaled. The recap waits for the end of
-     * the raid (publishDueRecaps).
+     * raid comes from several officers: only what is new is added and journaled. The recap goes out as soon as a log
+     * says an officer ended the raid in game, built from the most complete record kept; else it waits for the end
+     * of the raid (publishDueRecaps).
      */
     async receiveFromCompanion(
       officer: Member,
@@ -166,14 +167,26 @@ export function createRaidLogs({
         throw new ForbiddenError();
       }
       const log = parseRaidLog(text);
-      return unitOfWork.run(async (repositories) => {
-        const { summary, news } = await record(repositories, officer, log, text, {
+      const { summary, news, recap } = await unitOfWork.run(async (repositories) => {
+        const recorded = await record(repositories, officer, log, text, {
           reason: COMPANION_LOG_REASON,
           journalAlways: false,
           now: clock(),
         });
-        return { summary, news };
+        const due = log.closedAt !== undefined && !(await repositories.events.isRecapPosted(log.eventId));
+        const kept = due ? await repositories.raidLogs.find(log.eventId) : undefined;
+        return {
+          ...recorded,
+          recap:
+            kept === undefined
+              ? undefined
+              : buildRaidRecap(recorded.event, parseRaidLog(kept), await raidNames(repositories, recorded.event)),
+        };
       });
+      if (recap !== undefined) {
+        await publishRecap(log.eventId, recap);
+      }
+      return { summary, news };
     },
 
     /**
