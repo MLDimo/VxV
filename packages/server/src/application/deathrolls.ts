@@ -1,19 +1,10 @@
-import { fullName, type Character } from "../domain/characters.ts";
-import {
-  BIG_STAKE,
-  DEATHROLL_BETTING_MS,
-  deathrollBets,
-  deathrollLoser,
-  deathrollRefusal,
-  parseDeathroll,
-  type DeathrollGame,
-} from "../domain/deathrolls.ts";
+import { fullName } from "../domain/characters.ts";
+import { BIG_STAKE, deathrollLoser, deathrollRefusal, parseDeathroll } from "../domain/deathrolls.ts";
 import type { Member } from "../domain/members.ts";
-import { canGamble, canManageRaids } from "../domain/permissions.ts";
-import { settleBet } from "./bets.ts";
-import { loserOf, memberDebt, winnerOf } from "./debts.ts";
+import { loserOf, winnerOf } from "./debts.ts";
+import { gamePlayers, placeGuildBet } from "./diceGames.ts";
 import { ValidationError } from "./errors.ts";
-import type { Clock, DeathrollPlayer, Repositories, StoredDeathroll, UnitOfWork } from "./ports.ts";
+import type { Clock, GamePlayer, StoredDeathroll, UnitOfWork } from "./ports.ts";
 import type { DeathrollAnnouncer } from "./discordPorts.ts";
 
 /** How many games the website lists. */
@@ -22,74 +13,16 @@ const DEATHROLLS_LISTED = 30;
 const UNKNOWN_DEATHROLL = "Ce deathroll n'existe pas.";
 const KNOWN = "Deathroll déjà connu.";
 const PAID = "Paiement du deathroll confirmé.";
-const NOT_A_PLAYER = "Seuls les joueurs de la partie, ou un officier qui la relaie, peuvent l'envoyer.";
-const UNKNOWN_PLAYER = "Un joueur de la partie n'est lié à aucun membre sur le site.";
 
 /** A game with its winner and loser. */
 export interface DeathrollView {
   game: StoredDeathroll;
-  winner: DeathrollPlayer;
-  loser: DeathrollPlayer;
+  winner: GamePlayer;
+  loser: GamePlayer;
 }
 
 export function view(game: StoredDeathroll): DeathrollView {
   return { game, winner: winnerOf(game), loser: loserOf(game) };
-}
-
-/** The guild's stakes on a player of the game, from the members with the role « Membre », neither player nor in debt. */
-async function placeBets(
-  repositories: Repositories,
-  game: DeathrollGame,
-  players: { challenger: Character; challenged: Character },
-  byName: ReadonlyMap<string, Character>,
-  sender: Member,
-  now: Date,
-): Promise<string | undefined> {
-  const playing = new Set([players.challenger.memberId, players.challenged.memberId]);
-  const gamblers = new Set(
-    (await repositories.members.listAll()).filter((member) => canGamble(member.roles)).map((member) => member.id),
-  );
-  const stakes = new Map<string, { choice: string; amount: number }>();
-  for (const bet of deathrollBets(game)) {
-    const memberId = byName.get(bet.bettor)?.memberId;
-    if (memberId === undefined || playing.has(memberId) || stakes.has(memberId) || !gamblers.has(memberId)) {
-      continue;
-    }
-    if ((await memberDebt(repositories, memberId)) === 0) {
-      stakes.set(memberId, { choice: bet.choice, amount: bet.amount });
-    }
-  }
-  if (stakes.size === 0) {
-    return undefined;
-  }
-  const closesAt = new Date(game.acceptedAt.getTime() + DEATHROLL_BETTING_MS);
-  const betId = await repositories.bets.create(
-    {
-      title: `Deathroll : ${game.challenger} vs ${game.challenged}`,
-      choices: [game.challenger, game.challenged],
-      closesAt,
-    },
-    sender.id,
-    now,
-  );
-  const bet = await repositories.bets.findById(betId);
-  if (bet === undefined) {
-    return undefined;
-  }
-  const choiceOf = (label: string) => bet.choices.find((choice) => choice.label === label)?.id ?? "";
-  for (const [memberId, stake] of stakes) {
-    await repositories.stakes.save(
-      { betId, memberId, choiceId: choiceOf(stake.choice), amount: stake.amount },
-      closesAt,
-    );
-  }
-  const winner = deathrollLoser(game) === game.challenger ? game.challenged : game.challenger;
-  await settleBet(repositories, bet, await repositories.stakes.listByBet(betId), choiceOf(winner), {
-    recordedBy: sender.id,
-    reason: "Pari du deathroll, joué en jeu.",
-    now,
-  });
-  return betId;
 }
 
 /** The deathrolls (P15): the games played in game, their debts until paid, their ranking. */
@@ -111,18 +44,8 @@ export function createDeathrolls({
     }
     const now = clock();
     const outcome = await unitOfWork.run(async (repositories) => {
-      const byName = new Map(
-        (await repositories.characters.listAll()).map((character) => [fullName(character), character]),
-      );
-      const challenger = byName.get(game.challenger);
-      const challenged = byName.get(game.challenged);
-      if (challenger?.memberId === undefined || challenged?.memberId === undefined) {
-        throw new ValidationError(UNKNOWN_PLAYER);
-      }
-      const officer = canManageRaids(sender.roles);
-      if (!officer && sender.id !== challenger.memberId && sender.id !== challenged.memberId) {
-        throw new ValidationError(NOT_A_PLAYER);
-      }
+      const players = await gamePlayers(repositories, game, sender);
+      const { challenger, challenged, officer } = players;
       const loser = deathrollLoser(game) === game.challenger ? challenger : challenged;
       const winner = loser === challenger ? challenged : challenger;
       const known = await repositories.deathrolls.find(game.id);
@@ -138,7 +61,13 @@ export function createDeathrolls({
             acceptedAt: game.acceptedAt,
             endedAt: game.endedAt,
             loserId: loser.id,
-            betId: await placeBets(repositories, game, { challenger, challenged }, byName, sender, now),
+            betId: await placeGuildBet(
+              repositories,
+              { ...game, title: `Deathroll : ${game.challenger} vs ${game.challenged}`, winner: fullName(winner) },
+              players,
+              sender,
+              now,
+            ),
             rolls: game.rolls.map((roll) => ({
               characterId: roll.character === game.challenger ? challenger.id : challenged.id,
               high: roll.high,

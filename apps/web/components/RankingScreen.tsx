@@ -17,6 +17,7 @@ const RECORDS_TITLES: Record<RankingPeriod, string> = {
 const CATEGORIES: readonly { category: RankingCategory; href: string; name: string }[] = [
   { category: "paris", href: "/ranking", name: "Paris" },
   { category: "deathroll", href: "/ranking/deathroll", name: "Deathroll" },
+  { category: "chifoumi", href: "/ranking/chifoumi", name: "Chi Fou Mi" },
   { category: "quetes", href: "/ranking/quetes", name: "Quêtes" },
   { category: "titres", href: "/ranking/titres", name: "Titres" },
 ];

@@ -14,7 +14,7 @@ import {
   type Tally,
   type TitleFacts,
 } from "../domain/titles.ts";
-import { rankedDeathroll } from "./debts.ts";
+import { rankedGame } from "./debts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, TitleHolder, UnitOfWork } from "./ports.ts";
@@ -76,7 +76,7 @@ async function titleFacts(repositories: Repositories): Promise<TitleFacts> {
     healingReceived: tally((log) => healingReceivedInRaid(log, fights)),
     raised: tally((log) => log.raised.map(({ name, count }) => ({ name, amount: count }))),
     deathrolls: (await repositories.deathrolls.listAll()).flatMap((game) => {
-      const ranked = rankedDeathroll(game);
+      const ranked = rankedGame(game);
       return ranked === undefined || !inSeason(ranked.endedAt) ? [] : [ranked];
     }),
     duels: duelOutcomes(await repositories.duels.listAll()),

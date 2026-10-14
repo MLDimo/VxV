@@ -20,4 +20,4 @@ export function canGamble(roles: readonly MemberRole[]): boolean {
 
 /** Why a member without the role « Membre » cannot bet nor play a deathroll. */
 export const GAMBLE_REFUSAL =
-  "Paris et deathroll sont réservés au rôle Membre sur Discord (reçu à l'instant : reconnecte-toi au site).";
+  "Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord (reçu à l'instant : reconnecte-toi au site).";

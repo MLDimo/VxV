@@ -191,7 +191,7 @@ describe("the core interface", () => {
       expect(client(CARDS)).toEqual([
         ["Prochain raid", "Bientôt", "Ce lieu ouvre avec sa phase.", false],
         ["Quête de la semaine", "Bientôt", "Le tableau des quêtes ouvre avec les missions de la guilde.", false],
-        ["Le Dé Pipé", "Bientôt", "Paris et deathroll arrivent avec la salle de jeu.", false],
+        ["Le Dé Pipé", "Bientôt", "Paris, deathroll et Chi Fou Mi arrivent avec la salle de jeu.", false],
       ]);
     });
 

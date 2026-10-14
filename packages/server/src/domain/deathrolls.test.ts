@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   DEATHROLL_HEADER,
   deathrollLoser,
-  deathrollBets,
   deathrollRefusal,
   parseDeathroll,
   type DeathrollGame,
 } from "./deathrolls.ts";
+import { guildBets } from "./diceGames.ts";
 import { TextFormatError } from "./textFormat.ts";
 
 const at = (seconds: number) => new Date(seconds * 1000);
@@ -92,6 +92,6 @@ describe("the deathroll's rules", () => {
       { bettor: "Aube Claire", choice: "Aube Claire", amount: 10 },
       { bettor: "Brume Noire", choice: "Ðéjà Vu", amount: 0 },
     ];
-    expect(deathrollBets({ ...game, bets })).toEqual([{ bettor: "Ciel Gris", choice: "Thom Leboss", amount: 100 }]);
+    expect(guildBets({ ...game, bets })).toEqual([{ bettor: "Ciel Gris", choice: "Thom Leboss", amount: 100 }]);
   });
 });

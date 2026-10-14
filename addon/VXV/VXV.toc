@@ -158,6 +158,22 @@ Deathroll\UI\DeathrollTab.lua
 
 Deathroll\Bootstrap.lua
 
+# ===== Chifoumi
+# The website's Chi Fou Mi data (VXV-CHIFOUMIS), the rules, the games, who may play, and how they travel in the guild.
+Chifoumi\ChifoumiData.lua
+Chifoumi\Rules.lua
+Chifoumi\Games.lua
+Chifoumi\Rights.lua
+Chifoumi\Matches.lua
+
+# Interface: the challenge, the game's window, Le Dé Pipé's Chi Fou Mi tab.
+Chifoumi\UI\ChallengeDialog.lua
+Chifoumi\UI\MatchView.lua
+Chifoumi\UI\MatchWindow.lua
+Chifoumi\UI\ChifoumiTab.lua
+
+Chifoumi\Bootstrap.lua
+
 # ===== Missions
 # The missions as the website exports them (VXV-QUETES), how they travel in the guild, the game's counters, and the
 # quests an officer publishes in game.

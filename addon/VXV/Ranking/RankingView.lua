@@ -9,6 +9,7 @@ ns.RankingView = RankingView
 RankingView.CATEGORIES = {
     { id = "paris", name = "Paris" },
     { id = "deathroll", name = "Deathroll" },
+    { id = "chifoumi", name = "Chi Fou Mi" },
     { id = "quetes", name = "Quêtes" },
     { id = "titres", name = "Titres" },
 }

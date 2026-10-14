@@ -5,7 +5,8 @@ import { createAddonPvp } from "./application/addonPvp.ts";
 import { createAddonArtisans } from "./application/addonArtisans.ts";
 import { createArtisans } from "./application/artisans.ts";
 import { createBossFights } from "./application/bossFights.ts";
-import { createAddonDeathrolls } from "./application/addonDeathrolls.ts";
+import { createAddonGames } from "./application/addonGames.ts";
+import { createChifoumis } from "./application/chifoumis.ts";
 import { createDeathrolls } from "./application/deathrolls.ts";
 import { createDuelAnnouncements } from "./application/duelAnnouncements.ts";
 import { createDuels } from "./application/duels.ts";
@@ -118,6 +119,7 @@ export function createApplication({
   const ranking = createRanking({ unitOfWork, clock });
   const artisans = createArtisans({ unitOfWork });
   const deathrolls = createDeathrolls({ unitOfWork, clock, announcer: deathrollAnnouncer });
+  const chifoumis = createChifoumis({ unitOfWork, clock });
   return {
     auth: createAuth({ unitOfWork, clock, discordRoles }),
     companion: createCompanion({ unitOfWork, clock, discordRoles, guild }),
@@ -130,6 +132,7 @@ export function createApplication({
       missionAnnouncements,
       artisans,
       deathrolls,
+      chifoumis,
       bossFights: createBossFights({ unitOfWork, clock }),
       items: createItems({ unitOfWork }),
     }),
@@ -163,7 +166,8 @@ export function createApplication({
     artisans,
     addonArtisans: createAddonArtisans({ unitOfWork, clock }),
     deathrolls,
-    addonDeathrolls: createAddonDeathrolls({ unitOfWork, clock }),
+    chifoumis,
+    addonGames: createAddonGames({ unitOfWork, clock }),
     duels,
     duelAnnouncements,
     addonPvp: createAddonPvp({ unitOfWork, clock, duels }),

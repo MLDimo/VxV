@@ -1,4 +1,4 @@
-import { formatAddonDeathrolls } from "@vxv/server/domain/addonDeathrolls";
+import { ADDON_DEATHROLLS_HEADER, formatAddonGames } from "@vxv/server/domain/addonGames";
 import type { Character } from "@vxv/server/domain/characters";
 import { deathrollRefusal, parseDeathroll } from "@vxv/server/domain/deathrolls";
 import { describe, expect, it } from "vitest";
@@ -118,7 +118,7 @@ describe("the deathroll in game (P15)", () => {
     // Vorn owes the stake: no new challenge until Thom confirms.
     expect(
       guild.player(VORN).bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${SIRA}", "10", "100")`),
-    ).toBe("Tu as une dette (paris ou deathroll) : règle-la pour jouer de nouveau.");
+    ).toBe("Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour jouer de nouveau.");
     guild.player(THOM).bundles.Deathroll?.run(`local _, ns = ... ns.Duels.ConfirmPaid("${id}")`);
     settle(guild, 1);
     const paid = parseDeathroll(guild.player(THOM).client(`return VXV_SyncDB.texts.deathroll["${id}"]`) as string);
@@ -166,7 +166,7 @@ describe("the deathroll in game (P15)", () => {
       isMain: true,
       inGuild: true,
     };
-    const text = formatAddonDeathrolls({
+    const text = formatAddonGames(ADDON_DEATHROLLS_HEADER, {
       officers: [],
       characters: [vorn],
       barred: ["m-vorn"],
@@ -191,7 +191,7 @@ describe("the deathroll in game (P15)", () => {
       isMain: true,
       inGuild: true,
     });
-    const text = formatAddonDeathrolls({
+    const text = formatAddonGames(ADDON_DEATHROLLS_HEADER, {
       officers: [],
       characters: [character("Thom", "Leboss", "m-thom"), character("Vorn", "Cendrelune", "m-vorn")],
       barred: [],
@@ -210,7 +210,7 @@ describe("the deathroll in game (P15)", () => {
       return answer;
     };
     expect(challenge(THOM, VORN)).toBe("Vorn Cendrelune n'a pas le rôle Membre sur Discord : pas de deathroll.");
-    expect(challenge(VORN, THOM)).toBe("Paris et deathroll sont réservés au rôle Membre sur Discord.");
+    expect(challenge(VORN, THOM)).toBe("Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord.");
   });
 
   it("shows Le Dé Pipé's two tabs, Paris then Deathroll", () => {

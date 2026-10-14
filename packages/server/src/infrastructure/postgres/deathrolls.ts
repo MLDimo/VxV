@@ -1,5 +1,6 @@
-import type { DeathrollPlayer, DeathrollRepository, StoredDeathroll } from "../../application/ports.ts";
+import type { DeathrollRepository, StoredDeathroll } from "../../application/ports.ts";
 import type { SqlClient } from "../sql.ts";
+import { gamePlayer, PLAYER_COLUMNS, PLAYER_JOINS } from "./gamePlayers.ts";
 
 interface DeathrollRow {
   id: string;
@@ -12,44 +13,12 @@ interface DeathrollRow {
   paid_at: Date | null;
 }
 
-interface PlayerRow {
-  character_id: string;
-  name: string;
-  class: string;
-  member_id: string | null;
-  member_name: string | null;
-  member_class: string | null;
-}
-
-/** A player: the character, and its member shown by their main character, else by their Discord name. */
-const PLAYER = (side: "challenger" | "challenged") => `
-  ${side}.id as ${side}_character_id, ${side}.first_name || ' ' || ${side}.last_name as ${side}_name,
-  ${side}.class as ${side}_class, ${side}.member_id as ${side}_member_id,
-  coalesce(${side}_main.first_name || ' ' || ${side}_main.last_name, ${side}_member.discord_name) as ${side}_member_name,
-  ${side}_main.class as ${side}_member_class`;
-const PLAYER_JOINS = (side: "challenger" | "challenged") => `
-  join characters ${side} on ${side}.id = deathrolls.${side}_id
-  left join members ${side}_member on ${side}_member.id = ${side}.member_id
-  left join characters ${side}_main on ${side}_main.member_id = ${side}.member_id and ${side}_main.is_main`;
-
-function player(row: Record<string, unknown>, side: "challenger" | "challenged"): DeathrollPlayer {
-  const field = (name: keyof PlayerRow) => row[`${side}_${name}`] as string | null;
-  return {
-    characterId: field("character_id") ?? "",
-    name: field("name") ?? "",
-    characterClass: field("class") ?? "",
-    memberId: field("member_id") ?? undefined,
-    memberName: field("member_name") ?? undefined,
-    memberClass: field("member_class") ?? undefined,
-  };
-}
-
 export function deathrollRepository(sql: SqlClient): DeathrollRepository {
   async function select(where: string, params: unknown[]): Promise<StoredDeathroll[]> {
     const rows = await sql.query<DeathrollRow & Record<string, unknown>>(
       `select deathrolls.id, deathrolls.stake, deathrolls.start_number, deathrolls.accepted_at, deathrolls.ended_at,
-              deathrolls.loser_id, deathrolls.bet_id, deathrolls.paid_at, ${PLAYER("challenger")}, ${PLAYER("challenged")}
-       from deathrolls ${PLAYER_JOINS("challenger")} ${PLAYER_JOINS("challenged")}
+              deathrolls.loser_id, deathrolls.bet_id, deathrolls.paid_at, ${PLAYER_COLUMNS("challenger")}, ${PLAYER_COLUMNS("challenged")}
+       from deathrolls ${PLAYER_JOINS("deathrolls", "challenger")} ${PLAYER_JOINS("deathrolls", "challenged")}
        ${where} order by deathrolls.ended_at desc, deathrolls.id`,
       params,
     );
@@ -65,8 +34,8 @@ export function deathrollRepository(sql: SqlClient): DeathrollRepository {
     );
     return rows.map((row) => ({
       id: row.id,
-      challenger: player(row, "challenger"),
-      challenged: player(row, "challenged"),
+      challenger: gamePlayer(row, "challenger"),
+      challenged: gamePlayer(row, "challenged"),
       stake: row.stake,
       start: row.start_number,
       acceptedAt: row.accepted_at,

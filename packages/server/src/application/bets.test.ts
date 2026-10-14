@@ -234,7 +234,7 @@ describe("bets", () => {
       expect(await treasury.debtOf(member)).toBe(40);
       const next = await open(48, "Pari suivant");
       await expect(bets.stake(member, next, await choiceId(next, "Un tank"), 10)).rejects.toThrow(
-        /Tu dois 40\s?po \(paris ou deathroll\)/u,
+        /Tu dois 40\s?po \(paris, deathroll ou Chi Fou Mi\)/u,
       );
       const [debt] = (await treasury.book()).debts;
       await expect(treasury.markPaid(officer, debt?.id ?? "")).rejects.toThrow(/réservée au trésorier/);

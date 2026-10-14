@@ -1,6 +1,7 @@
 import type { ProfessionReading, Recipe } from "../domain/artisans.ts";
 import type { Bet, DiscordMessage, NewBet, SettledStake, Stake } from "../domain/bets.ts";
 import type { CashMovement, CashMovementKind } from "../domain/cash.ts";
+import type { ChifoumiRound } from "../domain/chifoumis.ts";
 import type { CustomTitle, NewCustomTitle } from "../domain/customTitles.ts";
 import type { Duel, NewDuel } from "../domain/duels.ts";
 import type { Appearance, Character } from "../domain/characters.ts";
@@ -355,8 +356,8 @@ export interface ProfessionRepository {
   listKnown(): Promise<KnownRecipe[]>;
 }
 
-/** A player of a deathroll: their character, and the member who plays it, shown by their main character. */
-export interface DeathrollPlayer {
+/** A player of Le Dé Pipé's games: their character, and the member who plays it, shown by their main character. */
+export interface GamePlayer {
   characterId: string;
   /** "Prénom Nom". */
   name: string;
@@ -366,19 +367,23 @@ export interface DeathrollPlayer {
   memberClass: string | undefined;
 }
 
-/** A deathroll as the website keeps it (P15). */
-export interface StoredDeathroll {
+/** A game of Le Dé Pipé as the website keeps it: a deathroll or a Chi Fou Mi. */
+export interface PlayedGame {
   id: string;
-  challenger: DeathrollPlayer;
-  challenged: DeathrollPlayer;
+  challenger: GamePlayer;
+  challenged: GamePlayer;
   stake: number;
-  start: number;
   acceptedAt: Date;
   endedAt: Date;
   loserCharacterId: string;
   betId: string | undefined;
   /** When the winner confirmed the payment; the loser owes the stake until then. */
   paidAt: Date | undefined;
+}
+
+/** A deathroll as the website keeps it (P15). */
+export interface StoredDeathroll extends PlayedGame {
+  start: number;
   rolls: { characterId: string; high: number; result: number }[];
 }
 
@@ -402,6 +407,32 @@ export interface DeathrollRepository {
   markPaid(id: string, at: Date): Promise<boolean>;
   /** Every game, the latest first. */
   listAll(): Promise<StoredDeathroll[]>;
+}
+
+/** A Chi Fou Mi as the website keeps it. */
+export interface StoredChifoumi extends PlayedGame {
+  rounds: ChifoumiRound[];
+}
+
+export interface NewChifoumi {
+  id: string;
+  challengerId: string;
+  challengedId: string;
+  stake: number;
+  acceptedAt: Date;
+  endedAt: Date;
+  loserId: string;
+  betId: string | undefined;
+  rounds: ChifoumiRound[];
+}
+
+export interface ChifoumiRepository {
+  find(id: string): Promise<StoredChifoumi | undefined>;
+  save(game: NewChifoumi, sentBy: string, recordedAt: Date): Promise<void>;
+  /** Notes the payment confirmed; false when it was already. */
+  markPaid(id: string, at: Date): Promise<boolean>;
+  /** Every game, the latest first. */
+  listAll(): Promise<StoredChifoumi[]>;
 }
 
 export interface MissionRewardRepository {
@@ -546,6 +577,7 @@ export interface Repositories {
   missionRewards: MissionRewardRepository;
   professions: ProfessionRepository;
   deathrolls: DeathrollRepository;
+  chifoumis: ChifoumiRepository;
   titles: TitleRepository;
   customTitles: CustomTitleRepository;
   bossFights: BossFightRepository;
