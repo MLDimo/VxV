@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { formatGold, formatSignedGold } from "./labels.ts";
-import { betsBoard, deathrollsBoard, questsBoard, titlesBoard } from "./rankingBoards.ts";
+import { betsBoard, gamesBoard, questsBoard, titlesBoard } from "./rankingBoards.ts";
 import type { RankedStake } from "./ranking.ts";
 
 const at = (day: number) => new Date(Date.UTC(2026, 9, day, 20));
@@ -51,7 +51,8 @@ describe("Ranking's boards", () => {
   });
 
   it("ranks the deathroll's players by net gain, with the biggest win, the biggest defeat and the most games", () => {
-    const board = deathrollsBoard(
+    const board = gamesBoard(
+      "deathroll",
       [
         { winnerId: "ulric", loserId: "brann", stake: 800, endedAt: at(3) },
         { winnerId: "brann", loserId: "ulric", stake: 200, endedAt: at(4) },

@@ -162,7 +162,17 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   vérifie, crée et règle le pari de la guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du
   gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
   (`DISCORD_DEATHROLLS_CHANNEL_ID`, salon des paris sans lui).
-- **Ranking** (`VXV/Ranking` ; site `/ranking`) : Paris et Deathroll au gain net, Quêtes aux points de places (3, 2 et
+- **Chi Fou Mi** (`VXV/Chifoumi`, Le Dé Pipé › Chi Fou Mi ; site `/paris/chifoumi` ; demande du propriétaire du
+  14 octobre) : pierre, feuille, ciseaux au meilleur des trois manches, une égalité rejouée (`domain/chifoumis.ts`).
+  Défi chuchoté comme au deathroll, pour une mise choisie par les joueurs, 0 compris ; une ligne « Chi Fou Mi : X
+  contre Y » dans le chat de guilde et aucune fenêtre chez les autres, qui regardent et parient depuis l'onglet ; une
+  minute de paris, mêmes droits (dette, rôle Membre). Un coup est d'abord verrouillé sans être dit, puis chaque addon
+  dit le sien quand les deux joueurs ont joué (l'addon officiel ne montre rien avant). Partie finie envoyée au site,
+  qui la vérifie, règle le pari de la guilde et garde la dette du perdant (mise non nulle) jusqu'à la confirmation du
+  gagnant. Ce que partagent les deux jeux : `domain/diceGames.ts` (paris de la guilde, partie classée),
+  `application/diceGames.ts` (joueurs, pari), `application/debts.ts`, `application/addonGames.ts`. Pas d'annonce
+  Discord.
+- **Ranking** (`VXV/Ranking` ; site `/ranking`) : Paris, Deathroll et Chi Fou Mi au gain net, Quêtes aux points de places (3, 2 et
   1 par quête validée), Titres aux semaines détenues (`domain/rankingBoards.ts`, égalités départagées par le nom), par
   période (toujours, mois, saison). Fanions des trois premiers, trois records, suite du classement, position du joueur
   en bas, comme la capture `docs/design/captures/ranking.jpg`. Le jeu ne fait pas tourner les cadres : pas de
@@ -194,7 +204,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (décision du propriétaire du 9 octobre) : `/guide`, page autonome `apps/web/public/guide/index.html` (polices et
   images du site, émojis du bot et captures de la charte copiés à côté), tenue à jour avec les fonctionnalités.
 - Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
-- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll.
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll, Chi Fou Mi.
 - Dégradés et lueurs en petites images PNG (`VXV/Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus.
 - Bot Discord : couleurs des messages tirées des jetons (raids améthyste, Le Dé Pipé sakura, Quêtes vert, titres or,
@@ -220,7 +230,7 @@ La table complète est dans le README. Règles :
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
 - **Un seul addon, des parties indépendantes** : un dossier `VXV`, une case à cocher dans la liste des addons du jeu
   (demande du propriétaire). Chaque fonctionnalité est une partie, dans son dossier, avec son espace de noms privé
-  (`Core`, `Sync`, `Raid`, `Paris`, `Deathroll`, `Missions`, `Titles`, `Artisans`, `Ranking`, `PvP`), et ne dépend que
+  (`Core`, `Sync`, `Raid`, `Paris`, `Deathroll`, `Chifoumi`, `Missions`, `Titles`, `Artisans`, `Ranking`, `PvP`), et ne dépend que
   du socle (`Core`).
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon. Rôles cumulables (Membre, officier, trésorier, GM) ; seul le trésorier a les droits de trésorerie ; tout membre du serveur Discord est membre de la guilde, mais seul le rôle Discord « Membre » ouvre paris et deathroll.
@@ -274,6 +284,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-LOG-3` (journal d'un raid, fin de raid comprise) | addon → site | `VXV/Raid/RaidLog.lua` | `domain/raidLog.ts` |
 | `VXV-METIERS-1` (métiers d'un personnage) | addon → site | `VXV/Artisans/Website.lua` | `domain/artisans.ts` |
 | `VXV-DEATHROLL-1` (une partie, ligne `Y` : paiement confirmé) | addon → site | `VXV/Deathroll/Games.lua` | `domain/deathrolls.ts` |
+| `VXV-CHIFOUMI-1` (une partie, ses manches ; ligne `Y` : paiement confirmé) | addon → site | `VXV/Chifoumi/Games.lua` | `domain/chifoumis.ts` |
 | `VXV-OBJETS-1` (catégorie, sous-catégorie et emplacement des objets des raids) | addon → site | `VXV/Raid/ItemKinds.lua` | `domain/itemKinds.ts` |
 | `VXV-COMBAT-1` (boss tués, soins reçus) | compagnon → site | `apps/companion/src/domain/combatLog.ts` | `domain/bossFights.ts` |
 | `VXV-RAID-5` (événement, qui peut porter chaque objet et SR réutilisables compris) | site → addon | `domain/addonExport.ts` | `VXV/Raid/EventData.lua` |
@@ -282,7 +293,8 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV/Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV/Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV/Artisans/ArtisansData.lua` |
-| `VXV-DEATHROLLS-2` (bloqués : dettes et sans le rôle Membre ; dettes, dernières parties) | site → addon | `domain/addonDeathrolls.ts` | `VXV/Deathroll/DeathrollData.lua` |
+| `VXV-DEATHROLLS-2` (bloqués : dettes et sans le rôle Membre ; dettes, dernières parties) | site → addon | `domain/addonGames.ts` | `VXV/Deathroll/DeathrollData.lua` |
+| `VXV-CHIFOUMIS-1` (les mêmes lignes, pour le Chi Fou Mi) | site → addon | `domain/addonGames.ts` | `VXV/Chifoumi/ChifoumiData.lua` |
 | `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV/Ranking/RankingData.lua` |
 | `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV/PvP/PvpData.lua` |
 

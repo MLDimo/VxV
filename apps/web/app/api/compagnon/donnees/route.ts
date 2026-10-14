@@ -15,7 +15,7 @@ export async function GET(request: Request): Promise<Response> {
       addonMissions,
       addonTitles,
       addonArtisans,
-      addonDeathrolls,
+      addonGames,
       addonRanking,
       addonPvp,
     } = getApplication();
@@ -27,7 +27,8 @@ export async function GET(request: Request): Promise<Response> {
       quetes: { text: await addonMissions.exportMissions() },
       titres: { text: await addonTitles.exportTitles() },
       artisans: { text: await addonArtisans.exportArtisans() },
-      deathroll: { text: await addonDeathrolls.exportDeathrolls() },
+      deathroll: { text: await addonGames.exportDeathrolls() },
+      chifoumi: { text: await addonGames.exportChifoumis() },
       ranking: { text: await addonRanking.exportRanking() },
       pvp: { text: await addonPvp.exportPvp() },
       raidroles: roles === undefined ? null : { text: roles },

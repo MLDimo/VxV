@@ -55,7 +55,7 @@ export const PLACES: readonly Place[] = [
     id: "dice",
     name: "Le Dé Pipé",
     short: "Paris",
-    subtitle: "Paris & deathroll",
+    subtitle: "Paris, deathroll & Chi Fou Mi",
     kicker: "neon",
     spot: [73.5, 21, 11, 68],
     plaque: "door",
@@ -115,7 +115,7 @@ export const TAVERN_CARDS: readonly { place: Place["id"]; kicker: string; soon?:
     kicker: "Quête de la semaine",
     soon: "Le tableau des quêtes ouvre avec les missions de la guilde.",
   },
-  { place: "dice", kicker: "Le Dé Pipé", soon: "Paris et deathroll arrivent avec la salle de jeu." },
+  { place: "dice", kicker: "Le Dé Pipé", soon: "Paris, deathroll et Chi Fou Mi arrivent avec la salle de jeu." },
 ];
 
 /** The scene: the tavern picture's size, and its lights (left, top, width, height in percent). */

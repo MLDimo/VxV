@@ -4,7 +4,7 @@ import type { Member } from "../domain/members.ts";
 import { RANKING_PERIODS, type RankingPeriod } from "../domain/ranking.ts";
 import {
   betsBoard,
-  deathrollsBoard,
+  gamesBoard,
   RANKING_CATEGORIES,
   questsBoard,
   RANKING_METRICS,
@@ -15,7 +15,7 @@ import {
   type RankingUnit,
 } from "../domain/rankingBoards.ts";
 import { TITLES, titleWeek } from "../domain/titles.ts";
-import { rankedDeathroll } from "./debts.ts";
+import { rankedGame } from "./debts.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, MemberLook, Repositories, Season, UnitOfWork } from "./ports.ts";
 
@@ -62,8 +62,16 @@ async function boardOf(
     case "paris":
       return betsBoard(await repositories.stakes.listRanked(), since, nameOf);
     case "deathroll":
-      return deathrollsBoard(
-        (await repositories.deathrolls.listAll()).flatMap((game) => rankedDeathroll(game) ?? []),
+      return gamesBoard(
+        category,
+        (await repositories.deathrolls.listAll()).flatMap((game) => rankedGame(game) ?? []),
+        since,
+        nameOf,
+      );
+    case "chifoumi":
+      return gamesBoard(
+        category,
+        (await repositories.chifoumis.listAll()).flatMap((game) => rankedGame(game) ?? []),
         since,
         nameOf,
       );

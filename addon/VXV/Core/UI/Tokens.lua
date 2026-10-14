@@ -104,7 +104,7 @@ ns.Tokens = {
           spot = { 52, 25, 19, 31 }, plaque = "board", kicker = "loss",
           backdrop = { position = { 69, 29 }, zoom = 2.5, opacity = 0.3 } },
         { id = "dice", name = "Le Dé Pipé", short = "Paris",
-          subtitle = "Paris & deathroll",
+          subtitle = "Paris, deathroll & Chi Fou Mi",
           spot = { 73.5, 21, 11, 68 }, plaque = "door", kicker = "neon",
           backdrop = { position = { 80, 75 }, zoom = 2.5, opacity = 0.32 } },
         { id = "quests", name = "Quêtes", short = "Quêtes",
@@ -130,7 +130,7 @@ ns.Tokens = {
         { place = "quests", kicker = "Quête de la semaine",
           soon = "Le tableau des quêtes ouvre avec les missions de la guilde." },
         { place = "dice", kicker = "Le Dé Pipé",
-          soon = "Paris et deathroll arrivent avec la salle de jeu." },
+          soon = "Paris, deathroll et Chi Fou Mi arrivent avec la salle de jeu." },
     },
     seasons = {
         { id = "voile-d-hiver", from = 20261215, to = 20270102 },

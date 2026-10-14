@@ -3,6 +3,7 @@ import { SubNav } from "./SubNav";
 const LINKS = [
   { href: "/paris", name: "Paris" },
   { href: "/paris/deathroll", name: "Deathroll" },
+  { href: "/paris/chifoumi", name: "Chi Fou Mi" },
   { href: "/paris/tresorerie", name: "Trésorerie" },
 ] as const;
 

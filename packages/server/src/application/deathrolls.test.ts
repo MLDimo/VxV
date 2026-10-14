@@ -7,7 +7,7 @@ import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
 import { createGuildCharacters, createMember } from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
-import { createAddonDeathrolls } from "./addonDeathrolls.ts";
+import { createAddonGames } from "./addonGames.ts";
 import { createBets } from "./bets.ts";
 import { createDeathrolls } from "./deathrolls.ts";
 import type { AnnouncedDeathroll } from "./discordPorts.ts";
@@ -100,7 +100,7 @@ describe("deathrolls", () => {
 
   it("hands the debts and the games to the addon", async () => {
     await deathrolls.recordFromGame(thom, [game("g4", 500)]);
-    const text = await createAddonDeathrolls({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
+    const text = await createAddonGames({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
     const lines = text.split("\n");
     expect(lines[0]).toBe("VXV-DEATHROLLS-2");
     expect(lines).toContain(`X;${vorn.id}`);
@@ -117,7 +117,7 @@ describe("deathrolls", () => {
     ]);
     const [view] = await createBets({ unitOfWork: createUnitOfWork(sql), clock }).list();
     expect(view?.stakes.map((stake) => stake.memberId)).toEqual([sira.id]);
-    const text = await createAddonDeathrolls({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
+    const text = await createAddonGames({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
     expect(text.split("\n").filter((line) => line.startsWith("N;"))).toEqual([`N;${newcomer.id}`]);
   });
 });

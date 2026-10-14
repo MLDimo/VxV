@@ -1,14 +1,14 @@
-import type { RankedDeathroll } from "./deathrolls.ts";
+import type { RankedGame } from "./diceGames.ts";
 import { count, formatGold, formatSignedGold } from "./labels.ts";
 import type { RankedStake } from "./ranking.ts";
 
 /**
  * Ranking (§7.5, owner's decisions of 7 October): each category ranks the members over the period on the same board,
- * the first three on banners, the period's records, then the others. Paris and Deathroll by net gain, Quêtes by
+ * the first three on banners, the period's records, then the others. Paris, Deathroll and Chi Fou Mi by net gain, Quêtes by
  * points of places (3 for a mission won, 2 for second, 1 for third), Titres by weeks of title held.
  */
 
-export const RANKING_CATEGORIES = ["paris", "deathroll", "quetes", "titres"] as const;
+export const RANKING_CATEGORIES = ["paris", "deathroll", "chifoumi", "quetes", "titres"] as const;
 export type RankingCategory = (typeof RANKING_CATEGORIES)[number];
 
 /** How a board's values read: gold with its sign, or a count. */
@@ -32,6 +32,7 @@ export interface BoardRecord {
 export const RANKING_METRICS: Readonly<Record<RankingCategory, { metric: string; unit: RankingUnit }>> = {
   paris: { metric: "gain net", unit: "gold" },
   deathroll: { metric: "gain net", unit: "gold" },
+  chifoumi: { metric: "gain net", unit: "gold" },
   quetes: { metric: "points de places", unit: "count" },
   titres: { metric: "semaines de titre", unit: "count" },
 };
@@ -133,9 +134,10 @@ export function betsBoard(stakes: readonly RankedStake[], since: Date | undefine
   };
 }
 
-/** The players of the deathrolls ended in the period, by net gain. */
-export function deathrollsBoard(
-  games: readonly RankedDeathroll[],
+/** The players of Le Dé Pipé's games (deathrolls, Chi Fou Mi) ended in the period, by net gain. */
+export function gamesBoard(
+  category: "deathroll" | "chifoumi",
+  games: readonly RankedGame[],
   since: Date | undefined,
   nameOf: NameOf,
 ): RankingBoard {
@@ -146,7 +148,7 @@ export function deathrollsBoard(
     add(net, game.loserId, -game.stake);
   }
   return {
-    ...RANKING_METRICS.deathroll,
+    ...RANKING_METRICS[category],
     rows: rank(net, nameOf),
     records: [
       ...record(

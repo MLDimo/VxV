@@ -45,6 +45,8 @@ const OFFICERS_ONLY = "Réservé aux officiers.";
 const PROFESSIONS_KIND = "metiers";
 /** The kind of text the deathroll games come as (addon/VXV/Deathroll). */
 const DEATHROLL_KIND = "deathroll";
+/** The kind of text the Chi Fou Mi games come as (addon/VXV/Chifoumi). */
+const CHIFOUMI_KIND = "chifoumi";
 /** The kind of text the bosses killed come as, read by the companion in the combat log (since 1.4). */
 const BOSS_FIGHT_KIND = "combat";
 /** The kind of text the raids' items come as, read in game (addon/VXV/Raid). */
@@ -66,6 +68,7 @@ interface CompanionUploadDependencies {
   missionAnnouncements: { announceQuietly(missionId: string): Promise<boolean> };
   artisans: { recordFromGame(sender: Member, texts: readonly string[]): Promise<number> };
   deathrolls: { recordFromGame(sender: Member, texts: readonly string[]): Promise<string[]> };
+  chifoumis: { recordFromGame(sender: Member, texts: readonly string[]): Promise<string[]> };
   bossFights: { recordFromCompanion(sender: Member, texts: readonly string[]): Promise<number> };
   items: { recordKindsFromGame(texts: readonly string[]): Promise<number> };
 }
@@ -117,6 +120,7 @@ export function createCompanionUploads({
   missionAnnouncements,
   artisans,
   deathrolls,
+  chifoumis,
   bossFights,
   items,
 }: CompanionUploadDependencies) {
@@ -181,6 +185,9 @@ export function createCompanionUploads({
       }
       for (const text of upload.texts[DEATHROLL_KIND] ?? []) {
         report.texts.push(await described(async () => (await deathrolls.recordFromGame(member, [text])).join(" ")));
+      }
+      for (const text of upload.texts[CHIFOUMI_KIND] ?? []) {
+        report.texts.push(await described(async () => (await chifoumis.recordFromGame(member, [text])).join(" ")));
       }
       const sentRoster = upload.roster;
       if (sentRoster !== undefined) {

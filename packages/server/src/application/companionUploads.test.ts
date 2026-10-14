@@ -22,6 +22,7 @@ import { createBets } from "./bets.ts";
 import { createBossFights } from "./bossFights.ts";
 import { createMissions } from "./missions.ts";
 import { createArtisans } from "./artisans.ts";
+import { createChifoumis } from "./chifoumis.ts";
 import { createDeathrolls } from "./deathrolls.ts";
 import { createItems } from "./items.ts";
 
@@ -78,6 +79,7 @@ describe("companion uploads", () => {
       missionAnnouncements,
       artisans: createArtisans({ unitOfWork }),
       deathrolls: createDeathrolls({ unitOfWork, clock, announcer: { announce: async () => {} } }),
+      chifoumis: createChifoumis({ unitOfWork, clock }),
       bossFights: createBossFights({ unitOfWork, clock }),
       items: createItems({ unitOfWork }),
     });

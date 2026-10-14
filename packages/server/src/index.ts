@@ -54,7 +54,7 @@ export { createPgSqlClient, type PgSqlClient, type SqlClient } from "./infrastru
 export { identityFromDiscordUser, type DiscordUser } from "./infrastructure/discord/users.ts";
 export { createDiscordGuild } from "./infrastructure/discord/guild.ts";
 export type { DiscordProfileSync } from "./application/discordProfiles.ts";
-export type { DeathrollPlayer, TitleHolder } from "./application/ports.ts";
+export type { GamePlayer, TitleHolder } from "./application/ports.ts";
 export type {
   AnnouncedBet,
   AnnouncedMission,
@@ -79,6 +79,7 @@ export { RANKING_CATEGORIES, type RankingCategory, type RankingUnit } from "./do
 export type { MissionView } from "./application/missions.ts";
 export { type TitleWeek } from "./application/titles.ts";
 export type { RecipeFound } from "./application/artisans.ts";
+export type { ChifoumiView } from "./application/chifoumis.ts";
 export type { DeathrollView } from "./application/deathrolls.ts";
 export type { ArtisanProfession } from "./application/ports.ts";
 export { TITLES, titleRole, type TitleId } from "./domain/titles.ts";

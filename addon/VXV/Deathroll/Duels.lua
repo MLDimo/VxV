@@ -14,7 +14,7 @@ local BET, ROLL, PAID = "deathroll.bet", "deathroll.roll", "deathroll.paid"
 local CHALLENGE_SECONDS = 60
 local DEFAULT_START = 1000
 Duels.DEFAULT_START = DEFAULT_START
-local NEWCOMER = "Paris et deathroll sont réservés au rôle Membre sur Discord."
+local NEWCOMER = "Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord."
 
 local challenges = {}
 local sent = 0
@@ -35,7 +35,7 @@ function Duels.Challenge(target, stake, start)
         return "Mise d'au moins 1 po et nombre de départ d'au moins 2."
     end
     if Debts.Barred(me) then
-        return "Tu as une dette (paris ou deathroll) : règle-la pour jouer de nouveau."
+        return "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour jouer de nouveau."
     end
     if Debts.Barred(target) then
         return target .. " a une dette : pas de deathroll avant qu'elle soit réglée."
@@ -123,7 +123,7 @@ function Duels.Bet(id, choice, amount)
         return "Les joueurs ne parient pas sur leur partie."
     end
     if Debts.Barred(me) then
-        return "Tu as une dette (paris ou deathroll) : règle-la pour parier de nouveau."
+        return "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour parier de nouveau."
     end
     if Newcomers.Is(me) then
         return NEWCOMER

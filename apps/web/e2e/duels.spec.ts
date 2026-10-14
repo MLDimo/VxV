@@ -49,7 +49,9 @@ test.describe.serial("duels", () => {
     await page.getByRole("radio", { name: "Dune Sable" }).check();
     await page.getByLabel("Mise (po)").fill("30");
     await page.getByRole("button", { name: "Miser" }).click();
-    await expect(page.getByRole("status")).toContainText("Paris et deathroll sont réservés au rôle Membre sur Discord");
+    await expect(page.getByRole("status")).toContainText(
+      "Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord",
+    );
 
     await signInAs(context, "member");
     await page.reload();

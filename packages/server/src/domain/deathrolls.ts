@@ -1,3 +1,4 @@
+import type { GameBet } from "./diceGames.ts";
 import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.ts";
 
 /**
@@ -14,9 +15,6 @@ export const DEATHROLL_HEADER = "VXV-DEATHROLL-1";
 
 /** The stake from which a game is announced on Discord (P15.5). */
 export const BIG_STAKE = 1000;
-
-/** How long the guild bets on a game, between its acceptance and its first roll (P15.2). */
-export const DEATHROLL_BETTING_MS = 60_000;
 
 export interface DeathrollRoll {
   /** "Prénom Nom". */
@@ -36,7 +34,7 @@ export interface DeathrollGame {
   endedAt: Date;
   rolls: DeathrollRoll[];
   /** The stakes of the guild on a player, placed before the first roll. */
-  bets: { bettor: string; choice: string; amount: number }[];
+  bets: GameBet[];
   /** The winner's confirmation of the payment, if given. */
   paid: { by: string; at: Date } | undefined;
 }
@@ -154,18 +152,4 @@ export function deathrollRefusal(game: DeathrollGame): string | undefined {
     high = roll.result;
   }
   return game.rolls.at(-1)?.result === DEATHROLL_LOSING_ROLL ? undefined : "La partie n'est pas finie.";
-}
-
-/** The guild's stakes that count (P15.2): on a player, by someone else, of 1 po at least. */
-export function deathrollBets(game: DeathrollGame): DeathrollGame["bets"] {
-  const players = [game.challenger, game.challenged];
-  return game.bets.filter((bet) => !players.includes(bet.bettor) && players.includes(bet.choice) && bet.amount >= 1);
-}
-
-/** A game over, for the ranking: the members who won and lost it, its stake and when it ended. */
-export interface RankedDeathroll {
-  winnerId: string;
-  loserId: string;
-  stake: number;
-  endedAt: Date;
 }
