@@ -72,8 +72,11 @@ export interface AnnouncedMission {
   scores: MissionScore[];
 }
 
-/** The missions' channel, where each mission has its message, with its ranking. */
-export type MissionAnnouncer = MessageAnnouncer<AnnouncedMission>;
+/** The missions' channel, where each mission has its message, with its ranking; and its results, once validated. */
+export interface MissionAnnouncer extends MessageAnnouncer<AnnouncedMission> {
+  /** Publishes the results of a mission an officer validated, in a message of their own. */
+  results(item: AnnouncedMission): Promise<void>;
+}
 
 /** The week's titles, as their Discord announcement shows them: each title and its holder, if any. */
 export interface AnnouncedTitles {

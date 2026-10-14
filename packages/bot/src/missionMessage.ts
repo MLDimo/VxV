@@ -59,3 +59,30 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
     ],
   };
 }
+
+/** The results of a mission an officer validated (owner's request of 14 October): its podium and the rewards. */
+export function missionResultsMessage(announced: AnnouncedMission, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
+  const { mission, scores } = announced;
+  const labels = MISSION_TYPE_LABELS[mission.type];
+  const podium = missionRewards(scores, mission.reward).map((reward) => {
+    const score = scores.find((candidate) => candidate.memberId === reward.memberId);
+    return (
+      `${formatPlace(reward.rank)} ${score?.memberName ?? ""} — ${String(score?.score ?? 0)} ${labels.counts}` +
+      ` · ${formatGold(reward.amount)}`
+    );
+  });
+  return {
+    embeds: [
+      {
+        title: `🏆 Résultats · ${mission.title}`,
+        url: missionUrl(siteUrl, mission.id),
+        description:
+          `${labels.name} : ${mostOf(labels.counts)}, du ${timestamp(mission.startsAt, "D")} au ` +
+          `${timestamp(mission.endsAt, "D")}. Résultat validé par un officier.`,
+        color: EMBED_COLOR,
+        fields: [{ name: "Podium", value: podium.length === 0 ? "Personne n'a participé." : podium.join("\n") }],
+        footer: { text: "Le trésorier verse les récompenses." },
+      },
+    ],
+  };
+}

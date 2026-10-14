@@ -40,6 +40,7 @@ export async function closeMission(_previous: ActionState, form: FormData): Prom
     const application = getApplication();
     await application.missions.close(officer, missionId, formText(form, "reason"));
     await application.missionAnnouncements.announceQuietly(missionId);
+    await application.missionAnnouncements.publishResults(missionId);
     return "Résultat validé : le trésorier verse les récompenses.";
   }, ["/", "/quetes", `/quetes/${missionId}`, "/journal"]);
 }
