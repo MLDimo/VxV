@@ -2,6 +2,7 @@ import { canManageRaids, type Member } from "@vxv/server";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "@/app/actions/auth";
+import { BurgerMenu } from "./BurgerMenu";
 import { rolesLabel } from "./roleLabels";
 import { SECTIONS } from "./sections";
 
@@ -70,31 +71,10 @@ export function SiteHeader({ member }: { member: Member }) {
             <SignOut member={member} compact />
           </span>
         </div>
-        <details className="group ml-auto min-[1400px]:hidden">
-          <summary
-            className="flex size-12 cursor-pointer list-none items-center justify-center bg-wood ring-pixel"
-            aria-label="Menu"
-          >
-            <svg viewBox="0 0 15 15" className="size-5 fill-parchment group-open:fill-gold" aria-hidden="true">
-              <rect className="group-open:hidden" x="0" y="1" width="15" height="3" />
-              <rect className="group-open:hidden" x="0" y="6" width="15" height="3" />
-              <rect className="group-open:hidden" x="0" y="11" width="15" height="3" />
-              <rect className="hidden group-open:block" x="6" y="6" width="3" height="3" />
-              <rect className="hidden group-open:block" x="0" y="0" width="3" height="3" />
-              <rect className="hidden group-open:block" x="12" y="0" width="3" height="3" />
-              <rect className="hidden group-open:block" x="0" y="12" width="3" height="3" />
-              <rect className="hidden group-open:block" x="12" y="12" width="3" height="3" />
-              <rect className="hidden group-open:block" x="3" y="3" width="3" height="3" />
-              <rect className="hidden group-open:block" x="9" y="3" width="3" height="3" />
-              <rect className="hidden group-open:block" x="3" y="9" width="3" height="3" />
-              <rect className="hidden group-open:block" x="9" y="9" width="3" height="3" />
-            </svg>
-          </summary>
-          <div className="absolute inset-x-0 top-[72px] z-20 flex flex-col gap-4 bg-[#24160d] p-6 [&>a]:border-b-2 [&>a]:border-dashed [&>a]:border-beam [&>a]:pb-3 [&>a]:text-[22px]">
-            <Links member={member} />
-            <SignOut member={member} />
-          </div>
-        </details>
+        <BurgerMenu>
+          <Links member={member} />
+          <SignOut member={member} />
+        </BurgerMenu>
       </nav>
     </header>
   );

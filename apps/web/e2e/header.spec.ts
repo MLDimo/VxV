@@ -20,4 +20,9 @@ test("the header folds its sections into the burger menu under 1,400 px", async 
   await header.getByLabel("Menu").click();
   await expect(header.getByRole("link", { name: "PvP", exact: true })).toBeVisible();
   await expect(header.getByText("Officier Test · Officier, Trésorier")).toBeVisible();
+
+  // A link chosen in the menu opens its page with the menu closed.
+  await header.getByRole("link", { name: "PvP", exact: true }).click();
+  await expect(page).toHaveURL(/\/pvp$/);
+  await expect(header.getByRole("link", { name: "PvP", exact: true })).toBeHidden();
 });
