@@ -28,6 +28,9 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "title.takeBack": { label: "TITRE", className: "border-ink-brown text-ink-brown" },
   "duel.result": { label: "PVP", className: "border-stamp-bet text-stamp-bet" },
   "duel.cancel": { label: "PVP", className: "border-stamp-bet text-stamp-bet" },
+  "legend.chapter": { label: "LÉGENDE", className: "border-stamp-cash text-stamp-cash" },
+  "legend.publish": { label: "LÉGENDE", className: "border-stamp-cash text-stamp-cash" },
+  "legend.refuse": { label: "LÉGENDE", className: "border-stamp-cash text-stamp-cash" },
 };
 
 /** The accounts book (§7.7): the guild's cash on the left, the officers' journal on the right. */

@@ -10,6 +10,13 @@ import type { GameChangeOutcome } from "../domain/gameChanges.ts";
 import type { LootMethod, LootRecord } from "../domain/history.ts";
 import type { ItemKindReading } from "../domain/itemKinds.ts";
 import type { JournalEntry, NewJournalEntry } from "../domain/journal.ts";
+import type {
+  ExploitImage,
+  ExploitPlacement,
+  ExploitProposal,
+  ExploitRarity,
+  ExploitStatus,
+} from "../domain/legend.ts";
 import type { Member, MemberRole } from "../domain/members.ts";
 import type { ReminderTarget } from "../domain/reminders.ts";
 import type { RosterEntry } from "../domain/roster.ts";
@@ -435,6 +442,59 @@ export interface ChifoumiRepository {
   listAll(): Promise<StoredChifoumi[]>;
 }
 
+/** A painting of the Hall of Fame as the website keeps it. */
+export interface StoredExploit extends ExploitProposal {
+  id: string;
+  proposedBy: string;
+  proposedAt: Date;
+  status: ExploitStatus;
+  chapterId: string | undefined;
+  rarity: ExploitRarity | undefined;
+  mvpId: string | undefined;
+  mvpWhy: string;
+  loot: string;
+  /** Why an officer refused it. */
+  refusal: string | undefined;
+}
+
+export interface LegendChapter {
+  id: string;
+  title: string;
+  period: string;
+  createdAt: Date;
+}
+
+export interface LegendComment {
+  memberId: string;
+  body: string;
+  writtenAt: Date;
+}
+
+export interface LegendRepository {
+  createChapter(chapter: { title: string; period: string }, createdBy: string, at: Date): Promise<string>;
+  /** The chapters, the first created first. */
+  listChapters(): Promise<LegendChapter[]>;
+  propose(proposal: ExploitProposal, images: readonly ExploitImage[], proposedBy: string, at: Date): Promise<string>;
+  find(id: string): Promise<StoredExploit | undefined>;
+  /** Every exploit, by the day and hour it happened. */
+  list(): Promise<StoredExploit[]>;
+  /** Publishes a proposal; false when it was not waiting any more. */
+  publish(id: string, placement: ExploitPlacement, reviewedBy: string, at: Date): Promise<boolean>;
+  /** Refuses a proposal; false when it was not waiting any more. */
+  refuse(id: string, reason: string, reviewedBy: string, at: Date): Promise<boolean>;
+  /** The captures of these exploits, by their place. */
+  listImages(exploitIds: readonly string[]): Promise<{ id: string; exploitId: string; position: number }[]>;
+  findImage(id: string): Promise<{ exploitId: string; contentType: string; bytes: Uint8Array } | undefined>;
+  setPresence(exploitId: string, memberId: string, present: boolean, at: Date): Promise<void>;
+  /** « J'y étais », for every exploit. */
+  listPresences(): Promise<{ exploitId: string; memberId: string }[]>;
+  /** The members present at these raid nights, by their characters in the raids' records. */
+  listRaidPresences(eventIds: readonly string[]): Promise<{ eventId: string; memberId: string }[]>;
+  addComment(exploitId: string, memberId: string, body: string, at: Date): Promise<void>;
+  /** The memories left under the exploit, the oldest first. */
+  listComments(exploitId: string): Promise<LegendComment[]>;
+}
+
 export interface MissionRewardRepository {
   save(missionId: string, rewards: readonly MissionReward[]): Promise<void>;
   /** The rewards of these missions, by mission then place. */
@@ -578,6 +638,7 @@ export interface Repositories {
   professions: ProfessionRepository;
   deathrolls: DeathrollRepository;
   chifoumis: ChifoumiRepository;
+  legend: LegendRepository;
   titles: TitleRepository;
   customTitles: CustomTitleRepository;
   bossFights: BossFightRepository;

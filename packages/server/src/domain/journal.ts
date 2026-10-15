@@ -20,7 +20,10 @@ export type JournalAction =
   | "title.custom"
   | "title.takeBack"
   | "duel.result"
-  | "duel.cancel";
+  | "duel.cancel"
+  | "legend.chapter"
+  | "legend.publish"
+  | "legend.refuse";
 
 export interface NewJournalEntry {
   actorId: string;
@@ -36,6 +39,19 @@ export interface JournalEntry extends Omit<NewJournalEntry, "actorId"> {
   id: string;
   occurredAt: Date;
   actorName: string;
+}
+
+/** What the journal keeps about a chapter of the Hall of Fame. */
+export interface LegendChapterRecord {
+  title: string;
+  period: string;
+}
+
+/** What the journal keeps about a painting of the Hall of Fame: published in its chapter, or refused. */
+export interface LegendExploitRecord {
+  title: string;
+  chapter?: string;
+  rarity?: string;
 }
 
 /** What the journal keeps about a created event. */

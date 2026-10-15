@@ -80,6 +80,14 @@ export type { MissionView } from "./application/missions.ts";
 export { type TitleWeek } from "./application/titles.ts";
 export type { RecipeFound } from "./application/artisans.ts";
 export type { ChifoumiView } from "./application/chifoumis.ts";
+export type {
+  Corridor,
+  CorridorChapter,
+  CorridorPainting,
+  ExploitView,
+  LegendPerson,
+  ProposalView,
+} from "./application/legend.ts";
 export type { DeathrollView } from "./application/deathrolls.ts";
 export type { ArtisanProfession } from "./application/ports.ts";
 export { TITLES, titleRole, type TitleId } from "./domain/titles.ts";

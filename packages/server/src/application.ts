@@ -7,6 +7,7 @@ import { createArtisans } from "./application/artisans.ts";
 import { createBossFights } from "./application/bossFights.ts";
 import { createAddonGames } from "./application/addonGames.ts";
 import { createChifoumis } from "./application/chifoumis.ts";
+import { createLegend } from "./application/legend.ts";
 import { createDeathrolls } from "./application/deathrolls.ts";
 import { createDuelAnnouncements } from "./application/duelAnnouncements.ts";
 import { createDuels } from "./application/duels.ts";
@@ -168,6 +169,7 @@ export function createApplication({
     deathrolls,
     chifoumis,
     addonGames: createAddonGames({ unitOfWork, clock }),
+    legend: createLegend({ unitOfWork, clock }),
     duels,
     duelAnnouncements,
     addonPvp: createAddonPvp({ unitOfWork, clock, duels }),

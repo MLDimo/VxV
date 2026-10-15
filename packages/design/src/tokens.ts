@@ -68,6 +68,15 @@ export const COLORS = {
   "banner-ink": "#120A1C",
   "banner-title": "#5A0F3A",
   "avatar-ground": "#141828",
+  // Hall of Fame (mockup HallOfFame, 15 October): the paintings' qualities, their brass plaques, their frames' wood
+  "quality-rare": "#0070DD",
+  "quality-epic": "#A335EE",
+  "quality-legendary": "#FF8000",
+  brass: "#B8862F",
+  "brass-shade": "#7A5418",
+  "brass-ink": "#1E1004",
+  "frame-wood": "#6B4423",
+  "frame-wood-light": "#A0742C",
 } as const;
 
 export type ColorToken = keyof typeof COLORS;

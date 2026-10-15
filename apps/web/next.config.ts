@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@vxv/bot", "@vxv/raid-data", "@vxv/server"],
   // The repository has its own CLAUDE.md at the root: no generated agent files in apps/web.
   agentRules: false,
+  // The Hall of Fame's captures travel with a proposal: up to four, made smaller by the browser (Vercel allows 4.5 MB).
+  experimental: { serverActions: { bodySizeLimit: "4mb" } },
   // The member guide, open to every visitor (owner's decision of 9 October): a page of its own in public/guide.
   async rewrites() {
     return [{ source: "/guide", destination: "/guide/index.html" }];

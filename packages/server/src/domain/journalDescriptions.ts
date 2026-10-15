@@ -11,6 +11,8 @@ import type {
   ExclusionRecord,
   JournalAction,
   JournalEntry,
+  LegendChapterRecord,
+  LegendExploitRecord,
   LootCorrectionRecord,
   LootCouncilRecord,
   RaidLogImportRecord,
@@ -49,6 +51,9 @@ export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "title.takeBack": "Titre fait main retiré",
   "duel.result": "Résultat d'un duel saisi par un officier",
   "duel.cancel": "Duel annulé par un officier",
+  "legend.chapter": "Nouveau chapitre du Hall of Fame",
+  "legend.publish": "Tableau publié au Hall of Fame",
+  "legend.refuse": "Proposition du Hall of Fame refusée",
 };
 
 export function describeRosterImport(summary: RosterImportSummary): string {
@@ -193,6 +198,16 @@ export function describeJournalEntry(entry: JournalEntry): string {
     case "duel.result":
     case "duel.cancel":
       return describeDuel(entry.after as DuelRecord);
+    case "legend.chapter": {
+      const record = entry.after as LegendChapterRecord;
+      return record.period === "" ? record.title : `${record.title} (${record.period})`;
+    }
+    case "legend.publish": {
+      const record = entry.after as LegendExploitRecord;
+      return `« ${record.title} », ${record.rarity ?? ""}, chapitre ${record.chapter ?? ""}`;
+    }
+    case "legend.refuse":
+      return `« ${(entry.before as LegendExploitRecord).title} »`;
     case "season.start":
       return `Saison ${String((entry.after as SeasonStartRecord).number)} : les classements par saison repartent de zéro`;
   }

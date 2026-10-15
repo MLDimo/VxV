@@ -29,8 +29,14 @@ export function placeOfPath(path: string): Place | undefined {
   return PLACES.find((place) => place.id === id);
 }
 
-/** The sections of the site's menu (§1: Raid, PvP, Quêtes, Le Dé Pipé, Ranking, Artisans, Journal). */
-export const SECTIONS = ["raid", "pvp", "quests", "dice", "ranking", "artisans", "journal"].flatMap((id) => {
-  const place = PLACES.find((candidate) => candidate.id === id);
-  return place ? [{ name: place.name, href: sectionHref(place) }] : [];
-});
+/**
+ * The sections of the site's menu (§1: Raid, PvP, Quêtes, Le Dé Pipé, Ranking, Artisans, Journal), then the Hall of
+ * Fame, a page of the website only.
+ */
+export const SECTIONS = [
+  ...["raid", "pvp", "quests", "dice", "ranking", "artisans", "journal"].flatMap((id) => {
+    const place = PLACES.find((candidate) => candidate.id === id);
+    return place ? [{ name: place.name, href: sectionHref(place) }] : [];
+  }),
+  { name: "Hall of Fame", href: "/hall-of-fame" },
+];
