@@ -4,7 +4,7 @@ import { addonHead, line, seconds, type AddonReaders } from "./addonText.ts";
 export const ADDON_DEATHROLLS_HEADER = "VXV-DEATHROLLS-2";
 
 /** First line of the Chi Fou Mi's data for the addon (contract with VXV/Chifoumi); the number is its version. */
-export const ADDON_CHIFOUMIS_HEADER = "VXV-CHIFOUMIS-1";
+export const ADDON_CHIFOUMIS_HEADER = "VXV-CHIFOUMIS-2";
 
 /** How many of the latest games the addon shows. */
 export const ADDON_GAMES_SHOWN = 10;
@@ -20,6 +20,8 @@ export interface AddonGamesFacts extends AddonReaders {
   barred: readonly string[];
   /** The members without the guild's Discord role « Membre »: barred from both too. */
   newcomers: readonly string[];
+  /** The members' portraits (packages/design's avatars), for the games that draw their players: the Chi Fou Mi. */
+  portraits: readonly { memberId: string; avatar: string }[];
   /** The games over, the latest first, with their winner and loser. */
   games: readonly { id: string; winner: Player; loser: Player; stake: number; endedAt: Date; paid: boolean }[];
 }
@@ -29,6 +31,7 @@ export interface AddonGamesFacts extends AddonReaders {
  * the head of every part's data (addonHead: P, O and M):
  * X;member id (in debt: barred from deathrolls and bets)
  * N;member id (without the role « Membre » on Discord: barred from deathrolls and bets)
+ * A;member id;portrait (the Chi Fou Mi's players are drawn with it)
  * D;game id;loser's member id;loser;winner's member id;winner;stake;ended (Unix seconds) (the games not paid yet,
  *   with a stake)
  * H;game id;winner;loser;stake;ended (Unix seconds) (the latest games)
@@ -38,6 +41,7 @@ export function formatAddonGames(header: string, facts: AddonGamesFacts): string
     ...addonHead(header, facts),
     ...facts.barred.map((memberId) => line("X", memberId)),
     ...facts.newcomers.map((memberId) => line("N", memberId)),
+    ...facts.portraits.map((portrait) => line("A", portrait.memberId, portrait.avatar)),
     ...facts.games
       .filter((game) => !game.paid && game.stake > 0)
       .map((game) =>

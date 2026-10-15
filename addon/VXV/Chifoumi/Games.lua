@@ -2,9 +2,9 @@ local ns = select(2, ...).Chifoumi
 
 --- The Chi Fou Mi this addon knows: those it plays or follows, then the games over, kept until the website knows them
 --- and sent to it. A game: { id, challenger, challenged, stake, acceptedAt (Unix seconds), closesAt (the game's clock,
---- GetTime, when the guild's bets close), rounds = { { challenger = move, challenged = move } }, locked = { [player]
---- = true } and moves = { [player] = move } for the round being played, bets = { [bettor] = { choice, amount } },
---- endedAt, paid = { by, at } }; its rules are Rules.lua's.
+--- GetTime, when the guild's bets close), rounds = { { challenger = move, challenged = move } }, locked = { [player] =
+--- true } and moves = { [player] = move } for the round being played, roundAt (GetTime, when the last round ended: its
+--- reveal), bets = { [bettor] = { choice, amount } }, endedAt, paid = { by, at } }; its rules are Rules.lua's.
 local Games = {}
 ns.Games = Games
 
@@ -136,7 +136,7 @@ function Games.Reveal(id, player, round, move)
     if game.moves[game.challenger] ~= nil and game.moves[game.challenged] ~= nil then
         game.rounds[#game.rounds + 1] = { challenger = game.moves[game.challenger],
             challenged = game.moves[game.challenged] }
-        game.locked, game.moves = {}, {}
+        game.locked, game.moves, game.roundAt = {}, {}, GetTime()
         if Rules.Loser(game) ~= nil then
             game.endedAt = time()
             keep(game)

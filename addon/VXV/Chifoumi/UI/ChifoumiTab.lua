@@ -43,8 +43,9 @@ end
 local function live()
     local rows = {}
     for _, game in ipairs(Games.Live()) do
-        rows[#rows + 1] = row("line", ("%s contre %s · %s · %s"):format(game.challenged, game.challenger,
-            MatchView.Score(game), Gold.Format(game.stake)), { onClick = function()
+        rows[#rows + 1] = row("line", ("%s contre %s · %d – %d · %s"):format(game.challenged, game.challenger,
+            MatchView.RoundsWon(game, game.challenged), MatchView.RoundsWon(game, game.challenger),
+            Gold.Format(game.stake)), { onClick = function()
             MatchWindow.Show(game.id)
         end })
     end

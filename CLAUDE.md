@@ -169,7 +169,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   minute de paris, mêmes droits (dette, rôle Membre). Un coup est d'abord verrouillé sans être dit, puis chaque addon
   dit le sien quand les deux joueurs ont joué (l'addon officiel ne montre rien avant). Partie finie envoyée au site,
   qui la vérifie, règle le pari de la guilde et garde la dette du perdant (mise non nulle) jusqu'à la confirmation du
-  gagnant. Ce que partagent les deux jeux : `domain/diceGames.ts` (paris de la guilde, partie classée),
+  gagnant. Fenêtre de la partie comme la maquette `AddonChifoumi` (canevas de la charte, 15 octobre) : joueurs dans
+  leur cadre de classe avec leur portrait (lignes `A` de `VXV-CHIFOUMIS-2`), plaque, rôle, pastilles des manches ;
+  arène aux deux cases (coup scellé, « Chi… Fou… Mi ! », coups révélés, gagnant cerclé d'or), trois coups illustrés,
+  manches jouées, paris en bas, « VICTOIRE » ou « Plié en trois » ; images dans `VXV/Chifoumi/Media` et
+  `apps/web/public/images/chifoumi`. Le guide la rejoue (« Essaie un Chi Fou Mi »). Ce que partagent les deux jeux : `domain/diceGames.ts` (paris de la guilde, partie classée),
   `application/diceGames.ts` (joueurs, pari), `application/debts.ts`, `application/addonGames.ts`. Pas d'annonce
   Discord.
 - **Ranking** (`VXV/Ranking` ; site `/ranking`) : Paris, Deathroll et Chi Fou Mi au gain net, Quêtes aux points de places (3, 2 et
@@ -294,7 +298,7 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV/Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV/Artisans/ArtisansData.lua` |
 | `VXV-DEATHROLLS-2` (bloqués : dettes et sans le rôle Membre ; dettes, dernières parties) | site → addon | `domain/addonGames.ts` | `VXV/Deathroll/DeathrollData.lua` |
-| `VXV-CHIFOUMIS-1` (les mêmes lignes, pour le Chi Fou Mi) | site → addon | `domain/addonGames.ts` | `VXV/Chifoumi/ChifoumiData.lua` |
+| `VXV-CHIFOUMIS-2` (les mêmes lignes, et les portraits des joueurs, lignes `A`) | site → addon | `domain/addonGames.ts` | `VXV/Chifoumi/ChifoumiData.lua` |
 | `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV/Ranking/RankingData.lua` |
 | `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV/PvP/PvpData.lua` |
 
