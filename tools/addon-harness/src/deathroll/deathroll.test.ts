@@ -171,6 +171,7 @@ describe("the deathroll in game (P15)", () => {
       characters: [vorn],
       barred: ["m-vorn"],
       newcomers: [],
+      portraits: [],
       games: [],
       exportedAt: new Date("2026-12-10T07:00:00Z"),
     });
@@ -196,6 +197,7 @@ describe("the deathroll in game (P15)", () => {
       characters: [character("Thom", "Leboss", "m-thom"), character("Vorn", "Cendrelune", "m-vorn")],
       barred: [],
       newcomers: ["m-vorn"],
+      portraits: [],
       games: [],
       exportedAt: new Date("2026-12-10T07:00:00Z"),
     });

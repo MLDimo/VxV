@@ -1,6 +1,7 @@
 import type { ChifoumiView } from "@vxv/server";
 import type { ChifoumiMove } from "@vxv/server/domain/chifoumis";
 import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
+import Image from "next/image";
 import { confirmChifoumiPayment } from "@/app/actions/chifoumis";
 import { CharacterName } from "@/components/CharacterName";
 import { ConfirmButton } from "@/components/ConfirmButton";
@@ -11,6 +12,16 @@ import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
 const MOVES: Record<ChifoumiMove, string> = { pierre: "Pierre", feuille: "Feuille", ciseaux: "Ciseaux" };
+
+/** A move: its picture (the mockup's pixel art) and its name. */
+function Move({ move }: { move: ChifoumiMove }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <Image src={`/images/chifoumi/${move}.png`} alt="" width={20} height={20} className="image-pixelated size-5" />
+      {MOVES[move]}
+    </span>
+  );
+}
 
 /** « Thom Leboss bat Vorn Cendrelune · 500 po ». */
 function Game({ view }: { view: ChifoumiView }) {
@@ -80,10 +91,13 @@ export default async function ChifoumiPage() {
                   <span className="ml-3 text-xs font-extrabold text-loss">À payer</span>
                 )}
               </p>
-              <p className="mt-1 text-sm text-lavender">
-                {view.game.rounds
-                  .map((round) => `${MOVES[round.challenger]} contre ${MOVES[round.challenged]}`)
-                  .join(" · ")}
+              <p className="mt-1 flex flex-wrap items-center gap-x-1 text-sm text-lavender">
+                {view.game.rounds.map((round, index) => (
+                  <span key={index} className="inline-flex items-center gap-1">
+                    {index > 0 && " · "}
+                    <Move move={round.challenger} /> contre <Move move={round.challenged} />
+                  </span>
+                ))}
               </p>
             </li>
           ))}

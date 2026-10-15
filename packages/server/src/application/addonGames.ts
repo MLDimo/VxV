@@ -1,3 +1,4 @@
+import { avatarName } from "@vxv/design";
 import { ADDON_CHIFOUMIS_HEADER, ADDON_DEATHROLLS_HEADER, formatAddonGames } from "../domain/addonGames.ts";
 import { isDebt } from "../domain/bets.ts";
 import { canGamble } from "../domain/permissions.ts";
@@ -22,16 +23,29 @@ async function barredMembers(repositories: Repositories) {
   };
 }
 
+/** The members' portraits, by their main character's class, race and sex. */
+async function portraits(repositories: Repositories) {
+  return (await repositories.members.listLooks()).flatMap((look) => {
+    const avatar = look.characterClass === undefined ? undefined : avatarName(look.characterClass, look.race, look.sex);
+    return avatar === undefined ? [] : [{ memberId: look.memberId, avatar }];
+  });
+}
+
 /**
  * Le Dé Pipé's games as the companion hands them to the addon (P15): who is barred, the games not paid and the latest
  * games, VXV-DEATHROLLS for the deathroll, VXV-CHIFOUMIS for the Chi Fou Mi (Ranking: VXV-RANKING).
  */
 export function createAddonGames({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
-  function exportGames(header: string, list: (repositories: Repositories) => Promise<PlayedGame[]>): Promise<string> {
+  function exportGames(
+    header: string,
+    list: (repositories: Repositories) => Promise<PlayedGame[]>,
+    withPortraits: boolean,
+  ): Promise<string> {
     return unitOfWork.run(async (repositories) =>
       formatAddonGames(header, {
         ...(await addonReaders(repositories)),
         ...(await barredMembers(repositories)),
+        portraits: withPortraits ? await portraits(repositories) : [],
         games: (await list(repositories)).map((game) => ({
           id: game.id,
           winner: winnerOf(game),
@@ -47,8 +61,10 @@ export function createAddonGames({ unitOfWork, clock }: { unitOfWork: UnitOfWork
 
   return {
     /** VXV-DEATHROLLS text for the companion of any member: an officer's addon passes it on to the guild. */
-    exportDeathrolls: () => exportGames(ADDON_DEATHROLLS_HEADER, (repositories) => repositories.deathrolls.listAll()),
-    /** VXV-CHIFOUMIS text, the same way. */
-    exportChifoumis: () => exportGames(ADDON_CHIFOUMIS_HEADER, (repositories) => repositories.chifoumis.listAll()),
+    exportDeathrolls: () =>
+      exportGames(ADDON_DEATHROLLS_HEADER, (repositories) => repositories.deathrolls.listAll(), false),
+    /** VXV-CHIFOUMIS text, the same way, with the members' portraits its window draws. */
+    exportChifoumis: () =>
+      exportGames(ADDON_CHIFOUMIS_HEADER, (repositories) => repositories.chifoumis.listAll(), true),
   };
 }

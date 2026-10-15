@@ -459,6 +459,39 @@ figure { margin: 0; min-width: 0; }
   .drs-plaque { font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) { .drs-die, .drs-die.rolling, .drs-player.turn .drs-frame { animation: none; } .drs { transition: none; } }
+/* ---------- Chi Fou Mi simulation (the addon's Le Dé Pipé › Chi Fou Mi window), on the deathroll's frame ---------- */
+.cfs { --drs-bg: #160e24; }
+.cfs .drs-veil { background: radial-gradient(440px 300px at 50% 52%, rgba(242,201,76,.08), transparent 70%), linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.55)); }
+.cfs-round { font: 600 18px var(--font-pixel); color: #f8dc8a; }
+.cfs-pips { display: flex; align-items: center; gap: 6px; }
+.cfs-pips small { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #a49bbd; margin-right: 2px; }
+.cfs-pips i { width: 14px; height: 14px; background: #2a1a10; box-shadow: 0 0 0 2px #0d0912; }
+.cfs-pips i.on { background: #f2c94c; }
+.cfs-ring { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2.4vw, 22px); }
+.cfs-slot { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cfs-box { width: clamp(92px, 13vw, 136px); aspect-ratio: 1; display: grid; place-items: center; background: rgba(13,9,18,.8); box-shadow: 0 0 0 3px #0d0912, 0 0 0 7px #8a5a2a, 0 0 0 10px #0d0912; transition: all .3s; }
+.cfs-box img { width: 74%; height: 74%; image-rendering: pixelated; filter: drop-shadow(0 6px 0 rgba(0,0,0,.35)); }
+.cfs-box .q { font: 700 clamp(44px, 7vw, 64px) var(--font-pixel); color: #5b4a78; }
+.cfs-box.win { box-shadow: 0 0 0 3px #0d0912, 0 0 0 7px #f2c94c, 0 0 0 10px #0d0912, 0 0 28px rgba(242,201,76,.55); }
+.cfs-box.lose { opacity: .55; box-shadow: 0 0 0 3px #0d0912, 0 0 0 7px #3a2a4a, 0 0 0 10px #0d0912; }
+.cfs-box.sealed img { filter: drop-shadow(0 0 12px rgba(163,92,255,.9)) drop-shadow(0 6px 0 rgba(0,0,0,.35)); animation: cfs-shake .45s steps(4) infinite; }
+.cfs-box.pop img { animation: cfs-pop .35s steps(3) 1; }
+@keyframes cfs-shake { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-10px) rotate(-6deg); } 50% { transform: translateY(0) rotate(0); } 75% { transform: translateY(-10px) rotate(6deg); } }
+@keyframes cfs-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.cfs-label { font-size: 12px; font-weight: 700; color: #c9c2ea; }
+.cfs-label.win { color: #f2c94c; }
+.cfs-vs { width: clamp(70px, 10vw, 120px); text-align: center; font: 700 40px/1 var(--font-pixel); color: #e0479e; text-shadow: 4px 4px 0 #0d0912, 0 0 24px rgba(224,71,158,.5); }
+.cfs-vs.gold { color: #f2c94c; text-shadow: 4px 4px 0 #0d0912, 0 0 24px rgba(242,201,76,.5); }
+.cfs-vs.grey { color: #a49bbd; }
+.cfs-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.cfs-choice { width: 124px; min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 6px; border: 0; cursor: pointer; font-family: var(--font-body); background: #2a1a10; box-shadow: 0 0 0 2px #0d0912, inset 0 0 0 2px #8a5a2a, inset -3px -3px 0 #1a0f08; transition: transform .1s; }
+.cfs-choice:hover:not(:disabled) { transform: translateY(-3px); }
+.cfs-choice:disabled { cursor: default; opacity: .55; }
+.cfs-choice[aria-pressed="true"] { box-shadow: 0 0 0 2px #0d0912, inset 0 0 0 2px #f2c94c, inset -3px -3px 0 #1a0f08; }
+.cfs-choice img { width: 54px; height: 54px; image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0,0,0,.4)); }
+.cfs-choice b { font: 700 17px var(--font-pixel); color: #f4effc; }
+.cfs-choice span { font-size: 11px; color: #c9b48a; }
+@media (prefers-reduced-motion: reduce) { .cfs-box.sealed img, .cfs-box.pop img { animation: none; } }
 </style>
 </head>
 <body>
@@ -512,6 +545,7 @@ figure { margin: 0; min-width: 0; }
 <li><a href="#deathroll">Le deathroll, en plus beau</a></li>
 <li><a href="#essai-deathroll">Essaie une partie</a></li>
 <li><a href="#chifoumi">Le Chi Fou Mi</a></li>
+<li><a href="#essai-chifoumi">Essaie un Chi Fou Mi</a></li>
 <li><a href="#dettes">Payer, encaisser, et les dettes</a></li>
 </ol></li>
 <li class="part"><a href="#partie-guilde"><span>VI</span>La vie de la guilde</a><ol>
@@ -573,6 +607,7 @@ figure { margin: 0; min-width: 0; }
 <li><a href="#deathroll">Le deathroll, en plus beau</a></li>
 <li><a href="#essai-deathroll">Essaie une partie</a></li>
 <li><a href="#chifoumi">Le Chi Fou Mi</a></li>
+<li><a href="#essai-chifoumi">Essaie un Chi Fou Mi</a></li>
 <li><a href="#dettes">Payer, encaisser, et les dettes</a></li>
 </ol></li>
 <li class="part"><a href="#partie-guilde"><span>VI</span>La vie de la guilde</a><ol>
@@ -1782,19 +1817,77 @@ figure { margin: 0; min-width: 0; }
               <span class="guild">[Guilde] [Kaelys] : [VXV] Chi Fou Mi : Kaelys contre Vorn pour 200 po. Paris ouverts une minute dans l'addon.</span>
             </div>
           </div>
-          <div class="addon" style="margin-top:12px">
-            <div class="addon-top"><img src="/images/logo.jpg" alt=""><b>VXV</b><span class="tab on">Chi Fou Mi</span><span class="muted small" style="margin-left:auto">Manche 3</span></div>
-            <div class="addon-body">
-              <div class="panel">
-                <h5>Vorn contre Kaelys <small>1 – 1</small></h5>
-                <div class="row"><span class="small">Pierre / Pierre · Ciseaux / Feuille · Pierre / Feuille</span></div>
-                <div class="btns"><span class="btn gold">Pierre</span> <span class="btn gold">Feuille</span> <span class="btn gold">Ciseaux</span></div>
-              </div>
-            </div>
-          </div>
-          <figcaption><span class="example-tag">Exemple</span> · <b>Une partie de Chi Fou Mi</b>, l'annonce dans le chat de guilde puis la fenêtre du joueur à la troisième manche.</figcaption>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le lancement d'une partie</b> : une ligne dans le chat de guilde, sans fenêtre chez les autres. Essaie la fenêtre de la partie juste en dessous.</figcaption>
         </figure>
       </div>
+    </section>
+
+    <section class="sec" id="essai-chifoumi">
+      <header>
+        <p class="eyebrow">Chi Fou Mi · à toi de jouer</p>
+        <h3>Essaie un Chi Fou Mi</h3>
+        <p>La fenêtre d'une partie, rejouée ici : tu es Ulric, et Morgane a déjà scellé son coup. Choisis le tien, puis « Chi… Fou… Mi ! » : le premier à deux manches gagnées emporte les 300 po.</p>
+      </header>
+      <figure class="fig">
+        <div class="drs cfs" id="cfs" aria-label="Simulation d'une partie de Chi Fou Mi">
+          <div class="drs-flag" aria-hidden="true"></div>
+          <div class="drs-veil" aria-hidden="true"></div>
+          <div class="drs-in">
+            <div class="drs-tabs" aria-hidden="true">
+              <img src="/images/logo.jpg" alt=""><b>VXV</b>
+              <span class="drs-tab">Taverne</span><span class="drs-tab">Raid</span><span class="drs-tab">PvP</span><span class="drs-tab on">Le Dé Pipé</span><span class="drs-tab">Quêtes</span><span class="drs-tab">Ranking</span><span class="drs-tab">Artisans</span><span class="drs-tab">Journal</span>
+            </div>
+            <div class="drs-rule" aria-hidden="true"></div>
+            <div class="drs-head">
+              <div><span class="k">Le Dé Pipé · en direct</span><span class="t">Chi Fou Mi</span></div>
+              <div class="drs-sub" aria-hidden="true"><span>Paris</span><span>Deathroll</span><span class="on">Chi Fou Mi</span></div>
+              <div class="drs-badges">
+                <span style="background: rgba(242,201,76,.16); color: #f2c94c">Mise 300 po</span>
+                <span style="background: rgba(163,92,255,.18); color: #c9a6ff">Au meilleur des 3</span>
+              </div>
+            </div>
+            <div class="drs-arena">
+              <div class="drs-player left" data-player="0">
+                <div class="drs-frame" style="background: var(--shaman)"><img src="/images/avatars/orc_chaman_m.png" alt="Portrait d'Ulric, orc chaman"></div>
+                <span class="drs-plaque c-shaman">Ulric</span>
+                <span class="drs-role">Lance le défi · toi</span>
+                <div class="cfs-pips" aria-label="Manches gagnées par Ulric"><small>Manches</small><i></i><i></i></div>
+                <span class="drs-stamp" hidden>Plié en trois</span>
+                <div class="drs-result" hidden><span>VICTOIRE</span><b>+300 po</b></div>
+              </div>
+              <div class="drs-center">
+                <span class="cfs-round" id="cfs-round">Manche 1 · score 0 – 0</span>
+                <div class="cfs-ring">
+                  <div class="cfs-slot"><div class="cfs-box" id="cfs-mine"><span class="q">?</span></div><span class="cfs-label" id="cfs-mine-label">Choisis ton coup</span></div>
+                  <div class="cfs-vs" id="cfs-vs" aria-live="polite">VS</div>
+                  <div class="cfs-slot"><div class="cfs-box sealed" id="cfs-opp"><img src="/images/chifoumi/scelle.png" alt="Coup scellé"></div><span class="cfs-label" id="cfs-opp-label">Morgane · coup scellé</span></div>
+                </div>
+                <div class="drs-status" id="cfs-status" aria-live="polite">Choisis Pierre, Feuille ou Ciseaux : Morgane a déjà scellé son coup.</div>
+                <div class="cfs-choices" role="group" aria-label="Ton coup">
+                  <button class="cfs-choice" type="button" data-move="0" aria-pressed="false"><img src="/images/chifoumi/pierre.png" alt=""><b>Pierre</b><span>bat Ciseaux</span></button>
+                  <button class="cfs-choice" type="button" data-move="1" aria-pressed="false"><img src="/images/chifoumi/feuille.png" alt=""><b>Feuille</b><span>bat Pierre</span></button>
+                  <button class="cfs-choice" type="button" data-move="2" aria-pressed="false"><img src="/images/chifoumi/ciseaux.png" alt=""><b>Ciseaux</b><span>battent Feuille</span></button>
+                </div>
+                <button class="drs-again" id="cfs-again" type="button" hidden>Revanche · 300 po</button>
+                <div class="drs-history" id="cfs-history"></div>
+              </div>
+              <div class="drs-player right" data-player="1">
+                <div class="drs-frame" style="background: var(--warlock)"><img src="/images/avatars/mv_demoniste_f.png" alt="Portrait de Morgane, morte-vivante démoniste"></div>
+                <span class="drs-plaque c-warlock">Morgane</span>
+                <span class="drs-role">Défiée</span>
+                <div class="cfs-pips" aria-label="Manches gagnées par Morgane"><small>Manches</small><i></i><i></i></div>
+                <span class="drs-stamp" hidden>Plié en trois</span>
+                <div class="drs-result" hidden><span>VICTOIRE</span><b>+300 po</b></div>
+              </div>
+            </div>
+            <div class="drs-foot">
+              <span>Paris des spectateurs fermés · cagnotte <b style="color: #f2c94c">420 po</b> · 10 % pour la caisse</span>
+              <span>Coups scellés : rien n'est révélé avant le « Mi ! »</span>
+            </div>
+          </div>
+        </div>
+        <figcaption><span class="example-tag">Simulation</span> · <b>Une partie, comme dans l'addon.</b> Ici Morgane joue au hasard sur ta page ; en jeu, chacun choisit son coup, scellé jusqu'à ce que l'autre ait joué, et les spectateurs suivent la partie depuis l'onglet Chi Fou Mi.</figcaption>
+      </figure>
     </section>
 
     <section class="sec" id="dettes">
@@ -2345,6 +2438,118 @@ figure { margin: 0; min-width: 0; }
 
   $("drs-roll").addEventListener("click", roll);
   $("drs-again").addEventListener("click", reset);
+  reset();
+})();
+
+(() => {
+  const root = document.getElementById("cfs");
+  if (!root) return;
+  const $ = (id) => document.getElementById(id);
+  const NAMES = ["Pierre", "Feuille", "Ciseaux"];
+  const VERBS = ["casse", "enveloppe", "coupent"];
+  const FILES = ["pierre", "feuille", "ciseaux"];
+  const COUNTDOWN = ["Chi…", "Fou…", "Mi !"];
+  const players = [...root.querySelectorAll(".drs-player")];
+  const choices = [...root.querySelectorAll(".cfs-choice")];
+  const timers = [];
+  let state;
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const picture = (move, alt) => `<img src="/images/chifoumi/${FILES[move]}.png" alt="${alt}">`;
+  const beats = (winner, loser) => `${NAMES[winner]} ${VERBS[winner]} ${NAMES[loser]}`;
+
+  function reset() {
+    timers.splice(0).forEach(clearTimeout);
+    state = { phase: "choose", mine: null, opp: null, word: 0, score: [0, 0], history: [], last: null };
+    render();
+  }
+
+  function render() {
+    const done = state.phase === "done";
+    const revealed = state.phase === "reveal" || done;
+    const winner = done ? (state.score[0] === 2 ? 0 : 1) : null;
+    players.forEach((player, index) => {
+      const lost = done && winner !== index;
+      player.classList.toggle("lost", lost);
+      player.classList.toggle("turn", state.phase === "choose" && index === 0);
+      player.querySelector(".drs-stamp").hidden = !lost;
+      player.querySelector(".drs-result").hidden = !(done && winner === index);
+      player.querySelectorAll(".cfs-pips i").forEach((pip, k) => pip.classList.toggle("on", k < state.score[index]));
+    });
+    const mine = $("cfs-mine");
+    const opp = $("cfs-opp");
+    const won = revealed && state.last === 1;
+    const lostRound = revealed && state.last === 2;
+    mine.className = "cfs-box" + (won ? " win" : lostRound ? " lose" : "");
+    mine.innerHTML = state.mine === null ? '<span class="q">?</span>' : picture(state.mine, NAMES[state.mine]);
+    $("cfs-mine-label").textContent = state.mine === null ? "Choisis ton coup" : `Ulric · ${NAMES[state.mine]}`;
+    $("cfs-mine-label").className = "cfs-label" + (won ? " win" : "");
+    opp.className = "cfs-box" + (revealed ? (lostRound ? " win" : won ? " lose" : "") + " pop" : " sealed");
+    opp.innerHTML = revealed ? picture(state.opp, NAMES[state.opp]) : '<img src="/images/chifoumi/scelle.png" alt="Coup scellé">';
+    $("cfs-opp-label").textContent = revealed ? `Morgane · ${NAMES[state.opp]}` : "Morgane · coup scellé";
+    $("cfs-opp-label").className = "cfs-label" + (lostRound ? " win" : "");
+    const vs = $("cfs-vs");
+    if (state.phase === "count") {
+      vs.textContent = COUNTDOWN[state.word];
+      vs.className = "cfs-vs" + (state.word === 2 ? " gold" : "");
+    } else if (revealed) {
+      vs.textContent = state.last === 0 ? "=" : state.last === 1 ? ">" : "<";
+      vs.className = "cfs-vs" + (state.last === 0 ? " grey" : " gold");
+    } else {
+      vs.textContent = "VS";
+      vs.className = "cfs-vs";
+    }
+    const played = state.score[0] + state.score[1] + (revealed && state.last !== 0 ? 0 : 1);
+    $("cfs-round").textContent = done ? "Partie terminée" : `Manche ${Math.min(3, played)} · score ${state.score[0]} – ${state.score[1]}`;
+    let status = "Choisis Pierre, Feuille ou Ciseaux : Morgane a déjà scellé son coup.";
+    if (state.phase === "count") status = "Coups scellés… révélation au « Mi ! »";
+    if (state.phase === "reveal") {
+      status = state.last === 0 ? "Égalité : la manche est rejouée."
+        : state.last === 1 ? `${beats(state.mine, state.opp)} · manche pour Ulric` : `${beats(state.opp, state.mine)} · manche pour Morgane`;
+    }
+    if (done) status = `${winner === 0 ? "Ulric" : "Morgane"} remporte la partie ${Math.max(...state.score)} – ${Math.min(...state.score)} et empoche 300 po.`;
+    $("cfs-status").textContent = status;
+    choices.forEach((button) => {
+      const move = Number(button.dataset.move);
+      button.disabled = state.phase !== "choose";
+      button.hidden = done;
+      button.setAttribute("aria-pressed", String(state.mine === move));
+    });
+    $("cfs-again").hidden = !done;
+    const history = $("cfs-history");
+    history.replaceChildren(...state.history.slice(-6).map((entry) => {
+      const chip = document.createElement("span");
+      chip.textContent = `M${entry.n} · ${entry.text} `;
+      const who = document.createElement("b");
+      who.textContent = entry.who;
+      who.style.color = entry.color;
+      chip.append(who);
+      return chip;
+    }));
+  }
+
+  function play(move) {
+    if (state.phase !== "choose") return;
+    state = { ...state, phase: "count", mine: move, opp: null, word: 0, last: null };
+    render();
+    later(() => { state.word = 1; render(); }, 520);
+    later(() => { state.word = 2; render(); }, 1040);
+    later(() => {
+      const opp = Math.floor(Math.random() * 3);
+      const outcome = (3 + move - opp) % 3; // 0 a draw, 1 Ulric's round, 2 Morgane's
+      const score = state.score.slice();
+      const n = score[0] + score[1] + 1;
+      let entry = { n, text: `Égalité · ${NAMES[move]}`, who: "on rejoue", color: "#a49bbd" };
+      if (outcome === 1) { score[0] += 1; entry = { n, text: beats(move, opp), who: "Ulric", color: "#0070DD" }; }
+      if (outcome === 2) { score[1] += 1; entry = { n, text: beats(opp, move), who: "Morgane", color: "#8788EE" }; }
+      const done = score[0] === 2 || score[1] === 2;
+      state = { ...state, phase: done ? "done" : "reveal", opp, score, last: outcome, history: [...state.history, entry] };
+      render();
+      if (!done) later(() => { state = { ...state, phase: "choose", mine: null, opp: null, last: null }; render(); }, 1900);
+    }, 1560);
+  }
+
+  choices.forEach((button) => button.addEventListener("click", () => play(Number(button.dataset.move))));
+  $("cfs-again").addEventListener("click", reset);
   reset();
 })();
 </script>
