@@ -181,6 +181,13 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   période (toujours, mois, saison). Fanions des trois premiers, trois records, suite du classement, position du joueur
   en bas, comme la capture `docs/design/captures/ranking.jpg`. Le jeu ne fait pas tourner les cadres : pas de
   balancement des fanions.
+- **Hall of Fame** (site `/hall-of-fame`, maquettes `HallOfFame` et `HallOfFameMobile` ; `domain/legend.ts`) : couloir
+  de tableaux à parcourir de gauche à droite, une porte par chapitre (créé par un officier), plan du couloir, filtres
+  par type et « Mes exploits ». Un membre propose un exploit (récit, phrase, chiffres, jusqu'à 4 captures réduites par
+  le navigateur, soirée de raid facultative) ; un officier l'accroche dans un chapitre avec sa rareté (Rare, Épique,
+  Légendaire, cadre et taille du tableau), son MVP et son butin notable, ou le refuse avec motif (`legend.chapter`,
+  `legend.publish`, `legend.refuse`). Sur le tableau : J'y étais, présents de la soirée de raid, commentaires. Captures
+  gardées dans la base (`legend_images`), servies aux membres connectés par `/api/hall-of-fame/images/<id>`.
 
 ## Design (charte « La Taverne »)
 

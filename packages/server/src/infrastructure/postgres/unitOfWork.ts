@@ -18,6 +18,7 @@ import { memberRepository } from "./members.ts";
 import { counterReadingRepository, missionRepository, missionRewardRepository } from "./missions.ts";
 import { professionRepository } from "./professions.ts";
 import { chifoumiRepository } from "./chifoumis.ts";
+import { legendRepository } from "./legend.ts";
 import { deathrollRepository } from "./deathrolls.ts";
 import { duelRepository } from "./duels.ts";
 import { raidLogRepository } from "./raidLogs.ts";
@@ -60,6 +61,7 @@ function createRepositories(sql: SqlClient): Repositories {
     professions: professionRepository(sql),
     deathrolls: deathrollRepository(sql),
     chifoumis: chifoumiRepository(sql),
+    legend: legendRepository(sql),
     titles: titleRepository(sql),
     customTitles: customTitleRepository(sql),
     bossFights: bossFightRepository(sql),
