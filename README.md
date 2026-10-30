@@ -106,7 +106,10 @@ git tag v0.1.0 && git push origin v0.1.0
 
 La CI crée l'archive `VXV-<version>.zip`, un seul dossier `VXV`, puis la publie sur GitHub. Une version avec un tiret, comme
 `v0.2.0-beta.1`, est publiée en bêta. Un lancement manuel du flux « Release addon » construit l'archive sans rien
-publier. L'envoi sur CurseForge et Wago s'active dès que leurs secrets et variables sont renseignés.
+publier. CurseForge (projet 1774406) : secret `CF_API_KEY` (jeton de la console des auteurs, Settings › API Tokens)
+et variable `CF_PROJECT_ID` ; la version de jeu est l'`## Interface` du `.toc` lue comme un patch (16001 : 1.60.1),
+cherchée sur CurseForge, aussi par un lancement manuel qui vérifie ainsi les réglages. L'envoi sur Wago s'active dès
+que ses secrets et variables sont renseignés.
 
 ## Publier le compagnon
 
