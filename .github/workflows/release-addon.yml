@@ -19,7 +19,6 @@ jobs:
     env:
       CF_API_KEY: ${{ secrets.CF_API_KEY }}
       CF_PROJECT_ID: ${{ vars.CF_PROJECT_ID }}
-      CF_GAME_VERSION_IDS: ${{ vars.CF_GAME_VERSION_IDS }}
       WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
       WAGO_PROJECT_ID: ${{ vars.WAGO_PROJECT_ID }}
       WAGO_PATCH_FIELD: ${{ vars.WAGO_PATCH_FIELD }}
@@ -41,6 +40,19 @@ jobs:
           echo "ARCHIVE=dist/release/VXV-$version.zip" >> "$GITHUB_ENV"
           if [[ "$version" == *-* ]]; then echo "STABILITY=beta" >> "$GITHUB_ENV"; else echo "STABILITY=release" >> "$GITHUB_ENV"; fi
 
+      # Enabled once the CurseForge project exists: secret CF_API_KEY, variable CF_PROJECT_ID. The game version is the
+      # TOC's interface as a patch (16001 is 1.60.1), looked up on CurseForge, also by a manual run to check the setup.
+      - name: CurseForge game version
+        if: env.CF_API_KEY != '' && env.CF_PROJECT_ID != ''
+        run: |
+          interface=$(sed -n 's/^## Interface: *\([0-9]*\).*/\1/p' addon/VXV/VXV.toc)
+          patch="$((interface / 10000)).$((interface / 100 % 100)).$((interface % 100))"
+          ids=$(curl --fail-with-body -sS -H "X-Api-Token: $CF_API_KEY" "https://wow.curseforge.com/api/game/versions" \
+            | jq -c --arg name "$patch" 'map(select(.name == $name) | .id)')
+          if [[ "$ids" == "[]" ]]; then echo "::error::No CurseForge game version named $patch"; exit 1; fi
+          echo "CurseForge game version $patch: $ids"
+          echo "CF_GAME_VERSIONS=$ids" >> "$GITHUB_ENV"
+
       - name: Build the archive
         run: |
           npm run release:prepare -- "$VERSION"
@@ -60,13 +72,11 @@ jobs:
           if [[ "$STABILITY" == "beta" ]]; then prerelease="--prerelease"; fi
           gh release create "$GITHUB_REF_NAME" "$ARCHIVE" --title "VXV $VERSION" --generate-notes $prerelease
 
-      # Enabled once the CurseForge project exists: secret CF_API_KEY,
-      # variables CF_PROJECT_ID and CF_GAME_VERSION_IDS (comma-separated CurseForge game version ids).
       - name: CurseForge
         if: github.ref_type == 'tag' && env.CF_API_KEY != '' && env.CF_PROJECT_ID != ''
         run: |
           metadata=$(jq -n --arg name "VXV $VERSION" --arg changelog "$RELEASE_URL" --arg type "$STABILITY" \
-            --argjson versions "[$CF_GAME_VERSION_IDS]" \
+            --argjson versions "$CF_GAME_VERSIONS" \
             '{displayName: $name, changelog: $changelog, changelogType: "text", releaseType: $type, gameVersions: $versions}')
           curl --fail-with-body -sS -H "X-Api-Token: $CF_API_KEY" -F "metadata=$metadata" -F "file=@$ARCHIVE" \
             "https://wow.curseforge.com/api/projects/$CF_PROJECT_ID/upload-file"
