@@ -84,12 +84,26 @@ export async function createRaidWithLoot(sql: SqlClient): Promise<void> {
 /** A loot already received by a character during an event. */
 export async function recordLoot(
   sql: SqlClient,
-  loot: { eventId: string; encounterId: number; itemId: number; characterId: string; method?: LootMethod },
+  loot: {
+    eventId: string;
+    encounterId: number;
+    itemId: number;
+    characterId: string;
+    method?: LootMethod;
+    lootedAt?: Date;
+  },
 ): Promise<void> {
   await sql.query(
     `insert into loots (event_id, encounter_id, item_id, character_id, method, looted_at)
-     values ($1, $2, $3, $4, $5, now())`,
-    [loot.eventId, loot.encounterId, loot.itemId, loot.characterId, loot.method ?? "soft_reserve"],
+     values ($1, $2, $3, $4, $5, coalesce($6, now()))`,
+    [
+      loot.eventId,
+      loot.encounterId,
+      loot.itemId,
+      loot.characterId,
+      loot.method ?? "soft_reserve",
+      loot.lootedAt ?? null,
+    ],
   );
 }
 
