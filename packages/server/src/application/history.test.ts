@@ -55,8 +55,22 @@ describe("loot history", () => {
 
   it("lists every loot with how it was given and who had reserved it, latest first", async () => {
     const eventId = await prepareEventWithReserve();
-    await recordLoot(sql, { eventId, encounterId: 2, itemId: 21, characterId: eole.id, method: "free_roll" });
-    await recordLoot(sql, { eventId, encounterId: 2, itemId: 20, characterId: eole.id, method: "loot_council" });
+    await recordLoot(sql, {
+      eventId,
+      encounterId: 2,
+      itemId: 21,
+      characterId: eole.id,
+      method: "free_roll",
+      lootedAt: new Date("2026-12-10T21:00:00Z"),
+    });
+    await recordLoot(sql, {
+      eventId,
+      encounterId: 2,
+      itemId: 20,
+      characterId: eole.id,
+      method: "loot_council",
+      lootedAt: new Date("2026-12-10T21:01:00Z"),
+    });
 
     expect(await history.listLoots({ softReserveOnly: false })).toEqual([
       expect.objectContaining({
