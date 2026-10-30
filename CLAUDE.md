@@ -257,7 +257,8 @@ La table complète est dans le README. Règles :
 - `main` n'est pas protégée côté GitHub : la discipline repose sur le hook et la CI.
 - À chaque push, décider explicitement si la nouveauté mérite un test unitaire, et le justifier dans la pull request.
 - Flux GitHub : `tests.yml` (réutilisable, seul endroit où sont définis les tests) ; `ci.yml` (demandes de fusion et `main` : tests puis déploiement du site) ; `deploy-database.yml` ; `release-addon.yml` ; `release-companion.yml` (étiquettes `compagnon-v<semver>`, installeurs publiés dans `MLDimo/vxv-compagnon`). Tout déploiement dépend de `tests.yml`.
-- Versions de l'addon : étiquettes `v<semver>` sur `main` ; aucune n'est encore publiée.
+- Versions de l'addon : étiquettes `v<semver>` sur `main`, publiées sur GitHub et CurseForge (projet 1774406) ; la
+  première est la `v1.0.0`.
 
 ## Conventions Lua (addon)
 
