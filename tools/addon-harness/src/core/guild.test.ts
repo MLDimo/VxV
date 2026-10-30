@@ -21,13 +21,14 @@ describe("guild filter", () => {
     return started;
   };
 
-  it.each(["VXV", "The Daliranas", "THE DALIRANAS"])("starts everything for a member of the guild %s", (name) => {
+  it.each(["VXV", "VxV", "vxv"])("starts everything for a member of the guild %s", (name) => {
     const { client } = startIn(`GuildInfo.name = "${name}"`);
     expect(client(STARTED)).toEqual({ module: true, icon: true, announced: true });
   });
 
   it.each([
     ["in another guild", 'GuildInfo.name = "Les Autres"'],
+    ["in the beta's test guild", 'GuildInfo.name = "The Daliranas"'],
     ["without a guild", "Player.inGuild = false"],
   ])("starts nothing for a player %s, and says VXV is for the guild", (_, setup) => {
     const { client, errors } = startIn(setup);
