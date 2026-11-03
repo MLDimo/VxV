@@ -7,7 +7,8 @@ Un fichier JSON par raid. Ajouter un raid, c'est ajouter un fichier ici : aucun 
 ## Format
 
 Le nom du fichier est l'identifiant du raid : minuscules et tirets, par exemple `mont-hyjal.json`.
-Extrait réel de `salle-des-thanes.json` :
+Exemple tiré de La salle des Thanes, le donjon de la bêta, devenu le raid de test des tests de bout en bout
+(`apps/web/e2e/raids/salle-des-thanes.json`) :
 
 ```json
 {
@@ -39,4 +40,6 @@ dans le jeu et l'envoie au site par le compagnon, qui en déduit les classes qui
 
 ## Fichiers actuels
 
-- `salle-des-thanes.json` : donjon de la bêta, relevé en jeu le 2026-10-02 (un objet confirmé par boss). Il sert à valider la chaîne de données en attendant les tables de butin d'Onyxia, du Mont Hyjal et des Profondeurs des tertres (ouverture le 9 décembre).
+Aucun pour l'instant : les tables de butin d'Onyxia, du Mont Hyjal et des Profondeurs des tertres arrivent avec leur
+ouverture, le 9 décembre. La salle des Thanes, donjon de la bêta, n'est pas un raid : elle ne sert plus qu'aux tests de
+bout en bout.
