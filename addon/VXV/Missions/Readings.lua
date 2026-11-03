@@ -46,7 +46,8 @@ local function note(name, kind, value, at)
 end
 
 --- What a character's counter gained during the mission, and when it last moved: from its last reading before the
---- start, else from its first reading during the mission, as the website counts it.
+--- start, else from its first reading during the mission, as the website counts it. In the race, the level reached
+--- once it rose, a character already at the top not running.
 local function characterScore(list, mission)
     local baseline, latest
     for _, reading in ipairs(list) do
@@ -60,19 +61,29 @@ local function characterScore(list, mission)
     if baseline == nil or latest == nil then
         return 0, nil
     end
+    if mission.kind == Counters.RACE then
+        local rose = baseline.value < Counters.TOP_LEVEL and latest.value > baseline.value
+        return rose and latest.value or 0, latest.at
+    end
     return math.max(0, latest.value - baseline.value), latest.at
 end
 
---- The player's member's score on the mission: the account's characters of that member, added up.
+--- The player's member's score on the mission: the account's characters of that member, added up (in the race, the
+--- highest).
 function Readings.Score(mission, data)
     local memberId = VXV.MemberOf(data)
+    local race = mission.kind == Counters.RACE
     local score, reachedAt = 0, nil
     for name, kinds in pairs(saved.history) do
         if kinds[mission.kind] ~= nil and (name == VXV.PlayerName() or VXV.MemberOf(data, name) == memberId) then
             local gained, at = characterScore(kinds[mission.kind], mission)
-            score = score + gained
-            if gained > 0 and (reachedAt == nil or at > reachedAt) then
-                reachedAt = at
+            if race and gained > score then
+                score, reachedAt = gained, at
+            elseif not race then
+                score = score + gained
+                if gained > 0 and (reachedAt == nil or at > reachedAt) then
+                    reachedAt = at
+                end
             end
         end
     end

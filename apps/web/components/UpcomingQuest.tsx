@@ -1,12 +1,12 @@
-import { MISSION_TYPE_LABELS, type MissionView } from "@vxv/server";
+import type { MissionView } from "@vxv/server";
 import { formatGold } from "@vxv/server/domain/labels";
-import { mostOf } from "@vxv/server/domain/missions";
+import { missionGoal } from "@vxv/server/domain/missions";
 import Link from "next/link";
 
 /** A quest to come, pinned to the board (§7.4): its title, what counts and its reward. */
 export function UpcomingQuest({ view }: { view: MissionView }) {
   const { mission } = view;
-  const counted = mostOf(MISSION_TYPE_LABELS[mission.type].counts);
+  const counted = missionGoal(mission.type);
   return (
     <article className="parchment quest-sheet relative flex flex-col gap-1 px-3.5 py-3">
       <span className="quest-pin" aria-hidden />

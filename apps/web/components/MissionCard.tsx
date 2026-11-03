@@ -36,7 +36,7 @@ export function MissionCard({ view, member, linked = false }: { view: MissionVie
   const { mission, scores, status } = view;
   const labels = MISSION_TYPE_LABELS[mission.type];
   const best = scores[0]?.score ?? 0;
-  const progress = missionProgress(scores, member.id, labels.counts);
+  const progress = missionProgress(scores, member.id, mission.type);
   return (
     <section
       className={`parchment quest-sheet relative flex flex-col gap-3 px-5 pt-[18px] pb-4 ${

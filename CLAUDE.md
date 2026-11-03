@@ -124,8 +124,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   ma mise ».
 - **Missions** (`VXV/Missions`, Quêtes ; site `/quetes`, `/vxv_mission`) : pêche (statistique 1456), herboristerie,
   minage et dépeçage (le jeu ne les compte pas : une fenêtre de butin avec une herbe, un minerai ou un cuir compte
-  pour une récolte, `Gathering.lua`), victoires honorables (`GetPVPLifetimeStats`). Score : ce que gagnent les
-  compteurs de tous les personnages liés du membre pendant la mission ; à égalité, le premier à l'atteindre. Compteurs
+  pour une récolte, `Gathering.lua`), victoires honorables (`GetPVPLifetimeStats`), gain de niveau et course au
+  niveau 60 (demande du propriétaire du 3 novembre ; niveau lu dans la liste de guilde, `GetGuildRosterInfo`, mesuré).
+  Score : ce que gagnent les compteurs de tous les personnages liés du membre pendant la mission ; dans la course au 60,
+  le plus haut niveau atteint par ses personnages, sans ceux déjà 60 au départ ; à égalité, le premier à l'atteindre. Compteurs
   lus à la connexion puis chaque minute hors combat. Résultat validé par un officier ; récompense 70 / 20 / 10 % versée
   par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct ; à la validation, les résultats (podium et récompenses)
   dans un message à eux du salon des quêtes (`publishResults`, demande du propriétaire du 14 octobre). Écran Quêtes comme la

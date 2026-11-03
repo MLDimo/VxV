@@ -177,6 +177,44 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
     expect(errors()).toEqual([]);
   });
 
+  it("reads the level in the guild roster, and ranks the race to level 60 by who got there first", () => {
+    const race = {
+      ...GUILD_QUESTS,
+      missions: [
+        {
+          mission: mission("q2", "level60", "La Course au 60"),
+          scores: [
+            {
+              memberId: "m-thom",
+              memberName: "Thom Leboss",
+              memberClass: "PRIEST",
+              score: 60,
+              reachedAt: new Date("2026-12-09T20:00:00Z"),
+            },
+          ],
+          rewards: [],
+        },
+      ],
+    };
+    const { client, errors } = startQuests({ facts: race });
+    client('MockGuildMembers = { { name = "Ðéjà Vu", class = "ROGUE", level = 58 } } AdvanceTime(5)');
+    expect(outbox(client, "level60")).toEqual([{ name: "Ðéjà Vu", type: "level60", value: 58, at: 1796904005 }]);
+    client("MockGuildMembers[1].level = 60 AdvanceTime(60)");
+    expect(outbox(client, "levels")).toEqual([expect.objectContaining({ value: 60 })]);
+    expect(client("return GuildRosterRequests")).toBeGreaterThan(1);
+    client(OPEN_TAB("Quêtes"));
+    expect(plain(client(SHOWN()))).toEqual(
+      expect.arrayContaining([
+        "QUÊTE DE LA SEMAINE · NIVEAU 60",
+        "Le premier à mener un personnage au niveau 60 d'ici la fin remporte la récompense : chacun est classé sur " +
+          "le plus haut niveau atteint par ses personnages, d'après le jeu.",
+        "Niveau 60 atteint, après d'autres",
+        "2e",
+      ]),
+    );
+    expect(errors()).toEqual([]);
+  });
+
   it("reads the fishing from the game's statistics", () => {
     const { client } = startQuests();
     client('Counters.statistics[1456] = "12" AdvanceTime(5)');

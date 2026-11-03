@@ -48,9 +48,27 @@ local function readable(kind)
 end
 
 --- "le plus de pêches réussies", "le plus d'herbes cueillies".
-function QuestsView.MostOf(counts)
+local function mostOf(counts)
     local elided = counts:match("^[aeiouyh]") or counts:match("^\195[\168-\170]")
     return (elided and "le plus d'" or "le plus de ") .. counts
+end
+
+--- What wins the quest: "le plus de pêches réussies", "le premier au niveau 60".
+local function goal(mission)
+    if mission.kind == Counters.RACE then
+        return ("le premier au niveau %d"):format(Counters.TOP_LEVEL)
+    end
+    return mostOf(labelsOf(mission).counts)
+end
+
+--- What the guild rewards, as the website's parchment tells it.
+local function pitch(mission)
+    if mission.kind == Counters.RACE then
+        return ("Le premier à mener un personnage au niveau %d d'ici la fin remporte la récompense : chacun est "
+            .. "classé sur le plus haut niveau atteint par ses personnages, d'après le jeu."):format(Counters.TOP_LEVEL)
+    end
+    return ("Qui fera %s d'ici la fin remporte la récompense : main et rerolls additionnés, d'après les compteurs du "
+        .. "jeu."):format(goal(mission))
 end
 
 --- The quests pinned on the board: those running, else the first to come.
@@ -96,6 +114,10 @@ local function progress(mission, ranking, memberId)
     if mine <= 0 then
         return { text = NOTHING_YET, place = NO_PLACE }
     end
+    if mission.kind == Counters.RACE and mine >= Counters.TOP_LEVEL then
+        local text = index == 1 and "Premier au niveau %d" or "Niveau %d atteint, après d'autres"
+        return { text = text:format(Counters.TOP_LEVEL), place = place(index) }
+    end
     local function toPass(above)
         return ("%d %s"):format(above - mine + 1, counts)
     end
@@ -138,8 +160,7 @@ function QuestsView.Sheet(mission, data, now)
     return {
         kicker = KICKERS[status] .. " · " .. labels.name,
         title = mission.title,
-        pitch = ("Qui fera %s d'ici la fin remporte la récompense : main et rerolls additionnés, d'après les "
-            .. "compteurs du jeu."):format(QuestsView.MostOf(labels.counts)),
+        pitch = pitch(mission),
         prizes = prizes,
         lead = lead,
         empty = #lead == 0 and "Personne pour l'instant." or nil,
@@ -154,7 +175,7 @@ function QuestsView.ToCome(data, now)
     local quests = {}
     for _, mission in ipairs(Quests.WithStatus(data, now, "upcoming")) do
         if mission ~= pinned then
-            local counted = QuestsView.MostOf(labelsOf(mission).counts):gsub("^%l", string.upper)
+            local counted = goal(mission):gsub("^%l", string.upper)
             quests[#quests + 1] = { title = mission.title,
                 line = counted .. " · " .. Theme.Colored(Gold.Format(mission.reward), "stamp-cash"),
                 startsAt = mission.startsAt }

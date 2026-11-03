@@ -1,7 +1,13 @@
 import type { AnnouncedMission } from "@vxv/server";
 import { colorValue, COLORS } from "@vxv/design";
 import { formatGold, formatPlace } from "@vxv/server/domain/labels";
-import { MISSION_TYPE_LABELS, missionRewards, mostOf, REWARD_SHARES } from "@vxv/server/domain/missions";
+import {
+  formatMissionScore,
+  MISSION_TYPE_LABELS,
+  missionGoal,
+  missionRewards,
+  REWARD_SHARES,
+} from "@vxv/server/domain/missions";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
 import { emoji } from "./emojis.ts";
@@ -39,7 +45,7 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
   const ranking = scores.slice(0, SHOWN_SCORES).map((score, index) => {
     const reward = rewards.find((candidate) => candidate.memberId === score.memberId);
     const prize = announced.status === "closed" && reward !== undefined ? ` · ${formatGold(reward.amount)}` : "";
-    return `${String(index + 1)}. ${score.memberName} — ${String(score.score)} ${labels.counts}${prize}`;
+    return `${String(index + 1)}. ${score.memberName} — ${formatMissionScore(mission.type, score.score)}${prize}`;
   });
   return {
     embeds: [
@@ -47,7 +53,7 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
         title: `${emoji("quete")} ${mission.title}`,
         url: missionUrl(siteUrl, mission.id),
         description:
-          `${labels.name} : ${mostOf(labels.counts)}, du ${timestamp(mission.startsAt, "D")} au ` +
+          `${labels.name} : ${missionGoal(mission.type)}, du ${timestamp(mission.startsAt, "D")} au ` +
           `${timestamp(mission.endsAt, "D")}\n${statusLine(announced)}`,
         color: EMBED_COLOR,
         fields: [
@@ -67,7 +73,7 @@ export function missionResultsMessage(announced: AnnouncedMission, siteUrl: stri
   const podium = missionRewards(scores, mission.reward).map((reward) => {
     const score = scores.find((candidate) => candidate.memberId === reward.memberId);
     return (
-      `${formatPlace(reward.rank)} ${score?.memberName ?? ""} — ${String(score?.score ?? 0)} ${labels.counts}` +
+      `${formatPlace(reward.rank)} ${score?.memberName ?? ""} — ${formatMissionScore(mission.type, score?.score ?? 0)}` +
       ` · ${formatGold(reward.amount)}`
     );
   });
@@ -77,7 +83,7 @@ export function missionResultsMessage(announced: AnnouncedMission, siteUrl: stri
         title: `🏆 Résultats · ${mission.title}`,
         url: missionUrl(siteUrl, mission.id),
         description:
-          `${labels.name} : ${mostOf(labels.counts)}, du ${timestamp(mission.startsAt, "D")} au ` +
+          `${labels.name} : ${missionGoal(mission.type)}, du ${timestamp(mission.startsAt, "D")} au ` +
           `${timestamp(mission.endsAt, "D")}. Résultat validé par un officier.`,
         color: EMBED_COLOR,
         fields: [{ name: "Podium", value: podium.length === 0 ? "Personne n'a participé." : podium.join("\n") }],
