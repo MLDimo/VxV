@@ -30,7 +30,7 @@ import {
 const MAX_CONNECTIONS = 10;
 
 const database = await createMigratedPGlite();
-await database.exec(renderSeedSql(await loadRaids()).content);
+await database.exec(renderSeedSql(await loadRaids(new URL("./raids/", import.meta.url))).content);
 const rest = { token: WEB_ENVIRONMENT.DISCORD_BOT_TOKEN, apiUrl: WEB_ENVIRONMENT.DISCORD_API_URL };
 const guild = createDiscordGuild({ ...rest, guildId: WEB_ENVIRONMENT.DISCORD_GUILD_ID });
 const app = createApplication({
