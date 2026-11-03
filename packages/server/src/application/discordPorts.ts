@@ -1,7 +1,7 @@
 import type { Bet, DiscordMessage, Stake } from "../domain/bets.ts";
 import type { Duel, DuelStatus } from "../domain/duels.ts";
 import type { ServerRole } from "../domain/eventRoles.ts";
-import type { GuildEvent } from "../domain/events.ts";
+import type { EventKind, GuildEvent } from "../domain/events.ts";
 import type { Mission, MissionScore, MissionStatus } from "../domain/missions.ts";
 import type { RaidRecap } from "../domain/raidRecap.ts";
 import type { RaidReminder, SoftReserveReminder } from "../domain/reminders.ts";
@@ -39,6 +39,8 @@ export interface EventAnnouncer {
   publish(raid: AnnouncedEvent): Promise<string>;
   /** Refreshes the message; false when it no longer exists (deleted on Discord). */
   update(messageId: string, raid: AnnouncedEvent): Promise<boolean>;
+  /** Deletes the sign-up message of a deleted event. */
+  withdraw(messageId: string, kind: EventKind): Promise<void>;
   /** Reminds the signed-up members of the raid, in the raid channel. */
   remind(reminder: RaidReminder): Promise<void>;
   /** Calls the signed-up members without soft reserves to choose them, in the raid channel. */

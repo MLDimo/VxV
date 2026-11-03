@@ -4,6 +4,7 @@ import type { LootMethod } from "./history.ts";
 export type JournalAction =
   | "roster.import"
   | "event.create"
+  | "event.delete"
   | "exclusion.add"
   | "exclusion.remove"
   | "softReserve.override"
@@ -54,8 +55,8 @@ export interface LegendExploitRecord {
   rarity?: string;
 }
 
-/** What the journal keeps about a created event. */
-export interface EventCreationRecord {
+/** What the journal keeps about an event: after its creation, and before its deletion. */
+export interface EventRecord {
   startsAt: string;
   /** A PvP outing's title; none for a raid night, named after its raids. */
   title?: string;

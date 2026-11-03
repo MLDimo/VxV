@@ -2,15 +2,17 @@ import { eventAudience } from "@vxv/server/domain/eventRoles";
 import { eventPath } from "@vxv/server/domain/events";
 import { eventTitle, formatEventDate } from "@vxv/server/domain/labels";
 import { isComing } from "@vxv/server/domain/signups";
+import { canManageRaids } from "@vxv/server";
 import { notFound, redirect } from "next/navigation";
 import { Badge } from "@/components/Badge";
+import { EventDeleteForm } from "@/components/EventDeleteForm";
 import { EventSignups } from "@/components/EventSignups";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SignupPanel } from "@/components/SignupPanel";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
-/** A PvP outing: who may sign up, the member's sign-up and who comes. */
+/** A PvP outing: who may sign up, the member's sign-up and who comes; officers may delete it. */
 export default async function PvpEventPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, member] = await Promise.all([params, requireMember()]);
   const { events, signups, characters } = getApplication();
@@ -38,6 +40,15 @@ export default async function PvpEventPage({ params }: { params: Promise<{ id: s
         <SignupPanel eventId={event.id} characters={ownCharacters} current={mine} />
         <EventSignups signups={eventSignups} />
       </div>
+      {canManageRaids(member.roles) && (
+        <section className="panel-officer mt-10">
+          <h2 className="font-pixel text-lg text-ivory">Officiers · supprimer l&apos;événement</h2>
+          <p className="mt-1 text-sm text-muted">
+            Les inscriptions et le message Discord partent avec lui. Impossible une fois des présents enregistrés.
+          </p>
+          <EventDeleteForm eventId={event.id} />
+        </section>
+      )}
     </>
   );
 }

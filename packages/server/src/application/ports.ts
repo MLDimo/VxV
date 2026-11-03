@@ -144,6 +144,10 @@ export interface EventRepository {
   /** Events starting after the given instant, soonest first. */
   listStartingAfter(instant: Date, kind: EventKind): Promise<GuildEvent[]>;
   setDiscordMessage(eventId: string, messageId: string): Promise<void>;
+  /** Whether the event already has history: present players, loots or a painting of the Hall of Fame. */
+  hasHistory(eventId: string): Promise<boolean>;
+  /** Deletes the event with its sign-ups, soft reserves and exclusions. */
+  delete(eventId: string): Promise<void>;
   /** Events starting after "from" and up to "until" that were not reminded yet, soonest first. */
   listToRemind(from: Date, until: Date): Promise<GuildEvent[]>;
   markReminded(eventId: string, at: Date): Promise<void>;

@@ -4,7 +4,7 @@ import { MISSION_TYPES, type MissionType } from "@vxv/server";
 import { wallClockToInstant } from "@vxv/server/domain/dateTime";
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { formText, runCreateAction, runFormAction } from "@/server/formActions";
+import { formText, runRedirectAction, runFormAction } from "@/server/formActions";
 import { requireMember, requireOfficer } from "@/server/session";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -12,7 +12,7 @@ const isMissionType = (type: string): type is MissionType => (MISSION_TYPES as r
 
 export async function createMission(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  return runCreateAction(async () => {
+  return runRedirectAction(async () => {
     const application = getApplication();
     const type = formText(form, "type");
     const startsAt = wallClockToInstant(formText(form, "startsAt"));

@@ -33,6 +33,7 @@ describe("raid reminders", () => {
         softReservesReminded.push(reminder);
       },
       recap: async () => {},
+      withdraw: async () => {},
     };
     reminders = createRaidReminders({ unitOfWork: createUnitOfWork(sql), announcer });
     await createRaidWithLoot(sql);

@@ -1,5 +1,6 @@
-import type { UnitOfWork } from "./ports.ts";
+import type { GuildEvent } from "../domain/events.ts";
 import type { EventAnnouncer } from "./discordPorts.ts";
+import type { UnitOfWork } from "./ports.ts";
 
 export function createRaidAnnouncements({
   unitOfWork,
@@ -38,6 +39,18 @@ export function createRaidAnnouncements({
       } catch (error) {
         console.error("Discord raid announcement failed", error);
         return false;
+      }
+    },
+
+    /** Deletes the sign-up message of an event an officer deleted: never fails, whatever Discord answers. */
+    async withdrawQuietly({ discordMessageId, kind }: GuildEvent): Promise<void> {
+      if (discordMessageId === undefined) {
+        return;
+      }
+      try {
+        await announcer.withdraw(discordMessageId, kind);
+      } catch (error) {
+        console.error("Discord raid announcement withdrawal failed", error);
       }
     },
   };

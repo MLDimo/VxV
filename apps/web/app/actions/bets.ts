@@ -4,7 +4,7 @@ import { wallClockToInstant } from "@vxv/server/domain/dateTime";
 import { formatGold } from "@vxv/server/domain/labels";
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { formText, runCreateAction, runFormAction } from "@/server/formActions";
+import { formText, runRedirectAction, runFormAction } from "@/server/formActions";
 import { requireMember, requireOfficer } from "@/server/session";
 
 /** The choices are typed one per line. */
@@ -12,7 +12,7 @@ const CHOICE_LINES = /\r?\n/;
 
 export async function createBet(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  return runCreateAction(async () => {
+  return runRedirectAction(async () => {
     const application = getApplication();
     const betId = await application.bets.create(
       officer,

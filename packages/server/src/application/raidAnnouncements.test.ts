@@ -32,6 +32,12 @@ function createRecordingChannel() {
       shown.set(messageId, raid);
       return true;
     },
+    async withdraw(messageId) {
+      if (!available) {
+        throw new Error("Discord is down");
+      }
+      shown.delete(messageId);
+    },
   };
   return { announcer, shown, setAvailable: (value: boolean) => (available = value) };
 }
@@ -91,6 +97,22 @@ describe("raid announcements", () => {
     channel.setAvailable(true);
     expect(await announcements.announceQuietly(eventId)).toBe(true);
     expect([...channel.shown.keys()]).toEqual(["message-1"]);
+  });
+
+  it("withdraws the message of a deleted event, and never fails when Discord is down", async () => {
+    await announcements.announce(eventId);
+    const event = await eventRepository(sql).findById(eventId);
+    if (event === undefined) {
+      throw new Error("event not found");
+    }
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    channel.setAvailable(false);
+    await announcements.withdrawQuietly(event);
+    expect([...channel.shown.keys()]).toEqual(["message-1"]);
+
+    channel.setAvailable(true);
+    await announcements.withdrawQuietly(event);
+    expect(channel.shown.size).toBe(0);
   });
 
   it("ignores an unknown event", async () => {

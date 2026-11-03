@@ -57,6 +57,15 @@ export function eventPath({ id, kind }: Pick<GuildEvent, "id" | "kind">): string
   return kind === "pvp" ? `/pvp/evenements/${id}` : `/evenements/${id}`;
 }
 
+/** Why an officer cannot delete an event: what happened during it stays in the guild's history. */
+export const EVENT_WITH_HISTORY =
+  "Cet événement a déjà des présents, des loots ou un exploit du Hall of Fame : il ne peut plus être supprimé.";
+
+/** The page listing the upcoming events of this kind. */
+export function eventsPath(kind: EventKind): string {
+  return kind === "pvp" ? "/pvp" : "/raid";
+}
+
 /** Upcoming events stay listed a few hours after their start, while the raid is being played. */
 export const EVENT_LISTED_AFTER_START_MS = 6 * 60 * 60 * 1000;
 

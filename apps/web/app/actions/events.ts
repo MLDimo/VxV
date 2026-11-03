@@ -2,14 +2,14 @@
 
 import type { ActionState } from "@/components/actionState";
 import { wallClockToInstant } from "@vxv/server/domain/dateTime";
-import { eventPath } from "@vxv/server/domain/events";
+import { eventPath, eventsPath } from "@vxv/server/domain/events";
 import { getApplication } from "@/server/application";
-import { formText, runCreateAction } from "@/server/formActions";
+import { formText, runRedirectAction } from "@/server/formActions";
 import { requireOfficer } from "@/server/session";
 
 export async function createEvent(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  return runCreateAction(async () => {
+  return runRedirectAction(async () => {
     const application = getApplication();
     const eventId = await application.events.createEvent(
       officer,
@@ -28,7 +28,7 @@ export async function createEvent(_previous: ActionState, form: FormData): Promi
 
 export async function createPvpEvent(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
-  return runCreateAction(async () => {
+  return runRedirectAction(async () => {
     const application = getApplication();
     const eventId = await application.events.createPvpEvent(
       officer,
@@ -42,4 +42,14 @@ export async function createPvpEvent(_previous: ActionState, form: FormData): Pr
     await application.raidAnnouncements.announceQuietly(eventId);
     return eventPath({ id: eventId, kind: "pvp" });
   }, ["/pvp", "/journal"]);
+}
+
+export async function deleteEvent(_previous: ActionState, form: FormData): Promise<ActionState> {
+  const officer = await requireOfficer();
+  return runRedirectAction(async () => {
+    const application = getApplication();
+    const deleted = await application.events.deleteEvent(officer, formText(form, "eventId"), formText(form, "reason"));
+    await application.raidAnnouncements.withdrawQuietly(deleted);
+    return eventsPath(deleted.kind);
+  }, ["/", "/raid", "/pvp", "/journal"]);
 }

@@ -129,6 +129,17 @@ export function createFakeDiscord({ ownerId }: { ownerId?: string } = {}) {
         return ok({ id: messageId, channel_id: channelId });
       },
     ],
+    [
+      "DELETE",
+      /^\/channels\/([^/]+)\/messages\/([^/]+)$/,
+      ([channelId = "", messageId = ""]) => {
+        if (messages.get(messageId)?.channelId !== channelId) {
+          return { status: HTTP_NOT_FOUND, body: UNKNOWN_MESSAGE };
+        }
+        messages.delete(messageId);
+        return ok();
+      },
+    ],
   ];
 
   function handle(method: string, path: string, body: unknown): FakeDiscordReply {

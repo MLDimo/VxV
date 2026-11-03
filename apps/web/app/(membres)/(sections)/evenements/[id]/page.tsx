@@ -6,6 +6,7 @@ import { isComing } from "@vxv/server/domain/signups";
 import { notFound, redirect } from "next/navigation";
 import { AddonExport } from "@/components/AddonExport";
 import { Badge } from "@/components/Badge";
+import { EventDeleteForm } from "@/components/EventDeleteForm";
 import { EventSignups } from "@/components/EventSignups";
 import { ExclusionForm } from "@/components/ExclusionForm";
 import { RaidLogImportForm } from "@/components/RaidLogImportForm";
@@ -108,6 +109,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               characterClass,
             }))}
           />
+          <h3 className="mt-8 font-pixel text-ivory">Supprimer l&apos;événement</h3>
+          <p className="mt-1 text-sm text-muted">
+            Les inscriptions, les SR et le message Discord partent avec lui. Impossible une fois des présents ou des
+            loots enregistrés.
+          </p>
+          <EventDeleteForm eventId={event.id} />
         </section>
       )}
     </>

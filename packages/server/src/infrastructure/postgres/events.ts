@@ -71,6 +71,20 @@ export function eventRepository(sql: SqlClient): EventRepository {
       await sql.query("update events set discord_message_id = $2 where id = $1", [eventId, messageId]);
     },
 
+    async hasHistory(eventId) {
+      const [row] = await sql.query<{ exists: boolean }>(
+        `select exists (select 1 from event_attendance where event_id = $1)
+             or exists (select 1 from loots where event_id = $1)
+             or exists (select 1 from legend_exploits where event_id = $1) as exists`,
+        [eventId],
+      );
+      return row?.exists === true;
+    },
+
+    async delete(eventId) {
+      await sql.query("delete from events where id = $1", [eventId]);
+    },
+
     async listToRemind(from, until) {
       const rows = await sql.query<EventRow>(
         `${SELECT_EVENTS} where events.starts_at > $1 and events.starts_at <= $2 and events.reminded_at is null

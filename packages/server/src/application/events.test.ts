@@ -5,11 +5,19 @@ import type { Member } from "../domain/members.ts";
 import { createFakeDiscord, type FakeDiscord } from "../infrastructure/discord/fakeDiscord.ts";
 import { createUnitOfWork } from "../infrastructure/postgres/unitOfWork.ts";
 import type { SqlClient } from "../infrastructure/sql.ts";
-import { createMember, createRaids, TEST_GUILD_ID, testGuild } from "../test/fixtures.ts";
+import {
+  createGuildCharacters,
+  createMember,
+  createRaids,
+  recordAttendance,
+  TEST_GUILD_ID,
+  testGuild,
+} from "../test/fixtures.ts";
 import { createTestDatabase } from "../testing.ts";
 import { ForbiddenError, ValidationError } from "./errors.ts";
 import { createEvents } from "./events.ts";
 import { createJournal } from "./journal.ts";
+import { createSignups } from "./signups.ts";
 
 const HOUR = 60 * 60 * 1000;
 
@@ -172,6 +180,56 @@ describe("events", () => {
     expect((await events.listUpcoming("raid")).map((listed) => listed.id)).toEqual([sooner, later]);
     now = new Date(now.getTime() + 2 * HOUR);
     expect((await events.listUpcoming("raid")).map((listed) => listed.id)).toEqual([later]);
+  });
+
+  describe("deletion", () => {
+    const signUpDeja = async (eventId: string) => {
+      const me = await createMember(sql, "member", "Moi");
+      const [deja] = await createGuildCharacters(sql, "Ðéjà Vu");
+      await sql.query("update characters set member_id = $1 where id = $2", [me.id, deja.id]);
+      const signups = createSignups({ unitOfWork: createUnitOfWork(sql), clock: () => now, guild: testGuild });
+      await signups.signUp(me, eventId, { characterId: deja.id, role: "dps", spec: "Combat", status: "present" });
+      return deja;
+    };
+
+    it("deletes an event with its sign-ups, and records it in the journal", async () => {
+      const created = event(48);
+      const eventId = await events.createEvent(officer, created, "Raid de la semaine");
+      await signUpDeja(eventId);
+
+      const deleted = await events.deleteEvent(officer, eventId, "Créé par erreur");
+      expect(deleted.id).toBe(eventId);
+      expect(await events.getEvent(eventId)).toBeUndefined();
+      expect(await sql.query("select 1 from signups where event_id = $1", [eventId])).toEqual([]);
+      expect((await journal.listRecent())[0]).toEqual(
+        expect.objectContaining({
+          action: "event.delete",
+          entityId: eventId,
+          reason: "Créé par erreur",
+          before: {
+            startsAt: created.startsAt.toISOString(),
+            raids: ["Onyxia"],
+            softReservesPerPlayer: 1,
+            audience: "Ouvert à tous",
+          },
+          after: null,
+        }),
+      );
+    });
+
+    it("keeps an event with present players, and refuses a member or an unknown event", async () => {
+      const eventId = await events.createEvent(officer, event(48), "Raid de la semaine");
+      const member = await createMember(sql, "member", "Quelqu'un");
+      await expect(events.deleteEvent(member, eventId, "Motif")).rejects.toBeInstanceOf(ForbiddenError);
+      await expect(events.deleteEvent(officer, "00000000-0000-0000-0000-000000000000", "Motif")).rejects.toThrow(
+        /n'existe plus/,
+      );
+
+      await recordAttendance(sql, eventId, (await signUpDeja(eventId)).id);
+      await expect(events.deleteEvent(officer, eventId, "Motif")).rejects.toThrow(/ne peut plus être supprimé/);
+      expect(await events.getEvent(eventId)).toBeDefined();
+      expect((await journal.listRecent()).map((entry) => entry.action)).toEqual(["event.create"]);
+    });
   });
 
   it("finds no event for an unknown or malformed id", async () => {

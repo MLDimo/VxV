@@ -48,6 +48,7 @@ describe("companion uploads", () => {
       update: async () => true,
       remind: async () => {},
       remindSoftReserves: async () => {},
+      withdraw: async () => {},
       recap: async () => {},
     };
     const missions = createMissions({ unitOfWork, clock });

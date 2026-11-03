@@ -23,7 +23,7 @@ export {
   type RaidSummary,
 } from "./domain/events.ts";
 export type {
-  EventCreationRecord,
+  EventRecord,
   ExclusionRecord,
   JournalAction,
   JournalEntry,
