@@ -1,5 +1,5 @@
 import { rm } from "node:fs/promises";
-import { loadRaids } from "@vxv/raid-data";
+import { loadDungeons, loadRaids } from "@vxv/raid-data";
 import { generate } from "./generate.ts";
 import { writeOutputFiles } from "./outputFile.ts";
 
@@ -8,7 +8,8 @@ const REPOSITORY = new URL("../../../", import.meta.url);
 const GENERATED_DIRECTORY = new URL("dist/generated/", REPOSITORY);
 
 const raids = await loadRaids();
-const files = generate(raids);
+const dungeons = await loadDungeons();
+const files = generate(raids, dungeons);
 await rm(GENERATED_DIRECTORY, { recursive: true, force: true });
 await writeOutputFiles(REPOSITORY, files);
-console.log(`${files.map((file) => file.path).join(", ")}: ${raids.length} raid(s).`);
+console.log(`${files.map((file) => file.path).join(", ")}: ${raids.length} raid(s), ${dungeons.length} dungeon(s).`);

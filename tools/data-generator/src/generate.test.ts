@@ -7,9 +7,10 @@ import { writeOutputFiles } from "./outputFile.ts";
 import { onyxia, salleDesThanes } from "./test/raids.ts";
 
 describe("generate", () => {
-  it("produces the addon's raids' data and the database script", () => {
-    expect(generate([onyxia, salleDesThanes]).map((file) => file.path)).toEqual([
+  it("produces the addon's raids' and dungeons' data and the database script", () => {
+    expect(generate([onyxia, salleDesThanes], []).map((file) => file.path)).toEqual([
       "addon/VXV/Data/Raids.lua",
+      "addon/VXV/Missions/Dungeons.lua",
       "dist/generated/database/raid-data.sql",
     ]);
   });
@@ -19,7 +20,7 @@ describe("writeOutputFiles", () => {
   it("writes every file, creating the folders", async () => {
     const directory = pathToFileURL(`${await mkdtemp(`${tmpdir()}/vxv-`)}/`);
     try {
-      const files = generate([onyxia]);
+      const files = generate([onyxia], []);
       await writeOutputFiles(directory, files);
       for (const file of files) {
         expect(await readFile(new URL(file.path, directory), "utf8")).toBe(file.content);

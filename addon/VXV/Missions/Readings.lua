@@ -135,8 +135,8 @@ function Readings.Start()
     C_Timer.After(FIRST_READ_SECONDS, tick)
 end
 
--- A gathering counted by the addon: read at once.
-VXV.On("quetes.gathered", readCounters)
+-- A gathering or a run with the guild counted by the addon: read at once.
+VXV.On("quetes.counted", readCounters)
 
 -- An officer with the companion relays the counters of the others; the website checks that the relay is an officer.
 VXV.OnMessage(COUNTER, function(payload, sender)

@@ -125,7 +125,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - **Missions** (`VXV/Missions`, Quêtes ; site `/quetes`, `/vxv_mission`) : pêche (statistique 1456), herboristerie,
   minage et dépeçage (le jeu ne les compte pas : une fenêtre de butin avec une herbe, un minerai ou un cuir compte
   pour une récolte, `Gathering.lua`), victoires honorables (`GetPVPLifetimeStats`), gain de niveau et course au
-  niveau 60 (demande du propriétaire du 3 novembre ; niveau lu dans la liste de guilde, `GetGuildRosterInfo`, mesuré).
+  niveau 60 (demande du propriétaire du 3 novembre ; niveau lu dans la liste de guilde, `GetGuildRosterInfo`, mesuré),
+  donjons finis et champs de bataille gagnés avec un autre membre connecté avec VXV dans le groupe (même demande ;
+  comptés par l'addon, `GuildRuns.lua` : un donjon au dernier boss tué, d'après `data/dungeons` généré dans
+  `Missions/Dungeons.lua` ; une victoire lue par `GetBattlefieldWinner` et `UnitFactionGroup`, par `Compat.Resolve`,
+  non mesurés, interrogés toutes les 2 s dans un champ de bataille).
   Score : ce que gagnent les compteurs de tous les personnages liés du membre pendant la mission ; dans la course au 60,
   le plus haut niveau atteint par ses personnages, sans ceux déjà 60 au départ ; à égalité, le premier à l'atteindre. Compteurs
   lus à la connexion puis chaque minute hors combat. Résultat validé par un officier ; récompense 70 / 20 / 10 % versée

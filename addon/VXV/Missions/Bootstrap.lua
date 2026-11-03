@@ -7,8 +7,10 @@ VXV.RegisterModule({
         ns.QuestsData.Restore(data)
         ns.Changes.Restore(data)
         ns.Gathering.Restore(data)
+        ns.GuildRuns.Restore(data)
         ns.Readings.Restore(data)
         ns.Readings.Start()
+        ns.GuildRuns.Start()
     end,
     tab = {
         place = "quests",

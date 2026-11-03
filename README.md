@@ -15,7 +15,7 @@ npm i -g npm@11  # npm 11 ou plus (npm 10 plante sur la résolution des dépenda
 npm install      # installe tous les espaces de travail
 npx playwright install chromium   # navigateur des tests de bout en bout, une fois
 npm run check    # formatage, lint, typage, tests unitaires et de bout en bout ; aussi lancé avant chaque push
-npm run generate # données des raids (addon et SQL) depuis data/raids, jetons de la charte
+npm run generate # données des raids (addon et SQL) et des donjons (addon), jetons de la charte
 npm run dev -w @vxv/web   # site en local sur http://localhost:3000
 VXV_SITE_URL=http://localhost:3000 npm start -w @vxv/companion   # compagnon relié au site local
 npm run package -w @vxv/companion   # installeur du compagnon pour la plateforme, dans apps/companion/release
@@ -38,6 +38,7 @@ Dépôt unique géré par les espaces de travail npm. Un dossier n'est créé qu
 | `packages/design` | Jetons de la charte (couleurs, polices), thème du site et de l'addon générés (`@vxv/design`) |
 | `addon/VXV` | L'addon, en un seul dossier : le socle (`Core`), une partie par lieu (`Raid`, `Paris`…), le lien avec le compagnon (`Sync`) et les données des raids (`Data`) |
 | `data/raids` | Source des données de raid en JSON, une par raid ([format](data/raids/README.md)) |
+| `data/dungeons` | Dernier boss de chaque donjon en JSON, pour la quête des donjons en guilde ([format](data/dungeons/README.md)) |
 | `supabase/` | Schéma, migrations et tests de la base (`@vxv/database`) |
 | `tools/data-generator` | Données des raids : `addon/VXV/Data/Raids.lua` et script SQL dans `dist/generated` (`npm run generate`) |
 | `tools/addon-release` | Copie l'addon à publier et inscrit la version (`npm run release:prepare -- v1.2.0`) |

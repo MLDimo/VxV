@@ -1,7 +1,7 @@
 {
   "name": "@vxv/raid-data",
   "private": true,
-  "description": "Raid reference data: JSON source files in data/raids, schema and validation.",
+  "description": "Instance reference data: JSON source files in data/raids and data/dungeons, schema and validation.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

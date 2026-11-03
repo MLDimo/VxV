@@ -1,12 +1,13 @@
 local ns = select(2, ...).Missions
 
 --- The counter each kind of mission reads (P12.3), never what a player says: the game's own where it keeps one (the
---- Statistics tab of WoW Forever, measured on 6 October, the honorable kills, the character's level), else the
---- gatherings the addon counts itself (Gathering.lua: the game keeps no count of herbs, ores and skins).
+--- Statistics tab of WoW Forever, measured on 6 October, the honorable kills, the character's level), else what the
+--- addon counts itself: the gatherings (Gathering.lua: the game keeps no count of herbs, ores and skins), the
+--- dungeons and battlegrounds done with the guild (GuildRuns.lua).
 local Counters = {}
 ns.Counters = Counters
 
-local Gathering = ns.Gathering
+local Gathering, GuildRuns = ns.Gathering, ns.GuildRuns
 
 --- What each kind counts, as the website names it (packages/server/src/domain/missions.ts).
 Counters.LABELS = {
@@ -17,9 +18,13 @@ Counters.LABELS = {
     honorableKills = { name = "Victoires honorables", counts = "victoires honorables" },
     levels = { name = "Gain de niveau", counts = "niveaux gagnés" },
     level60 = { name = "Niveau 60", counts = "niveaux" },
+    dungeons = { name = "Donjons en guilde", counts = "donjons finis en guilde" },
+    battlegrounds = { name = "Champs de bataille en guilde", counts = "champs de bataille gagnés en guilde" },
 }
 --- The kinds in the website's order.
-Counters.KINDS = { "fishing", "herbalism", "mining", "skinning", "honorableKills", "levels", "level60" }
+Counters.KINDS = {
+    "fishing", "herbalism", "mining", "skinning", "honorableKills", "levels", "level60", "dungeons", "battlegrounds",
+}
 --- The race to the top level: the first character there wins, the others ranked by their highest level.
 Counters.RACE = "level60"
 Counters.TOP_LEVEL = 60
@@ -53,6 +58,12 @@ local function gathered(kind)
     end
 end
 
+local function withGuild(kind)
+    return function()
+        return GuildRuns.Count(VXV.PlayerName(), kind)
+    end
+end
+
 -- The game answers one guild roster request every 10 seconds.
 local ROSTER_EVERY_SECONDS = 10
 local rosterAskedAt
@@ -78,6 +89,8 @@ local READERS = {
     end,
     levels = level,
     level60 = level,
+    dungeons = withGuild("dungeons"),
+    battlegrounds = withGuild("battlegrounds"),
     herbalism = gathered("herbalism"),
     mining = gathered("mining"),
     skinning = gathered("skinning"),
