@@ -518,7 +518,7 @@ function GetNumGuildMembers()
 end
 function GetGuildRosterInfo(index)
     local member = MockGuildMembers[index]
-    return member.name, "Membre", 3, 60, "Classe", "", "", "", member.online ~= false, 0, member.class
+    return member.name, "Membre", 3, member.level or 60, "Classe", "", "", "", member.online ~= false, 0, member.class
 end
 ChatFontNormal = {}
 --- The game's font object, whose fonts write each alphabet; and the font families made from fonts.

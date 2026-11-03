@@ -3,11 +3,25 @@ import type { DiscordMessage } from "./bets.ts";
 /**
  * Weekly missions (P12): a challenge for the whole guild, counted by the game itself. The score of a member is what
  * their characters' game counter gained during the mission (main and rerolls added); the first three share the
- * reward, 70 %, 20 % and 10 %.
+ * reward, 70 %, 20 % and 10 %. The race to level 60 (owner's request of 3 November) ranks instead the highest level
+ * a member's characters reached during the mission: the first at 60 wins.
  */
 
-export const MISSION_TYPES = ["fishing", "herbalism", "mining", "skinning", "honorableKills"] as const;
+export const MISSION_TYPES = [
+  "fishing",
+  "herbalism",
+  "mining",
+  "skinning",
+  "honorableKills",
+  "levels",
+  "level60",
+] as const;
 export type MissionType = (typeof MISSION_TYPES)[number];
+
+/** The race's finish: Classic's highest level. */
+export const TOP_LEVEL = 60;
+/** The mission won by the first to bring a character to TOP_LEVEL, the others ranked by their highest level. */
+const RACE: MissionType = "level60";
 
 /** Each type: its name, the mission's usual title, and what its counter counts. */
 export const MISSION_TYPE_LABELS: Record<MissionType, { name: string; title: string; counts: string }> = {
@@ -16,6 +30,8 @@ export const MISSION_TYPE_LABELS: Record<MissionType, { name: string; title: str
   mining: { name: "Minage", title: "Le Cœur de pierre", counts: "filons minés" },
   skinning: { name: "Dépeçage", title: "Le Tanneur", counts: "peaux dépecées" },
   honorableKills: { name: "Victoires honorables", title: "Le Chasseur de têtes", counts: "victoires honorables" },
+  levels: { name: "Gain de niveau", title: "L'Ascension", counts: "niveaux gagnés" },
+  level60: { name: `Niveau ${String(TOP_LEVEL)}`, title: `La Course au ${String(TOP_LEVEL)}`, counts: "niveaux" },
 };
 
 export const DEFAULT_MISSION_DAYS = 7;
@@ -99,14 +115,22 @@ export function newMissionRefusal(mission: NewMission, now: Date): string | unde
   return undefined;
 }
 
-/** A character's progress: the counter's steps over its value at the start (or at its first reading after). */
-function characterSteps(readings: readonly CounterReading[], mission: Pick<Mission, "startsAt" | "endsAt">) {
+/**
+ * A character's progress: the counter's steps over its value at the start (or at its first reading after). In the
+ * race, each step is the level reached once it rose, and a character already at the top does not run.
+ */
+function characterSteps(readings: readonly CounterReading[], mission: Pick<Mission, "type" | "startsAt" | "endsAt">) {
   const sorted = [...readings].sort((left, right) => left.readAt.getTime() - right.readAt.getTime());
   const before = sorted.filter((reading) => reading.readAt <= mission.startsAt).at(-1);
   const during = sorted.filter((reading) => reading.readAt > mission.startsAt && reading.readAt <= mission.endsAt);
   const baseline = before ?? during[0];
   if (baseline === undefined) {
     return [];
+  }
+  if (mission.type === RACE) {
+    return baseline.value >= TOP_LEVEL
+      ? []
+      : during.map((reading) => ({ at: reading.readAt, score: reading.value > baseline.value ? reading.value : 0 }));
   }
   return during.map((reading) => ({ at: reading.readAt, score: Math.max(0, reading.value - baseline.value) }));
 }
@@ -138,13 +162,14 @@ export function missionScores(
   }
   const scores = [...byMember.values()].flatMap(({ first, steps }) => {
     steps.sort((left, right) => left.at.getTime() - right.at.getTime());
-    // The member's score after each reading: each character's latest score, added up.
+    // The member's score after each reading: each character's latest score, added up (in the race, the highest).
     const latest = new Map<string, number>();
     let score = 0;
     let reachedAt: Date | undefined;
     for (const step of steps) {
       latest.set(step.characterId, step.score);
-      const total = [...latest.values()].reduce((sum, value) => sum + value, 0);
+      const values = [...latest.values()];
+      const total = mission.type === RACE ? Math.max(...values) : values.reduce((sum, value) => sum + value, 0);
       if (total !== score) {
         score = total;
         reachedAt = step.at;
@@ -232,14 +257,30 @@ export interface MissionRewardRecord extends MissionReward {
 }
 
 /** "le plus de pêches réussies", "le plus d'herbes cueillies". */
-export function mostOf(counts: string): string {
+function mostOf(counts: string): string {
   return /^[aeiouyhéèê]/i.test(counts) ? `le plus d'${counts}` : `le plus de ${counts}`;
+}
+
+/** What wins the mission: "le plus de pêches réussies", "le premier au niveau 60". */
+export function missionGoal(type: MissionType): string {
+  return type === RACE ? `le premier au niveau ${String(TOP_LEVEL)}` : mostOf(MISSION_TYPE_LABELS[type].counts);
+}
+
+/** A member's score as words: "12 pêches réussies", "niveau 42". */
+export function formatMissionScore(type: MissionType, score: number): string {
+  return type === RACE ? `niveau ${String(score)}` : `${String(score)} ${MISSION_TYPE_LABELS[type].counts}`;
 }
 
 /** What the guild rewards, as the quest's parchment tells it. */
 export function missionPitch(type: MissionType): string {
+  if (type === RACE) {
+    return (
+      `Le premier à mener un personnage au niveau ${String(TOP_LEVEL)} d'ici la fin remporte la récompense : ` +
+      "chacun est classé sur le plus haut niveau atteint par ses personnages, d'après le jeu."
+    );
+  }
   return (
-    `Qui fera ${mostOf(MISSION_TYPE_LABELS[type].counts)} d'ici la fin remporte la récompense : ` +
+    `Qui fera ${missionGoal(type)} d'ici la fin remporte la récompense : ` +
     "main et rerolls additionnés, d'après les compteurs du jeu."
   );
 }
@@ -253,18 +294,29 @@ export interface MissionProgress {
   text: string;
 }
 
-/** The member's progress: ahead, on the podium, or how much more to climb on it (a tie goes to the first to reach). */
+/**
+ * The member's progress: ahead, on the podium, or how much more to climb on it (a tie goes to the first to reach). In
+ * the race, a member at the top cannot climb any more.
+ */
 export function missionProgress(
   scores: readonly Pick<MissionScore, "memberId" | "score">[],
   memberId: string,
-  counts: string,
+  type: MissionType,
 ): MissionProgress {
+  const { counts } = MISSION_TYPE_LABELS[type];
   const index = scores.findIndex((score) => score.memberId === memberId);
   const mine = scores[index];
   if (mine === undefined || mine.score <= 0) {
     return { place: undefined, text: "Rien encore : l'addon VXV relève ton compteur en jeu." };
   }
   const place = index + 1;
+  if (type === RACE && mine.score >= TOP_LEVEL) {
+    return {
+      place,
+      text:
+        place === 1 ? `Premier au niveau ${String(TOP_LEVEL)}` : `Niveau ${String(TOP_LEVEL)} atteint, après d'autres`,
+    };
+  }
   const toPass = (above: number) => `${String(above - mine.score + 1)} ${counts}`;
   if (place === 1) {
     const second = scores[1]?.score ?? 0;

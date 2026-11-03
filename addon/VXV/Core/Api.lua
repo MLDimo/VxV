@@ -52,7 +52,7 @@ VXV = {
     Online = ns.Presence.Online,
     --- (event, handler(...)): a game event, among those measured on WoW Forever.
     OnEvent = ns.Events.On,
-    --- The guild members the client knows: { name, class, online }.
+    --- The guild members the client knows: { name, class, online, level }.
     GuildMembers = ns.Roster.Read,
     --- The roster as the website imports it (VXV-ROSTER-1 text), and how many characters it holds.
     GuildRosterText = function()
