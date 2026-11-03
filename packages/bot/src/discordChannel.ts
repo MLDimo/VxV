@@ -28,5 +28,16 @@ export function discordChannel({ channelId, ...options }: DiscordRestOptions & {
         throw error;
       }
     },
+
+    /** Deletes a message of the channel; one already deleted on Discord is fine. */
+    async remove(messageId: string): Promise<void> {
+      try {
+        await request("DELETE", `/channels/${channelId}/messages/${messageId}`);
+      } catch (error) {
+        if (!(error instanceof DiscordApiError && error.status === HTTP_NOT_FOUND)) {
+          throw error;
+        }
+      }
+    },
   };
 }

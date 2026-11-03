@@ -31,19 +31,19 @@ export async function runFormAction(
   }
 }
 
-/** Runs the work of a form action creating something: on success, refreshes the given pages and opens the page of
- * what was created, the path the work returns. */
-export async function runCreateAction(
+/** Runs the work of a form action: on success, refreshes the given pages and opens the page whose path the work
+ * returns (what it created, or the list after a deletion). */
+export async function runRedirectAction(
   work: () => Promise<string>,
   pagesToRefresh: readonly string[],
 ): Promise<ActionState> {
-  let created: string | undefined;
+  let target: string | undefined;
   const state = await runFormAction(async () => {
-    created = await work();
+    target = await work();
     return "";
   }, pagesToRefresh);
-  if (created !== undefined) {
-    redirect(created);
+  if (target !== undefined) {
+    redirect(target);
   }
   return state;
 }

@@ -3,7 +3,7 @@
 import { isRarity, statsOf, type ExploitCategory } from "@vxv/server/domain/legend";
 import type { ActionState } from "@/components/actionState";
 import { getApplication } from "@/server/application";
-import { formText, runCreateAction, runFormAction } from "@/server/formActions";
+import { formText, runRedirectAction, runFormAction } from "@/server/formActions";
 import { requireMember, requireOfficer } from "@/server/session";
 
 const HALL = "/hall-of-fame";
@@ -48,7 +48,7 @@ export async function proposeExploit(_previous: ActionState, form: FormData): Pr
 export async function publishExploit(_previous: ActionState, form: FormData): Promise<ActionState> {
   const officer = await requireOfficer();
   const exploitId = formText(form, "exploitId");
-  return runCreateAction(async () => {
+  return runRedirectAction(async () => {
     const rarity = formText(form, "rarity");
     const mvpId = formText(form, "mvpId");
     await getApplication().legend.publish(

@@ -11,6 +11,7 @@ import { requireMember } from "@/server/session";
 const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "roster.import": { label: "GUILDE", className: "border-ink-brown text-ink-brown" },
   "event.create": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
+  "event.delete": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
   "exclusion.add": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
   "exclusion.remove": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },
   "softReserve.override": { label: "RAID", className: "border-stamp-raid text-stamp-raid" },

@@ -7,7 +7,7 @@ import type {
   MissionCloseRecord,
   MissionCreationRecord,
   SeasonStartRecord,
-  EventCreationRecord,
+  EventRecord,
   ExclusionRecord,
   JournalAction,
   JournalEntry,
@@ -34,6 +34,7 @@ import type { RosterImportSummary } from "./roster.ts";
 export const JOURNAL_ACTION_LABELS: Record<JournalAction, string> = {
   "roster.import": "Import de la liste de guilde",
   "event.create": "Création d'un événement",
+  "event.delete": "Événement supprimé",
   "exclusion.add": "Objet exclu des SR",
   "exclusion.remove": "Objet de nouveau réservable",
   "softReserve.override": "SR corrigées par un officier",
@@ -66,7 +67,7 @@ export function describeRosterImport(summary: RosterImportSummary): string {
   ].join(", ");
 }
 
-function describeEventCreation(event: EventCreationRecord): string {
+function describeEvent(event: EventRecord): string {
   const parts = [`${event.title ?? raidTitle(event.raids)}, le ${formatDateTime(new Date(event.startsAt))}`];
   if (event.softReservesPerPlayer > 0) {
     parts.push(`${softReserveCount(event.softReservesPerPlayer)} par joueur`);
@@ -160,7 +161,9 @@ export function describeJournalEntry(entry: JournalEntry): string {
     case "roster.import":
       return describeRosterImport(entry.after as RosterImportSummary);
     case "event.create":
-      return describeEventCreation(entry.after as EventCreationRecord);
+      return describeEvent(entry.after as EventRecord);
+    case "event.delete":
+      return describeEvent(entry.before as EventRecord);
     case "exclusion.add":
     case "exclusion.remove":
       return describeExclusion(entry.after as ExclusionRecord);

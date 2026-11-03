@@ -58,4 +58,37 @@ test.describe.serial("raid events", () => {
     await page.goto("/evenements/nouveau");
     await expect(page).toHaveURL(/\/$/);
   });
+
+  test("an officer deletes an event: gone from the Raid page and from Discord, kept in the journal", async ({
+    page,
+    context,
+    request,
+  }) => {
+    await signInAs(context, "officer");
+    await page.goto("/evenements/nouveau");
+    await page.getByLabel("Date et heure (heure de Paris)").fill("2030-12-19T21:00");
+    await page.getByLabel("La salle des Thanes").check();
+    await page.getByLabel("Qui peut s'inscrire (rôle Discord)").selectOption({ label: "Tout le monde" });
+    await page.getByLabel("Motif (visible dans le journal)").fill("Raid en trop");
+    await page.getByRole("button", { name: "Créer l'événement" }).click();
+    await expect(page.getByText("jeudi 19 décembre 2030 à 21:00")).toBeVisible();
+    const eventId = page.url().split("/").pop() ?? "";
+    expect(await discordEventMessage(request, eventId)).toBeDefined();
+
+    const deletion = page.getByRole("form", { name: "Supprimer l'événement" });
+    await deletion.getByLabel("Motif de la suppression (visible dans le journal)").fill("Créé par erreur");
+    await deletion.getByRole("button", { name: "Supprimer l'événement" }).click();
+
+    await expect(page).toHaveURL(/\/raid$/);
+    await expect(
+      page.getByRole("link", { name: /La salle des Thanes/ }).filter({ hasText: "19 décembre 2030" }),
+    ).toHaveCount(0);
+    expect(await discordEventMessage(request, eventId)).toBeUndefined();
+    await page.goto(`/evenements/${eventId}`);
+    await expect(page.getByRole("heading", { name: "Page introuvable" })).toBeVisible();
+    await page.goto("/journal");
+    await expect(page.getByRole("listitem").filter({ hasText: "Motif : Créé par erreur" })).toContainText(
+      "Événement supprimé",
+    );
+  });
 });

@@ -8,6 +8,7 @@ import {
 } from "../domain/eventRoles.ts";
 import {
   EVENT_LISTED_AFTER_START_MS,
+  EVENT_WITH_HISTORY,
   newEventRefusal,
   newPvpEventRefusal,
   type EventKind,
@@ -16,12 +17,26 @@ import {
   type NewRaidEvent,
   type PlannedEvent,
 } from "../domain/events.ts";
-import type { EventCreationRecord } from "../domain/journal.ts";
+import type { EventRecord } from "../domain/journal.ts";
 import type { Member } from "../domain/members.ts";
 import type { GuildGateway } from "./discordPorts.ts";
 import { ValidationError } from "./errors.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, Repositories, UnitOfWork } from "./ports.ts";
+
+/** What the journal keeps about the event, its raids by name. */
+function eventRecord(
+  event: Pick<GuildEvent, "startsAt" | "title" | "softReservesPerPlayer" | "role">,
+  raidNames: string[],
+): EventRecord {
+  return {
+    startsAt: event.startsAt.toISOString(),
+    title: event.title,
+    raids: raidNames,
+    softReservesPerPlayer: event.softReservesPerPlayer,
+    audience: eventAudience(event.role),
+  };
+}
 
 interface EventsDependencies {
   unitOfWork: UnitOfWork;
@@ -52,20 +67,13 @@ export function createEvents({ unitOfWork, clock, guild }: EventsDependencies) {
     motive: string,
   ): Promise<string> {
     const eventId = await events.create(event, officer.id);
-    const after: EventCreationRecord = {
-      startsAt: event.startsAt.toISOString(),
-      title: event.title,
-      raids: raidNames,
-      softReservesPerPlayer: event.softReservesPerPlayer,
-      audience: eventAudience(event.role),
-    };
     await journal.record({
       actorId: officer.id,
       action: "event.create",
       entity: "event",
       entityId: eventId,
       before: null,
-      after,
+      after: eventRecord(event, raidNames),
       reason: motive,
     });
     return eventId;
@@ -113,6 +121,37 @@ export function createEvents({ unitOfWork, clock, guild }: EventsDependencies) {
         role,
       };
       return unitOfWork.run((repositories) => plan(repositories, officer, planned, [], motive));
+    },
+
+    /**
+     * An officer deletes an event, with its sign-ups and soft reserves; returns it, for its Discord message to go.
+     * An event with history (present players, loots, a painting of the Hall of Fame) stays.
+     */
+    async deleteEvent(officer: Member, eventId: string, reason: string): Promise<GuildEvent> {
+      const motive = checkOfficerAction(officer, reason);
+      return unitOfWork.run(async ({ events, journal }) => {
+        const event = await events.findById(eventId);
+        if (event === undefined) {
+          throw new ValidationError("Cet événement n'existe plus.");
+        }
+        if (await events.hasHistory(eventId)) {
+          throw new ValidationError(EVENT_WITH_HISTORY);
+        }
+        await events.delete(eventId);
+        await journal.record({
+          actorId: officer.id,
+          action: "event.delete",
+          entity: "event",
+          entityId: eventId,
+          before: eventRecord(
+            event,
+            event.raids.map((raid) => raid.name),
+          ),
+          after: null,
+          reason: motive,
+        });
+        return event;
+      });
     },
 
     getEvent(eventId: string): Promise<GuildEvent | undefined> {

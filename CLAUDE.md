@@ -34,7 +34,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`VXV.AfterCombat`, `Core/Combat.lua`, `InCombatLockdown` relu chaque seconde : `PLAYER_REGEN_ENABLED` n'est pas
   mesuré) ; un défi de deathroll n'apparaît que s'il reste du temps pour y répondre.
 - **Raid et SR** (`VXV/Raid`, site, bot) : un officier crée un événement (site, `/vxv_raid`, « Créer un événement » en
-  jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; inscriptions et SR depuis le site, le bouton du
+  jeu ; dates lues par `domain/raidStart.ts`), annoncé sur Discord ; supprimé par un officier sur sa page, avec motif
+  (`event.delete`), tant qu'il n'a ni présents, ni loots, ni exploit du Hall of Fame (inscriptions, SR et message
+  Discord partent avec lui ; demande du propriétaire du 3 novembre) ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
   Discord. Le nombre de SR est fixé à la création. Seuls les objets que la classe du personnage inscrit peut équiper se
   réservent (décision du propriétaire du 10 octobre, règles de Classic au niveau 60, `domain/equipment.ts`) : l'addon

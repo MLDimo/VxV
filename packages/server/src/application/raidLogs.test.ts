@@ -51,6 +51,7 @@ describe("raid logs", () => {
       update: async () => true,
       remind: async () => {},
       remindSoftReserves: async () => {},
+      withdraw: async () => {},
       recap: async (recap) => {
         if (discordDown) {
           throw new Error("Discord is down");

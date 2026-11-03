@@ -38,5 +38,9 @@ export function createDiscordRaidAnnouncer({
     async update(messageId, announced) {
       return channels[announced.event.kind].edit(messageId, raidMessage(announced, siteUrl));
     },
+
+    async withdraw(messageId, kind) {
+      await channels[kind].remove(messageId);
+    },
   };
 }
