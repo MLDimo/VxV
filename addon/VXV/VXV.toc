@@ -178,6 +178,8 @@ Chifoumi\Bootstrap.lua
 # The missions as the website exports them (VXV-QUETES), how they travel in the guild, the game's counters, and the
 # quests an officer publishes in game.
 Missions\Gathering.lua
+Missions\Dungeons.lua
+Missions\GuildRuns.lua
 Missions\Counters.lua
 Missions\QuestsData.lua
 Missions\Quests.lua

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { loadedBundle } from "../core.ts";
 import { startGuild } from "../guild.ts";
 import { EXPORTED } from "../siteFixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
@@ -213,6 +214,41 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
       ]),
     );
     expect(errors()).toEqual([]);
+  });
+
+  it("counts the dungeons finished and the battlegrounds won with another guild member connected with VXV", () => {
+    const written = companionFiles({ quetes: questsText() });
+    const guild = startGuild(["Ðéjà Vu", "Thom Leboss"], { bundles: ["Missions", "Sync"], written });
+    guild.deliver();
+    const deja = guild.player("Ðéjà Vu");
+    loadedBundle(deja, "Missions").run("local _, ns = ... ns.DUNGEON_LAST_BOSSES[3065] = 3496");
+    const runs = (type: string) => outbox(deja.client, type).map((reading) => (reading as { value: number }).value);
+    const kill = (encounterId: number) => `Fire("ENCOUNTER_END", ${String(encounterId)}, "Boss", 1, 5, 1)`;
+
+    // Alone, then with a guildmate: only the last boss, with the guildmate, counts.
+    deja.client(`Instance = { name = "La salle des Thanes", type = "party", id = 3065 } ${kill(3496)}`);
+    deja.client(`Group.members = { "Thom Leboss" } ${kill(3495)} ${kill(3496)}`);
+    expect(runs("dungeons")).toEqual([1]);
+
+    // A battleground won counts once; a lost one, nothing.
+    deja.client(`
+      Instance = { name = "Goulet des Chanteguerres", type = "pvp", id = 489 }
+      Group.raid = true
+      UnitFactionGroup = function() return "Horde" end
+      GetBattlefieldWinner = function() return nil end
+      AdvanceTime(4)
+      GetBattlefieldWinner = function() return 0 end
+      AdvanceTime(10)
+    `);
+    expect(runs("battlegrounds")).toEqual([1]);
+    deja.client(`
+      Instance = { name = "Kalimdor", type = "none", id = 1 } AdvanceTime(2)
+      Instance = { name = "Goulet des Chanteguerres", type = "pvp", id = 489 }
+      GetBattlefieldWinner = function() return 1 end
+      AdvanceTime(10)
+    `);
+    expect(runs("battlegrounds")).toEqual([1]);
+    expect(deja.errors()).toEqual([]);
   });
 
   it("reads the fishing from the game's statistics", () => {

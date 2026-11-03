@@ -55,5 +55,5 @@ VXV.OnEvent("LOOT_OPENED", function()
     for kind in pairs(kinds) do
         saved.gathered[name][kind] = (saved.gathered[name][kind] or 0) + 1
     end
-    VXV.Emit("quetes.gathered")
+    VXV.Emit("quetes.counted")
 end)

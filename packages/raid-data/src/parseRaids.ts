@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import { raidFileSchema, type Raid } from "./schema.ts";
 
 export interface RaidSource {
@@ -8,14 +9,19 @@ export interface RaidSource {
 /** Thrown with every problem found, so that a maintainer can fix a data file in one pass. */
 export class RaidDataError extends Error {
   constructor(readonly issues: readonly string[]) {
-    super(`Invalid raid data:\n- ${issues.join("\n- ")}`);
+    super(`Invalid instance data:\n- ${issues.join("\n- ")}`);
     this.name = "RaidDataError";
   }
 }
 
 const FILE_NAME = /^([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/;
 
-function parseSource(source: RaidSource, issues: string[]): Raid | undefined {
+/** A data file (a raid, a dungeon) checked against its schema, its id taken from its name; its problems in issues. */
+export function parseDataFile<Schema extends z.ZodType<object>>(
+  source: RaidSource,
+  schema: Schema,
+  issues: string[],
+): (z.infer<Schema> & { id: string }) | undefined {
   const id = FILE_NAME.exec(source.fileName)?.[1];
   if (id === undefined) {
     issues.push(`${source.fileName}: file name must be lowercase words joined by dashes, e.g. mont-hyjal.json`);
@@ -28,7 +34,7 @@ function parseSource(source: RaidSource, issues: string[]): Raid | undefined {
     issues.push(`${source.fileName}: invalid JSON (${error instanceof Error ? error.message : String(error)})`);
     return undefined;
   }
-  const result = raidFileSchema.safeParse(json);
+  const result = schema.safeParse(json);
   if (!result.success) {
     for (const issue of result.error.issues) {
       issues.push(`${source.fileName}: ${issue.path.join(".") || "(root)"}: ${issue.message}`);
@@ -38,7 +44,7 @@ function parseSource(source: RaidSource, issues: string[]): Raid | undefined {
   return { id, ...result.data };
 }
 
-function duplicates<T>(values: readonly T[]): T[] {
+export function duplicates<T>(values: readonly T[]): T[] {
   const seen = new Set<T>();
   const repeated = new Set<T>();
   for (const value of values) {
@@ -78,7 +84,7 @@ function crossRaidIssues(raids: readonly Raid[]): string[] {
 /** Validates every raid source and returns the raids sorted by id, or throws a RaidDataError. */
 export function parseRaids(sources: readonly RaidSource[]): Raid[] {
   const issues: string[] = [];
-  const raids = sources.flatMap((source) => parseSource(source, issues) ?? []);
+  const raids: Raid[] = sources.flatMap((source) => parseDataFile(source, raidFileSchema, issues) ?? []);
   issues.push(...crossRaidIssues(raids));
   if (issues.length > 0) {
     throw new RaidDataError(issues);

@@ -15,6 +15,8 @@ export const MISSION_TYPES = [
   "honorableKills",
   "levels",
   "level60",
+  "dungeons",
+  "battlegrounds",
 ] as const;
 export type MissionType = (typeof MISSION_TYPES)[number];
 
@@ -32,6 +34,12 @@ export const MISSION_TYPE_LABELS: Record<MissionType, { name: string; title: str
   honorableKills: { name: "Victoires honorables", title: "Le Chasseur de têtes", counts: "victoires honorables" },
   levels: { name: "Gain de niveau", title: "L'Ascension", counts: "niveaux gagnés" },
   level60: { name: `Niveau ${String(TOP_LEVEL)}`, title: `La Course au ${String(TOP_LEVEL)}`, counts: "niveaux" },
+  dungeons: { name: "Donjons en guilde", title: "Les Compagnons de route", counts: "donjons finis en guilde" },
+  battlegrounds: {
+    name: "Champs de bataille en guilde",
+    title: "Les Frères d'armes",
+    counts: "champs de bataille gagnés en guilde",
+  },
 };
 
 export const DEFAULT_MISSION_DAYS = 7;
