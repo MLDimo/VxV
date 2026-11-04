@@ -19,25 +19,24 @@ describe("the tavern's holidays", () => {
   it("dresses the tavern up from a holiday's first day to its last, across the new year too", () => {
     const on = (day: string) => seasonOn(day)?.id;
     expect(on("2026-10-13")).toBeUndefined();
-    // The days after Sanssaint and the Voile d'hiver are the Darkmoon Faire's, from the month's first Sunday.
     expect([on("2026-10-17"), on("2026-10-18"), on("2026-11-01"), on("2026-11-02")]).toEqual([
       undefined,
       "sanssaint",
       "sanssaint",
-      "sombrelune",
+      undefined,
     ]);
     expect([on("2026-12-15"), on("2026-12-31"), on("2027-01-02"), on("2027-01-03")]).toEqual([
       "voile-d-hiver",
       "voile-d-hiver",
       "voile-d-hiver",
-      "sombrelune",
+      undefined,
     ]);
     // The Jardin des nobles is Easter's week.
     expect([on("2027-03-27"), on("2027-03-28"), on("2027-04-03"), on("2027-04-04")]).toEqual([
       undefined,
       "jardin-des-nobles",
       "jardin-des-nobles",
-      "sombrelune",
+      undefined,
     ]);
     expect([on("2026-02-14"), on("2026-06-21"), on("2026-09-20")]).toEqual(["amour", "solstice", "brasseurs"]);
   });
@@ -62,24 +61,32 @@ describe("the tavern's holidays", () => {
     }
   });
 
-  it("holds the Darkmoon Faire the week from each month's first Sunday, giving way to the other holidays", () => {
+  it("holds the Darkmoon Faire from the Monday after each month's first Friday to the Sunday, after the other holidays", () => {
     const on = (day: string) => seasonOn(day)?.id;
-    // November 2026: Sunday the 1st is still Sanssaint's, then the faire until Saturday the 7th.
-    expect([on("2026-11-01"), on("2026-11-02"), on("2026-11-07"), on("2026-11-08")]).toEqual([
-      "sanssaint",
-      "sombrelune",
-      "sombrelune",
+    // November 2026: set up on Friday the 6th, open from Monday the 9th to Sunday the 15th.
+    expect([on("2026-11-04"), on("2026-11-08"), on("2026-11-09"), on("2026-11-15"), on("2026-11-16")]).toEqual([
       undefined,
-    ]);
-    // December 2026: from Sunday the 6th to Saturday the 12th.
-    expect([on("2026-12-05"), on("2026-12-06"), on("2026-12-12"), on("2026-12-13")]).toEqual([
       undefined,
       "sombrelune",
       "sombrelune",
       undefined,
     ]);
-    // October 2026: Brewfest until the 6th, then the faire's last days.
-    expect([on("2026-10-04"), on("2026-10-07"), on("2026-10-10")]).toEqual(["brasseurs", "sombrelune", "sombrelune"]);
+    // December 2026: from Monday the 7th to Sunday the 13th.
+    expect([on("2026-12-06"), on("2026-12-07"), on("2026-12-13"), on("2026-12-14")]).toEqual([
+      undefined,
+      "sombrelune",
+      "sombrelune",
+      undefined,
+    ]);
+    // A month starting on a Friday: January 2027, from Monday the 4th.
+    expect([on("2027-01-03"), on("2027-01-04"), on("2027-01-10")]).toEqual([undefined, "sombrelune", "sombrelune"]);
+    // October 2026 (Friday the 2nd): Brewfest until Tuesday the 6th, then the faire's last days.
+    expect([on("2026-10-05"), on("2026-10-07"), on("2026-10-11"), on("2026-10-12")]).toEqual([
+      "brasseurs",
+      "sombrelune",
+      "sombrelune",
+      undefined,
+    ]);
   });
 
   it("has each holiday's tavern, for the website and for the addon", () => {

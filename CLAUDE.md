@@ -211,10 +211,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   dans l'addon comme sur le site (`PlaceBackdrop`, pages rattachées à leur lieu par `placeOfPath`).
 - Taverne des fêtes de WoW, par date et selon le calendrier du jeu (`packages/design/src/seasons.ts`, jours de
   France) : Voile d'hiver, De l'amour dans l'air, Jardin des nobles (semaine de Pâques), solstice d'été, Fête des
-  Brasseurs, Sanssaint, et chaque mois la Foire de Sombrelune (la semaine du premier dimanche, qui cède la place
-  aux autres fêtes). Chaque fête a son image, aux mêmes dimensions et avec les lieux aux mêmes places
-  (`apps/web/public/images/tavernes/<id>.jpg`, `VXV/Core/Media/Tavernes/<id>.png`) ; le site la choisit par
-  `tavernPicture`, l'addon par `TavernPicture`, d'après les jours que `npm run generate` écrit dans `Tokens.lua`.
+  Brasseurs, Sanssaint, et chaque mois la Foire de Sombrelune (règle de Classic : du lundi qui suit le premier
+  vendredi au dimanche ; elle cède la place aux autres fêtes). Chaque fête a son image, aux mêmes dimensions et avec
+  les lieux aux mêmes places (`apps/web/public/images/tavernes/<id>.jpg`, `VXV/Core/Media/Tavernes/<id>.png`) ; le
+  site la choisit par `tavernPicture`, l'addon par `TavernPicture`, d'après les jours que `npm run generate` écrit
+  dans `Tokens.lua`.
 - Noms de joueurs toujours dans leur couleur de classe (`CLASS_COLORS`), jusque sur Discord par la couleur des rôles de
   classe (`classRole`, rendue par le bot à un rôle d'une autre couleur), et ces couleurs ne servent à rien d'autre. Sur
   parchemin, la même couleur foncée à l'encre du parchemin pour rester lisible (`CLASS_COLORS_ON_PARCHMENT`, 30 %).

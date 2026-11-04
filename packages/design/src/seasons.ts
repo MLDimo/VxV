@@ -32,8 +32,8 @@ function fixed(first: MonthDay, last: MonthDay): Season["periods"] {
   return (year) => [[isoDay(dayOf(year, first)), isoDay(dayOf(astride ? year + 1 : year, last))]];
 }
 
-/** The week from a Sunday. */
-const weekFrom = (sunday: Date): Period => [isoDay(sunday), isoDay(new Date(sunday.getTime() + 6 * DAY_MS))];
+/** The week from a day: that day and the six after it. */
+const weekFrom = (first: Date): Period => [isoDay(first), isoDay(new Date(first.getTime() + 6 * DAY_MS))];
 
 /** Easter Sunday in the Gregorian calendar (Meeus, Jones and Butcher's algorithm). */
 export function easter(year: number): Date {
@@ -51,11 +51,19 @@ export function easter(year: number): Date {
 /** The week from Easter Sunday. */
 const easterWeek: Season["periods"] = (year) => [weekFrom(easter(year))];
 
-/** The Darkmoon Faire, as in the game's calendar: the week from each month's first Sunday. */
+const FRIDAY = 5;
+/** From the setting-up Friday to the opening Monday. */
+const SETTING_UP_DAYS = 3;
+
+/**
+ * The Darkmoon Faire, as in Classic's calendar (Blizzard: set up on the month's first Friday, open the next Monday),
+ * from that Monday to the Sunday after it.
+ */
 const monthlyFaire: Season["periods"] = (year) =>
   Array.from({ length: MONTHS }, (_, month) => {
     const first = dayOf(year, [month + 1, 1]);
-    return weekFrom(new Date(first.getTime() + ((WEEK_DAYS - first.getUTCDay()) % WEEK_DAYS) * DAY_MS));
+    const toFriday = (FRIDAY - first.getUTCDay() + WEEK_DAYS) % WEEK_DAYS;
+    return weekFrom(new Date(first.getTime() + (toFriday + SETTING_UP_DAYS) * DAY_MS));
   });
 
 /** In this order: on a day of two holidays, the first wins (the Darkmoon Faire, each month, gives way to the others). */
