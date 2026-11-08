@@ -6,6 +6,7 @@ VXV.RegisterModule({
     Enable = function(data)
         ns.Gear.Load(data)
         ns.Key.Load(data)
+        ns.Waters.Load(data)
         ns.Session.Load(data)
     end,
     tab = {

@@ -36,6 +36,7 @@ local LOOKS = {
     hooked = { "gold", "gold-light", "gold-shade", "Ferrer", "ink" },
     caught = { "wood", "gold", "wood-shade", "Prise !", "gold" },
     fight = { "ink-loss", "loss", "wood-shade", "Pêcher", "muted" },
+    far = { "line", "muted", "ink", "Pêcher", "muted" },
 }
 
 local window, live, summary
@@ -148,6 +149,8 @@ local function buildSummary()
     text(summary, "textHeavy", 10, "muted", left + 110, top - 26):SetText("DURÉE")
     summary.best = text(summary, "text", 12, "lavender", left, top - 50)
     summary.weapons = text(summary, "text", 12, "gain", left, top - 70)
+    summary.reason = text(summary, "textBold", 11, "loss", left, top - 88)
+    summary.reason:SetWidth(WIDTH - 2 * (BORDER + PADDING))
     local again = Theme.Button(summary, "pixel", "Relancer", 100, SMALL_BUTTON_HEIGHT)
     again:SetPoint("BOTTOMRIGHT", -(BORDER + PADDING + 90), BORDER + PADDING - 2)
     again:SetScript("OnClick", Session.Start)
@@ -226,22 +229,27 @@ local function status(state, data)
         return "En combat", "muted"
     end
     setImage(button.icon, POLE)
+    if data.far then
+        return "Trop loin de l'eau", "loss"
+    end
     return "Canne équipée · prête", "gain"
 end
 
---- The banner of a fight: the weapons back, or the key to press.
+--- The banner: a fight (the weapons back, or the key to press), or the line out of the water.
 local function banner(state, data)
-    live.banner:SetShown(state == "fight")
-    if state ~= "fight" then
-        return
+    local line
+    if state == "fight" then
+        line = "Combat ! Session fermée après le combat"
+        if data.weaponsBack == false then
+            line = "Combat ! Appuie sur " .. Key.Current() .. " pour reprendre ton arme"
+        elseif data.weaponsBack then
+            line = "Combat ! Session fermée, arme rééquipée"
+        end
+    elseif state == "ready" and data.far then
+        line = "Ta ligne n'a pas touché l'eau : approche-toi et relance"
     end
-    local weaponsBack, line = data.weaponsBack, "Combat ! Session fermée après le combat"
-    if weaponsBack == false then
-        line = "Combat ! Appuie sur " .. Key.Current() .. " pour reprendre ton arme"
-    elseif weaponsBack then
-        line = "Combat ! Session fermée, arme rééquipée"
-    end
-    live.banner.label:SetText(line)
+    live.banner:SetShown(line ~= nil)
+    live.banner.label:SetText(line or "")
 end
 
 --- The lure: its time left on the pole, or its button when the bags hold one; the button changes out of combat.
@@ -257,7 +265,7 @@ local function lureLine()
 end
 
 local function renderLive(state, data)
-    look(state)
+    look(state == "ready" and data.far and "far" or state)
     local line, color = status(state, data)
     live.status:SetText(line)
     live.status:SetTextColor(Theme.Color(color))
@@ -276,6 +284,7 @@ local function renderSummary()
     summary.time:SetText(Session.Clock(last.seconds or 0))
     summary.best:SetText(last.best and last.best.name and ("Meilleure prise : " .. last.best.name) or "Aucune prise")
     summary.weapons:SetText(last.weapons and "Arme rééquipée" or "")
+    summary.reason:SetText(Session.Explain() or "")
 end
 
 --- Draws the running session again every moment (animations, the line's time), while it shows.
@@ -311,6 +320,11 @@ function SessionWindow.Render()
     end
     local running = state ~= "off"
     if not running and not wasRunning then
+        -- The summary already showing follows what happens next (why the session stopped); a failed start shows
+        -- nothing.
+        if window:IsShown() then
+            renderSummary()
+        end
         return
     end
     wasRunning = running

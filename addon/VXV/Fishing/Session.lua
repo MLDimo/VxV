@@ -8,7 +8,7 @@ local ns = select(2, ...).Fishing
 local Session = {}
 ns.Session = Session
 
-local Gear, Key, Skill = ns.Gear, ns.Key, ns.Skill
+local Gear, Key, Skill, Waters = ns.Gear, ns.Key, ns.Skill, ns.Waters
 
 -- How long the line stays in the water.
 Session.CAST_SECONDS = 20
@@ -20,15 +20,19 @@ local LOOT_WAIT_SECONDS = 1
 -- long after the fight the session shows before its summary.
 local EQUIP_CHECK_SECONDS = 1
 local AFTER_FIGHT_SECONDS = 3
+-- The game's text of a refused cast follows its failure at once.
+local REFUSAL_SECONDS = 1
 local CHANGED = "fishing.changed"
 local SECONDS_PER_MINUTE = 60
 
 local saved = {}
 local state = "off"
--- The running session: { startedAt, catches, best, last = { name, quality, icon }, castEndsAt, weaponsBack }.
+-- The running session: { startedAt, catches, best, last = { name, quality, icon }, castEndsAt, weaponsBack, far }.
 local session
--- Why the last start failed: "pole" (none in the bags), "fight", or nil.
+-- Why the last start failed or the session stopped: { kind = "pole" | "fight" | "water", need, level, zone }, or nil.
 local problem
+-- When the last fishing cast failed, to read the game's text of it.
+local failedAt
 
 local function changed()
     VXV.Emit(CHANGED)
@@ -50,9 +54,22 @@ function Session.State()
     return state, session
 end
 
---- Why the last start failed ("pole", "fight"), or nil.
+--- Why the last start failed or the session stopped: { kind = "pole" | "fight" | "water", need, level, zone }, or nil.
 function Session.Problem()
     return problem
+end
+
+--- The problem as the player reads it, or nil.
+function Session.Explain()
+    if problem == nil then
+        return nil
+    elseif problem.kind == "pole" then
+        return "Aucune canne à pêche dans tes sacs"
+    elseif problem.kind == "fight" then
+        return "Impossible pendant un combat"
+    end
+    return ("Eau trop difficile%s : il faut la Pêche à %d, la tienne est à %d"):format(
+        problem.zone and (" (" .. problem.zone .. ")") or "", problem.need, problem.level)
 end
 
 --- The last session's summary { catches, seconds, best }, or nil.
@@ -62,11 +79,20 @@ end
 
 --- Starts a session: checks the character fishes, is out of a fight and has a pole; takes the pole, binds the key.
 function Session.Start()
-    if state ~= "off" or Skill.Read() == nil then
+    local skill = Skill.Read()
+    if state ~= "off" or skill == nil then
         return
     end
     local pole = Gear.Pole()
-    problem = InCombatLockdown() and "fight" or pole == nil and "pole" or nil
+    local need, zone = Waters.Need()
+    problem = nil
+    if InCombatLockdown() then
+        problem = { kind = "fight" }
+    elseif pole == nil then
+        problem = { kind = "pole" }
+    elseif need ~= nil and skill.level < need then
+        problem = { kind = "water", need = need, level = skill.level, zone = zone }
+    end
     if problem ~= nil then
         changed()
         return
@@ -147,6 +173,7 @@ end
 VXV.OnEvent("UNIT_SPELLCAST_CHANNEL_START", function(unit, _, spellId)
     if isFishing(unit, spellId) and (state == "ready" or state == "caught") then
         session.castEndsAt = GetTime() + Session.CAST_SECONDS
+        session.far = nil
         Key.Hook()
         enter("fishing")
     end
@@ -203,6 +230,33 @@ VXV.OnEvent("LOOT_OPENED", function()
 end)
 
 VXV.OnEvent("PLAYER_REGEN_DISABLED", fight)
+
+VXV.OnEvent("UNIT_SPELLCAST_FAILED", function(unit, _, spellId)
+    if isFishing(unit, spellId) and state ~= "off" then
+        failedAt = GetTime()
+    end
+end)
+
+--- The game's text of a refused cast: water too hard for the level, the session stops and the zone is learned; the
+--- line out of the water, the button greys until the next cast.
+VXV.OnEvent("UI_ERROR_MESSAGE", function(_, text)
+    if state == "off" or failedAt == nil or GetTime() - failedAt > REFUSAL_SECONDS then
+        return
+    end
+    failedAt = nil
+    local refusal, need = Waters.Refusal(text)
+    local skill = Skill.Read()
+    if refusal == "low" and skill ~= nil then
+        Waters.Learn(skill.level, need)
+        local learned, zone = Waters.Need()
+        Session.Stop()
+        problem = { kind = "water", need = learned or need, level = skill.level, zone = zone }
+        changed()
+    elseif refusal == "far" then
+        session.far = true
+        changed()
+    end
+end)
 
 --- Takes the module's saved data at start-up: the key, the last session, and the weapons of a session cut short by a
 --- /reload or a disconnection, given back now.

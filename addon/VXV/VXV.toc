@@ -228,6 +228,7 @@ Artisans\Bootstrap.lua
 # key and its secure button, the session.
 Fishing\Skill.lua
 Fishing\Gear.lua
+Fishing\Waters.lua
 Fishing\Key.lua
 Fishing\Session.lua
 

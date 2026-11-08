@@ -173,7 +173,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   session ») ; le bouton « Appât » pose le meilleur appât des sacs sur la canne. Un combat (`PLAYER_REGEN_DISABLED`)
   rend les armes si le jeu le permet, sinon la touche le fait (macro `/equip [combat]`) ; la session se ferme
   3 s après le combat, avec son récapitulatif. La fenêtre tient des boutons sécurisés : elle ne change qu'hors combat
-  et Échap ne la ferme pas.
+  et Échap ne la ferme pas. Le jeu ne dit le niveau d'une eau qu'en refusant un lancer (`UI_ERROR_MESSAGE` après
+  `UNIT_SPELLCAST_FAILED`, textes `SPELL_FAILED_*` du client) : refusé pour le niveau, la session s'arrête et la zone
+  retient le niveau demandé (`Waters.lua`, données du compte, tous ses personnages), puis une session ne s'y lance plus
+  en dessous, avec un message ; ligne hors de l'eau, le bouton se grise jusqu'au lancer suivant (demande du
+  propriétaire du 8 novembre).
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
   connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde et une minute de paris (pas les joueurs,
   pas un membre endetté ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,

@@ -14,6 +14,16 @@ const GEAR = `
   Hands[16], Hands[17] = 25, 2362
 `;
 const START = 'SlashCmdList.VXV("peche")';
+/** Lua: the player in Durotar, and the game's texts of a refused cast (French client). */
+const WATERS = `
+  Zone = { map = 1411, name = "Durotar" }
+  C_Map = { GetBestMapForUnit = function() return Zone.map end, GetMapInfo = function() return { name = Zone.name } end }
+  SPELL_FAILED_LOW_CASTLEVEL = "Niveau de la technique insuffisant"
+  SPELL_FAILED_FISHING_TOO_LOW = "Pêche (%d) requise"
+  SPELL_FAILED_NOT_FISHABLE = "Votre ligne n'est pas tombée dans une eau poissonneuse"
+`;
+const REFUSED = (text: string) =>
+  `Fire("UNIT_SPELLCAST_FAILED", "player", "Cast-2", 7620) Fire("UI_ERROR_MESSAGE", 57, ${JSON.stringify(text)})`;
 const CAST = 'Fire("UNIT_SPELLCAST_CHANNEL_START", "player", "Cast-1", 7620)';
 const LINE_OUT = 'Fire("UNIT_SPELLCAST_CHANNEL_STOP", "player", "Cast-1", 7620)';
 const CATCH = `${LINE_OUT} CorpseLinks = { ItemLink(6303, "Saumon gris cru") } Fire("LOOT_OPENED")`;
@@ -160,6 +170,47 @@ describe("fishing in one button (Artisans › Pêche)", () => {
     expect(lure).toBe("/use Verroterie brillante\n/use 16");
     client("Lure.on, Lure.ms = true, 420000 AdvanceTime(0.2)");
     expect(shown(client, "VXV_FishingWindow")).toContain("Appât posé · 7 min");
+  });
+
+  it("stops at the first cast refused for the level, then no longer starts in that zone below it", () => {
+    const { client, state } = startFishing();
+    client(`${WATERS} ${START}`);
+    client(REFUSED("Niveau de la technique insuffisant"));
+    expect(state()).toBe("off");
+    expect(client("return Hands[16]")).toBe(25);
+    expect(shown(client, "VXV_FishingWindow")).toContain(
+      "Eau trop difficile (Durotar) : il faut la Pêche à 76, la tienne est à 75",
+    );
+    expect(client('return VXV_DB.modules.fishing.waters["map:1411"]')).toBe(76);
+    client(START);
+    expect(state()).toBe("off");
+    expect(client("return Hands[16]")).toBe(25);
+    client(OPEN_ARTISANS);
+    expect(shown(client, "VXV_Window")).toContain(
+      "Eau trop difficile (Durotar) : il faut la Pêche à 76, la tienne est à 75",
+    );
+    // Elsewhere, the session starts.
+    client(`Zone = { map = 1412, name = "Mulgore" } ${START}`);
+    expect(state()).toBe("ready");
+  });
+
+  it("learns the level the game asks for when it tells it", () => {
+    const { client } = startFishing();
+    client(`${WATERS} ${START}`);
+    client(REFUSED("Pêche (150) requise"));
+    expect(client('return VXV_DB.modules.fishing.waters["map:1411"]')).toBe(150);
+  });
+
+  it("greys the button when the line lands out of the water, until the next cast", () => {
+    const { client, state } = startFishing();
+    client(`${WATERS} ${START}`);
+    client(REFUSED("Votre ligne n'est pas tombée dans une eau poissonneuse"));
+    expect(state()).toBe("ready");
+    expect(shown(client, "VXV_FishingWindow")).toEqual(
+      expect.arrayContaining(["Trop loin de l'eau", "Ta ligne n'a pas touché l'eau : approche-toi et relance"]),
+    );
+    client(CAST);
+    expect(shown(client, "VXV_FishingWindow")).not.toContain("Trop loin de l'eau");
   });
 
   it("is only for a character who fishes", () => {

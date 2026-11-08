@@ -34,6 +34,7 @@ export const FOREVER_EVENTS = new Set([
   "TRADE_SKILL_SHOW",
   // Fishing in one button (probe, T12, 8 November): accepted by the client, the casts' failure and success, the
   // equipment's changes seen firing; the line's start and end, and the fight's start, to see firing.
+  "UNIT_SPELLCAST_FAILED",
   "UNIT_SPELLCAST_CHANNEL_START",
   "UNIT_SPELLCAST_CHANNEL_STOP",
   "PLAYER_REGEN_DISABLED",

@@ -33,6 +33,11 @@ local EVENTS = {
     "UNIT_SPELLCAST_FAILED", "UNIT_SPELLCAST_INTERRUPTED", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
     "PLAYER_SOFT_INTERACT_CHANGED", "PLAYER_EQUIPMENT_CHANGED", "LOOT_OPENED",
 }
+-- The game's texts of a refused fishing cast: too low a level, out of the water.
+local REFUSALS = {
+    "SPELL_FAILED_LOW_CASTLEVEL", "SPELL_FAILED_FISHING_TOO_LOW", "SPELL_FAILED_NOT_FISHABLE",
+    "SPELL_FAILED_TOO_SHALLOW",
+}
 local WATCH_SECONDS = 0.5
 local CHECK_DELAY_SECONDS = 1
 local BUTTON_WIDTH, BUTTON_HEIGHT, GAP = 260, 26, 6
@@ -130,6 +135,14 @@ local function status()
         log.Info("CVar", cvar, ":", Util.Results(Compat.GetCVar(cvar)))
     end
     log.Info("commande /interact (SLASH_INTERACT1) :", Util.Safe(_G.SLASH_INTERACT1))
+    for _, name in ipairs(REFUSALS) do
+        log.Info("texte", name, ":", Util.Safe(_G[name]))
+    end
+    local mapOf, infoOf = Compat.Resolve("C_Map.GetBestMapForUnit"), Compat.Resolve("C_Map.GetMapInfo")
+    local mapId = type(mapOf) == "function" and select(2, pcall(mapOf, "player")) or nil
+    local info = type(infoOf) == "function" and mapId and select(2, pcall(infoOf, mapId)) or nil
+    log.Info("zone : carte", Util.Safe(mapId), type(info) == "table" and Util.Safe(info.name) or "sans nom",
+        "GetRealZoneText", Util.Safe(type(_G.GetRealZoneText) == "function" and _G.GetRealZoneText() or nil))
     for _, event in ipairs(EVENTS) do
         local accepted = ns.Events.IsKnown(event)
         log.Check(accepted, "événement", event, accepted and "accepté" or "refusé")

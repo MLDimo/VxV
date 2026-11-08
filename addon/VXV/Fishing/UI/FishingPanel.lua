@@ -13,10 +13,6 @@ local Theme = VXV.Theme
 local BUTTON_HEIGHT, SMALL_BUTTON_HEIGHT, CHANGE_WIDTH = 34, 22, 90
 local BAR_HEIGHT, KEYCAP = 6, 22
 local LINE, GAP = 18, 12
-local PROBLEMS = {
-    pole = "Aucune canne à pêche dans tes sacs",
-    fight = "Impossible pendant un combat",
-}
 local NOT_A_FISHER = "Ce personnage ne pêche pas : la pêche en un bouton est réservée aux pêcheurs. "
     .. "Apprends la Pêche auprès d'un maître pêcheur."
 -- Keys that only modify another: the capture waits for the next one.
@@ -121,6 +117,7 @@ function FishingPanel.Create(parent, width)
     start:SetScript("OnClick", Session.Toggle)
     local problem = Theme.Text(fisher, "textBold", 12, "loss")
     problem:SetPoint("TOPLEFT", 0, top - BUTTON_HEIGHT - 6)
+    problem:SetWidth(width)
     local row = keyRow(fisher, width, top - BUTTON_HEIGHT - LINE - GAP)
     local heading = Theme.Heading(fisher, "Dernière session")
     heading:SetPoint("TOPLEFT", 0, top - BUTTON_HEIGHT - 2 * LINE - KEYCAP - 2 * GAP)
@@ -142,7 +139,7 @@ function FishingPanel.Create(parent, width)
         level:SetText(("Pêche · %d / %d"):format(skill.level, skill.max))
         bar:SetWidth(math.max(1, width * skill.level / math.max(skill.max, 1)))
         start:SetText(Session.State() == "off" and "Lancer une session de pêche" or "Quitter la session")
-        problem:SetText(PROBLEMS[Session.Problem()] or "")
+        problem:SetText(Session.Explain() or "")
         renderKey(row)
         last:SetText(lastSession())
     end
