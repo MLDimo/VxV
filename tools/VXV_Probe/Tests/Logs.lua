@@ -31,10 +31,7 @@ local function isMarked(text)
 end
 
 local function describe(ok, ...)
-    if not ok then
-        return "erreur : " .. Util.Safe((...))
-    end
-    return Util.Join("renvoie", ...)
+    return ok and ("renvoie " .. Util.Results(ok, ...)) or Util.Results(ok, ...)
 end
 
 --- The state of both logs and of the advanced combat logging, as the client tells it.
