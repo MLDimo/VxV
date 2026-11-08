@@ -377,7 +377,8 @@ ns.Registry.Register({
             log.Ok("PLAYER_REGEN_DISABLED")
             onCombat()
         end)
-        log.Journal({ PLAYER_REGEN_ENABLED = "Ok", PLAYER_SOFT_INTERACT_CHANGED = "Info",
+        -- The soft target changes at every step near creatures and objects: kept, not printed.
+        log.Journal({ PLAYER_REGEN_ENABLED = "Ok", PLAYER_SOFT_INTERACT_CHANGED = "Trace",
             PLAYER_EQUIPMENT_CHANGED = "Info" })
         log.Listen("LOOT_OPENED", onLoot)
     end,
