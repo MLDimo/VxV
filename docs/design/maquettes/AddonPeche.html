@@ -107,9 +107,9 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
 .big .secs{position:absolute;right:6px;top:6px;font:700 11px 'Pixelify Sans',sans-serif;color:#1A1206}
 
 /* Animations : une image PNG par étape, enchaînées en steps() */
-.ripple{background:url(peche/ondes-bande.png) 0 0/320px 48px no-repeat;image-rendering:pixelated;animation:rip 1.2s steps(4) infinite}
+.ripple{background:url(../../../addon/VXV/Fishing/Media/ondes-bande.png) 0 0/320px 48px no-repeat;image-rendering:pixelated;animation:rip 1.2s steps(4) infinite}
 @keyframes rip{to{background-position:-320px 0}}
-.splash{background:url(peche/eclaboussure-bande.png) 0 0/240px 48px no-repeat;image-rendering:pixelated;animation:spl .45s steps(3) infinite}
+.splash{background:url(../../../addon/VXV/Fishing/Media/eclaboussure-bande.png) 0 0/240px 48px no-repeat;image-rendering:pixelated;animation:spl .45s steps(3) infinite}
 @keyframes spl{to{background-position:-240px 0}}
 .blink{animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:.35}}
@@ -207,7 +207,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
                   <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;gap:6px;font-size:13px"><b style="color:#C69B6D">Vorn</b><span style="color:var(--old-paper)">· Pêche</span><b style="margin-left:auto;font-family:'Pixelify Sans';color:var(--gold)">225</b></div><span style="height:6px;background:#2a2238"><span style="display:block;height:100%;width:75%;background:var(--ember)"></span></span></div>
                 </section>
                 <section class="panel" style="box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--ember)">
-                  <span class="ptitle" style="color:var(--ember)"><img class="px" src="peche/canne.png" alt="" width="16" height="16">Pêche en un bouton</span>
+                  <span class="ptitle" style="color:var(--ember)"><img class="px" src="../../../addon/VXV/Fishing/Media/canne.png" alt="" width="16" height="16">Pêche en un bouton</span>
                   <span style="font-size:12px;line-height:1.45;color:var(--lavender)">Lance, ferre, relance : une seule touche. Ton arme revient à la fin.</span>
                   <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted)"><span>Quête en cours : <b style="color:var(--lavender)">Le Grand Pêcheur</b></span><span style="color:var(--amethyst)">5e</span></div>
                   <button class="btn amethyst" type="button" style="width:100%;min-height:42px;padding:0 8px;font-size:14px">Lancer une session de pêche</button>
@@ -251,13 +251,13 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
               <div class="qbar"><span style="width:36%"></span></div>
             </div>
 
-            <button class="btn amethyst" type="button" style="margin:8px 2px 0;min-height:56px;font-size:18px"><img class="px" src="peche/canne.png" alt="" width="32" height="32">Lancer une session de pêche</button>
+            <button class="btn amethyst" type="button" style="margin:8px 2px 0;min-height:56px;font-size:18px"><img class="px" src="../../../addon/VXV/Fishing/Media/canne.png" alt="" width="32" height="32">Lancer une session de pêche</button>
             <div style="display:flex;align-items:center;gap:8px;padding:0 6px;font-size:12px;color:var(--muted)">Touche de pêche <span class="keycap">F</span><button class="btn wood" type="button" style="margin-left:auto;min-height:26px;padding:0 10px;font-size:13px">Changer</button></div>
 
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
               <span style="font:600 14px 'Pixelify Sans',sans-serif;color:var(--ember)">Dernière session</span>
               <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card);box-shadow:0 0 0 2px var(--ink)">
-                <span class="slot" style="width:30px;height:30px"><img class="px" src="peche/poisson.png" alt="" width="24" height="24"></span>
+                <span class="slot" style="width:30px;height:30px"><img class="px" src="../../../addon/VXV/Fishing/Media/poisson.png" alt="" width="24" height="24"></span>
                 <div style="display:flex;flex-direction:column;gap:1px;font-size:12px;color:var(--lavender)"><span><b style="font-family:'Pixelify Sans';color:var(--ivory)">23</b> prises · <b style="font-family:'Pixelify Sans';color:var(--ivory)">18:40</b></span><span>Meilleure : <b style="color:#1EFF00">Poisson-chat boueux</b></span></div>
                 <span style="margin-left:auto;font-size:11px;color:var(--muted)">hier</span>
               </div>
@@ -284,7 +284,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
           <div class="sess"><div class="in">
             <div class="sbar"><svg width="9" height="12" viewBox="0 0 9 12" aria-hidden="true"><g fill="#8A5A2A"><rect x="0" y="0" width="3" height="3"/><rect x="6" y="0" width="3" height="3"/><rect x="0" y="5" width="3" height="3"/><rect x="6" y="5" width="3" height="3"/><rect x="0" y="9" width="3" height="3"/><rect x="6" y="9" width="3" height="3"/></g></svg><span class="ttl">Session de pêche</span><span class="tag">Artisans</span></div>
             <div class="sbody">
-              <button class="big ready" type="button"><span class="k">F</span><img class="px rod" src="peche/canne.png" alt="">Pêcher</button>
+              <button class="big ready" type="button"><span class="k">F</span><img class="px rod" src="../../../addon/VXV/Fishing/Media/canne.png" alt="">Pêcher</button>
               <div class="side">
                 <span class="status" style="color:var(--gain)">Canne équipée · prêt</span>
                 <div class="meta"><span><b>12</b> prises</span><span><b>08:42</b></span></div>
@@ -344,7 +344,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
           <div class="sess"><div class="in">
             <div class="sbar"><svg width="9" height="12" viewBox="0 0 9 12" aria-hidden="true"><g fill="#8A5A2A"><rect x="0" y="0" width="3" height="3"/><rect x="6" y="0" width="3" height="3"/><rect x="0" y="5" width="3" height="3"/><rect x="6" y="5" width="3" height="3"/><rect x="0" y="9" width="3" height="3"/><rect x="6" y="9" width="3" height="3"/></g></svg><span class="ttl">Session de pêche</span><span class="tag">Artisans</span></div>
             <div class="sbody">
-              <button class="big caught" type="button" aria-disabled="true"><span class="k">F</span><span class="slot"><img class="px" src="peche/poisson.png" alt="" width="32" height="32"></span>Prise !<span class="timer"><span style="width:50%"></span></span></button>
+              <button class="big caught" type="button" aria-disabled="true"><span class="k">F</span><span class="slot"><img class="px" src="../../../addon/VXV/Fishing/Media/poisson.png" alt="" width="32" height="32"></span>Prise !<span class="timer"><span style="width:50%"></span></span></button>
               <div class="side">
                 <span class="status" style="color:#FFFFFF">+1 · Germon arc-en-ciel</span>
                 <div class="meta"><span><b style="color:var(--gain)">13</b> prises</span><span><b>08:57</b></span></div>
@@ -398,7 +398,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
                 <div style="padding:5px 6px;background:var(--card);box-shadow:0 0 0 1px var(--line)"><span style="display:block;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Quête</span><b style="font:700 18px 'Pixelify Sans',sans-serif;color:var(--amethyst)">4e</b></div>
               </div>
               <div style="display:flex;align-items:center;gap:8px">
-                <span class="slot"><img class="px" src="peche/poisson.png" alt="" width="32" height="32"></span>
+                <span class="slot"><img class="px" src="../../../addon/VXV/Fishing/Media/poisson.png" alt="" width="32" height="32"></span>
                 <div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Meilleure prise</span><b style="font-size:13px;color:#1EFF00;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Poisson-chat boueux</b></div>
               </div>
               <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gain)"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><g fill="#7EE2A0"><rect x="0" y="6" width="3" height="3"/><rect x="3" y="9" width="3" height="3"/><rect x="6" y="6" width="3" height="3"/><rect x="9" y="3" width="3" height="3"/></g></svg>Arme rééquipée</div>
@@ -425,7 +425,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
           <div class="sess"><div class="in">
             <div class="banner combat"><svg class="ico" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><g fill="#F4EFFC"><rect x="0" y="0" width="3" height="3"/><rect x="3" y="3" width="3" height="3"/><rect x="8" y="3" width="3" height="3"/><rect x="11" y="0" width="3" height="3"/><rect x="5" y="5" width="4" height="4"/><rect x="3" y="8" width="3" height="3"/><rect x="8" y="8" width="3" height="3"/><rect x="0" y="11" width="3" height="3"/><rect x="11" y="11" width="3" height="3"/></g></svg>Combat ! Session fermée, arme rééquipée</div>
             <div class="sbody dim">
-              <button class="big off" type="button" disabled><span class="k">F</span><img class="px rod" src="peche/canne.png" alt="" style="filter:grayscale(1)">Pêcher</button>
+              <button class="big off" type="button" disabled><span class="k">F</span><img class="px rod" src="../../../addon/VXV/Fishing/Media/canne.png" alt="" style="filter:grayscale(1)">Pêcher</button>
               <div class="side">
                 <span class="status" style="color:var(--muted)">En combat</span>
                 <div class="meta"><span><b>12</b> prises</span><span><b>08:42</b></span></div>
@@ -468,7 +468,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
           <div class="sess"><div class="in">
             <div class="banner error"><svg class="ico" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><g fill="#F19A9A"><rect x="4" y="0" width="4" height="7"/><rect x="4" y="9" width="4" height="3"/></g></svg>Aucune canne à pêche dans tes sacs</div>
             <div class="sbody">
-              <button class="big off" type="button" disabled><span class="k">F</span><img class="px rod" src="peche/canne.png" alt="" style="filter:grayscale(1);opacity:.6">Pêcher</button>
+              <button class="big off" type="button" disabled><span class="k">F</span><img class="px rod" src="../../../addon/VXV/Fishing/Media/canne.png" alt="" style="filter:grayscale(1);opacity:.6">Pêcher</button>
               <div class="side">
                 <span style="font-size:12px;line-height:1.45;color:var(--lavender)">Mets une canne à pêche dans tes sacs, puis relance la session.</span>
                 <button class="btn wood quit" type="button">Fermer</button>
@@ -483,7 +483,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
           <div class="sess"><div class="in">
             <div class="banner error"><svg class="ico" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><g fill="#F19A9A"><rect x="4" y="0" width="4" height="7"/><rect x="4" y="9" width="4" height="3"/></g></svg>Impossible pendant un combat</div>
             <div class="sbody">
-              <button class="big off" type="button" disabled><span class="k">F</span><img class="px rod" src="peche/canne.png" alt="" style="filter:grayscale(1);opacity:.6">Pêcher</button>
+              <button class="big off" type="button" disabled><span class="k">F</span><img class="px rod" src="../../../addon/VXV/Fishing/Media/canne.png" alt="" style="filter:grayscale(1);opacity:.6">Pêcher</button>
               <div class="side">
                 <span style="font-size:12px;line-height:1.45;color:var(--lavender)">Attends la fin du combat : la session se lancera d'un clic.</span>
                 <button class="btn wood quit" type="button">Fermer</button>
@@ -495,7 +495,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
       <div class="board">
         <span class="lbl">Même erreur au point d'entrée</span>
         <div class="panel" style="width:270px;box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--ember)">
-          <span class="ptitle" style="color:var(--ember)"><img class="px" src="peche/canne.png" alt="" width="16" height="16">Pêche en un bouton</span>
+          <span class="ptitle" style="color:var(--ember)"><img class="px" src="../../../addon/VXV/Fishing/Media/canne.png" alt="" width="16" height="16">Pêche en un bouton</span>
           <button class="btn amethyst" type="button" disabled style="width:100%;min-height:42px;padding:0 8px;font-size:13px">Lancer une session de pêche</button>
           <div class="banner error" style="font-size:11px">Aucune canne à pêche dans tes sacs</div>
         </div>
@@ -541,10 +541,10 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
     <h2>Images fournies</h2>
     <p>PNG en pixel art à la taille native (à afficher en <code>NEAREST</code>, ×2 dans le gros bouton). Une image par étape, et la même suite en bande horizontale pour l'animation.</p>
     <div class="row" style="gap:28px">
-      <div class="board"><span class="lbl">onde-1 → onde-4 · 40×24</span><div style="display:flex;gap:8px"><img class="px" src="peche/onde-1.png" width="120" height="72" alt="Ondes, étape 1"><img class="px" src="peche/onde-2.png" width="120" height="72" alt="Ondes, étape 2"><img class="px" src="peche/onde-3.png" width="120" height="72" alt="Ondes, étape 3"><img class="px" src="peche/onde-4.png" width="120" height="72" alt="Ondes, étape 4"></div><span class="note">En pêche, en boucle, 0,3 s par étape.</span></div>
-      <div class="board"><span class="lbl">eclaboussure-1 → 3 · 40×24</span><div style="display:flex;gap:8px"><img class="px" src="peche/eclaboussure-1.png" width="120" height="72" alt="Éclaboussure, étape 1"><img class="px" src="peche/eclaboussure-2.png" width="120" height="72" alt="Éclaboussure, étape 2"><img class="px" src="peche/eclaboussure-3.png" width="120" height="72" alt="Éclaboussure, étape 3"></div><span class="note">Au ferrage, une fois, 0,15 s par étape.</span></div>
-      <div class="board"><span class="lbl">canne · poisson · 16×16</span><div style="display:flex;gap:8px"><img class="px" src="peche/canne.png" width="64" height="64" alt="Canne à pêche"><img class="px" src="peche/poisson.png" width="64" height="64" alt="Poisson"></div><span class="note">Canne : icône du bouton et du panneau. Poisson : exemple seulement, le jeu donne la vraie icône de la prise.</span></div>
-      <div class="board"><span class="lbl">ondes-bande · eclaboussure-bande</span><div style="display:flex;flex-direction:column;gap:8px"><img class="px" src="peche/ondes-bande.png" width="480" height="72" alt="Bande des ondes"><img class="px" src="peche/eclaboussure-bande.png" width="360" height="72" alt="Bande de l'éclaboussure"></div><span class="note">Pour <code>SetTexCoord</code> étape par étape, ou en CSS <code>steps()</code>.</span></div>
+      <div class="board"><span class="lbl">onde-1 → onde-4 · 40×24</span><div style="display:flex;gap:8px"><img class="px" src="../../../addon/VXV/Fishing/Media/onde-1.png" width="120" height="72" alt="Ondes, étape 1"><img class="px" src="../../../addon/VXV/Fishing/Media/onde-2.png" width="120" height="72" alt="Ondes, étape 2"><img class="px" src="../../../addon/VXV/Fishing/Media/onde-3.png" width="120" height="72" alt="Ondes, étape 3"><img class="px" src="../../../addon/VXV/Fishing/Media/onde-4.png" width="120" height="72" alt="Ondes, étape 4"></div><span class="note">En pêche, en boucle, 0,3 s par étape.</span></div>
+      <div class="board"><span class="lbl">eclaboussure-1 → 3 · 40×24</span><div style="display:flex;gap:8px"><img class="px" src="../../../addon/VXV/Fishing/Media/eclaboussure-1.png" width="120" height="72" alt="Éclaboussure, étape 1"><img class="px" src="../../../addon/VXV/Fishing/Media/eclaboussure-2.png" width="120" height="72" alt="Éclaboussure, étape 2"><img class="px" src="../../../addon/VXV/Fishing/Media/eclaboussure-3.png" width="120" height="72" alt="Éclaboussure, étape 3"></div><span class="note">Au ferrage, une fois, 0,15 s par étape.</span></div>
+      <div class="board"><span class="lbl">canne · poisson · 16×16</span><div style="display:flex;gap:8px"><img class="px" src="../../../addon/VXV/Fishing/Media/canne.png" width="64" height="64" alt="Canne à pêche"><img class="px" src="../../../addon/VXV/Fishing/Media/poisson.png" width="64" height="64" alt="Poisson"></div><span class="note">Canne : icône du bouton et du panneau. Poisson : exemple seulement, le jeu donne la vraie icône de la prise.</span></div>
+      <div class="board"><span class="lbl">ondes-bande · eclaboussure-bande</span><div style="display:flex;flex-direction:column;gap:8px"><img class="px" src="../../../addon/VXV/Fishing/Media/ondes-bande.png" width="480" height="72" alt="Bande des ondes"><img class="px" src="../../../addon/VXV/Fishing/Media/eclaboussure-bande.png" width="360" height="72" alt="Bande de l'éclaboussure"></div><span class="note">Pour <code>SetTexCoord</code> étape par étape, ou en CSS <code>steps()</code>.</span></div>
     </div>
   </section>
 </div>
@@ -560,7 +560,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
   function show(s) {
     state = s; clearInterval(tick); timer.hidden = true; status.style.color = '';
     if (s === 'ready') {
-      btn.className = 'big ready'; face.className = ''; face.innerHTML = '<img class="px rod" src="peche/canne.png" alt="">';
+      btn.className = 'big ready'; face.className = ''; face.innerHTML = '<img class="px rod" src="../../../addon/VXV/Fishing/Media/canne.png" alt="">';
       label.textContent = 'Pêcher'; status.textContent = 'Canne équipée · prêt'; status.style.color = 'var(--gain)';
     } else if (s === 'fishing') {
       btn.className = 'big strike'; face.innerHTML = ''; face.className = 'water ripple'; label.textContent = 'Ferrer';
@@ -576,7 +576,7 @@ section.group>p{margin:0 0 22px;max-width:900px;font-size:14px;line-height:1.5;c
       setTimeout(function () { show('caught'); }, 450);
     } else if (s === 'caught') {
       n++; done++; count.textContent = n; q.textContent = done + ' / 252'; qbar.style.width = (done / 252 * 100) + '%';
-      btn.className = 'big caught'; face.className = 'slot'; face.innerHTML = '<img class="px" src="peche/poisson.png" alt="" width="32" height="32">';
+      btn.className = 'big caught'; face.className = 'slot'; face.innerHTML = '<img class="px" src="../../../addon/VXV/Fishing/Media/poisson.png" alt="" width="32" height="32">';
       label.textContent = 'Prise !'; status.textContent = '+1 · Germon arc-en-ciel'; status.style.color = '#FFFFFF';
       timer.hidden = false; bar.style.width = '100%'; bar.style.transition = 'none';
       var t = 0; tick = setInterval(function () { t += 100; bar.style.width = (100 - t / 20) + '%'; if (t >= 2000) show('ready'); }, 100);

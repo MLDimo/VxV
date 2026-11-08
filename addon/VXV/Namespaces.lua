@@ -4,7 +4,7 @@ local _, addon = ...
 --- "local ns = select(2, ...).Raid", and sees the other parts only through the core's public API, the VXV global
 --- (Core/Api.lua).
 local PARTS = { "Core", "Sync", "Raid", "Paris", "Deathroll", "Chifoumi", "Missions",
-    "Titles", "Artisans", "Ranking", "PvP" }
+    "Titles", "Artisans", "Fishing", "Ranking", "PvP" }
 for _, part in ipairs(PARTS) do
     addon[part] = {}
 end

@@ -223,6 +223,21 @@ Artisans\UI\ArtisansTab.lua
 
 Artisans\Bootstrap.lua
 
+# ===== Fishing
+# Fishing in one button, for the characters who fish (Artisans › Pêche): the profession, the pole and the lures, the
+# key and its secure button, the session.
+Fishing\Skill.lua
+Fishing\Gear.lua
+Fishing\Key.lua
+Fishing\Session.lua
+
+# Interface: the session's window over the game, the panel of the Artisans screen and of the reduced mode.
+Fishing\UI\SessionWindow.lua
+Fishing\UI\FishingPanel.lua
+Fishing\UI\FishingTab.lua
+
+Fishing\Bootstrap.lua
+
 # ===== Ranking
 # The boards the website exports (VXV-RANKING), and what the screen shows of them.
 Ranking\RankingData.lua

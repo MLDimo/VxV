@@ -163,6 +163,17 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   fabriquer… ? » sans accents ni casse. L'annuaire du site n'arrive que par le compagnon (trop gros pour le relais des
   officiers). Infobulle d'un objet de recette (`RecipeItems.lua`) : « Recette possédée par VXV » en vert ou « Recette
   non possédée par VXV » en rouge, le nom après « : » comparé sans accents ni casse ; rien sur les livres.
+- **Pêche en un bouton** (`VXV/Fishing`, Artisans › Pêche ; demande du propriétaire du 8 novembre, maquette
+  `AddonPeche`) : réservée aux personnages qui ont la Pêche (ligne de métier 356) ; sans toucher au son du joueur.
+  « Lancer une session de pêche » (onglet, mode réduit, `/vxv peche`) garde les armes en main (gardées aussi dans les
+  données, rendues à la connexion suivante après un `/reload`) et équipe la canne des sacs. La touche de pêche (F,
+  choisie dans l'onglet) n'est liée que pendant la session, à un bouton sécurisé (`VXV_FishingButton`, seul moyen de
+  lancer un sort) : elle lance la ligne, puis le temps de la ligne ferre le bouchon (`INTERACTTARGET`, cible
+  d'interaction du jeu), puis relance. Fenêtre de session posée sur le jeu (prises, durée, appât, « Quitter la
+  session ») ; le bouton « Appât » pose le meilleur appât des sacs sur la canne. Un combat (`PLAYER_REGEN_DISABLED`)
+  rend les armes si le jeu le permet, sinon la touche le fait (macro `/equip [combat]`) ; la session se ferme
+  3 s après le combat, avec son récapitulatif. La fenêtre tient des boutons sécurisés : elle ne change qu'hors combat
+  et Échap ne la ferme pas.
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
   connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde et une minute de paris (pas les joueurs,
   pas un membre endetté ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,
@@ -223,8 +234,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 - Le site est réservé aux membres : un visiteur ne voit que la page de connexion et le guide du membre, public
   (décision du propriétaire du 9 octobre) : `/guide`, page autonome `apps/web/public/guide/index.html` (polices et
   images du site, émojis du bot et captures de la charte copiés à côté), tenue à jour avec les fonctionnalités.
-- Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller.
-- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll, Chi Fou Mi.
+- Addon : `VXV.Theme` (couleurs, polices, panneaux, boutons, anneaux) et `VXV.CreateDialog` ; aucun modèle de cadre ou de bouton du jeu (`UIPanelButtonTemplate`…), sauf la zone de saisie défilante de la fenêtre de copier-coller et les boutons sécurisés de la pêche (`SecureActionButtonTemplate`, invisible sous notre habillage).
+- Un module branche un lieu par `tab = { place, Build(content), Card(), Compact(content) }` : écran de la grande fenêtre, carte sous la Taverne (rafraîchie par l'événement `tavern.changed`), écran du mode réduit. Les écrans se construisent avec `VXV.Screen` (en-tête, badges, liste qui suit les événements du bus, écran simple du mode réduit) et `VXV.RowList` (lignes à la molette, `RowList.Row`) ; les deux fenêtres partagent `UI/PlaceWindow.lua` (onglets par lieu, position gardée). Plusieurs modules sur un même lieu ont chacun leur sous-onglet (`tab.name`, `tab.order`) ; la carte et le mode réduit viennent du premier qui les fournit. Le Dé Pipé : Paris, Deathroll, Chi Fou Mi ; Artisans : Annuaire, Pêche.
 - Dégradés et lueurs en petites images PNG (`VXV/Core/Media`) : `CreateColor`, nécessaire aux dégradés du jeu, n'est pas mesuré sur Forever.
 - Un cadre posé sur un autre (page sur une couverture, carte sur un panneau) en est l'enfant : le jeu dessine les textures des cadres de même niveau calque par calque, et le fond du dessous recouvrirait celui du dessus.
 - Bot Discord : couleurs des messages tirées des jetons (raids améthyste, Le Dé Pipé sakura, Quêtes vert, titres or,
@@ -250,7 +261,7 @@ La table complète est dans le README. Règles :
 - **Clean architecture** : le domaine ne dépend de rien ; l'infrastructure (Blizzard, Supabase, Discord) est derrière des adaptateurs.
 - **Un seul addon, des parties indépendantes** : un dossier `VXV`, une case à cocher dans la liste des addons du jeu
   (demande du propriétaire). Chaque fonctionnalité est une partie, dans son dossier, avec son espace de noms privé
-  (`Core`, `Sync`, `Raid`, `Paris`, `Deathroll`, `Chifoumi`, `Missions`, `Titles`, `Artisans`, `Ranking`, `PvP`), et ne dépend que
+  (`Core`, `Sync`, `Raid`, `Paris`, `Deathroll`, `Chifoumi`, `Missions`, `Titles`, `Artisans`, `Fishing`, `Ranking`, `PvP`), et ne dépend que
   du socle (`Core`).
 - La base de données fait foi. Discord, le site, le compagnon et l'addon ne sont que des points d'accès.
 - Droits contrôlés par le serveur, jamais par l'addon ni le compagnon. Rôles cumulables (Membre, officier, trésorier, GM) ; seul le trésorier a les droits de trésorerie ; tout membre du serveur Discord est membre de la guilde, mais seul le rôle Discord « Membre » ouvre paris et deathroll.
@@ -412,6 +423,11 @@ Mesurées par la sonde (détail et journaux : `docs/phase-0/resultats.md`).
   (`advancedCombatLogging`). Le journal de combat (`Logs/WoWCombatLog-*.txt`) s'écrit pendant la partie (soins reçus
   et rencontres de boss compris ; joueurs par prénom et GUID, sans nom de famille) ; le journal du chat n'est écrit qu'à la fermeture du jeu.
   Canal de discussion privé : envois sans clic bloqués.
+- Pêche (sonde, 8 novembre) : un bouton sécurisé de l'addon lance la Pêche au clic et par une touche que l'addon lie
+  (`SetOverrideBindingClick`) ; l'addon équipe la canne (`C_Item.EquipItemByName`) et lit sacs, mains et appât
+  (`C_Container`, `GetInventoryItemID`, `GetWeaponEnchantInfo`). La cible d'interaction suit les objets proches
+  (`SoftTargetInteract` à 3 par défaut, `PLAYER_SOFT_INTERACT_CHANGED`) ; pas de commande `/interact`. Une eau trop
+  difficile pour la compétence répond « Niveau de la technique insuffisant ».
 - `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés.
 - Habillage : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.
 

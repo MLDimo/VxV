@@ -29,6 +29,11 @@ local FUNCTIONS = {
     "PlaySound", "SOUNDKIT",
     -- Damage and healing titles (P13)
     "C_DamageMeter.GetAvailableCombatSessions", "C_DamageMeter.GetCombatSessionFromID",
+    -- Fishing in one button (T12): which of the modern and old functions the client has
+    "C_Container.GetContainerNumSlots", "C_Container.GetContainerItemID", "C_Item.GetItemInfoInstant",
+    "C_Item.EquipItemByName", "EquipItemByName", "C_Spell.GetSpellName", "GetSpellInfo", "GetInventoryItemID",
+    "GetWeaponEnchantInfo", "SetOverrideBinding", "SetOverrideBindingClick", "ClearOverrideBindings",
+    "GetBindingAction", "IsFishingLoot",
 }
 
 local EVENTS = {

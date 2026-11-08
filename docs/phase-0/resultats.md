@@ -118,6 +118,23 @@ Bilan : seul le journal de combat porte des données pendant la partie, et seule
 mises, deathrolls et changements faits en jeu restent portés par les données sauvegardées (`/reload` ou déconnexion).
 La sonde laisse le mode avancé du journal de combat allumé (`advancedCombatLogging` à 1, réglage du jeu).
 
+## Pêche en un bouton (8 novembre, client de la sortie)
+
+Journal : `sessions/2026-11-08.txt`, un apprenti pêcheur, une canne (6256) et une Verroterie brillante (6529) dans les
+sacs, une épée et un bouclier en main.
+
+| Test | Question | Résultat | Statut | Conséquence |
+| --- | --- | --- | --- | --- |
+| T12 sacs et mains | L'addon trouve-t-il la canne, l'appât et les armes en main ? | Oui : `C_Container.GetContainerNumSlots` et `GetContainerItemID`, `C_Item.GetItemInfoInstant` (classe 2, sous-classe 20 pour la canne), `GetInventoryItemID` (16 et 17), `C_Item.GetItemSpell` (appât : sort 8087). | ✅ | `VXV/Fishing/Gear.lua` |
+| T12 équiper | L'addon équipe-t-il la canne ? | Oui, hors combat depuis une commande : épée et bouclier retirés (`PLAYER_EQUIPMENT_CHANGED` 16 et 17), canne en main. | ✅ | La session prend la canne et rend les armes. |
+| T12 bouton sécurisé | Un bouton de l'addon lance-t-il la Pêche ? | Oui : `SecureActionButtonTemplate` avec une macro `/cast Pêche`, au clic et par la touche F liée par `SetOverrideBindingClick` ; un seul lancer par appui (`ActionButtonUseKeyDown` à 1). Ici refusé par le jeu : « Niveau de la technique insuffisant » (eau trop difficile). | ✅ | `VXV/Fishing/Key.lua` |
+| T12 appât | Le bouton d'appât pose-t-il l'appât sur la canne ? | Oui : macro `/use Verroterie brillante` puis `/use 16`, sort 8087 réussi. | ✅ | Bouton « Appât » de la session |
+| T12 cible d'interaction | Le jeu vise-t-il seul les objets proches ? | Oui : `SoftTargetInteract` à 3 par défaut, `PLAYER_SOFT_INTERACT_CHANGED` à chaque objet ou créature à portée. `/interact` n'existe pas (`SLASH_INTERACT1` absent). | ✅ | Ferrer par `INTERACTTARGET` lié à la touche, pas par macro. |
+| T12 événements | Les événements de la pêche sont-ils acceptés ? | Oui : `UNIT_SPELLCAST_CHANNEL_START` et `_STOP`, `_SUCCEEDED`, `_FAILED`, `_INTERRUPTED`, `PLAYER_REGEN_DISABLED` et `_ENABLED`, `PLAYER_EQUIPMENT_CHANGED`, `LOOT_OPENED`. | ✅ | — |
+
+Restent à mesurer (`docs/tests-en-jeu.md`) : la ligne à l'eau et le ferrage par la touche, `SetOverrideBinding`, et
+l'équipement en combat.
+
 ## Hypothèses de départ (sources communautaires)
 
 | Hypothèse | Résultat |

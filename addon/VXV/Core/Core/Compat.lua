@@ -55,6 +55,17 @@ local ALIASES = {
     -- The game's combat log, written while the game runs (phase 0, T11, 7 October): switched on without a click.
     LoggingCombat = { "LoggingCombat" },
     SetCVar = { "C_CVar.SetCVar", "SetCVar" },
+    -- Fishing in one button (probe, T12, 8 November): the bags, an item's kind, the hands and what the player
+    -- equips, the fishing spell's name, the time left of a lure, a key bound by the addon.
+    GetContainerNumSlots = { "C_Container.GetContainerNumSlots", "GetContainerNumSlots" },
+    GetContainerItemID = { "C_Container.GetContainerItemID", "GetContainerItemID" },
+    GetItemInfoInstant = { "C_Item.GetItemInfoInstant", "GetItemInfoInstant" },
+    GetInventoryItemID = { "GetInventoryItemID" },
+    EquipItemByName = { "C_Item.EquipItemByName", "EquipItemByName" },
+    GetSpellName = { "C_Spell.GetSpellName", "GetSpellInfo" },
+    GetWeaponEnchantInfo = { "GetWeaponEnchantInfo" },
+    SetOverrideBindingClick = { "SetOverrideBindingClick" },
+    ClearOverrideBindings = { "ClearOverrideBindings" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

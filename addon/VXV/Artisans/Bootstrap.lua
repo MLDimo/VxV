@@ -12,6 +12,8 @@ VXV.RegisterModule({
     end,
     tab = {
         place = "artisans",
+        name = "Annuaire",
+        order = 1,
         Build = ns.ArtisansTab.Build,
     },
 })
