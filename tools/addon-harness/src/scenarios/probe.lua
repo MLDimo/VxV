@@ -60,6 +60,8 @@ run("professions recipes")
 
 -- Fishing: out of combat, the buttons and the key; a cast with the key swapped; then combat.
 InCombatLockdown = function() return false end
+run("peche etat")
+GetProfessions = function() return 1, nil, nil, 4, 5 end
 for _, command in ipairs({
     "peche etat", "peche rendre", "peche touche f", "peche equiper", "peche boutons", "peche touche f a",
     "peche interact on", "peche interact off", "peche combat on",

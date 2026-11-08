@@ -239,7 +239,10 @@ ScrollUtil = {
 
 -- Professions (T10): modern API; the scenario removes it to run the classic one.
 GetProfessions = function() return 1, nil, nil, 4, 5 end
-GetProfessionInfo = function(index) return "Métier " .. index, "icon", 150, 300, 10, 0, 164 end
+GetProfessionInfo = function(index)
+    if index == 4 then return "Pêche", "icon", 75, 150, 10, 0, 356 end
+    return "Métier " .. index, "icon", 150, 300, 10, 0, 164
+end
 GetNumSkillLines = function() return 2 end
 GetSkillLineInfo = function(index)
     if index == 1 then return "Métiers", true end

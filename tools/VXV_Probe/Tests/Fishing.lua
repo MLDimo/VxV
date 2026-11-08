@@ -13,6 +13,9 @@ local FISHING_SPELLS = { 7620, 7731, 7732, 18248 }
 -- Classic's lures: Shiny Bauble, Nightcrawlers, Bright Baubles, Aquadynamic Fish Attractor, Aquadynamic Fish Lens,
 -- Flesh Eating Worm.
 local LURES = { 6529, 6530, 6532, 6533, 6811, 7307 }
+-- The fishing profession's skill line (measured on 7 October), and the slots GetProfessions returns.
+local FISHING_SKILL_LINE = 356
+local PROFESSION_SLOTS = 5
 local WEAPON_CLASS, FISHING_POLE_SUBCLASS = 2, 20
 local MAIN_HAND, OFF_HAND = 16, 17
 local FIRST_BAG, LAST_BAG = 0, 4
@@ -96,7 +99,23 @@ local function scanBags()
     return pole, lure
 end
 
+--- The fishing profession's level and maximum, read like the Artisans part reads every profession; nil without it.
+local function fishingProfession()
+    local slots = { Compat.GetProfessions() }
+    for slot = 1, slots[1] and PROFESSION_SLOTS or 0 do
+        local index = slots[slot + 1]
+        if index ~= nil then
+            local ok, name, _, level, max, _, _, skillLine = Compat.GetProfessionInfo(index)
+            if ok and skillLine == FISHING_SKILL_LINE then
+                return Util.Join(name, level, "/", max, "(case", slot .. ")")
+            end
+        end
+    end
+end
+
 local function status()
+    local profession = fishingProfession()
+    log.Check(profession ~= nil, "métier de pêche (GetProfessions, ligne", FISHING_SKILL_LINE .. ") :", profession)
     local name, known = fishingSpell()
     log.Check(name ~= nil, "sort de pêche :", name, "rangs connus :", table.concat(known, ", "))
     for _, slot in ipairs({ MAIN_HAND, OFF_HAND }) do
