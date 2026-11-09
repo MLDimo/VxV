@@ -1,7 +1,7 @@
 import { fullName } from "../domain/characters.ts";
 import { chifoumiLoser, chifoumiRefusal, parseChifoumi } from "../domain/chifoumis.ts";
 import type { Member } from "../domain/members.ts";
-import { loserOf, winnerOf } from "./debts.ts";
+import { gameDebts, loserOf, winnerOf } from "./debts.ts";
 import { gamePlayers, placeGuildBet } from "./diceGames.ts";
 import { ValidationError } from "./errors.ts";
 import type { Clock, GamePlayer, StoredChifoumi, UnitOfWork } from "./ports.ts";
@@ -112,17 +112,9 @@ export function createChifoumis({ unitOfWork, clock }: { unitOfWork: UnitOfWork;
       return unitOfWork.run(async ({ chifoumis }) => (await chifoumis.listAll()).slice(0, CHIFOUMIS_LISTED).map(view));
     },
 
-    /** The member's unpaid games with a stake: those they lost, and those they won whose payment they confirm. */
-    async debtsOf(member: Member): Promise<{ owed: ChifoumiView[]; toConfirm: ChifoumiView[] }> {
-      return unitOfWork.run(async ({ chifoumis }) => {
-        const unpaid = (await chifoumis.listAll())
-          .filter((game) => game.paidAt === undefined && game.stake > 0)
-          .map(view);
-        return {
-          owed: unpaid.filter((game) => game.loser.memberId === member.id),
-          toConfirm: unpaid.filter((game) => game.winner.memberId === member.id),
-        };
-      });
+    /** The member's debts: the games they lost unpaid, those whose payment they confirm, and all of them. */
+    async debtsOf(member: Member) {
+      return unitOfWork.run(async ({ chifoumis }) => gameDebts((await chifoumis.listAll()).map(view), member.id));
     },
   };
 }

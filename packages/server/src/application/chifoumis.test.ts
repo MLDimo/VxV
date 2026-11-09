@@ -95,8 +95,8 @@ describe("Chi Fou Mi", () => {
   it("hands the debts and the games to the addon, and ranks the players by net gain", async () => {
     await chifoumis.recordFromGame(thom, [game("c4", 500)]);
     const lines = (await createAddonGames({ unitOfWork: createUnitOfWork(sql), clock }).exportChifoumis()).split("\n");
-    expect(lines[0]).toBe("VXV-CHIFOUMIS-2");
-    expect(lines).toContain(`X;${vorn.id}`);
+    expect(lines[0]).toBe("VXV-CHIFOUMIS-3");
+    expect(lines).toContain(`X;${vorn.id};500`);
     // Each player's portrait, by their main character: the window draws them.
     expect(lines.some((line) => line.startsWith(`A;${thom.id};`) && line.includes("voleur"))).toBe(true);
     expect(lines).toContain(`D;c4;${vorn.id};Vorn Cendrelune;${thom.id};Thom Leboss;500;${String(ACCEPTED + 120)}`);

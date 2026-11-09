@@ -2,12 +2,11 @@ import type { DeathrollView } from "@vxv/server";
 import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
 import { CharacterName } from "@/components/CharacterName";
 import { confirmDeathrollPayment } from "@/app/actions/deathrolls";
-import { ConfirmButton } from "@/components/ConfirmButton";
 import { DiceNav } from "@/components/DiceNav";
+import { GameDebts } from "@/components/GameDebts";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
-import { Panel } from "@/components/Panel";
 
 /** « Thom Leboss bat Vorn Cendrelune · 500 po ». */
 function Duel({ view }: { view: DeathrollView }) {
@@ -24,7 +23,7 @@ function Duel({ view }: { view: DeathrollView }) {
 export default async function DeathrollPage() {
   const member = await requireMember();
   const { deathrolls } = getApplication();
-  const { owed, toConfirm } = await deathrolls.debtsOf(member);
+  const debts = await deathrolls.debtsOf(member);
   const games = await deathrolls.list();
   return (
     <>
@@ -32,34 +31,16 @@ export default async function DeathrollPage() {
       <DiceNav current="/paris/deathroll" />
       <p className="mt-6 max-w-3xl text-lavender">
         Un contre un, depuis l&apos;addon : le défié roll le premier, chacun ensuite de 0 au résultat précédent ; qui
-        fait 0 perd la mise, due au gagnant jusqu&apos;à ce qu&apos;il confirme le paiement. Une dette bloque les paris
-        et les deathrolls.
+        fait 0 perd la mise, due au gagnant jusqu&apos;à ce qu&apos;il confirme le paiement. À partir de 100 po de
+        dettes, paris, deathrolls et Chi Fou Mi sont bloqués.
       </p>
-      {(owed.length > 0 || toConfirm.length > 0) && (
-        <Panel title="Mes dettes" label="Mes dettes de deathroll" className="mt-6">
-          <ul className="mt-3 space-y-2">
-            {owed.map((view) => (
-              <li key={view.game.id} className="text-loss">
-                Tu dois {formatGold(view.game.stake)} à{" "}
-                <CharacterName name={view.winner.name} characterClass={view.winner.characterClass} />.
-              </li>
-            ))}
-            {toConfirm.map((view) => (
-              <li key={view.game.id} className="flex flex-wrap items-center gap-3">
-                <span>
-                  <CharacterName name={view.loser.name} characterClass={view.loser.characterClass} /> te doit{" "}
-                  {formatGold(view.game.stake)}.
-                </span>
-                <ConfirmButton
-                  action={confirmDeathrollPayment}
-                  fields={{ deathrollId: view.game.id }}
-                  label="Paiement reçu"
-                />
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      )}
+      <GameDebts
+        game="deathroll"
+        memberId={member.id}
+        debts={debts}
+        confirm={confirmDeathrollPayment}
+        field="deathrollId"
+      />
       <section className="mt-8" aria-label="Dernières parties">
         <h2 className="font-pixel text-xl text-ivory">Dernières parties</h2>
         {games.length === 0 && (

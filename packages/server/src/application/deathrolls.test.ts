@@ -77,6 +77,10 @@ describe("deathrolls", () => {
     await expect(deathrolls.confirmPayment(vorn, "g1")).rejects.toThrow("Seul le gagnant confirme le paiement.");
     await deathrolls.confirmPayment(thom, "g1");
     expect(await treasury.debtOf(vorn)).toBe(0);
+    // Paid, the debt stays in the players' history.
+    const { owed, history } = await deathrolls.debtsOf(vorn);
+    expect(owed).toEqual([]);
+    expect(history.map((view) => [view.game.id, view.game.paidAt !== undefined])).toEqual([["g1", true]]);
     await expect(deathrolls.confirmPayment(thom, "g1")).rejects.toThrow("Ce paiement est déjà confirmé.");
   });
 
@@ -102,10 +106,12 @@ describe("deathrolls", () => {
     await deathrolls.recordFromGame(thom, [game("g4", 500)]);
     const text = await createAddonGames({ unitOfWork: createUnitOfWork(sql), clock }).exportDeathrolls();
     const lines = text.split("\n");
-    expect(lines[0]).toBe("VXV-DEATHROLLS-2");
-    expect(lines).toContain(`X;${vorn.id}`);
+    expect(lines[0]).toBe("VXV-DEATHROLLS-3");
+    expect(lines).toContain("L;100");
+    expect(lines).toContain(`X;${vorn.id};500`);
+    expect(lines.some((line) => line.startsWith(`A;${thom.id};`))).toBe(true);
     expect(lines).toContain(`D;g4;${vorn.id};Vorn Cendrelune;${thom.id};Thom Leboss;500;${String(ACCEPTED + 120)}`);
-    expect(lines).toContain(`H;g4;Thom Leboss;Vorn Cendrelune;500;${String(ACCEPTED + 120)}`);
+    expect(lines).toContain(`H;g4;Thom Leboss;Vorn Cendrelune;500;${String(ACCEPTED + 120)};0`);
   });
 
   it("leaves aside the stake of a member without the role « Membre », and tells the addon who they are", async () => {

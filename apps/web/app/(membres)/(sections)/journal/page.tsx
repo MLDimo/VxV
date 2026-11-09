@@ -1,7 +1,8 @@
-import { formatDateTime } from "@vxv/server/domain/labels";
+import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
 import { canManageTreasury, type JournalAction } from "@vxv/server";
 import { describeJournalEntry, JOURNAL_ACTION_LABELS } from "@vxv/server/domain/journalDescriptions";
 import { CashPage } from "@/components/CashPage";
+import { CharacterName } from "@/components/CharacterName";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { guildMembers } from "@/server/guildMembers";
@@ -34,11 +35,29 @@ const STAMPS: Record<JournalAction, { label: string; className: string }> = {
   "legend.refuse": { label: "LÉGENDE", className: "border-stamp-cash text-stamp-cash" },
 };
 
-/** The accounts book (§7.7): the guild's cash on the left, the officers' journal on the right. */
+/** How many of Le Dé Pipé's latest games the journal shows. */
+const GAMES_SHOWN = 10;
+
+/**
+ * The accounts book (§7.7): the guild's cash on the left; on the right the officers' journal, then Le Dé Pipé's latest
+ * games (owner's request of 9 November).
+ */
 export default async function JournalPage() {
   const member = await requireMember();
-  const { journal, cash } = getApplication();
-  const [entries, overview, givers] = await Promise.all([journal.listRecent(), cash.overview(), guildMembers()]);
+  const { journal, cash, deathrolls, chifoumis } = getApplication();
+  const [entries, overview, givers, rolled, played] = await Promise.all([
+    journal.listRecent(),
+    cash.overview(),
+    guildMembers(),
+    deathrolls.list(),
+    chifoumis.list(),
+  ]);
+  const games = [
+    ...rolled.map((view) => ({ ...view, kind: "Deathroll" })),
+    ...played.map((view) => ({ ...view, kind: "Chi Fou Mi" })),
+  ]
+    .sort((left, right) => right.game.endedAt.getTime() - left.game.endedAt.getTime())
+    .slice(0, GAMES_SHOWN);
   return (
     <>
       <ScreenHeader title="Journal" />
@@ -67,6 +86,31 @@ export default async function JournalPage() {
                     <p className="mt-1 font-bold">{JOURNAL_ACTION_LABELS[entry.action]}</p>
                     <p>{describeJournalEntry(entry)}</p>
                     <p className="mt-1 text-sm italic">Motif : {entry.reason}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <h2 className="mt-10 font-pixel text-xl">Le Dé Pipé</h2>
+            <p className="mt-1 text-sm">Les dernières parties de deathroll et de Chi Fou Mi, jouées en jeu.</p>
+            {games.length === 0 ? (
+              <p className="mt-6">Aucune partie pour l&apos;instant.</p>
+            ) : (
+              <ul className="mt-6 space-y-3" aria-label="Dernières parties du Dé Pipé">
+                {games.map((view) => (
+                  <li key={`${view.kind}-${view.game.id}`}>
+                    <p className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="border-[1.5px] border-stamp-bet px-1 text-[11px] font-extrabold text-stamp-bet">
+                        {view.kind.toUpperCase()}
+                      </span>
+                      {formatDateTime(view.game.endedAt)}
+                    </p>
+                    <p className="mt-1">
+                      <CharacterName name={view.winner.name} characterClass={view.winner.characterClass} onParchment />{" "}
+                      bat{" "}
+                      <CharacterName name={view.loser.name} characterClass={view.loser.characterClass} onParchment /> ·{" "}
+                      {formatGold(view.game.stake)}
+                      {view.game.stake > 0 && view.game.paidAt === undefined && " · à payer"}
+                    </p>
                   </li>
                 ))}
               </ul>

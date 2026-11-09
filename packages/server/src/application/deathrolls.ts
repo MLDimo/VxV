@@ -1,7 +1,7 @@
 import { fullName } from "../domain/characters.ts";
 import { BIG_STAKE, deathrollLoser, deathrollRefusal, parseDeathroll } from "../domain/deathrolls.ts";
 import type { Member } from "../domain/members.ts";
-import { loserOf, winnerOf } from "./debts.ts";
+import { gameDebts, loserOf, winnerOf } from "./debts.ts";
 import { gamePlayers, placeGuildBet } from "./diceGames.ts";
 import { ValidationError } from "./errors.ts";
 import type { Clock, GamePlayer, StoredDeathroll, UnitOfWork } from "./ports.ts";
@@ -142,15 +142,9 @@ export function createDeathrolls({
       );
     },
 
-    /** The member's unpaid games: those they lost, and those they won whose payment they have to confirm. */
-    async debtsOf(member: Member): Promise<{ owed: DeathrollView[]; toConfirm: DeathrollView[] }> {
-      return unitOfWork.run(async ({ deathrolls }) => {
-        const unpaid = (await deathrolls.listAll()).filter((game) => game.paidAt === undefined).map(view);
-        return {
-          owed: unpaid.filter((game) => game.loser.memberId === member.id),
-          toConfirm: unpaid.filter((game) => game.winner.memberId === member.id),
-        };
-      });
+    /** The member's debts: the games they lost unpaid, those whose payment they confirm, and all of them. */
+    async debtsOf(member: Member) {
+      return unitOfWork.run(async ({ deathrolls }) => gameDebts((await deathrolls.listAll()).map(view), member.id));
     },
   };
 }
