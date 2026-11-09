@@ -146,7 +146,7 @@ describe("fishing in one button (Artisans › Pêche)", () => {
     client(`EquipInFight = false ${START} InCombat = true Fire("PLAYER_REGEN_DISABLED") AdvanceTime(1)`);
     expect(client("return Hands[16]")).toBe(6256);
     expect(shown(client, "VXV_FishingWindow")).toEqual(
-      expect.arrayContaining(["Combat ! Appuie sur F pour reprendre ton arme", "Reprendre l'arme"]),
+      expect.arrayContaining(["Combat ! F pour reprendre ton arme", "Reprendre l'arme"]),
     );
     client("InCombat = false AdvanceTime(5)");
     expect(state()).toBe("off");
@@ -213,7 +213,7 @@ describe("fishing in one button (Artisans › Pêche)", () => {
     client(REFUSED("Votre ligne n'est pas tombée dans une eau poissonneuse"));
     expect(state()).toBe("ready");
     expect(shown(client, "VXV_FishingWindow")).toEqual(
-      expect.arrayContaining(["Trop loin de l'eau", "Ta ligne n'a pas touché l'eau : approche-toi et relance"]),
+      expect.arrayContaining(["Trop loin de l'eau", "Ligne hors de l'eau : approche-toi"]),
     );
     client(CAST);
     expect(shown(client, "VXV_FishingWindow")).not.toContain("Trop loin de l'eau");

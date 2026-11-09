@@ -21,7 +21,6 @@ local BUTTON_WIDTH, BUTTON_HEIGHT, BEVEL, KEYCAP = 88, 84, 3, 16
 local SMALL_BUTTON_HEIGHT, QUIT_WIDTH, LURE_WIDTH, LURE_HEIGHT = 22, 130, 120, 20
 -- The right column's lines under the big button's top: the state, the catches and time, the lure.
 local STATS_LINE, LURE_LINE = 20, 40
-local BANNER_HEIGHT = 20
 local PROGRESS_HEIGHT = 3
 local TICK_SECONDS = 0.15
 -- The pixel art's images at twice their size; the catch's icon from the game.
@@ -132,13 +131,17 @@ local function buildLive()
     quit = Theme.Button(live, "wood", "Quitter la session", QUIT_WIDTH, SMALL_BUTTON_HEIGHT)
     quit:SetPoint("BOTTOMRIGHT", -(BORDER + PADDING), BORDER + PADDING - 2)
     quit:SetScript("OnClick", Session.Stop)
+    -- The banner takes the title bar's place (mockup, §4): over it, one line within the window's width.
     live.banner = CreateFrame("Frame", nil, live)
-    live.banner:SetPoint("TOPLEFT", BORDER, -(BORDER + BAR_HEIGHT))
-    live.banner:SetPoint("TOPRIGHT", -BORDER, -(BORDER + BAR_HEIGHT))
-    live.banner:SetHeight(BANNER_HEIGHT)
+    live.banner:SetPoint("TOPLEFT", BORDER, -BORDER)
+    live.banner:SetPoint("TOPRIGHT", -BORDER, -BORDER)
+    live.banner:SetHeight(BAR_HEIGHT)
     Theme.Fill(live.banner, "ink-loss", "ARTWORK"):SetAllPoints()
     live.banner.label = Theme.Text(live.banner, "textBold", 11, "ivory")
     live.banner.label:SetPoint("LEFT", PADDING, 0)
+    live.banner.label:SetPoint("RIGHT", -PADDING, 0)
+    live.banner.label:SetJustifyH("LEFT")
+    live.banner.label:SetWordWrap(false)
 end
 
 --- What shows once the session ends: the catches, the time, the best catch, and how to fish again or close.
@@ -242,14 +245,14 @@ end
 local function banner(state, data)
     local line
     if state == "fight" then
-        line = "Combat ! Session fermée après le combat"
+        line = "Combat ! La session va se fermer"
         if data.weaponsBack == false then
-            line = "Combat ! Appuie sur " .. Key.Current() .. " pour reprendre ton arme"
+            line = "Combat ! " .. Key.Current() .. " pour reprendre ton arme"
         elseif data.weaponsBack then
             line = "Combat ! Session fermée, arme rééquipée"
         end
     elseif state == "ready" and data.far then
-        line = "Ta ligne n'a pas touché l'eau : approche-toi et relance"
+        line = "Ligne hors de l'eau : approche-toi"
     end
     live.banner:SetShown(line ~= nil)
     live.banner.label:SetText(line or "")
