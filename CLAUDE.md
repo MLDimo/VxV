@@ -430,8 +430,10 @@ Mesurées par la sonde (détail et journaux : `docs/phase-0/resultats.md`).
 - Pêche (sonde, 8 novembre) : un bouton sécurisé de l'addon lance la Pêche au clic et par une touche que l'addon lie
   (`SetOverrideBindingClick`) ; l'addon équipe la canne (`C_Item.EquipItemByName`) et lit sacs, mains et appât
   (`C_Container`, `GetInventoryItemID`, `GetWeaponEnchantInfo`). La cible d'interaction suit les objets proches
-  (`SoftTargetInteract` à 3 par défaut, `PLAYER_SOFT_INTERACT_CHANGED`) ; pas de commande `/interact`. Une eau trop
-  difficile pour la compétence répond « Niveau de la technique insuffisant ».
+  (`SoftTargetInteract` à 3 par défaut, `PLAYER_SOFT_INTERACT_CHANGED`), le bouchon dès le lancer sauf si une créature
+  est plus près ; pas de commande `/interact`. Ligne à l'eau 30 s (`UnitChannelInfo`), prise reconnue par
+  `IsFishingLoot`, zone par `C_Map`. Refus lus dans les textes du client : `SPELL_FAILED_LOW_CASTLEVEL` (« Niveau de
+  la technique insuffisant »), `SPELL_FAILED_FISHING_TOO_LOW` (« Requiert %d en Pêche »), `SPELL_FAILED_NOT_FISHABLE`.
 - `PlaySound` et `SOUNDKIT` présents ; événements `PLAYER_ENTERING_WORLD` et `ZONE_CHANGED_NEW_AREA` acceptés.
 - Habillage : textures PNG et TGA de l'addon affichées nettes en `NEAREST`, même hors puissance de deux ; polices TTF de l'addon chargées en différé (premier `SetFont` à `false`) ; chinois et coréen absents de nos polices, affichés par une famille de polices (`CreateFontFamily`) qui prend les polices du jeu pour ces alphabets ; `RAID_CLASS_COLORS`, `C_ClassColor`, `UnitRace`, `UnitSex` et `UnitClass` présents.
 

@@ -66,7 +66,14 @@ local ALIASES = {
     IsPlayerSpell = { "IsPlayerSpell" },
     GetWeaponEnchantInfo = { "GetWeaponEnchantInfo" },
     SetOverrideBindingClick = { "SetOverrideBindingClick" },
+    SetOverrideBinding = { "SetOverrideBinding" },
     ClearOverrideBindings = { "ClearOverrideBindings" },
+    GetBindingAction = { "GetBindingAction" },
+    -- Fishing (probe, 9 November): the line's time, a catch, the zone.
+    UnitChannelInfo = { "UnitChannelInfo" },
+    IsFishingLoot = { "IsFishingLoot" },
+    GetBestMapForUnit = { "C_Map.GetBestMapForUnit" },
+    GetMapInfo = { "C_Map.GetMapInfo" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

@@ -132,8 +132,18 @@ sacs, une épée et un bouclier en main.
 | T12 cible d'interaction | Le jeu vise-t-il seul les objets proches ? | Oui : `SoftTargetInteract` à 3 par défaut, `PLAYER_SOFT_INTERACT_CHANGED` à chaque objet ou créature à portée. `/interact` n'existe pas (`SLASH_INTERACT1` absent). | ✅ | Ferrer par `INTERACTTARGET` lié à la touche, pas par macro. |
 | T12 événements | Les événements de la pêche sont-ils acceptés ? | Oui : `UNIT_SPELLCAST_CHANNEL_START` et `_STOP`, `_SUCCEEDED`, `_FAILED`, `_INTERRUPTED`, `PLAYER_REGEN_DISABLED` et `_ENABLED`, `PLAYER_EQUIPMENT_CHANGED`, `LOOT_OPENED`. | ✅ | — |
 
-Restent à mesurer (`docs/tests-en-jeu.md`) : la ligne à l'eau et le ferrage par la touche, `SetOverrideBinding`, et
-l'équipement en combat.
+Seconde séance (9 novembre, `sessions/2026-11-09.txt`), Pêche 1/75 à Mulgore, la version de développement de VXV :
+
+| Test | Question | Résultat | Statut | Conséquence |
+| --- | --- | --- | --- | --- |
+| T12 fonctions | Lesquelles sont présentes ? | `C_Container.*`, `C_Item.GetItemInfoInstant`, `C_Item.EquipItemByName` (pas `EquipItemByName`), `C_Spell.GetSpellName` (pas `GetSpellInfo`), `GetInventoryItemID`, `GetWeaponEnchantInfo`, `SetOverrideBinding`, `SetOverrideBindingClick`, `ClearOverrideBindings`, `GetBindingAction`, `IsFishingLoot`. | ✅ | Tout par `Compat` |
+| T12 métier | La liste des métiers porte-t-elle la Pêche ? | Oui : `GetProfessions` en 4e case, « Pêche 1 / 75 », ligne 356. | ✅ | Repli sur le sort connu (`IsPlayerSpell`) gardé |
+| T12 ligne à l'eau | Combien de temps, et le bouchon ? | `UNIT_SPELLCAST_CHANNEL_START` et `_STOP` (sort 7620) ; `UnitChannelInfo` : 30 s. Au lancer, le bouchon (objet 35591) devient la cible d'interaction (`PLAYER_SOFT_INTERACT_CHANGED`), sauf quand une créature est plus près (« Thrag Stonehoof ») ; l'unité `softinteract` ne répond pas. Deux prises (`LOOT_OPENED`, `IsFishingLoot` vrai). | ✅ | Fenêtre de 30 s lue dans le jeu |
+| T12 refus | Quels textes ? | `SPELL_FAILED_LOW_CASTLEVEL` « Niveau de la technique insuffisant », `SPELL_FAILED_FISHING_TOO_LOW` « Requiert %d en Pêche », `SPELL_FAILED_NOT_FISHABLE` « Votre ligne n'a pas atteint d'eaux poissonneuses », `SPELL_FAILED_TOO_SHALLOW` « L'eau n'est pas assez profonde ». | ✅ | `Waters.lua` |
+| T12 zone | La zone se lit-elle ? | Oui : `C_Map.GetBestMapForUnit` 1412, `C_Map.GetMapInfo` « Mulgore ». | ✅ | Eaux apprises par carte |
+| T12 ferrage | La touche ferre-t-elle le bouchon ? | Oui (vu par le propriétaire) : pendant la ligne, F liée par `SetOverrideBinding` à `INTERACTTARGET` ferre, le poisson va dans les sacs. | ✅ | Pêche à une seule touche |
+
+Reste à mesurer (`docs/tests-en-jeu.md`) : l'équipement en combat.
 
 ## Hypothèses de départ (sources communautaires)
 

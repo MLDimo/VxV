@@ -40,14 +40,9 @@ function Key.Set(key)
     saved.key = key
 end
 
---- What the key does in the game's own bindings ("Assister la cible"…), or nil when it is free. GetBindingAction is
---- not measured on WoW Forever: looked up, never called when absent.
+--- What the key does in the game's own bindings ("Assister la cible"…), or nil when it is free.
 function Key.Taken(key)
-    local actionOf = Compat.Resolve("GetBindingAction")
-    if type(actionOf) ~= "function" then
-        return nil
-    end
-    local ok, action = pcall(actionOf, key)
+    local ok, action = Compat.GetBindingAction(key)
     if not ok or type(action) ~= "string" or action == "" or VXV.IsSecret(action) then
         return nil
     end
@@ -115,12 +110,10 @@ function Key.ArmLure()
     return lure ~= nil
 end
 
---- Points the key at an action, out of combat. SetOverrideBinding is not measured on WoW Forever (8 November: the
---- line never went in the water): looked up, never called when absent.
+--- Points the key at an action, out of combat.
 local function point(action)
-    local rebind = Compat.Resolve("SetOverrideBinding")
-    if bound ~= nil and not InCombatLockdown() and type(rebind) == "function" then
-        pcall(rebind, owner, true, bound, action)
+    if bound ~= nil and not InCombatLockdown() then
+        Compat.SetOverrideBinding(owner, true, bound, action)
     end
 end
 

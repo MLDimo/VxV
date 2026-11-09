@@ -18,7 +18,9 @@ local BOTTOM_OFFSET = 220
 local RINGS = { { "ink", 2 }, { "copper", 3 }, { "ink", 2 } }
 local BORDER, BAR_HEIGHT, PADDING, GAP = 7, 22, 10, 10
 local BUTTON_WIDTH, BUTTON_HEIGHT, BEVEL, KEYCAP = 88, 84, 3, 16
-local SMALL_BUTTON_HEIGHT, QUIT_WIDTH, LURE_WIDTH = 22, 130, 70
+local SMALL_BUTTON_HEIGHT, QUIT_WIDTH, LURE_WIDTH, LURE_HEIGHT = 22, 130, 120, 20
+-- The right column's lines under the big button's top: the state, the catches and time, the lure.
+local STATS_LINE, LURE_LINE = 20, 40
 local BANNER_HEIGHT = 20
 local PROGRESS_HEIGHT = 3
 local TICK_SECONDS = 0.15
@@ -99,12 +101,12 @@ end
 local function drawLure(parent)
     local secure = Key.LureButton()
     secure:SetParent(parent)
-    secure:SetSize(LURE_WIDTH, SMALL_BUTTON_HEIGHT)
+    secure:SetSize(LURE_WIDTH, LURE_HEIGHT)
     Theme.Fill(secure, "wood"):SetAllPoints()
     Theme.Rings(secure, { { "ink", 2 } })
     local label = Theme.Text(secure, "pixel", 13, "parchment")
     label:SetPoint("CENTER")
-    label:SetText("Appât")
+    label:SetText("Poser l'appât")
     return secure
 end
 
@@ -122,10 +124,11 @@ local function buildLive()
     local left = BORDER + PADDING + BUTTON_WIDTH + GAP
     local top = -(BORDER + BAR_HEIGHT + PADDING)
     live.status = text(live, "textBold", 12, "gain", left, top)
-    live.stats = text(live, "text", 12, "lavender", left, top - 20)
-    live.lure = text(live, "text", 11, "muted", left, top - 40)
+    live.stats = text(live, "text", 12, "lavender", left, top - STATS_LINE)
+    live.lure = text(live, "text", 11, "muted", left, top - LURE_LINE)
+    -- The lure's button takes the lure's line when the bags hold one: under the catches, above « Quitter ».
     lure = drawLure(window)
-    lure:SetPoint("BOTTOMLEFT", left, BORDER + PADDING - 2)
+    lure:SetPoint("TOPLEFT", left, top - LURE_LINE + 2)
     quit = Theme.Button(live, "wood", "Quitter la session", QUIT_WIDTH, SMALL_BUTTON_HEIGHT)
     quit:SetPoint("BOTTOMRIGHT", -(BORDER + PADDING), BORDER + PADDING - 2)
     quit:SetScript("OnClick", Session.Stop)
@@ -261,7 +264,7 @@ local function lureLine()
     if left ~= nil then
         return "Appât posé · " .. VXV.Remaining(left)
     end
-    return lureInBags and "Appât dans les sacs" or "Aucun appât dans les sacs"
+    return lure:IsShown() and "" or "Aucun appât dans les sacs"
 end
 
 local function renderLive(state, data)

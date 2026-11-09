@@ -712,3 +712,9 @@ function SetOverrideBindingClick(_, _, key, button, mouseButton)
 end
 function SetOverrideBinding(_, _, key, action) Bindings[key] = action end
 function ClearOverrideBindings() Bindings = {} end
+-- The game's own bindings, { [key] = action }; whether the open loot window is a catch; the line's channel.
+GameBindings = {}
+function GetBindingAction(key) return GameBindings[key] or "" end
+FishingLoot = true
+function IsFishingLoot() return FishingLoot end
+function UnitChannelInfo() return nil end

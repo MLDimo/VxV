@@ -9,8 +9,8 @@ ns.Waters = Waters
 
 local Compat = VXV.Compat
 
--- The game's texts of a cast refused, by kind: its fishing too low ("Requires Fishing %d" tells the level needed),
--- or the line out of fishable water. Looked up in the client's globals, not measured on WoW Forever.
+-- The game's texts of a cast refused, by kind: its fishing too low (« Requiert %d en Pêche » tells the level needed),
+-- or the line out of fishable water. Read in the client's globals (measured on 9 November, French client).
 local TOO_LOW = { "SPELL_FAILED_LOW_CASTLEVEL", "SPELL_FAILED_FISHING_TOO_LOW" }
 local OUT_OF_WATER = { "SPELL_FAILED_NOT_FISHABLE", "SPELL_FAILED_TOO_SHALLOW" }
 
@@ -22,23 +22,13 @@ function Waters.Load(data)
     saved.waters = type(saved.waters) == "table" and saved.waters or {}
 end
 
---- The zone the player is in: its map's id and name (C_Map), else its name; nil when the client tells neither.
---- C_Map and GetRealZoneText are not measured on WoW Forever: looked up, never called when absent.
+--- The zone the player is in: its map's id and name (C_Map, measured on 9 November), nil when the client hides it.
 function Waters.Zone()
-    local mapOf, infoOf = Compat.Resolve("C_Map.GetBestMapForUnit"), Compat.Resolve("C_Map.GetMapInfo")
-    if type(mapOf) == "function" and type(infoOf) == "function" then
-        local ok, mapId = pcall(mapOf, "player")
-        local known, info = pcall(infoOf, mapId)
-        if ok and known and type(mapId) == "number" and type(info) == "table" and type(info.name) == "string" then
-            return "map:" .. mapId, info.name
-        end
-    end
-    local zoneText = Compat.Resolve("GetRealZoneText")
-    if type(zoneText) == "function" then
-        local ok, name = pcall(zoneText)
-        if ok and type(name) == "string" and name ~= "" and not VXV.IsSecret(name) then
-            return "zone:" .. name, name
-        end
+    local ok, mapId = Compat.GetBestMapForUnit("player")
+    local known, info = Compat.GetMapInfo(mapId)
+    if ok and known and type(mapId) == "number" and type(info) == "table" and type(info.name) == "string"
+        and not VXV.IsSecret(info.name) then
+        return "map:" .. mapId, info.name
     end
 end
 

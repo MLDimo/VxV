@@ -68,19 +68,13 @@ const USED_IN_GAME = [
   // The game's combat log and its advanced mode, switched on without a click (phase 0, T11, 7 October).
   "LoggingCombat",
   "C_CVar.SetCVar",
-  // Fishing in one button (probe, T12, 8 November, docs/phase-0/sessions/2026-11-08.txt): the pole and the lure found
-  // in the bags, the pole equipped, the spell's name, a secure button created and a key bound to it, all called
-  // without error. The modern path of each pair is the one the client resolves first.
-  "C_Container.GetContainerNumSlots",
-  "C_Container.GetContainerItemID",
-  "C_Item.GetItemInfoInstant",
-  "GetInventoryItemID",
-  "C_Item.EquipItemByName",
-  "C_Spell.GetSpellName",
+  // Fishing in one button (probe, T12): the bags, the hands, equipping and the key are inventoried on 9 November
+  // (docs/phase-0/sessions/2026-11-09.txt); beyond the inventory, the spell known (8 November), the line's times
+  // (UnitChannelInfo: 30 s) and the zone (C_Map: 1412 Mulgore), read in game on 9 November.
   "IsPlayerSpell",
-  "GetWeaponEnchantInfo",
-  "SetOverrideBindingClick",
-  "ClearOverrideBindings",
+  "UnitChannelInfo",
+  "C_Map.GetBestMapForUnit",
+  "C_Map.GetMapInfo",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

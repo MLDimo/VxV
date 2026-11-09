@@ -10,8 +10,11 @@ ns.Session = Session
 
 local Gear, Key, Skill, Waters = ns.Gear, ns.Key, ns.Skill, ns.Waters
 
--- How long the line stays in the water.
-Session.CAST_SECONDS = 20
+-- How long the line stays in the water (measured on 9 November), when the game does not tell it.
+Session.CAST_SECONDS = 30
+-- Position of the line's end, in milliseconds, among Compat.UnitChannelInfo's results (pcall's ok first).
+local CHANNEL_END_INDEX = 6
+local MS_PER_SECOND = 1000
 -- How long a catch shows before the button casts again.
 local CATCH_SECONDS = 2
 -- Once the line is out, how long the loot window has to open for a catch.
@@ -176,7 +179,9 @@ end
 
 VXV.OnEvent("UNIT_SPELLCAST_CHANNEL_START", function(unit, _, spellId)
     if isFishing(unit, spellId) and (state == "ready" or state == "caught") then
-        session.castEndsAt = GetTime() + Session.CAST_SECONDS
+        local channel = { VXV.Compat.UnitChannelInfo("player") }
+        local endMs = channel[1] and channel[CHANNEL_END_INDEX]
+        session.castEndsAt = type(endMs) == "number" and endMs / MS_PER_SECOND or GetTime() + Session.CAST_SECONDS
         session.far = nil
         Key.Hook()
         enter("fishing")
@@ -196,15 +201,10 @@ VXV.OnEvent("UNIT_SPELLCAST_CHANNEL_STOP", function(unit, _, spellId)
     end)
 end)
 
---- Whether the loot window is a catch. IsFishingLoot is not measured on WoW Forever: looked up, and when absent, the
---- window opening right after the line came out is one.
+--- Whether the loot window is a catch: the game tells it (measured on 9 November).
 local function isCatch()
-    local fishingLoot = VXV.Compat.Resolve("IsFishingLoot")
-    if type(fishingLoot) ~= "function" then
-        return true
-    end
-    local ok, caught = pcall(fishingLoot)
-    return not ok or caught == true
+    local ok, caught = VXV.Compat.IsFishingLoot()
+    return ok and caught == true
 end
 
 VXV.OnEvent("LOOT_OPENED", function()

@@ -100,6 +100,12 @@ describe("fishing in one button (Artisans › Pêche)", () => {
     expect(client("return Bindings.F")).toBe("CLICK VXV_FishingButton:LeftButton");
   });
 
+  it("counts no loot window the game does not call a catch", () => {
+    const { client, state } = startFishing();
+    client(`${START} ${CAST} FishingLoot = false ${CATCH}`);
+    expect(state()).toBe("hooked");
+  });
+
   it("counts nothing when the line comes out empty", () => {
     const { client, state, fishing } = startFishing();
     client(START);
@@ -250,9 +256,19 @@ describe("fishing in one button (Artisans › Pêche)", () => {
       capture:Run("OnKeyDown", "LSHIFT")
       capture:Run("OnKeyDown", "G")
     `);
+    expect(shown(client, "VXV_Window")).toContain("Sert aussi à reprendre ton arme en combat.");
     client(START);
     expect(client("return Bindings.G")).toBe("CLICK VXV_FishingButton:LeftButton");
     expect(client("return Bindings.F")).toBeUndefined();
+  });
+
+  it("warns when the fishing key already serves the game", () => {
+    const { client } = startFishing();
+    client('GameBindings.F = "ASSISTTARGET" BINDING_NAME_ASSISTTARGET = "Assister la cible"');
+    client(OPEN_ARTISANS);
+    expect(shown(client, "VXV_Window")).toContain(
+      "F sert aussi à « Assister la cible » : remplacée pendant la session.",
+    );
   });
 
   it("is the Artisans place's second tab, after the directory", () => {
