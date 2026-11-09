@@ -6,6 +6,9 @@ import { BurgerMenu } from "./BurgerMenu";
 import { rolesLabel } from "./roleLabels";
 import { SECTIONS } from "./sections";
 
+/** The addon's page on CurseForge, where the members install it (owner's request of 9 November). */
+const ADDON_PAGE = "https://www.curseforge.com/wow/addons/vxv";
+
 const NAV_LINK =
   "whitespace-nowrap font-pixel text-[17px] font-semibold text-[#e9dcc0] hover:text-gold focus-visible:text-gold";
 
@@ -23,6 +26,9 @@ function Links({ member }: { member: Member }) {
       <Link href="/compagnon" className={NAV_LINK}>
         Compagnon
       </Link>
+      <a href={ADDON_PAGE} target="_blank" rel="noopener noreferrer" className={NAV_LINK}>
+        Addon
+      </a>
       {canManageRaids(member.roles) && (
         <Link href="/officiers/liste-de-guilde" className={`${NAV_LINK} text-gold`}>
           Liste de guilde
