@@ -57,3 +57,28 @@ run("professions list")
 run("professions recipes")
 GetNumTradeSkills = nil
 run("professions recipes")
+
+-- Fishing: out of combat, the buttons and the key; a cast with the key swapped; then combat.
+InCombatLockdown = function() return false end
+run("peche etat")
+GetProfessions = function() return 1, nil, nil, 4, 5 end
+for _, command in ipairs({
+    "peche etat", "peche rendre", "peche touche f", "peche equiper", "peche boutons", "peche touche f a",
+    "peche interact on", "peche interact off", "peche combat on",
+}) do
+    run(command)
+end
+VXVProbe_FishCast.scripts.OnClick(VXVProbe_FishCast, "LeftButton", true)
+Fire("UNIT_SPELLCAST_CHANNEL_START", "player", "cast", 7620)
+Tick()
+Fire("UNIT_SPELLCAST_CHANNEL_STOP", "player", "cast", 7620)
+Fire("UNIT_SPELLCAST_SUCCEEDED", "player", "cast", 7620)
+Fire("UNIT_SPELLCAST_SUCCEEDED", "target", "cast", 1)
+Fire("LOOT_OPENED")
+Fire("PLAYER_REGEN_DISABLED")
+InCombatLockdown = function() return true end
+run("peche boutons")
+run("peche touche")
+run("peche rendre")
+run("peche combat off")
+Fire("PLAYER_REGEN_ENABLED")

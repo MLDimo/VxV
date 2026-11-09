@@ -44,6 +44,14 @@ function Util.Join(...)
     return table.concat(parts, " ")
 end
 
+--- The results of a call made through Compat or pcall (ok, ...), printable: the values, or the error.
+function Util.Results(ok, ...)
+    if not ok then
+        return "erreur : " .. Util.Safe((...))
+    end
+    return Util.Join(...)
+end
+
 --- Returns the name of an Enum code ("Success"), or the raw value when unknown.
 function Util.EnumName(enumName, value)
     local codes = Enum and Enum[enumName]

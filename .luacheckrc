@@ -15,8 +15,17 @@ globals = {
     "VXV_LootPanel",
     "VXV_CompactWindow",
     "VXV_BossAlert",
+    -- Fishing in one button: a key binding clicks the secure button by its global name.
+    "VXV_FishingButton",
+    "VXV_FishingWindow",
     "SLASH_VXV1",
     "SLASH_VXVPROBE1",
+    "VXV_ProbeReportFrame",
+    -- The probe's secure fishing buttons: a key binding clicks a button by its global name.
+    "VXVProbe_FishCast",
+    "VXVProbe_FishInteract",
+    "VXVProbe_FishLure",
+    "VXVProbe_FishEquip",
     "SlashCmdList",
     "UISpecialFrames",
 }

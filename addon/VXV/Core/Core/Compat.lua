@@ -55,6 +55,25 @@ local ALIASES = {
     -- The game's combat log, written while the game runs (phase 0, T11, 7 October): switched on without a click.
     LoggingCombat = { "LoggingCombat" },
     SetCVar = { "C_CVar.SetCVar", "SetCVar" },
+    -- Fishing in one button (probe, T12, 8 November): the bags, an item's kind, the hands and what the player
+    -- equips, the fishing spell's name, the time left of a lure, a key bound by the addon.
+    GetContainerNumSlots = { "C_Container.GetContainerNumSlots", "GetContainerNumSlots" },
+    GetContainerItemID = { "C_Container.GetContainerItemID", "GetContainerItemID" },
+    GetItemInfoInstant = { "C_Item.GetItemInfoInstant", "GetItemInfoInstant" },
+    GetInventoryItemID = { "GetInventoryItemID" },
+    EquipItemByName = { "C_Item.EquipItemByName", "EquipItemByName" },
+    GetSpellName = { "C_Spell.GetSpellName", "GetSpellInfo" },
+    IsPlayerSpell = { "IsPlayerSpell" },
+    GetWeaponEnchantInfo = { "GetWeaponEnchantInfo" },
+    SetOverrideBindingClick = { "SetOverrideBindingClick" },
+    SetOverrideBinding = { "SetOverrideBinding" },
+    ClearOverrideBindings = { "ClearOverrideBindings" },
+    GetBindingAction = { "GetBindingAction" },
+    -- Fishing (probe, 9 November): the line's time, a catch, the zone.
+    UnitChannelInfo = { "UnitChannelInfo" },
+    IsFishingLoot = { "IsFishingLoot" },
+    GetBestMapForUnit = { "C_Map.GetBestMapForUnit" },
+    GetMapInfo = { "C_Map.GetMapInfo" },
 }
 
 --- The value at a dotted path of the global table ("C_ChatInfo.SendAddonMessage"), or nil.

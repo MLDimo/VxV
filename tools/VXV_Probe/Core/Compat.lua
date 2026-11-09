@@ -50,6 +50,24 @@ local ALIASES = {
     JoinChannelByName = { "JoinChannelByName" },
     LeaveChannelByName = { "LeaveChannelByName" },
     GetChannelName = { "GetChannelName" },
+    -- T12: fishing in one button.
+    GetContainerNumSlots = { "C_Container.GetContainerNumSlots", "GetContainerNumSlots" },
+    GetContainerItemID = { "C_Container.GetContainerItemID", "GetContainerItemID" },
+    GetItemInfo = { "C_Item.GetItemInfo", "GetItemInfo" },
+    GetItemInfoInstant = { "C_Item.GetItemInfoInstant", "GetItemInfoInstant" },
+    GetItemSpell = { "C_Item.GetItemSpell", "GetItemSpell" },
+    EquipItemByName = { "C_Item.EquipItemByName", "EquipItemByName" },
+    GetInventoryItemID = { "GetInventoryItemID" },
+    GetWeaponEnchantInfo = { "GetWeaponEnchantInfo" },
+    GetSpellName = { "C_Spell.GetSpellName", "GetSpellInfo" },
+    IsPlayerSpell = { "IsPlayerSpell" },
+    SetOverrideBinding = { "SetOverrideBinding" },
+    SetOverrideBindingClick = { "SetOverrideBindingClick" },
+    ClearOverrideBindings = { "ClearOverrideBindings" },
+    UnitExists = { "UnitExists" },
+    UnitName = { "UnitName" },
+    UnitChannelInfo = { "UnitChannelInfo" },
+    IsFishingLoot = { "IsFishingLoot" },
 }
 
 local MISSING_API = "API absente"

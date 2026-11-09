@@ -23,6 +23,9 @@ local KNOWN_EVENTS = {
     CHAT_MSG_RAID = true, CHAT_MSG_RAID_LEADER = true, CHAT_MSG_RAID_WARNING = true, CHAT_MSG_PARTY = true,
     CHAT_MSG_PARTY_LEADER = true, CHAT_MSG_GUILD = true, PLAYER_DEAD = true, PLAYER_ALIVE = true,
     PLAYER_UNGHOST = true, RESURRECT_REQUEST = true, TRADE_SKILL_SHOW = true,
+    UNIT_SPELLCAST_CHANNEL_START = true, UNIT_SPELLCAST_CHANNEL_STOP = true, UNIT_SPELLCAST_SUCCEEDED = true,
+    UNIT_SPELLCAST_FAILED = true, UNIT_SPELLCAST_INTERRUPTED = true, PLAYER_REGEN_DISABLED = true,
+    PLAYER_REGEN_ENABLED = true, PLAYER_EQUIPMENT_CHANGED = true,
 }
 -- Registering these fires ADDON_ACTION_FORBIDDEN synchronously, as the Forever client does.
 local FORBIDDEN_EVENTS = { COMBAT_LOG_EVENT_UNFILTERED = true }
@@ -31,11 +34,20 @@ local function noop() end
 local FRAME_NOOPS = {
     "SetSize", "SetPoint", "SetFrameStrata", "SetMovable", "EnableMouse", "RegisterForDrag", "StartMoving",
     "StopMovingOrSizing", "SetMultiLine", "SetAutoFocus", "SetFontObject", "SetWidth", "SetScrollChild",
-    "SetFocus", "HighlightText",
+    "SetFocus", "HighlightText", "RegisterForClicks", "SetAllPoints",
 }
+-- Textures and font strings: every method does nothing.
+local inert = setmetatable({}, { __index = function() return noop end })
 
-function CreateFrame()
-    local frame = { events = {}, scripts = {} }
+function CreateFrame(_, name)
+    local frame = { events = {}, scripts = {}, attributes = {} }
+    if name ~= nil then
+        _G[name] = frame
+    end
+    function frame:SetAttribute(key, value) self.attributes[key] = value end
+    function frame:HookScript(script, fn) self.scripts[script] = fn end
+    function frame:CreateTexture() return inert end
+    function frame:CreateFontString() return inert end
     function frame:RegisterEvent(event)
         if FORBIDDEN_EVENTS[event] then
             Fire("ADDON_ACTION_FORBIDDEN", "VXV_Probe", "UNKNOWN()")
@@ -227,7 +239,10 @@ ScrollUtil = {
 
 -- Professions (T10): modern API; the scenario removes it to run the classic one.
 GetProfessions = function() return 1, nil, nil, 4, 5 end
-GetProfessionInfo = function(index) return "Métier " .. index, "icon", 150, 300, 10, 0, 164 end
+GetProfessionInfo = function(index)
+    if index == 4 then return "Pêche", "icon", 75, 150, 10, 0, 356 end
+    return "Métier " .. index, "icon", 150, 300, 10, 0, 164
+end
 GetNumSkillLines = function() return 2 end
 GetSkillLineInfo = function(index)
     if index == 1 then return "Métiers", true end
@@ -244,3 +259,33 @@ GetTradeSkillInfo = function(index)
     return "Recette " .. index, "optimal"
 end
 GetTradeSkillLine = function() return "Forge", 150, 300 end
+
+-- Fishing (T12): a pole and a lure in the bags, a sword in hand. The scenario fires the cast's events.
+local ITEMS = {
+    [6256] = { name = "Canne à pêche", class = 2, subclass = 20 },
+    [6529] = { name = "Babiole brillante", class = 0, subclass = 8 },
+    [2489] = { name = "Épée à deux mains", class = 2, subclass = 8 },
+}
+local BAG = { 6256, 6529 }
+Equipped = { [16] = 2489 }
+C_Container = {
+    GetContainerNumSlots = function(bag) return bag == 0 and #BAG or 0 end,
+    GetContainerItemID = function(_, slot) return BAG[slot] end,
+}
+C_Item = {
+    GetItemInfo = function(id) return ITEMS[id] and ITEMS[id].name end,
+    GetItemInfoInstant = function(id)
+        local item = ITEMS[id]
+        return id, "", "", "", 0, item and item.class, item and item.subclass
+    end,
+    GetItemSpell = function() return "Appât", 8087 end,
+    EquipItemByName = function(id) Equipped[16] = id end,
+}
+GetInventoryItemID = function(_, slot) return Equipped[slot] end
+GetWeaponEnchantInfo = function() return false end
+C_Spell = { GetSpellName = function() return "Pêche" end }
+IsPlayerSpell = function(id) return id == 7620 end
+SetOverrideBinding, SetOverrideBindingClick, ClearOverrideBindings = noop, noop, noop
+UnitExists = function(unit) return unit == "softinteract" end
+UnitChannelInfo = function() return "Pêche", "Pêche", 0, 0, 20000 end
+IsFishingLoot = function() return true end

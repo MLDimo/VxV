@@ -48,6 +48,7 @@ local function newRegion(kind)
     function region:ClearAllPoints()
         self.points = {}
     end
+    function region:SetAllPoints() self.points = { { "ALL" } } end
     function region:GetPoint()
         local first = self.points[1] or {}
         return table.unpack(first)
@@ -179,6 +180,13 @@ function CreateFrame(kind, name, parent, template)
     function frame:GetCenter() return self.centerX or 0, self.centerY or 0 end
     function frame:SetScale(scale) self.scale = scale end
     function frame:GetEffectiveScale() return 1 end
+    function frame:SetAttribute(key, value) self.attributes = self.attributes or {} self.attributes[key] = value end
+    function frame:GetAttribute(key) return self.attributes and self.attributes[key] end
+    function frame:EnableKeyboard(enabled) self.keyboard = enabled end
+    function frame:SetParent(newParent)
+        self.parent = newParent
+        newParent.children[#newParent.children + 1] = self
+    end
     --- Test helper: runs a script as the client would (a click, a drag, a frame update).
     function frame:Run(script, ...)
         if self.scripts[script] ~= nil then
@@ -660,3 +668,53 @@ C_TradeSkillUI = {
         return recipe and { recipeID = id, name = recipe.name, learned = recipe.learned }
     end,
 }
+
+-- Fishing (probe, T12, 8 November): the bags' items, the hands, what the addon equips, the spell's name, the lure on
+-- the pole, and the key bindings the addon sets during a session. The tests fill Bags, Hands and ItemInfo.
+Bags = { [0] = {} }
+Hands = {}
+EquipCalls = {}
+-- Whether the client lets the addon equip in a fight (to measure on WoW Forever).
+EquipInFight = true
+local MAIN_HAND, OFF_HAND, TWO_HANDED = 16, 17, "INVTYPE_2HWEAPON"
+C_Container = {
+    GetContainerNumSlots = function(bag) return #(Bags[bag] or {}) end,
+    GetContainerItemID = function(bag, slot) return (Bags[bag] or {})[slot] end,
+}
+function GetInventoryItemID(_, slot) return Hands[slot] end
+C_Item.GetItemInfoInstant = function(id)
+    local info = ItemInfo[id]
+    if info == nil then
+        return nil
+    end
+    return id, "", "", info.equipLoc or "", 0, info.classID, info.subclassID
+end
+C_Item.EquipItemByName = function(id, slot)
+    EquipCalls[#EquipCalls + 1] = { id = id, slot = slot, inFight = InCombat }
+    if InCombat and not EquipInFight then
+        return
+    end
+    Hands[slot or MAIN_HAND] = id
+    if (ItemInfo[id] or {}).equipLoc == TWO_HANDED then
+        Hands[OFF_HAND] = nil
+    end
+end
+C_Spell = { GetSpellName = function(id) return id == 7620 and "Pêche" or nil end }
+-- The spells the player knows, by id.
+KnownSpells = {}
+function IsPlayerSpell(id) return KnownSpells[id] == true end
+Lure = { on = false, ms = 0 }
+function GetWeaponEnchantInfo() return Lure.on, Lure.ms, 1 end
+-- The keys bound by the addon: { [key] = action }.
+Bindings = {}
+function SetOverrideBindingClick(_, _, key, button, mouseButton)
+    Bindings[key] = "CLICK " .. button .. ":" .. (mouseButton or "LeftButton")
+end
+function SetOverrideBinding(_, _, key, action) Bindings[key] = action end
+function ClearOverrideBindings() Bindings = {} end
+-- The game's own bindings, { [key] = action }; whether the open loot window is a catch; the line's channel.
+GameBindings = {}
+function GetBindingAction(key) return GameBindings[key] or "" end
+FishingLoot = true
+function IsFishingLoot() return FishingLoot end
+function UnitChannelInfo() return nil end
