@@ -5,8 +5,8 @@ local _, ns = ...
 --- bytes), and whether the game opens it again later, from another character while its owner is offline: by the
 --- function a click on a chat link calls (SetItemRef), and by a click on the link written in the chat frame. Measured:
 --- it opens only while its owner is online. So the addon draws its own window for an offline member: "recettes" keeps
---- some recipes of the open window, "details" reads what the game tells of each one, any window closed (icon,
---- category, crafted item, reagents).
+--- some recipes of the player's window when it opens, "details" reads what the game tells of each one, any window
+--- closed (icon, category, crafted item, reagents).
 local Compat, Util = ns.Compat, ns.Util
 local log = ns.Log.For("lien")
 
@@ -114,17 +114,23 @@ local function chat(args)
     end
 end
 
---- Keeps a few learned recipes of the open window, for "details" to read with every window closed.
+--- Keeps a few learned recipes of the open window, for "details" to read with every window closed; a window without
+--- any keeps the ones kept before.
 local function keepRecipes()
     local ok, ids = Compat.GetAllRecipeIDs()
-    db.recipes = {}
+    local recipes = {}
     for _, id in ipairs(ok and type(ids) == "table" and ids or {}) do
         local okInfo, info = Compat.GetRecipeInfo(id)
-        if okInfo and type(info) == "table" and info.learned and #db.recipes < KEPT_RECIPES then
-            db.recipes[#db.recipes + 1] = id
+        if okInfo and type(info) == "table" and info.learned and #recipes < KEPT_RECIPES then
+            recipes[#recipes + 1] = id
         end
     end
-    log.Check(#db.recipes > 0, #db.recipes, "recette(s) gardée(s) :", table.concat(db.recipes, " "))
+    if #recipes == 0 then
+        log.Fail("aucune recette dans la fenêtre : ouvre un de tes métiers ; gardées avant :", #(db.recipes or {}))
+        return
+    end
+    db.recipes = recipes
+    log.Ok(#recipes, "recette(s) gardée(s) :", table.concat(recipes, " "))
 end
 
 local function itemName(itemId)
@@ -190,6 +196,7 @@ ns.Registry.Register({
                 local ok, linked = Compat.IsTradeSkillLinked()
                 if not (ok and linked) then
                     readLink()
+                    keepRecipes()
                 end
             end)
         end)
