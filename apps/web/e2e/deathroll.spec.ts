@@ -50,7 +50,7 @@ test("a deathroll played in game: Discord tells it, the loser owes the stake unt
   await debts.getByRole("button", { name: "Paiement reçu" }).click();
   await expect(page.getByRole("region", { name: "Mes dettes de deathroll" })).toHaveCount(0);
   // Paid, the debt stays in the history.
-  await expect(page.getByRole("region", { name: "Historique de mes dettes de deathroll" })).toContainText(
+  await expect(page.getByRole("region", { name: "Historique des dettes de deathroll" })).toContainText(
     /Dune Sable te devait 1\s500\spo.*Payée le/,
   );
   await expect(page.getByRole("region", { name: "Dernières parties" })).toContainText("1000 : 412 → 87 → 0");

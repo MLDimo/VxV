@@ -58,7 +58,7 @@ export function GameDebts({
         </Panel>
       )}
       {history.length > 0 && (
-        <Panel title="Historique de mes dettes" label={`Historique de mes dettes de ${game}`} className="mt-6">
+        <Panel title="Historique de mes dettes" label={`Historique des dettes de ${game}`} className="mt-6">
           <ul className="mt-3 space-y-2 text-sm">
             {history.map((view) => (
               <li key={view.game.id} className="flex flex-wrap items-baseline gap-x-3">
