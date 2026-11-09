@@ -6,6 +6,11 @@ test("the header shows every section on one line, with the member's name, from 1
   await page.goto("/personnages");
   const header = page.locator("header");
   await expect(header.getByRole("link", { name: "Personnages", exact: true })).toBeVisible();
+  // The addon's page, beside the companion's.
+  await expect(header.getByRole("link", { name: "Addon", exact: true })).toHaveAttribute(
+    "href",
+    "https://www.curseforge.com/wow/addons/vxv",
+  );
   await expect(header.getByText("Officier Test", { exact: true })).toHaveAttribute("title", /Officier/);
   // One line: the header keeps its height.
   expect((await header.boundingBox())?.height).toBeLessThanOrEqual(72);
