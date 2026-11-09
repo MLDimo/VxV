@@ -5,7 +5,7 @@ local ns = select(2, ...).Deathroll
 local DeathrollTab = {}
 ns.DeathrollTab = DeathrollTab
 
-local DeathrollData, Debts, Duels, DuelWindow, Games = ns.DeathrollData, ns.Debts, ns.Duels, ns.DuelWindow, ns.Games
+local Debts, Duels, DuelWindow, Games = ns.Debts, ns.Duels, ns.DuelWindow, ns.Games
 local Rules = ns.Rules
 
 local Gold, RowList, Screen, Theme = VXV.Gold, VXV.RowList, VXV.Screen, VXV.Theme
@@ -20,23 +20,9 @@ local TOP_SHARE = 0.5
 
 local content
 local lists, form = {}, {}
-local target
+local picker
 
 local row = VXV.RowList.Row
-
---- The members connected with VXV the player may challenge, the one chosen marked.
-local function members()
-    local rows, me = {}, VXV.PlayerName()
-    for _, name in ipairs(VXV.Online()) do
-        if name ~= me then
-            rows[#rows + 1] = row("line", (name == target and "▸ " or "") .. name, { onClick = function()
-                target = name
-                lists.members.SetRows(members())
-            end })
-        end
-    end
-    return #rows > 0 and rows or { row("line", "Aucun autre membre connecté avec VXV.") }
-end
 
 local function live()
     local rows = {}
@@ -57,38 +43,47 @@ local function debts()
         elseif game.winner == me then
             rows[#rows + 1] = row("line", ("%s te doit %s : clique une fois payé."):format(game.loser,
                 Gold.Format(game.stake)), { onClick = function()
-                Duels.ConfirmPaid(game.id)
+                Duels.ConfirmPaid(game.ids)
             end })
+        end
+    end
+    local history = Debts.History(me)
+    if #history > 0 then
+        rows[#rows + 1] = row("header", "Historique")
+        for _, game in ipairs(history) do
+            rows[#rows + 1] = row("line", VXV.DiceGames.HistoryText(game, me))
         end
     end
     return #rows > 0 and rows or { row("line", "Aucune dette de deathroll.") }
 end
 
---- The latest games over, as the website exports them: the winner, the loser and the stake.
+--- The latest games over: the website's, and those it does not know yet.
 local function latest()
-    local data, rows = DeathrollData.Current(), {}
-    for _, game in ipairs(data and data.latest or {}) do
-        rows[#rows + 1] = row("line", ("%s bat %s · %s"):format(game.winner, game.loser, Gold.Format(game.stake)))
+    local rows = {}
+    for _, game in ipairs(Debts.Latest()) do
+        rows[#rows + 1] = row("line", VXV.DiceGames.GameText(game))
     end
-    return #rows > 0 and rows or { row("line", "Les dernières parties arrivent avec les données du site.") }
+    return #rows > 0 and rows or { row("line", "Aucune partie jouée pour l'instant.") }
 end
 
 local function render()
-    lists.members.SetRows(members())
+    picker.Refresh()
     lists.live.SetRows(live())
     lists.debts.SetRows(debts())
     lists.latest.SetRows(latest())
 end
 
 local function challenge()
+    local target = picker.Selected()
     local refusal = Duels.Challenge(target, form.stake:GetText(), form.start:GetText())
     form.answer:SetText(refusal or ("Défi envoyé à %s : une minute pour répondre."):format(target))
 end
 
---- The challenge's panel: the members to choose from, then the stake, the starting number and the button.
+--- The challenge's panel: the members to choose from, searched by name, then the stake, the starting number and the
+--- button.
 local function addChallenge(height)
     local _, body = Theme.TitledPanel(content, PADDING, GRID_TOP, LEFT, height, "Défier un membre")
-    lists.members = RowList.Create(body, 0, nil, FORM_HEIGHT)
+    picker = VXV.MemberPicker(body, FORM_HEIGHT)
     local stakeLabel = Theme.Heading(body, "Mise (po)")
     stakeLabel:SetPoint("BOTTOMLEFT", 0, FORM_HEIGHT - 20)
     local stakeHolder

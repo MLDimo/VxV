@@ -1,7 +1,7 @@
 import { fullName } from "../domain/characters.ts";
 import { BIG_STAKE, deathrollLoser, deathrollRefusal, parseDeathroll } from "../domain/deathrolls.ts";
 import type { Member } from "../domain/members.ts";
-import { loserOf, winnerOf } from "./debts.ts";
+import { gameDebts, loserOf, settlePair, winnerOf } from "./debts.ts";
 import { gamePlayers, placeGuildBet } from "./diceGames.ts";
 import { ValidationError } from "./errors.ts";
 import type { Clock, GamePlayer, StoredDeathroll, UnitOfWork } from "./ports.ts";
@@ -12,6 +12,8 @@ const DEATHROLLS_LISTED = 30;
 
 const UNKNOWN_DEATHROLL = "Ce deathroll n'existe pas.";
 const KNOWN = "Deathroll déjà connu.";
+/** The end of a game's message when the debts between its players cancel out. */
+const SETTLED = " : leurs dettes s'annulent";
 const PAID = "Paiement du deathroll confirmé.";
 
 /** A game with its winner and loser. */
@@ -35,7 +37,8 @@ export function createDeathrolls({
   clock: Clock;
   announcer: DeathrollAnnouncer;
 }) {
-  /** A game sent by a companion: kept once, with its bet; or its payment confirmed by its winner. */
+  /** A game sent by a companion: kept once, with its bet, its players' debts settled when they cancel out; or the
+   * payment confirmed by the one owed. */
   async function receiveOne(sender: Member, text: string): Promise<string> {
     const game = parseDeathroll(text);
     const refusal = deathrollRefusal(game);
@@ -78,13 +81,17 @@ export function createDeathrolls({
           now,
         );
       }
-      // The winner's confirmation, from the winner's companion or relayed by an officer.
+      // Debts that cancel out are settled; else the confirmation of the one owed, from their companion or relayed by
+      // an officer, settles them.
+      const settled = created && (await settlePair(repositories.deathrolls, game.id, now));
+      const creditor = game.paid === undefined ? undefined : players.byName.get(game.paid.by)?.memberId;
       const confirmed =
+        !settled &&
         game.paid !== undefined &&
-        game.paid.by === fullName(winner) &&
-        (officer || sender.id === winner.memberId) &&
-        (await repositories.deathrolls.markPaid(game.id, game.paid.at));
-      return { created, confirmed, winner: fullName(winner), loser: fullName(loser) };
+        creditor !== undefined &&
+        (officer || sender.id === creditor) &&
+        (await settlePair(repositories.deathrolls, game.id, game.paid.at, creditor));
+      return { created, settled, confirmed, winner: fullName(winner), loser: fullName(loser) };
     });
     if (outcome.created && game.stake >= BIG_STAKE) {
       try {
@@ -102,7 +109,9 @@ export function createDeathrolls({
     if (outcome.confirmed) {
       return PAID;
     }
-    return outcome.created ? `Deathroll ${outcome.winner} contre ${outcome.loser} enregistré.` : KNOWN;
+    return outcome.created
+      ? `Deathroll ${outcome.winner} contre ${outcome.loser} enregistré${outcome.settled ? SETTLED : ""}.`
+      : KNOWN;
   }
 
   return {
@@ -126,11 +135,11 @@ export function createDeathrolls({
         if (game === undefined) {
           throw new ValidationError(UNKNOWN_DEATHROLL);
         }
-        if (winnerOf(game).memberId !== member.id) {
-          throw new ValidationError("Seul le gagnant confirme le paiement.");
-        }
-        if (!(await deathrolls.markPaid(game.id, clock()))) {
+        if (game.paidAt !== undefined) {
           throw new ValidationError("Ce paiement est déjà confirmé.");
+        }
+        if (!(await settlePair(deathrolls, game.id, clock(), member.id))) {
+          throw new ValidationError("Seul celui à qui la dette est due confirme le paiement.");
         }
       });
     },
@@ -142,15 +151,9 @@ export function createDeathrolls({
       );
     },
 
-    /** The member's unpaid games: those they lost, and those they won whose payment they have to confirm. */
-    async debtsOf(member: Member): Promise<{ owed: DeathrollView[]; toConfirm: DeathrollView[] }> {
-      return unitOfWork.run(async ({ deathrolls }) => {
-        const unpaid = (await deathrolls.listAll()).filter((game) => game.paidAt === undefined).map(view);
-        return {
-          owed: unpaid.filter((game) => game.loser.memberId === member.id),
-          toConfirm: unpaid.filter((game) => game.winner.memberId === member.id),
-        };
-      });
+    /** The member's debts: the games they lost unpaid, those whose payment they confirm, and all of them. */
+    async debtsOf(member: Member) {
+      return unitOfWork.run(async ({ deathrolls }) => gameDebts((await deathrolls.listAll()).map(view), member.id));
     },
   };
 }

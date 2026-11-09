@@ -6,6 +6,7 @@ VXV.RegisterModule({
     Enable = function(data)
         ns.ChifoumiData.Restore(data)
         ns.Games.Restore(data)
+        ns.MatchWindow.Restore(data)
     end,
     tab = {
         place = "dice",

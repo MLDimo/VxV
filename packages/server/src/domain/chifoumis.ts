@@ -4,7 +4,7 @@ import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.t
 /**
  * The Chi Fou Mi (owner's request of 14 October): rock, paper, scissors, one against one in game, at the best of
  * three rounds; a draw does not count and is played again. The players choose the stake, 0 included; the guild bets
- * on the game during the minute before the first round (Le Dé Pipé's rules, diceGames.ts).
+ * on the game during the 30 seconds before the first round (Le Dé Pipé's rules, diceGames.ts).
  */
 
 /** First line of a game sent by the addon (contract with VXV/Chifoumi); the number is the format version. */

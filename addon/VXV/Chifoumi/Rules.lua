@@ -1,7 +1,7 @@
 local ns = select(2, ...).Chifoumi
 
 --- The Chi Fou Mi's rules (owner's request of 14 October): rock, paper, scissors at the best of three rounds, a draw
---- played again; the guild bets during the minute after the acceptance, before the first round
+--- played again; the guild bets during the 30 seconds after the acceptance, before the first round
 --- (packages/server/src/domain/chifoumis.ts).
 local Rules = {}
 ns.Rules = Rules
@@ -9,7 +9,8 @@ ns.Rules = Rules
 Rules.MOVES = { "pierre", "feuille", "ciseaux" }
 Rules.MOVE_NAMES = { pierre = "Pierre", feuille = "Feuille", ciseaux = "Ciseaux" }
 Rules.ROUNDS_TO_WIN = 2
-Rules.BETTING_SECONDS = 60
+-- The guild bets during the 30 seconds after the acceptance, before the first move (owner's request of 9 November).
+Rules.BETTING_SECONDS = 30
 
 -- What each move beats: the rock blunts the scissors, the paper wraps the rock, the scissors cut the paper.
 local BEATS = { pierre = "ciseaux", feuille = "pierre", ciseaux = "feuille" }
@@ -52,7 +53,7 @@ function Rules.Winner(game)
     return loser and (loser == game.challenger and game.challenged or game.challenger)
 end
 
---- Whether the guild still bets on the game: before its first round, until the minute is over.
+--- Whether the guild still bets on the game: before its first round, until the 30 seconds are over.
 function Rules.Betting(game)
     return #game.rounds == 0 and GetTime() < game.closesAt
 end

@@ -1,44 +1,40 @@
 local ns = select(2, ...).Deathroll
 
 --- The deathroll's debts (P15.6): the stake the loser owes until the winner confirms the payment, as the website
---- knows them and as the games over since its data were exported tell; a debt, bets or deathroll, bars the member.
+--- knows them and as the games over since tell (VXV.DiceGames' ledger). From the website's limit on, a member's debts
+--- (bets, deathrolls, Chi Fou Mi) bar them (owner's decision of 9 November: 100 po).
 local Debts = {}
 ns.Debts = Debts
 
 local DeathrollData, Games, Rules = ns.DeathrollData, ns.Games, ns.Rules
 
---- The unpaid games: the website's, and those over since its data were exported (it cannot know them yet).
-function Debts.Unpaid()
-    local list, known = {}, {}
-    local data = DeathrollData.Current()
-    for _, game in ipairs(data and data.unpaid or {}) do
-        known[game.id] = true
-        local stored = Games.Over()[game.id]
-        if stored == nil or stored.paid == nil then
-            list[#list + 1] = { id = game.id, winner = game.winner, loser = game.loser, stake = game.stake }
-        end
-    end
-    local exportedAt = DeathrollData.ExportedAt()
-    for _, game in pairs(Games.Over()) do
-        if not known[game.id] and game.paid == nil and game.endedAt > exportedAt then
-            list[#list + 1] = { id = game.id, winner = Rules.Winner(game), loser = Rules.Loser(game),
-                stake = game.stake }
-        end
-    end
-    return list
+local function ledger()
+    return VXV.DiceGames.Ledger(DeathrollData.Current(), Games.Over(), Rules)
 end
 
---- Whether the character's member is in debt (bets or deathrolls): barred from deathrolls (P15.6).
-function Debts.Barred(name)
-    local data = DeathrollData.Current()
-    local memberId = name ~= nil and VXV.MemberOf(data, name) or nil
-    if data ~= nil and memberId ~= nil and data.barred[memberId] then
-        return true
-    end
-    for _, game in ipairs(Debts.Unpaid()) do
-        if game.loser == name then
-            return true
-        end
-    end
-    return false
+--- The unpaid games: { id, winner, loser, stake }.
+function Debts.Unpaid()
+    return ledger().Unpaid()
 end
+
+--- Whether the character's member owes too much to play or bet.
+function Debts.Barred(name)
+    return ledger().Barred(name)
+end
+
+--- The character's debts, paid or not, the latest first.
+function Debts.History(name)
+    return ledger().History(name)
+end
+
+--- The latest games over.
+function Debts.Latest()
+    return ledger().Latest()
+end
+
+-- The Journal (the Raid part) asks for the latest games: ("journal.games", add(label, games)).
+VXV.On("journal.games", function(add)
+    if type(add) == "function" then
+        add("Deathroll", Debts.Latest())
+    end
+end)

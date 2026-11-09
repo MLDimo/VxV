@@ -227,19 +227,24 @@ describe("bets", () => {
       ).rejects.toBeInstanceOf(ValidationError);
     });
 
-    it("turns a lost unpaid stake into a debt, which bars betting until the treasurer has it", async () => {
-      const lost = await open(1);
-      await bets.stake(member, lost, await choiceId(lost, "Un heal"), 40);
-      await bets.declareResult(officer, lost, await choiceId(lost, "Un tank"), "Résultat");
+    it("turns a lost unpaid stake into a debt, which bars betting from 100 po until the treasurer has it", async () => {
+      const small = await open(1);
+      await bets.stake(member, small, await choiceId(small, "Un heal"), 40);
+      await bets.declareResult(officer, small, await choiceId(small, "Un tank"), "Résultat");
       expect(await treasury.debtOf(member)).toBe(40);
+      const lost = await open(2, "Pari perdu");
+      await bets.stake(member, lost, await choiceId(lost, "Un heal"), 60);
+      await bets.declareResult(officer, lost, await choiceId(lost, "Un tank"), "Résultat");
+      expect(await treasury.debtOf(member)).toBe(100);
       const next = await open(48, "Pari suivant");
       await expect(bets.stake(member, next, await choiceId(next, "Un tank"), 10)).rejects.toThrow(
-        /Tu dois 40\s?po \(paris, deathroll ou Chi Fou Mi\)/u,
+        /Tu dois 100\s?po \(paris, deathroll ou Chi Fou Mi\) : ramène ta dette sous 100\s?po/u,
       );
-      const [debt] = (await treasury.book()).debts;
-      await expect(treasury.markPaid(officer, debt?.id ?? "")).rejects.toThrow(/réservée au trésorier/);
-      await treasury.markPaid(treasurer, debt?.id ?? "");
-      expect(await treasury.debtOf(member)).toBe(0);
+      const debts = (await treasury.book()).debts;
+      await expect(treasury.markPaid(officer, debts[0]?.id ?? "")).rejects.toThrow(/réservée au trésorier/);
+      const sixty = debts.find((debt) => debt.amount === 60);
+      await treasury.markPaid(treasurer, sixty?.id ?? "");
+      expect(await treasury.debtOf(member)).toBe(40);
       await bets.stake(member, next, await choiceId(next, "Un tank"), 10);
     });
 

@@ -9,7 +9,5 @@ local DeathrollData = ns.DeathrollData
 
 --- Whether the website says the character's member lacks the role « Membre »; without its data, nobody does.
 function Newcomers.Is(name)
-    local data = DeathrollData.Current()
-    local memberId = name ~= nil and VXV.MemberOf(data, name) or nil
-    return memberId ~= nil and data.newcomers[memberId] == true
+    return VXV.DiceGames.Newcomer(DeathrollData.Current(), name)
 end

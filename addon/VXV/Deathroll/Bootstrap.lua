@@ -6,6 +6,7 @@ VXV.RegisterModule({
     Enable = function(data)
         ns.DeathrollData.Restore(data)
         ns.Games.Restore(data)
+        ns.DuelWindow.Restore(data)
     end,
     tab = {
         place = "dice",

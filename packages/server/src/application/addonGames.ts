@@ -1,22 +1,36 @@
 import { avatarName } from "@vxv/design";
 import { ADDON_CHIFOUMIS_HEADER, ADDON_DEATHROLLS_HEADER, formatAddonGames } from "../domain/addonGames.ts";
-import { isDebt } from "../domain/bets.ts";
+import { DEBT_LIMIT, isDebt } from "../domain/bets.ts";
 import { canGamble } from "../domain/permissions.ts";
 import { addonReaders } from "./addonReaders.ts";
-import { loserOf, winnerOf } from "./debts.ts";
+import { loserOf, pairDebts, winnerOf } from "./debts.ts";
 import type { Clock, PlayedGame, Repositories, UnitOfWork } from "./ports.ts";
 
-/** The members barred from Le Dé Pipé: in debt (bets, deathrolls, Chi Fou Mi), or without the role « Membre ». */
-async function barredMembers(repositories: Repositories) {
-  const unpaid = [...(await repositories.deathrolls.listAll()), ...(await repositories.chifoumis.listAll())].filter(
-    (game) => game.paidAt === undefined && game.stake > 0,
-  );
-  const debtors = [
-    ...(await repositories.stakes.listRanked()).filter((stake) => isDebt(stake, stake.outcome)).map((s) => s.memberId),
-    ...unpaid.flatMap((game) => loserOf(game).memberId ?? []),
-  ];
+/**
+ * What each member owes (bets, and in the deathrolls and the Chi Fou Mi each pair's games set against each other), the
+ * members who owe nothing left out, and the members without the role « Membre »: the addon bars from Le Dé Pipé those
+ * owing DEBT_LIMIT, and those.
+ */
+async function debtsAndNewcomers(repositories: Repositories) {
+  const owed = new Map<string, number>();
+  const owe = (memberId: string | undefined, amount: number) => {
+    if (memberId !== undefined) {
+      owed.set(memberId, (owed.get(memberId) ?? 0) + amount);
+    }
+  };
+  for (const stake of await repositories.stakes.listRanked()) {
+    if (isDebt(stake, stake.outcome)) {
+      owe(stake.memberId, stake.amount);
+    }
+  }
+  const lists: PlayedGame[][] = [await repositories.deathrolls.listAll(), await repositories.chifoumis.listAll()];
+  for (const games of lists) {
+    for (const pair of pairDebts(games)) {
+      owe(pair.debtor.memberId, pair.amount);
+    }
+  }
   return {
-    barred: [...new Set(debtors)],
+    debts: [...owed].map(([memberId, amount]) => ({ memberId, owed: amount })),
     newcomers: (await repositories.members.listAll())
       .filter((member) => !canGamble(member.roles))
       .map((member) => member.id),
@@ -32,20 +46,17 @@ async function portraits(repositories: Repositories) {
 }
 
 /**
- * Le Dé Pipé's games as the companion hands them to the addon (P15): who is barred, the games not paid and the latest
- * games, VXV-DEATHROLLS for the deathroll, VXV-CHIFOUMIS for the Chi Fou Mi (Ranking: VXV-RANKING).
+ * Le Dé Pipé's games as the companion hands them to the addon (P15): what each member owes, the players' portraits,
+ * the games not paid and the latest games, VXV-DEATHROLLS for the deathroll, VXV-CHIFOUMIS for the Chi Fou Mi (Ranking: VXV-RANKING).
  */
 export function createAddonGames({ unitOfWork, clock }: { unitOfWork: UnitOfWork; clock: Clock }) {
-  function exportGames(
-    header: string,
-    list: (repositories: Repositories) => Promise<PlayedGame[]>,
-    withPortraits: boolean,
-  ): Promise<string> {
+  function exportGames(header: string, list: (repositories: Repositories) => Promise<PlayedGame[]>): Promise<string> {
     return unitOfWork.run(async (repositories) =>
       formatAddonGames(header, {
         ...(await addonReaders(repositories)),
-        ...(await barredMembers(repositories)),
-        portraits: withPortraits ? await portraits(repositories) : [],
+        ...(await debtsAndNewcomers(repositories)),
+        debtLimit: DEBT_LIMIT,
+        portraits: await portraits(repositories),
         games: (await list(repositories)).map((game) => ({
           id: game.id,
           winner: winnerOf(game),
@@ -61,10 +72,8 @@ export function createAddonGames({ unitOfWork, clock }: { unitOfWork: UnitOfWork
 
   return {
     /** VXV-DEATHROLLS text for the companion of any member: an officer's addon passes it on to the guild. */
-    exportDeathrolls: () =>
-      exportGames(ADDON_DEATHROLLS_HEADER, (repositories) => repositories.deathrolls.listAll(), false),
-    /** VXV-CHIFOUMIS text, the same way, with the members' portraits its window draws. */
-    exportChifoumis: () =>
-      exportGames(ADDON_CHIFOUMIS_HEADER, (repositories) => repositories.chifoumis.listAll(), true),
+    exportDeathrolls: () => exportGames(ADDON_DEATHROLLS_HEADER, (repositories) => repositories.deathrolls.listAll()),
+    /** VXV-CHIFOUMIS text, the same way. */
+    exportChifoumis: () => exportGames(ADDON_CHIFOUMIS_HEADER, (repositories) => repositories.chifoumis.listAll()),
   };
 }

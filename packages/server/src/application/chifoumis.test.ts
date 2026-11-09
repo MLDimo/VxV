@@ -66,8 +66,10 @@ describe("Chi Fou Mi", () => {
     // Vorn owes the stake until Thom confirms, from the website or from the game.
     const treasury = createTreasury({ unitOfWork: createUnitOfWork(sql), clock });
     expect(await treasury.debtOf(vorn)).toBe(300);
-    expect((await chifoumis.debtsOf(thom)).toConfirm.map((view) => view.game.id)).toEqual(["c1"]);
-    await expect(chifoumis.confirmPayment(vorn, "c1")).rejects.toThrow("Seul le gagnant confirme le paiement.");
+    expect((await chifoumis.debtsOf(thom)).toConfirm.map((pair) => pair.id)).toEqual(["c1"]);
+    await expect(chifoumis.confirmPayment(vorn, "c1")).rejects.toThrow(
+      "Seul celui à qui la dette est due confirme le paiement.",
+    );
     expect(
       await chifoumis.recordFromGame(thom, [game("c1", 300, [`Y;Thom Leboss;${String(ACCEPTED + 600)}`])]),
     ).toEqual(["Paiement du Chi Fou Mi confirmé."]);
@@ -95,8 +97,8 @@ describe("Chi Fou Mi", () => {
   it("hands the debts and the games to the addon, and ranks the players by net gain", async () => {
     await chifoumis.recordFromGame(thom, [game("c4", 500)]);
     const lines = (await createAddonGames({ unitOfWork: createUnitOfWork(sql), clock }).exportChifoumis()).split("\n");
-    expect(lines[0]).toBe("VXV-CHIFOUMIS-2");
-    expect(lines).toContain(`X;${vorn.id}`);
+    expect(lines[0]).toBe("VXV-CHIFOUMIS-3");
+    expect(lines).toContain(`X;${vorn.id};500`);
     // Each player's portrait, by their main character: the window draws them.
     expect(lines.some((line) => line.startsWith(`A;${thom.id};`) && line.includes("voleur"))).toBe(true);
     expect(lines).toContain(`D;c4;${vorn.id};Vorn Cendrelune;${thom.id};Thom Leboss;500;${String(ACCEPTED + 120)}`);

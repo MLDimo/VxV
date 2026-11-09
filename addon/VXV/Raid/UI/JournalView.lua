@@ -1,8 +1,8 @@
 local ns = select(2, ...).Raid
 
 --- What the Journal's page shows (§7.7): the raids recorded in game, the current one in full (bosses killed, items
---- given, deaths) then the previous ones, and the officers' changes to the loaded event with their reason. Built
---- from the data alone.
+--- given, deaths) then the previous ones, the officers' changes to the loaded event with their reason, and Le Dé
+--- Pipé's latest games (owner's request of 9 November). Built from the data alone.
 local JournalView = {}
 ns.JournalView = JournalView
 
@@ -11,7 +11,10 @@ local Labels = ns.Labels
 local TIME = "%H:%M"
 local NONE = "Aucun raid enregistré : les boss tués et les objets donnés s'y ajoutent pendant le raid."
 -- The stamps of the entries (§7.7), in their category's ink.
-local STAMPS = { raid = { text = "RAID", color = "stamp-raid" }, loot = { text = "LOOT", color = "stamp-loot" } }
+local STAMPS = { raid = { text = "RAID", color = "stamp-raid" }, loot = { text = "LOOT", color = "stamp-loot" },
+    game = { text = "JEU", color = "stamp-bet" } }
+-- Le Dé Pipé's latest games the page shows.
+local GAMES_SHOWN = 10
 
 local function itemName(link)
     return link:match("%[(.-)%]") or link
@@ -89,8 +92,23 @@ local function addChanges(rows, event)
     end
 end
 
---- Rows of the page, the logs being newest first; event is the loaded one.
-function JournalView.Rows(logs, event)
+--- Le Dé Pipé's latest games, all games together ({ label, game }, the game as VXV.DiceGames' ledger lists it).
+local function addGames(rows, games)
+    if #games == 0 then
+        return
+    end
+    table.sort(games, function(left, right)
+        return left.game.endedAt > right.game.endedAt
+    end)
+    rows[#rows + 1] = { kind = "title", text = "Le Dé Pipé" }
+    for index = 1, math.min(#games, GAMES_SHOWN) do
+        rows[#rows + 1] = { kind = "line", stamp = STAMPS.game,
+            text = games[index].label .. " · " .. VXV.DiceGames.GameText(games[index].game) }
+    end
+end
+
+--- Rows of the page, the logs being newest first; event is the loaded one; games are Le Dé Pipé's latest.
+function JournalView.Rows(logs, event, games)
     local rows, previous = {}, {}
     for _, log in ipairs(logs) do
         if event ~= nil and log.eventId == event.id then
@@ -109,5 +127,6 @@ function JournalView.Rows(logs, event)
         rows[1] = { kind = "line", text = NONE }
     end
     addChanges(rows, event)
+    addGames(rows, games or {})
     return rows
 end

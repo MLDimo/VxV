@@ -42,8 +42,16 @@ test("a Chi Fou Mi played in game: the loser owes the stake until the winner con
   await expect(debts).toContainText(/Dune Sable te doit 200\spo/);
   await debts.getByRole("button", { name: "Paiement reçu" }).click();
   await expect(page.getByRole("region", { name: "Mes dettes de Chi Fou Mi" })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Historique des dettes de Chi Fou Mi" })).toContainText(
+    /Dune Sable te devait 200\spo.*Payée le/,
+  );
   await expect(page.getByRole("region", { name: "Dernières parties" })).toContainText(
     "Ciseaux contre Ciseaux · Feuille contre Pierre · Feuille contre Pierre",
+  );
+
+  await page.goto("/journal");
+  await expect(page.getByRole("list", { name: "Dernières parties du Dé Pipé" })).toContainText(
+    /CHI FOU MI.*Ciel Gris bat Dune Sable · 200\spo/,
   );
 
   await page.goto("/ranking");

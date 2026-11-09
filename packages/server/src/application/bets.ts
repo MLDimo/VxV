@@ -1,5 +1,6 @@
 import {
   betBook,
+  barredByDebt,
   cleanChoices,
   endRefusal,
   isOpen,
@@ -190,7 +191,7 @@ export function createBets({ unitOfWork, clock }: { unitOfWork: UnitOfWork; cloc
           throw new ValidationError(GAMBLE_REFUSAL);
         }
         const debt = await memberDebt(repositories, member.id);
-        if (debt > 0) {
+        if (barredByDebt(debt)) {
           throw new ValidationError(debtRefusal(debt));
         }
         await repositories.stakes.save({ betId: bet.id, memberId: member.id, choiceId, amount }, now);

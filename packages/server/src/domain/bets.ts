@@ -229,7 +229,18 @@ export function payout(stake: Pick<Stake, "amount" | "paidAt">, settled: Pick<Se
   return stake.paidAt === undefined ? settled.gain - stake.amount : settled.gain;
 }
 
-/** A lost stake that was never paid: a debt, which bars the member from betting until the treasurer has it. */
+/**
+ * What a member may owe and still bet and play (owner's decision of 9 November): from this much on, bets, deathrolls
+ * and Chi Fou Mi are barred until the debt goes back under it.
+ */
+export const DEBT_LIMIT = 100;
+
+/** Whether a member owing this much is barred from bets and games. */
+export function barredByDebt(debt: number): boolean {
+  return debt >= DEBT_LIMIT;
+}
+
+/** A lost stake that was never paid: a debt, owed to the treasurer until they have it. */
 export function isDebt(stake: Pick<Stake, "paidAt">, outcome: StakeOutcome | undefined): boolean {
   return outcome === "lost" && stake.paidAt === undefined;
 }

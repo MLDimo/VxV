@@ -482,6 +482,13 @@ C_DamageMeter = {
 --- Dead players, by name; tests set it.
 Dead = {}
 function UnitIsDeadOrGhost(unit) return Dead[GetUnitName(unit) or ""] == true end
+--- A click on a link of the chat frame: the client opens what it links (an addon's link, |Haddon:…|h, opens nothing
+--- by itself). ClickChatLink(text) clicks the first link of a text the chat shows.
+function SetItemRef() end
+function ClickChatLink(text)
+    local link = text:match("|H(.-)|h")
+    SetItemRef(link, text, "LeftButton")
+end
 --- A secure hook runs after the original function, with its arguments, and changes nothing of its results.
 function hooksecurefunc(name, hook)
     local original = _G[name]

@@ -75,6 +75,9 @@ const USED_IN_GAME = [
   "UnitChannelInfo",
   "C_Map.GetBestMapForUnit",
   "C_Map.GetMapInfo",
+  // A link opened by a click: SetItemRef opened a profession's link (probe, T13, 9 November); the addon's chat links
+  // follow it by a secure hook.
+  "SetItemRef",
 ];
 
 /** Lua 5.1 and the extensions the WoW client adds to it. */

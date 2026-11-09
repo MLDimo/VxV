@@ -4,9 +4,8 @@ import { formatDateTime, formatGold } from "@vxv/server/domain/labels";
 import Image from "next/image";
 import { confirmChifoumiPayment } from "@/app/actions/chifoumis";
 import { CharacterName } from "@/components/CharacterName";
-import { ConfirmButton } from "@/components/ConfirmButton";
 import { DiceNav } from "@/components/DiceNav";
-import { Panel } from "@/components/Panel";
+import { GameDebts } from "@/components/GameDebts";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
@@ -38,7 +37,7 @@ function Game({ view }: { view: ChifoumiView }) {
 export default async function ChifoumiPage() {
   const member = await requireMember();
   const { chifoumis } = getApplication();
-  const { owed, toConfirm } = await chifoumis.debtsOf(member);
+  const debts = await chifoumis.debtsOf(member);
   const games = await chifoumis.list();
   return (
     <>
@@ -47,33 +46,15 @@ export default async function ChifoumiPage() {
       <p className="mt-6 max-w-3xl text-lavender">
         Pierre, feuille, ciseaux, un contre un depuis l&apos;addon, au meilleur des trois manches. Les joueurs
         choisissent la mise, 0 compris : le perdant la doit au gagnant jusqu&apos;à ce qu&apos;il confirme le paiement.
-        Une dette bloque les paris, les deathrolls et les Chi Fou Mi.
+        À partir de 100 po de dettes, paris, deathrolls et Chi Fou Mi sont bloqués.
       </p>
-      {(owed.length > 0 || toConfirm.length > 0) && (
-        <Panel title="Mes dettes" label="Mes dettes de Chi Fou Mi" className="mt-6">
-          <ul className="mt-3 space-y-2">
-            {owed.map((view) => (
-              <li key={view.game.id} className="text-loss">
-                Tu dois {formatGold(view.game.stake)} à{" "}
-                <CharacterName name={view.winner.name} characterClass={view.winner.characterClass} />.
-              </li>
-            ))}
-            {toConfirm.map((view) => (
-              <li key={view.game.id} className="flex flex-wrap items-center gap-3">
-                <span>
-                  <CharacterName name={view.loser.name} characterClass={view.loser.characterClass} /> te doit{" "}
-                  {formatGold(view.game.stake)}.
-                </span>
-                <ConfirmButton
-                  action={confirmChifoumiPayment}
-                  fields={{ chifoumiId: view.game.id }}
-                  label="Paiement reçu"
-                />
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      )}
+      <GameDebts
+        game="Chi Fou Mi"
+        memberId={member.id}
+        debts={debts}
+        confirm={confirmChifoumiPayment}
+        field="chifoumiId"
+      />
       <section className="mt-8" aria-label="Dernières parties">
         <h2 className="font-pixel text-xl text-ivory">Dernières parties</h2>
         {games.length === 0 && (

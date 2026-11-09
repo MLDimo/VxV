@@ -1698,16 +1698,16 @@ figure { margin: 0; min-width: 0; }
       <div class="split">
         <div class="prose">
           <ol class="steps">
-            <li><p>Dans Le Dé Pipé › Deathroll, <strong>défie</strong> un membre connecté avec VXV : choisis la mise et le nombre de départ.</p></li>
+            <li><p>Dans Le Dé Pipé › Deathroll, <strong>défie</strong> un membre connecté avec VXV (tape une partie de son nom pour le trouver) : choisis la mise et le nombre de départ.</p></li>
             <li><p>Il a <strong>une minute</strong> pour accepter ou refuser. En plein combat, il ne voit le défi qu'à la fin du combat, s'il reste du temps pour répondre.</p></li>
-            <li><p>Défi accepté : toute la guilde est prévenue et peut <strong>parier pendant une minute</strong> (pas les deux joueurs, ni un membre endetté).</p></li>
+            <li><p>Défi accepté : une ligne part dans le chat de guilde, avec un lien <strong>[Regarder]</strong> qui ouvre la partie chez qui clique ; chacun peut <strong>parier pendant 30 secondes</strong> (pas les deux joueurs, ni un membre à 100 po de dettes).</p></li>
             <li><p>Le défié roll le premier, puis chacun roll à son tour <strong>de 0 au résultat précédent</strong>. Un clic sur Roll lance la bonne plage, au bon tour ; le tirage reste celui du serveur de Blizzard.</p></li>
             <li><p><strong>Le premier qui fait 0 perd la mise</strong>, qui va entièrement au gagnant.</p></li>
           </ol>
-          <p>La fenêtre du duel est animée (le dé VXV tourne, le fond rougit à l'approche de 0) et toute la guilde la suit en direct. La partie finie part au site, qui la vérifie et règle le pari des spectateurs avec les règles des paris.</p>
+          <p>La fenêtre du duel est animée : le dé VXV flotte puis roule pendant le tirage, les chiffres défilent puis s'arrêtent sur le vrai résultat, le fond rougit à l'approche de 0. Le bouton <strong>-</strong> en haut la réduit (le nombre, le tour, le bouton Roll et les paris), <strong>+</strong> la rend en grand ; l'addon s'en souvient. La partie finie part au site, qui la vérifie et règle le pari des spectateurs avec les règles des paris ; les dernières parties sont aussi dans le Journal.</p>
           <div class="note warn">
             <b class="t">La dette du perdant</b>
-            <p>Le perdant doit la mise au gagnant jusqu'à ce que celui-ci confirme le paiement, sur le site ou en jeu. Tant qu'elle court, plus de deathroll ni de pari pour lui.</p>
+            <p>Le perdant doit la mise au gagnant jusqu'à ce que celui-ci confirme le paiement, sur le site ou en jeu ; payée, elle reste dans l'historique des dettes. Entre deux joueurs, les dettes se compensent : si tu gagnes 10 po contre Vorn puis qu'il gagne 10 po contre toi, elles s'annulent ; s'il en gagne 4, il ne t'en doit plus que 6. À partir de <strong>100 po de dettes</strong> en tout (paris, deathroll, Chi Fou Mi), plus de deathroll, de Chi Fou Mi ni de pari.</p>
           </div>
         </div>
         <div class="stack">
@@ -1718,7 +1718,7 @@ figure { margin: 0; min-width: 0; }
           <figure class="fig">
             <div class="game">
               <div class="chat">
-                <span class="guild">[Guilde] [Brann] : [VXV] Deathroll : Kaelys contre Vorn pour 500 po, départ 1000. Paris ouverts une minute dans l'addon.</span>
+                <span class="guild">[Guilde] [Brann] : [VXV] Deathroll : Kaelys contre Vorn pour 500 po, départ 1000. Paris ouverts 30 s dans l'addon.</span>
                 <span><span class="vxv">VXV</span> <span class="note-line">Deathroll : Kaelys contre Vorn. Suis-le dans Le Dé Pipé › Deathroll.</span></span>
                 <span class="sys">Vorn obtient un 412 (0-1000)</span>
                 <span class="sys">Kaelys obtient un 87 (0-412)</span>
@@ -1813,7 +1813,7 @@ figure { margin: 0; min-width: 0; }
           <ol class="steps">
             <li><p>Dans Le Dé Pipé › Chi Fou Mi, <strong>défie</strong> un membre connecté avec VXV et choisis la mise : <strong>0 po</strong> pour le plaisir, ou plus.</p></li>
             <li><p>Il a <strong>une minute</strong> pour accepter ou refuser (en plein combat, il voit le défi à la fin du combat).</p></li>
-            <li><p>Défi accepté : une ligne part dans le chat de guilde, sans fenêtre chez les autres. Chacun peut ouvrir la partie depuis l'onglet pour la <strong>regarder</strong> et <strong>parier pendant une minute</strong>.</p></li>
+            <li><p>Défi accepté : une ligne part dans le chat de guilde, sans fenêtre qui s'ouvre seule chez les autres. Chacun peut ouvrir la partie par son lien <strong>[Regarder]</strong> ou depuis l'onglet pour la <strong>regarder</strong> et <strong>parier pendant 30 secondes</strong>. Le bouton <strong>-</strong> réduit la fenêtre.</p></li>
             <li><p>Puis chaque manche : choisis <strong>Pierre</strong>, <strong>Feuille</strong> ou <strong>Ciseaux</strong>. Ton coup reste caché jusqu'à ce que l'autre ait joué le sien.</p></li>
             <li><p>La pierre casse les ciseaux, la feuille enveloppe la pierre, les ciseaux coupent la feuille. Une égalité se rejoue : <strong>le premier à deux manches gagnées</strong> l'emporte.</p></li>
           </ol>
@@ -1822,10 +1822,10 @@ figure { margin: 0; min-width: 0; }
         <figure class="fig">
           <div class="game">
             <div class="chat">
-              <span class="guild">[Guilde] [Kaelys] : [VXV] Chi Fou Mi : Kaelys contre Vorn pour 200 po. Paris ouverts une minute dans l'addon.</span>
+              <span class="guild">[Guilde] [Kaelys] : [VXV] Chi Fou Mi : Kaelys contre Vorn pour 200 po. Paris ouverts 30 s dans l'addon. <span style="color:#FF5AC8">[Regarder]</span></span>
             </div>
           </div>
-          <figcaption><span class="example-tag">Exemple</span> · <b>Le lancement d'une partie</b> : une ligne dans le chat de guilde, sans fenêtre chez les autres. Essaie la fenêtre de la partie juste en dessous.</figcaption>
+          <figcaption><span class="example-tag">Exemple</span> · <b>Le lancement d'une partie</b> : une ligne dans le chat de guilde, dont le lien ouvre la partie. Essaie la fenêtre de la partie juste en dessous.</figcaption>
         </figure>
       </div>
     </section>
@@ -1908,7 +1908,7 @@ figure { margin: 0; min-width: 0; }
           <p>Les mises se paient en jeu, au <strong>trésorier</strong>. Lui seul note sur le site l'or qui change de mains : mise reçue, gain versé, dette réglée. L'historique est visible de tous.</p>
           <ul>
             <li>Une mise <strong>pas encore payée</strong> compte quand même dans la cagnotte. Si elle gagne, son montant est déduit du gain ; si elle perd, elle devient une <strong>dette</strong>.</li>
-            <li>Une dette (pari ou deathroll) <strong>bloque les paris et les deathrolls</strong> jusqu'à son règlement.</li>
+            <li>À partir de <strong>100 po de dettes</strong> en tout (paris, deathroll, Chi Fou Mi), <strong>paris, deathrolls et Chi Fou Mi sont bloqués</strong> jusqu'à ce que tu repasses en dessous. Tes dettes payées restent dans l'historique, sur le site et dans l'addon.</li>
             <li>Tes gains se récupèrent auprès du trésorier.</li>
           </ul>
         </div>
@@ -2441,7 +2441,7 @@ figure { margin: 0; min-width: 0; }
         </details>
         <details>
           <summary>Je ne peux plus parier ni lancer de deathroll.</summary>
-          <div><p>Tu as une dette, d'un pari perdu non payé ou d'un deathroll perdu. Règle-la auprès du trésorier (ou du gagnant pour un deathroll, qui confirme le paiement) et tout se débloque.</p></div>
+          <div><p>Tes dettes atteignent 100 po en tout : paris perdus non payés, deathrolls ou Chi Fou Mi perdus. Règles-en auprès du trésorier (ou du gagnant pour un deathroll ou un Chi Fou Mi, qui confirme le paiement) pour repasser sous 100 po et tout se débloque.</p></div>
         </details>
         <details>
           <summary>Mon titre ou ma place n'a pas changé.</summary>

@@ -1,3 +1,4 @@
+import { barredByDebt } from "../domain/bets.ts";
 import { fullName, type Character } from "../domain/characters.ts";
 import { DICE_BETTING_MS, guildBets, type GameBet } from "../domain/diceGames.ts";
 import type { Member } from "../domain/members.ts";
@@ -46,7 +47,7 @@ export async function gamePlayers(repositories: Repositories, game: ToldGame, se
 
 /**
  * The guild's bet on the game (P15.2): the stakes on a player from the members with the role « Membre », neither
- * player nor in debt, settled at once on the winner. Returns the bet's id, or undefined without any stake.
+ * player nor owing DEBT_LIMIT, settled at once on the winner. Returns the bet's id, or undefined without any stake.
  */
 export async function placeGuildBet(
   repositories: Repositories,
@@ -65,7 +66,7 @@ export async function placeGuildBet(
     if (memberId === undefined || playing.has(memberId) || stakes.has(memberId) || !gamblers.has(memberId)) {
       continue;
     }
-    if ((await memberDebt(repositories, memberId)) === 0) {
+    if (!barredByDebt(await memberDebt(repositories, memberId))) {
       stakes.set(memberId, { choice: bet.choice, amount: bet.amount });
     }
   }

@@ -1,8 +1,9 @@
 local ns = select(2, ...).Deathroll
 
 --- The deathroll between two members (P15.1 to P15.3), as the guild's addons tell it: the challenge whispered, the
---- answer, the start told to the guild (and to its chat), the guild's stakes for a minute, then each roll at its turn.
---- The roll is the game's own /roll, drawn by the server and seen in the chat; the roller's addon tells its result.
+--- answer, the start told to the guild (and to its chat), the guild's stakes for 30 seconds, then each roll at its
+--- turn. The roll is the game's own /roll, drawn by the server and seen in the chat; the roller's addon tells its
+--- result.
 local Duels = {}
 ns.Duels = Duels
 
@@ -15,6 +16,7 @@ local CHALLENGE_SECONDS = 60
 local DEFAULT_START = 1000
 Duels.DEFAULT_START = DEFAULT_START
 local NEWCOMER = "Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord."
+local IN_DEBT = "Tes dettes atteignent la limite (paris, deathroll, Chi Fou Mi) : règles-en pour jouer de nouveau."
 
 local challenges = {}
 local sent = 0
@@ -35,10 +37,10 @@ function Duels.Challenge(target, stake, start)
         return "Mise d'au moins 1 po et nombre de départ d'au moins 2."
     end
     if Debts.Barred(me) then
-        return "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour jouer de nouveau."
+        return IN_DEBT
     end
     if Debts.Barred(target) then
-        return target .. " a une dette : pas de deathroll avant qu'elle soit réglée."
+        return target .. " a trop de dettes : pas de deathroll avant qu'il en règle."
     end
     if Newcomers.Is(me) then
         return NEWCOMER
@@ -65,7 +67,7 @@ VXV.OnMessage(CHALLENGE, function(payload, sender)
     if Debts.Barred(VXV.PlayerName()) then
         Duels.Answer(challenge, false)
         VXV.AfterCombat(function()
-            VXV.Print(sender .. " te défie au deathroll, mais ta dette t'en empêche : règle-la d'abord.")
+            VXV.Print(sender .. " te défie au deathroll. " .. IN_DEBT)
         end)
         return
     end
@@ -97,8 +99,14 @@ VXV.OnMessage(ANSWER, function(payload, sender)
     local me = VXV.PlayerName()
     VXV.Broadcast(START, { id = payload.id, a = me, b = sender, stake = challenge.stake, start = challenge.start,
         at = time() })
-    VXV.SayToGuild(("Deathroll : %s contre %s pour %s, départ %d. Paris ouverts une minute dans l'addon.")
+    VXV.SayToGuild(("Deathroll : %s contre %s pour %s, départ %d. Paris ouverts 30 s dans l'addon.")
         :format(me, sender, VXV.Gold.Format(challenge.stake), challenge.start))
+end)
+
+-- The guild's announcement of a game gets a link that opens its window for the members who watch (owner's request of
+-- 9 November; the window: DuelWindow.lua).
+VXV.On("modules.started", function()
+    VXV.LinkGuildAnnouncement("deathroll", "%[VXV%] Deathroll : (.-) contre (.-) pour ")
 end)
 
 VXV.OnMessage(START, function(payload, sender)
@@ -113,7 +121,7 @@ VXV.OnMessage(START, function(payload, sender)
     VXV.Emit("deathroll.started", payload.id)
 end)
 
---- Stakes on a player of the game during its minute of bets; returns why not, or nil.
+--- Stakes on a player of the game during its 30 seconds of bets; returns why not, or nil.
 function Duels.Bet(id, choice, amount)
     local game, me = Games.Find(id), VXV.PlayerName()
     if game == nil or not Rules.Betting(game) then
@@ -123,7 +131,7 @@ function Duels.Bet(id, choice, amount)
         return "Les joueurs ne parient pas sur leur partie."
     end
     if Debts.Barred(me) then
-        return "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour parier de nouveau."
+        return IN_DEBT
     end
     if Newcomers.Is(me) then
         return NEWCOMER
@@ -175,13 +183,14 @@ VXV.OnMessage(ROLL, function(payload, sender)
     end
 end)
 
---- The winner confirms the loser paid the stake (P15.6).
-function Duels.ConfirmPaid(id)
-    VXV.Broadcast(PAID, { id = id, at = time() })
+--- The one owed confirms the payment of what another player owes them, their games set against each other (P15.6,
+--- owner's request of 9 November): all their unpaid games, by id.
+function Duels.ConfirmPaid(ids)
+    VXV.Broadcast(PAID, { ids = ids, at = time() })
 end
 
 VXV.OnMessage(PAID, function(payload, sender)
-    if type(payload) == "table" and type(payload.at) == "number" then
-        Games.Pay(payload.id, sender, payload.at)
+    if type(payload) == "table" and type(payload.at) == "number" and type(payload.ids) == "table" then
+        Games.Settle(payload.ids, sender, payload.at)
     end
 end)

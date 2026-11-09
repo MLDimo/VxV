@@ -1,15 +1,15 @@
 local ns = select(2, ...).Deathroll
 
 --- The deathroll's rules (P15): the challenged rolls first, each next roll from 0 to the previous result, and who
---- rolls 0 loses the stake to the other; the guild bets during the minute before the first roll.
+--- rolls 0 loses the stake to the other; the guild bets during the 30 seconds before the first roll.
 local Rules = {}
 ns.Rules = Rules
 
 -- Every roll starts there, and who rolls it loses (owner's rule of 8 October).
 Rules.LOSING_ROLL = 0
 
--- The guild bets during the minute after the acceptance, before the first roll (P15.2).
-Rules.BETTING_SECONDS = 60
+-- The guild bets during the 30 seconds after the acceptance, before the first move (owner's request of 9 November).
+Rules.BETTING_SECONDS = 30
 
 --- The player whose turn it is and the high of their roll; nil once the game is over.
 function Rules.Turn(game)
@@ -31,7 +31,7 @@ function Rules.Winner(game)
     return loser and (loser == game.challenger and game.challenged or game.challenger)
 end
 
---- Whether the guild still bets on the game: before its first roll, until the minute is over.
+--- Whether the guild still bets on the game: before its first roll, until the 30 seconds are over.
 function Rules.Betting(game)
     return #game.rolls == 0 and GetTime() < game.closesAt
 end

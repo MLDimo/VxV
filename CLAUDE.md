@@ -23,7 +23,11 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   événements PvP), la fenêtre « Mon inscription » (`VXV.OpenSignupDialog`, libellés `VXV.SignupLabels`), les rôles
   Discord apportés par le compagnon d'un officier (`VXV.EventRoles`, `Core/EventRoles.lua`) et leur choix aux
   flèches (`VXV.RoleStepper`) ; le tableau d'un classement à fanions, ses images et les portraits
-  (`VXV.RankingBoard`, `Media/`), pour le Ranking et les duels. Installation : `tools/install-addon.sh`. Chat
+  (`VXV.RankingBoard`, `Media/`), pour le Ranking et les duels ; pour Le Dé Pipé, les lignes communes des données du
+  site et le grand livre des dettes (`VXV.DiceGames`), le joueur dans son cadre de classe (`VXV.PlayerCard`), les
+  fenêtres à deux tailles (`VXV.CreateDialog` avec `onResize`, `VXV.ResizeDialog`) et les liens du chat qui ouvrent une
+  fenêtre (`VXV.OnChatLink`, `VXV.LinkGuildAnnouncement` : lien d'addon `|Haddon:vxv:…|h` suivi par un crochet
+  sécurisé sur `SetItemRef`). Installation : `tools/install-addon.sh`. Chat
   (décision du propriétaire du 10 octobre) : l'addon n'y écrit que les réponses aux commandes et aux clics du joueur,
   les refus du site (`PendingChanges`, « Site VXV, changement refusé ») et les appels à agir (invitations du raid,
   défis) ; ce qui arrive seul reste dans ses écrans : données chargées et modifications (Raid, Journal), données
@@ -113,8 +117,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   membre et par pari, modifiable ou retirable jusqu'à la fermeture tant qu'elle n'est pas notée payée. Part de
   l'organisation : 10 % de la cagnotte, jamais plus que les mises perdantes ; gains au prorata des mises, arrondis à la
   po inférieure, le reste à la caisse (`domain/bets.ts`). Résultat ou annulation par un officier. Seul le trésorier
-  note l'or qui change de mains (`/paris/tresorerie`) ; une mise perdue non payée devient une dette, et toute dette
-  (paris ou deathroll, `application/debts.ts`) bloque paris et deathrolls. Paris et deathroll sont réservés au rôle
+  note l'or qui change de mains (`/paris/tresorerie`) ; une mise perdue non payée devient une dette, et à partir de
+  100 po de dettes en tout (paris, deathroll, Chi Fou Mi ; `DEBT_LIMIT`, `application/debts.ts`, décision du
+  propriétaire du 9 novembre) paris, deathrolls et Chi Fou Mi sont bloqués ; en dessous, le membre joue encore. Paris et deathroll sont réservés au rôle
   Discord « Membre » (décision du propriétaire du 10 octobre : un nouveau venu n'apporte pas d'or issu du RMT, qui
   ferait bannir d'autres joueurs) : rôle `confirmed` (`DISCORD_ROLE_CONFIRMED`, `canGamble`), sans lequel le site
   refuse la mise et écarte les paris d'un deathroll, et l'addon refuse défis et paris (lignes `N`) ; relu comme les
@@ -179,24 +184,38 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   en dessous, avec un message ; ligne hors de l'eau, le bouton se grise jusqu'au lancer suivant (demande du
   propriétaire du 8 novembre).
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
-  connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde et une minute de paris (pas les joueurs,
-  pas un membre endetté ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent (`RandomRoll`), le défié en premier,
-  fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel animée et synchronisée chez toute la guilde. Partie finie envoyée au site, qui la
-  vérifie, crée et règle le pari de la guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du
-  gagnant (site ou jeu). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
+  connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde, avec un lien « [Regarder] » qui ouvre la
+  fenêtre chez qui clique (demande du propriétaire du 9 novembre), et 30 s de paris (pas les joueurs, pas un
+  membre à 100 po de dettes ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent
+  (`RandomRoll`), le défié en premier, fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel comme la maquette
+  `AddonDeathroll` : joueurs dans leur cadre de classe avec portrait (lignes `A`), plaque, titres et rôle, cadre du
+  joueur dont c'est le tour qui clignote or ; dé VXV qui flotte puis roule pendant le tirage (quatre quarts de tour
+  dans `VXV/Deathroll/Media` : le jeu ne fait pas tourner les textures), chiffres qui défilent et ralentissent, fond
+  qui rougit à l'approche de 0 (`deathroll-cold`, `deathroll-hot`), « VICTOIRE » et « A goûté le sol » ; le résultat
+  d'un roll, son historique et le tour suivant n'apparaissent qu'une fois les chiffres arrêtés. Deux tailles, comme la
+  fenêtre du Chi Fou Mi (bouton « - » / « + », choix gardé). Partie finie envoyée au site, renvoyée au compagnon à chaque
+  lancement tant qu'elle est gardée (le site ne la compte qu'une fois), qui la vérifie, crée et règle le pari de la
+  guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du gagnant (site ou jeu), gardée dans
+  l'historique des dettes de chacun (site et onglet) une fois payée. Entre deux joueurs, les dettes d'un même jeu se
+  compensent (demande du propriétaire du 9 novembre, `pairDebts`, `settlePair` ; `VXV.DiceGames` en jeu) : égales,
+  elles s'annulent et leurs parties sont réglées à l'enregistrement ; sinon seul l'écart est dû, et la confirmation de
+  celui à qui il est dû règle toutes leurs parties. Le membre à défier se cherche par son nom, sans accents ni casse
+  (`VXV.MemberPicker`, `VXV.Fold`, `VXV.Matches`). Les dernières parties des deux jeux sont aussi
+  dans le Journal (site et addon). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
   (`DISCORD_DEATHROLLS_CHANNEL_ID`, salon des paris sans lui).
 - **Chi Fou Mi** (`VXV/Chifoumi`, Le Dé Pipé › Chi Fou Mi ; site `/paris/chifoumi` ; demande du propriétaire du
   14 octobre) : pierre, feuille, ciseaux au meilleur des trois manches, une égalité rejouée (`domain/chifoumis.ts`).
   Défi chuchoté comme au deathroll, pour une mise choisie par les joueurs, 0 compris ; une ligne « Chi Fou Mi : X
-  contre Y » dans le chat de guilde et aucune fenêtre chez les autres, qui regardent et parient depuis l'onglet ; une
-  minute de paris, mêmes droits (dette, rôle Membre). Un coup est d'abord verrouillé sans être dit, puis chaque addon
+  contre Y » dans le chat de guilde, avec son lien « [Regarder] », et aucune fenêtre ne s'ouvre seule chez les autres,
+  qui regardent et parient depuis le lien ou l'onglet ; 30 s de paris, mêmes droits (dettes, rôle Membre). Un coup est d'abord verrouillé sans être dit, puis chaque addon
   dit le sien quand les deux joueurs ont joué (l'addon officiel ne montre rien avant). Partie finie envoyée au site,
   qui la vérifie, règle le pari de la guilde et garde la dette du perdant (mise non nulle) jusqu'à la confirmation du
   gagnant. Fenêtre de la partie comme la maquette `AddonChifoumi` (canevas de la charte, 15 octobre) : joueurs dans
-  leur cadre de classe avec leur portrait (lignes `A` de `VXV-CHIFOUMIS-2`), plaque, rôle, pastilles des manches ;
+  leur cadre de classe avec leur portrait (lignes `A` de `VXV-CHIFOUMIS-3`), plaque, rôle, pastilles des manches ;
   arène aux deux cases (coup scellé, « Chi… Fou… Mi ! », coups révélés, gagnant cerclé d'or), trois coups illustrés,
   manches jouées, paris en bas, « VICTOIRE » ou « Plié en trois » ; images dans `VXV/Chifoumi/Media` et
-  `apps/web/public/images/chifoumi`. Le guide la rejoue (« Essaie un Chi Fou Mi »). Ce que partagent les deux jeux : `domain/diceGames.ts` (paris de la guilde, partie classée),
+  `apps/web/public/images/chifoumi`. Taille réduite : le score entre les noms, la manche, les coups et les paris. Le
+  guide la rejoue (« Essaie un Chi Fou Mi »). Ce que partagent les deux jeux : `domain/diceGames.ts` (paris de la guilde, partie classée),
   `application/diceGames.ts` (joueurs, pari), `application/debts.ts`, `application/addonGames.ts`. Pas d'annonce
   Discord.
 - **Ranking** (`VXV/Ranking` ; site `/ranking`) : Paris, Deathroll et Chi Fou Mi au gain net, Quêtes aux points de places (3, 2 et
@@ -329,8 +348,8 @@ ligne par enregistrement, son type en premier champ. Le détail de chaque ligne 
 | `VXV-QUETES-2` (réponses aux quêtes publiées en jeu comprises) | site → addon | `domain/addonMissions.ts` | `VXV/Missions/QuestsData.lua` |
 | `VXV-TITRES-1` (noms et règles compris) | site → addon | `domain/addonTitles.ts` | `VXV/Titles/TitlesData.lua` |
 | `VXV-ARTISANS-1` (annuaire) | site → addon | `domain/addonArtisans.ts` | `VXV/Artisans/ArtisansData.lua` |
-| `VXV-DEATHROLLS-2` (bloqués : dettes et sans le rôle Membre ; dettes, dernières parties) | site → addon | `domain/addonGames.ts` | `VXV/Deathroll/DeathrollData.lua` |
-| `VXV-CHIFOUMIS-2` (les mêmes lignes, et les portraits des joueurs, lignes `A`) | site → addon | `domain/addonGames.ts` | `VXV/Chifoumi/ChifoumiData.lua` |
+| `VXV-DEATHROLLS-3` (limite et dettes de chacun, sans le rôle Membre, portraits, parties à payer, 50 dernières avec leur paiement) | site → addon | `domain/addonGames.ts` | `VXV/Core/Core/DiceGames.lua` (`VXV/Deathroll/DeathrollData.lua`) |
+| `VXV-CHIFOUMIS-3` (les mêmes lignes) | site → addon | `domain/addonGames.ts` | `VXV/Core/Core/DiceGames.lua` (`VXV/Chifoumi/ChifoumiData.lua`) |
 | `VXV-RANKING-1` (25 premiers de chaque tableau) | site → addon | `domain/addonRanking.ts` | `VXV/Ranking/RankingData.lua` |
 | `VXV-PVP-2` (événements PvP, duels, classement Elo et records) | site → addon | `domain/addonPvp.ts` | `VXV/PvP/PvpData.lua` |
 

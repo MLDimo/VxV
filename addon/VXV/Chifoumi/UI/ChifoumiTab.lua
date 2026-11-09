@@ -6,7 +6,7 @@ local ns = select(2, ...).Chifoumi
 local ChifoumiTab = {}
 ns.ChifoumiTab = ChifoumiTab
 
-local ChifoumiData, Matches, MatchWindow, Games = ns.ChifoumiData, ns.Matches, ns.MatchWindow, ns.Games
+local Matches, MatchWindow, Games = ns.Matches, ns.MatchWindow, ns.Games
 local MatchView, Rights = ns.MatchView, ns.Rights
 
 local Gold, RowList, Screen, Theme = VXV.Gold, VXV.RowList, VXV.Screen, VXV.Theme
@@ -21,23 +21,9 @@ local TOP_SHARE = 0.5
 
 local content
 local lists, form = {}, {}
-local target
+local picker
 
 local row = VXV.RowList.Row
-
---- The members connected with VXV the player may challenge, the one chosen marked.
-local function members()
-    local rows, me = {}, VXV.PlayerName()
-    for _, name in ipairs(VXV.Online()) do
-        if name ~= me then
-            rows[#rows + 1] = row("line", (name == target and "▸ " or "") .. name, { onClick = function()
-                target = name
-                lists.members.SetRows(members())
-            end })
-        end
-    end
-    return #rows > 0 and rows or { row("line", "Aucun autre membre connecté avec VXV.") }
-end
 
 --- The games being played: a click opens the game's window, to watch it and bet.
 local function live()
@@ -60,38 +46,46 @@ local function debts()
         elseif game.winner == me then
             rows[#rows + 1] = row("line", ("%s te doit %s : clique une fois payé."):format(game.loser,
                 Gold.Format(game.stake)), { onClick = function()
-                Matches.ConfirmPaid(game.id)
+                Matches.ConfirmPaid(game.ids)
             end })
+        end
+    end
+    local history = Rights.History(me)
+    if #history > 0 then
+        rows[#rows + 1] = row("header", "Historique")
+        for _, game in ipairs(history) do
+            rows[#rows + 1] = row("line", VXV.DiceGames.HistoryText(game, me))
         end
     end
     return #rows > 0 and rows or { row("line", "Aucune dette de Chi Fou Mi.") }
 end
 
---- The latest games over, as the website exports them: the winner, the loser and the stake.
+--- The latest games over: the website's, and those it does not know yet.
 local function latest()
-    local data, rows = ChifoumiData.Current(), {}
-    for _, game in ipairs(data and data.latest or {}) do
-        rows[#rows + 1] = row("line", ("%s bat %s · %s"):format(game.winner, game.loser, Gold.Format(game.stake)))
+    local rows = {}
+    for _, game in ipairs(Rights.Latest()) do
+        rows[#rows + 1] = row("line", VXV.DiceGames.GameText(game))
     end
-    return #rows > 0 and rows or { row("line", "Les dernières parties arrivent avec les données du site.") }
+    return #rows > 0 and rows or { row("line", "Aucune partie jouée pour l'instant.") }
 end
 
 local function render()
-    lists.members.SetRows(members())
+    picker.Refresh()
     lists.live.SetRows(live())
     lists.debts.SetRows(debts())
     lists.latest.SetRows(latest())
 end
 
 local function challenge()
+    local target = picker.Selected()
     local refusal = Matches.Challenge(target, form.stake:GetText())
     form.answer:SetText(refusal or ("Défi envoyé à %s : une minute pour répondre."):format(target))
 end
 
---- The challenge's panel: the members to choose from, then the stake and the button.
+--- The challenge's panel: the members to choose from, searched by name, then the stake and the button.
 local function addChallenge(height)
     local _, body = Theme.TitledPanel(content, PADDING, GRID_TOP, LEFT, height, "Défier un membre")
-    lists.members = RowList.Create(body, 0, nil, FORM_HEIGHT)
+    picker = VXV.MemberPicker(body, FORM_HEIGHT)
     local stakeLabel = Theme.Heading(body, "Mise (po, 0 possible)")
     stakeLabel:SetPoint("BOTTOMLEFT", 0, FORM_HEIGHT - 20)
     local stakeHolder
