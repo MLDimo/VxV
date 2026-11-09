@@ -68,6 +68,14 @@ local ALIASES = {
     UnitName = { "UnitName" },
     UnitChannelInfo = { "UnitChannelInfo" },
     IsFishingLoot = { "IsFishingLoot" },
+    -- T13: a profession's link, opened again later.
+    GetTradeSkillListLink = { "C_TradeSkillUI.GetTradeSkillListLink", "GetTradeSkillListLink" },
+    IsTradeSkillLinked = { "C_TradeSkillUI.IsTradeSkillLinked", "IsTradeSkillLinked" },
+    SetItemRef = { "SetItemRef" },
+    GetRecipeSchematic = { "C_TradeSkillUI.GetRecipeSchematic" },
+    GetCategoryInfo = { "C_TradeSkillUI.GetCategoryInfo" },
+    GetRecipeItemLink = { "C_TradeSkillUI.GetRecipeItemLink" },
+    GetSpellTexture = { "C_Spell.GetSpellTexture", "GetSpellTexture" },
 }
 
 local MISSING_API = "API absente"

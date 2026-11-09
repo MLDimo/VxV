@@ -9,10 +9,12 @@ ns.Sharing = Sharing
 local ArtisansData, Directory, Website = ns.ArtisansData, ns.Directory, ns.Website
 
 local PROFESSION, INDEX, ASK = "artisans.profession", "artisans.index", "artisans.ask"
+-- A profession's link, as the game writes it: « |cffffd000|Htrade:…|h[Travail du cuir]|h|r ».
+local LINK = "^|c%x%x%x%x%x%x%x%x|Htrade:[^|]+|h%[[^%]|]+%]|h|r$"
 
 local function payloadOf(entry)
     return { c = entry.character, k = entry.class, p = entry.id, n = entry.name, l = entry.level, m = entry.max,
-        at = entry.readAt, ra = entry.recipesAt, r = entry.recipes }
+        at = entry.readAt, ra = entry.recipesAt, r = entry.recipes, lk = entry.link }
 end
 
 local function entryOf(payload)
@@ -32,7 +34,7 @@ local function entryOf(payload)
     end
     return { character = payload.c, class = type(payload.k) == "string" and payload.k or nil, id = payload.p,
         name = payload.n, level = payload.l, max = payload.m, readAt = payload.at, recipesAt = recipes and payload.ra,
-        recipes = recipes }
+        recipes = recipes, link = recipes and type(payload.lk) == "string" and payload.lk:match(LINK) or nil }
 end
 
 --- What this addon holds of its own characters: { c, p, at, ra } each.

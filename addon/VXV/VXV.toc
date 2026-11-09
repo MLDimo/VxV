@@ -219,6 +219,7 @@ Artisans\ArtisansData.lua
 Artisans\Directory.lua
 Artisans\RecipeItems.lua
 Artisans\Website.lua
+Artisans\Links.lua
 Artisans\Professions.lua
 Artisans\Sharing.lua
 

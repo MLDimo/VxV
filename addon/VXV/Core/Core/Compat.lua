@@ -52,6 +52,10 @@ local ALIASES = {
     GetBaseProfessionInfo = { "C_TradeSkillUI.GetBaseProfessionInfo" },
     GetAllRecipeIDs = { "C_TradeSkillUI.GetAllRecipeIDs" },
     GetRecipeInfo = { "C_TradeSkillUI.GetRecipeInfo" },
+    -- A profession's link (probe, T13, 9 November): read from the player's open window, opened again by SetItemRef
+    -- while its owner is online.
+    GetTradeSkillListLink = { "C_TradeSkillUI.GetTradeSkillListLink" },
+    SetItemRef = { "SetItemRef" },
     -- The game's combat log, written while the game runs (phase 0, T11, 7 October): switched on without a click.
     LoggingCombat = { "LoggingCombat" },
     SetCVar = { "C_CVar.SetCVar", "SetCVar" },

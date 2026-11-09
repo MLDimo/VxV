@@ -34,6 +34,10 @@ local FUNCTIONS = {
     "C_Item.EquipItemByName", "EquipItemByName", "C_Spell.GetSpellName", "GetSpellInfo", "GetInventoryItemID",
     "GetWeaponEnchantInfo", "SetOverrideBinding", "SetOverrideBindingClick", "ClearOverrideBindings",
     "GetBindingAction", "IsFishingLoot",
+    -- A profession's link (T13)
+    "C_TradeSkillUI.GetTradeSkillListLink", "GetTradeSkillListLink", "C_TradeSkillUI.IsTradeSkillLinked",
+    "IsTradeSkillLinked", "SetItemRef", "C_TradeSkillUI.GetRecipeSchematic", "C_TradeSkillUI.GetCategoryInfo",
+    "C_TradeSkillUI.GetRecipeItemLink", "C_Spell.GetSpellTexture",
 }
 
 local EVENTS = {

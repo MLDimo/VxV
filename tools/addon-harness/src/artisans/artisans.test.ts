@@ -117,6 +117,44 @@ describe("the artisans in game (P14)", () => {
     }
   });
 
+  it("opens a crafter's profession as the game shows a linked one while they are online, and finds a profession", () => {
+    const guild = startGuild(["Ciel Gris"], { bundles: BUNDLES });
+    const thom = guild.join("Thom Leboss", { bundles: BUNDLES, beforeLogin: true });
+    thom.client(`${FIRST_AID} Fire("PLAYER_LOGIN")`);
+    settle(guild);
+    thom.client(OPEN(1));
+    settle(guild);
+    const ciel = guild.player("Ciel Gris");
+    ciel.client(`MockGuildMembers = { { name = "Thom Leboss", class = "PRIEST", online = true } }
+      ${OPEN_TAB}
+      local field = FindWidget(VXV_Window, function(widget) return widget.maxLetters == 60 end)
+      field:SetText("secour") field:Run("OnTextChanged")`);
+    expect(plain(ciel.client(ROWS))).toEqual(
+      expect.arrayContaining([
+        "Métier : Secourisme",
+        expect.stringMatching(/^Thom Leboss · Secourisme 22\/75 · .* · en ligne$/),
+      ]),
+    );
+    // A click opens Thom's first aid as a click on its link in the chat would.
+    ciel.client(`ItemRefs = {}
+      local original = SetItemRef
+      SetItemRef = function(link, text) ItemRefs[#ItemRefs + 1] = link end
+      FindWidget(VXV_Window, function(widget)
+        return widget.row ~= nil and widget.shown and widget.label.text:find("en ligne", 1, true) ~= nil
+      end):Run("OnMouseUp", "LeftButton")
+      SetItemRef = original`);
+    expect(ciel.client("return ItemRefs")).toEqual(["trade:Player-1-129:129:129"]);
+    // Thom gone, the game would not open it: the addon says so.
+    ciel.client(`MockGuildMembers[1].online = false
+      FindWidget(VXV_Window, function(widget)
+        return widget.row ~= nil and widget.shown and widget.label.text:find("Secourisme 22", 1, true) ~= nil
+      end):Run("OnMouseUp", "LeftButton")`);
+    expect(ciel.client("return Printed[#Printed]")).toContain("Thom Leboss n'est pas connecté");
+    for (const player of guild.players) {
+      expect(player.errors()).toEqual([]);
+    }
+  });
+
   it("has an officer's companion take to the website the professions of a member without one", () => {
     const deja: Character = {
       id: "c0",

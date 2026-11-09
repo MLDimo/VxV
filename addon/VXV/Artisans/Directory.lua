@@ -2,8 +2,9 @@ local ns = select(2, ...).Artisans
 
 --- The guild's artisans as this addon knows them: the website's directory (ArtisansData.lua),
 --- what the guild's addons told (Sharing.lua) and the player's own characters (Professions.lua). An entry is a
---- character's profession: { character, class, id, name, level, max, readAt, recipesAt, recipes = { [id] = name } };
---- for each, the latest level and the latest recipes win, whatever their source.
+--- character's profession: { character, class, id, name, level, max, readAt, recipesAt, recipes = { [id] = name },
+--- link (the game's link of the profession, read with the recipes) }; for each, the latest level and the latest
+--- recipes win, whatever their source.
 local Directory = {}
 ns.Directory = Directory
 
@@ -41,7 +42,7 @@ local function merge(entry, candidate)
             candidate.readAt
     end
     if entry ~= nil and newer({ readAt = 0, recipesAt = candidate.recipesAt }, entry) then
-        result.recipes, result.recipesAt = candidate.recipes, candidate.recipesAt
+        result.recipes, result.recipesAt, result.link = candidate.recipes, candidate.recipesAt, candidate.link
     end
     result.class = result.class or candidate.class
     return result
@@ -136,6 +137,28 @@ function Directory.Search(search)
     for index = #list, SEARCH_RESULTS + 1, -1 do
         list[index] = nil
     end
+    return list
+end
+
+--- The professions whose name holds every word searched, each with its crafters, the most skilled first.
+function Directory.Professions(search)
+    local found = {}
+    for _, entry in pairs(all()) do
+        if Text.Matches(search, entry.name) then
+            found[entry.name] = found[entry.name] or { name = entry.name, crafters = {} }
+            table.insert(found[entry.name].crafters, entry)
+        end
+    end
+    local list = {}
+    for _, profession in pairs(found) do
+        table.sort(profession.crafters, function(left, right)
+            return left.level > right.level
+        end)
+        list[#list + 1] = profession
+    end
+    table.sort(list, function(left, right)
+        return left.name < right.name
+    end)
     return list
 end
 
