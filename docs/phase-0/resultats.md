@@ -144,6 +144,15 @@ Seconde séance (9 novembre, `sessions/2026-11-09.txt`), Pêche 1/75 à Mulgore,
 | T12 ferrage | La touche ferre-t-elle le bouchon ? | Oui (vu par le propriétaire) : pendant la ligne, F liée par `SetOverrideBinding` à `INTERACTTARGET` ferre, le poisson va dans les sacs. | ✅ | Pêche à une seule touche |
 | T12 équiper en combat | L'addon rend-il l'arme en combat ? | Oui (vu par le propriétaire) : un monstre tapé canne en main, `C_Item.EquipItemByName` rend l'arme seule, la session se ferme après le combat avec son récapitulatif. | ✅ | La touche (`/equip [combat]`) reste le repli |
 
+## Métier vu comme un lien (9 novembre, T13)
+
+| Test | Question | Résultat | Statut | Conséquence |
+| --- | --- | --- | --- | --- |
+| T13 lien | Le jeu donne-t-il le lien du métier ouvert ? | Oui : `C_TradeSkillUI.GetTradeSkillListLink`, 70 octets, `trade:Player-6946-004E493B:3104:165` (personnage, sort, ligne du métier), sans les recettes. Pas de lien pour le Dépeçage. | ✅ | Le lien passe dans un message entre addons |
+| T13 rouvrir | Le lien se rouvre-t-il plus tard ? | Oui tant que son propriétaire est connecté : `SetItemRef` ouvre la vraie fenêtre, `C_TradeSkillUI.IsTradeSkillLinked` vrai et son nom, ses 17 recettes. Hors ligne, rien ne s'ouvre, ni par `SetItemRef` ni au clic dans le chat. | ✅ | Hors ligne, une fenêtre de l'addon |
+
+Reste à mesurer (`docs/tests-en-jeu.md`) : ce que le jeu dit d'une recette, la fenêtre de son métier fermée.
+
 ## Hypothèses de départ (sources communautaires)
 
 | Hypothèse | Résultat |
