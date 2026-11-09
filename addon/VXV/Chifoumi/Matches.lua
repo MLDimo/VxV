@@ -1,7 +1,7 @@
 local ns = select(2, ...).Chifoumi
 
 --- The Chi Fou Mi between two members, as the guild's addons tell it: the challenge whispered, the answer, the start
---- told to the guild (one line in its chat, no window for the others), the guild's stakes for a minute, then each
+--- told to the guild (one line in its chat, no window for the others), the guild's stakes for 30 seconds, then each
 --- round. A move is locked first, unknown to the others; once both players locked theirs, each addon tells its own.
 local Matches = {}
 ns.Matches = Matches
@@ -95,7 +95,7 @@ VXV.OnMessage(ANSWER, function(payload, sender)
     end
     local me = VXV.PlayerName()
     VXV.Broadcast(START, { id = payload.id, a = me, b = sender, stake = challenge.stake, at = time() })
-    VXV.SayToGuild(("Chi Fou Mi : %s contre %s pour %s. Paris ouverts une minute dans l'addon."):format(me, sender,
+    VXV.SayToGuild(("Chi Fou Mi : %s contre %s pour %s. Paris ouverts 30 s dans l'addon."):format(me, sender,
         VXV.Gold.Format(challenge.stake)))
 end)
 
@@ -115,7 +115,7 @@ VXV.OnMessage(START, function(payload, sender)
     VXV.Emit("chifoumi.started", payload.id)
 end)
 
---- Stakes on a player of the game during its minute of bets; returns why not, or nil.
+--- Stakes on a player of the game during its 30 seconds of bets; returns why not, or nil.
 function Matches.Bet(id, choice, amount)
     local game, me = Games.Find(id), VXV.PlayerName()
     if game == nil or not Rules.Betting(game) then
@@ -179,13 +179,14 @@ VXV.OnMessage(REVEAL, function(payload, sender)
     end
 end)
 
---- The winner confirms the loser paid the stake.
-function Matches.ConfirmPaid(id)
-    VXV.Broadcast(PAID, { id = id, at = time() })
+--- The one owed confirms the payment of what another player owes them, their games set against each other (P15.6,
+--- owner's request of 9 November): all their unpaid games, by id.
+function Matches.ConfirmPaid(ids)
+    VXV.Broadcast(PAID, { ids = ids, at = time() })
 end
 
 VXV.OnMessage(PAID, function(payload, sender)
-    if type(payload) == "table" and type(payload.at) == "number" then
-        Games.Pay(payload.id, sender, payload.at)
+    if type(payload) == "table" and type(payload.at) == "number" and type(payload.ids) == "table" then
+        Games.Settle(payload.ids, sender, payload.at)
     end
 end)

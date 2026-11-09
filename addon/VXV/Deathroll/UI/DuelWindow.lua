@@ -4,8 +4,8 @@ local ns = select(2, ...).Deathroll
 --- plaque, titles and role, the turn's frame blinking gold; between them the VXV die, bobbing while it waits and
 --- tumbling while a roll's digits scroll and slow down before stopping on the real result; the background from violet
 --- to red as the high nears 0, the sounds of tension and defeat, the Roll button at the player's turn, the stakes
---- during the minute of bets, the rolls so far, then « VICTOIRE » and « A goûté le sol ». The same window follows the
---- game for its players and for every member who watches it, in two sizes (owner's request of 9 November): the
+--- during the 30 seconds of bets, the rolls so far, then « VICTOIRE » and « A goûté le sol ». The same window follows
+--- the game for its players and for every member who watches it, in two sizes (owner's request of 9 November): the
 --- reduced one keeps the names, the number, the turn, the button and the bets.
 local DuelWindow = {}
 ns.DuelWindow = DuelWindow

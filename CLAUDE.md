@@ -185,7 +185,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   propriétaire du 8 novembre).
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
   connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde, avec un lien « [Regarder] » qui ouvre la
-  fenêtre chez qui clique (demande du propriétaire du 9 novembre), et une minute de paris (pas les joueurs, pas un
+  fenêtre chez qui clique (demande du propriétaire du 9 novembre), et 30 s de paris (pas les joueurs, pas un
   membre à 100 po de dettes ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent
   (`RandomRoll`), le défié en premier, fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel comme la maquette
   `AddonDeathroll` : joueurs dans leur cadre de classe avec portrait (lignes `A`), plaque, titres et rôle, cadre du
@@ -196,14 +196,18 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   fenêtre du Chi Fou Mi (bouton « - » / « + », choix gardé). Partie finie envoyée au site, renvoyée au compagnon à chaque
   lancement tant qu'elle est gardée (le site ne la compte qu'une fois), qui la vérifie, crée et règle le pari de la
   guilde avec les règles des paris ; dette du perdant jusqu'à la confirmation du gagnant (site ou jeu), gardée dans
-  l'historique des dettes de chacun (site et onglet) une fois payée. Les dernières parties des deux jeux sont aussi
+  l'historique des dettes de chacun (site et onglet) une fois payée. Entre deux joueurs, les dettes d'un même jeu se
+  compensent (demande du propriétaire du 9 novembre, `pairDebts`, `settlePair` ; `VXV.DiceGames` en jeu) : égales,
+  elles s'annulent et leurs parties sont réglées à l'enregistrement ; sinon seul l'écart est dû, et la confirmation de
+  celui à qui il est dû règle toutes leurs parties. Le membre à défier se cherche par son nom, sans accents ni casse
+  (`VXV.MemberPicker`, `VXV.Fold`, `VXV.Matches`). Les dernières parties des deux jeux sont aussi
   dans le Journal (site et addon). Parties de 1 000 po et plus annoncées dans le salon des deathrolls
   (`DISCORD_DEATHROLLS_CHANNEL_ID`, salon des paris sans lui).
 - **Chi Fou Mi** (`VXV/Chifoumi`, Le Dé Pipé › Chi Fou Mi ; site `/paris/chifoumi` ; demande du propriétaire du
   14 octobre) : pierre, feuille, ciseaux au meilleur des trois manches, une égalité rejouée (`domain/chifoumis.ts`).
   Défi chuchoté comme au deathroll, pour une mise choisie par les joueurs, 0 compris ; une ligne « Chi Fou Mi : X
   contre Y » dans le chat de guilde, avec son lien « [Regarder] », et aucune fenêtre ne s'ouvre seule chez les autres,
-  qui regardent et parient depuis le lien ou l'onglet ; une minute de paris, mêmes droits (dettes, rôle Membre). Un coup est d'abord verrouillé sans être dit, puis chaque addon
+  qui regardent et parient depuis le lien ou l'onglet ; 30 s de paris, mêmes droits (dettes, rôle Membre). Un coup est d'abord verrouillé sans être dit, puis chaque addon
   dit le sien quand les deux joueurs ont joué (l'addon officiel ne montre rien avant). Partie finie envoyée au site,
   qui la vérifie, règle le pari de la guilde et garde la dette du perdant (mise non nulle) jusqu'à la confirmation du
   gagnant. Fenêtre de la partie comme la maquette `AddonChifoumi` (canevas de la charte, 15 octobre) : joueurs dans

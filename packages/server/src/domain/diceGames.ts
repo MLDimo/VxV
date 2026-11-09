@@ -1,11 +1,12 @@
 /**
  * What Le Dé Pipé's games share, the deathroll (P15) and the Chi Fou Mi: one against one in game, the guild betting
- * on a player during the minute after the acceptance, the loser owing the stake to the winner until the payment is
+ * on a player during the 30 seconds after the acceptance, the loser owing the stake to the winner until the payment is
  * confirmed.
  */
 
-/** How long the guild bets on a game, between its acceptance and its first move (P15.2). */
-export const DICE_BETTING_MS = 60_000;
+/** How long the guild bets on a game, between its acceptance and its first move (P15.2; 30 s, owner's request of
+ * 9 November). */
+export const DICE_BETTING_MS = 30_000;
 
 /** A stake of the guild on a player of a game. */
 export interface GameBet {

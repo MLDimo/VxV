@@ -86,7 +86,7 @@ describe("Chi Fou Mi", () => {
     // Sira watches from the tab and bets during the minute.
     expect(run(guild, SIRA, `return ns.Matches.Bet("${id}", "${THOM}", "50")`)).toBeUndefined();
     settle(guild, 1);
-    settle(guild, 60);
+    settle(guild, 30);
     // The bets closed, the moves show.
     nextFrame(guild, 1);
 
@@ -119,7 +119,7 @@ describe("Chi Fou Mi", () => {
     expect(run(guild, VORN, `return ns.Matches.Challenge("${SIRA}", "0")`)).toBe(
       "Tes dettes atteignent la limite (paris, deathroll, Chi Fou Mi) : règles-en pour jouer de nouveau.",
     );
-    run(guild, THOM, `ns.Matches.ConfirmPaid("${id}")`);
+    run(guild, THOM, `ns.Matches.ConfirmPaid({ "${id}" })`);
     settle(guild, 1);
     expect(
       parseChifoumi(guild.player(THOM).client(`return VXV_SyncDB.texts.chifoumi["${id}"]`) as string).paid?.by,

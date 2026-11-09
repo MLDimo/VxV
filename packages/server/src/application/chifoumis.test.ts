@@ -66,8 +66,10 @@ describe("Chi Fou Mi", () => {
     // Vorn owes the stake until Thom confirms, from the website or from the game.
     const treasury = createTreasury({ unitOfWork: createUnitOfWork(sql), clock });
     expect(await treasury.debtOf(vorn)).toBe(300);
-    expect((await chifoumis.debtsOf(thom)).toConfirm.map((view) => view.game.id)).toEqual(["c1"]);
-    await expect(chifoumis.confirmPayment(vorn, "c1")).rejects.toThrow("Seul le gagnant confirme le paiement.");
+    expect((await chifoumis.debtsOf(thom)).toConfirm.map((pair) => pair.id)).toEqual(["c1"]);
+    await expect(chifoumis.confirmPayment(vorn, "c1")).rejects.toThrow(
+      "Seul celui à qui la dette est due confirme le paiement.",
+    );
     expect(
       await chifoumis.recordFromGame(thom, [game("c1", 300, [`Y;Thom Leboss;${String(ACCEPTED + 600)}`])]),
     ).toEqual(["Paiement du Chi Fou Mi confirmé."]);

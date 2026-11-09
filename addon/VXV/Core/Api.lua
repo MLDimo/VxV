@@ -98,6 +98,13 @@ VXV = {
     RankingBoard = ns.RankingBoard,
     --- (parent, size): a player of Le Dé Pipé's games in a frame of their class color. See Core/UI/PlayerCard.lua.
     PlayerCard = ns.PlayerCard.Create,
+    --- (parent, bottomOffset): the member to challenge, searched by name, { Selected(), Refresh() }. See
+    --- Core/UI/MemberPicker.lua.
+    MemberPicker = ns.MemberPicker.Create,
+    --- (text): a text without accents nor case; (search, name): whether the name holds every word searched. See
+    --- Core/Search.lua.
+    Fold = ns.Search.Fold,
+    Matches = ns.Search.Matches,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

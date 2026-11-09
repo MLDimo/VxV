@@ -14,6 +14,7 @@ Namespaces.lua
 Core\Core\Version.lua
 Core\Core\Config.lua
 Core\Core\Util.lua
+Core\Core\Search.lua
 Core\Core\Gold.lua
 Core\Core\Chat.lua
 Core\Core\Compat.lua
@@ -49,6 +50,7 @@ Core\UI\RowList.lua
 Core\UI\Screen.lua
 Core\UI\RankingBoard.lua
 Core\UI\PlayerCard.lua
+Core\UI\MemberPicker.lua
 Core\UI\PlaceWindow.lua
 Core\UI\Window.lua
 Core\UI\Dialog.lua

@@ -1,8 +1,9 @@
 local ns = select(2, ...).Deathroll
 
 --- The deathroll between two members (P15.1 to P15.3), as the guild's addons tell it: the challenge whispered, the
---- answer, the start told to the guild (and to its chat), the guild's stakes for a minute, then each roll at its turn.
---- The roll is the game's own /roll, drawn by the server and seen in the chat; the roller's addon tells its result.
+--- answer, the start told to the guild (and to its chat), the guild's stakes for 30 seconds, then each roll at its
+--- turn. The roll is the game's own /roll, drawn by the server and seen in the chat; the roller's addon tells its
+--- result.
 local Duels = {}
 ns.Duels = Duels
 
@@ -98,7 +99,7 @@ VXV.OnMessage(ANSWER, function(payload, sender)
     local me = VXV.PlayerName()
     VXV.Broadcast(START, { id = payload.id, a = me, b = sender, stake = challenge.stake, start = challenge.start,
         at = time() })
-    VXV.SayToGuild(("Deathroll : %s contre %s pour %s, départ %d. Paris ouverts une minute dans l'addon.")
+    VXV.SayToGuild(("Deathroll : %s contre %s pour %s, départ %d. Paris ouverts 30 s dans l'addon.")
         :format(me, sender, VXV.Gold.Format(challenge.stake), challenge.start))
 end)
 
@@ -120,7 +121,7 @@ VXV.OnMessage(START, function(payload, sender)
     VXV.Emit("deathroll.started", payload.id)
 end)
 
---- Stakes on a player of the game during its minute of bets; returns why not, or nil.
+--- Stakes on a player of the game during its 30 seconds of bets; returns why not, or nil.
 function Duels.Bet(id, choice, amount)
     local game, me = Games.Find(id), VXV.PlayerName()
     if game == nil or not Rules.Betting(game) then
@@ -182,13 +183,14 @@ VXV.OnMessage(ROLL, function(payload, sender)
     end
 end)
 
---- The winner confirms the loser paid the stake (P15.6).
-function Duels.ConfirmPaid(id)
-    VXV.Broadcast(PAID, { id = id, at = time() })
+--- The one owed confirms the payment of what another player owes them, their games set against each other (P15.6,
+--- owner's request of 9 November): all their unpaid games, by id.
+function Duels.ConfirmPaid(ids)
+    VXV.Broadcast(PAID, { ids = ids, at = time() })
 end
 
 VXV.OnMessage(PAID, function(payload, sender)
-    if type(payload) == "table" and type(payload.at) == "number" then
-        Games.Pay(payload.id, sender, payload.at)
+    if type(payload) == "table" and type(payload.at) == "number" and type(payload.ids) == "table" then
+        Games.Settle(payload.ids, sender, payload.at)
     end
 end)

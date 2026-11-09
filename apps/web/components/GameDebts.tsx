@@ -6,10 +6,18 @@ import { ConfirmButton } from "./ConfirmButton";
 import { Panel } from "./Panel";
 
 /** A game of Le Dé Pipé with its winner and loser. */
-interface DebtView {
+interface GameView {
   game: { id: string; stake: number; endedAt: Date; paidAt: Date | undefined };
   winner: GamePlayer;
   loser: GamePlayer;
+}
+
+/** What a member owes another once their games are set against each other, and a game of theirs. */
+interface PairView {
+  id: string;
+  debtor: GamePlayer;
+  creditor: GamePlayer;
+  amount: number;
 }
 
 function Player({ player }: { player: GamePlayer }) {
@@ -17,8 +25,9 @@ function Player({ player }: { player: GamePlayer }) {
 }
 
 /**
- * The member's debts in one of Le Dé Pipé's games (P15.6): what they owe, the payments they confirm, then the history
- * of their games with a stake, paid or not (owner's request of 9 November).
+ * The member's debts in one of Le Dé Pipé's games (P15.6): what they owe each player and what each owes them, their
+ * games set against each other, the payments they confirm, then the history of their games with a stake, paid or not
+ * (owner's requests of 9 November).
  */
 export function GameDebts({
   game,
@@ -30,8 +39,8 @@ export function GameDebts({
   /** The game's name in the panels' labels: « deathroll », « Chi Fou Mi ». */
   game: string;
   memberId: string;
-  debts: { owed: readonly DebtView[]; toConfirm: readonly DebtView[]; history: readonly DebtView[] };
-  /** The winner's confirmation of a payment, and the field that carries the game's id. */
+  debts: { owed: readonly PairView[]; toConfirm: readonly PairView[]; history: readonly GameView[] };
+  /** The confirmation of a payment by the one owed, and the field that carries a game's id. */
   confirm: (previous: ActionState, form: FormData) => Promise<ActionState>;
   field: string;
 }) {
@@ -41,17 +50,17 @@ export function GameDebts({
       {(owed.length > 0 || toConfirm.length > 0) && (
         <Panel title="Mes dettes" label={`Mes dettes de ${game}`} className="mt-6">
           <ul className="mt-3 space-y-2">
-            {owed.map((view) => (
-              <li key={view.game.id} className="text-loss">
-                Tu dois {formatGold(view.game.stake)} à <Player player={view.winner} />.
+            {owed.map((pair) => (
+              <li key={pair.id} className="text-loss">
+                Tu dois {formatGold(pair.amount)} à <Player player={pair.creditor} />.
               </li>
             ))}
-            {toConfirm.map((view) => (
-              <li key={view.game.id} className="flex flex-wrap items-center gap-3">
+            {toConfirm.map((pair) => (
+              <li key={pair.id} className="flex flex-wrap items-center gap-3">
                 <span>
-                  <Player player={view.loser} /> te doit {formatGold(view.game.stake)}.
+                  <Player player={pair.debtor} /> te doit {formatGold(pair.amount)}.
                 </span>
-                <ConfirmButton action={confirm} fields={{ [field]: view.game.id }} label="Paiement reçu" />
+                <ConfirmButton action={confirm} fields={{ [field]: pair.id }} label="Paiement reçu" />
               </li>
             ))}
           </ul>

@@ -9,7 +9,7 @@ import { companionFiles } from "../sync/fixtures.ts";
 const BUNDLES = ["Deathroll", "Sync"];
 const THOM = "Thom Leboss";
 const ANNOUNCEMENT =
-  "[VXV] Deathroll : Thom Leboss contre Vorn Cendrelune pour 500 po, départ 1000. Paris ouverts une minute dans l'addon.";
+  "[VXV] Deathroll : Thom Leboss contre Vorn Cendrelune pour 500 po, départ 1000. Paris ouverts 30 s dans l'addon.";
 const VORN = "Vorn Cendrelune";
 const SIRA = "Sira Ventargent";
 
@@ -106,7 +106,7 @@ describe("the deathroll in game (P15)", () => {
           `return IsVisible(FindWidget(VXV_DuelWindow, function(widget) return widget.label and widget.label.text == "Roll (0-1000)" end))`,
         ),
     ).toBe(false);
-    guild.advanceTime(61);
+    guild.advanceTime(31);
     roll(guild, VORN, 1000, 412);
     roll(guild, THOM, 412, 87, () => {
       // Sira watches: while the digits scroll, the window tells the roll being drawn, not its result.
@@ -146,7 +146,7 @@ describe("the deathroll in game (P15)", () => {
     expect(
       guild.player(VORN).bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${SIRA}", "10", "100")`),
     ).toBe(IN_DEBT);
-    guild.player(THOM).bundles.Deathroll?.run(`local _, ns = ... ns.Duels.ConfirmPaid("${id}")`);
+    guild.player(THOM).bundles.Deathroll?.run(`local _, ns = ... ns.Duels.ConfirmPaid({ "${id}" })`);
     settle(guild, 1);
     const paid = parseDeathroll(guild.player(THOM).client(`return VXV_SyncDB.texts.deathroll["${id}"]`) as string);
     expect(paid.paid?.by).toBe(THOM);
@@ -205,7 +205,7 @@ describe("the deathroll in game (P15)", () => {
   it("sends again at each start the games over kept, for a companion that missed them", () => {
     const guild = startTrio();
     const id = challengeAndAccept(guild);
-    guild.advanceTime(61);
+    guild.advanceTime(31);
     roll(guild, VORN, 1000, 0);
     const thom = guild.player(THOM);
     thom.client(`VXV_SyncDB.texts.deathroll["${id}"] = nil`);
@@ -227,6 +227,31 @@ describe("the deathroll in game (P15)", () => {
     };
     expect(challenge(THOM, VORN)).toBe("Vorn Cendrelune n'a pas le rôle Membre sur Discord : pas de deathroll.");
     expect(challenge(VORN, THOM)).toBe("Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord.");
+  });
+
+  it("finds the member to challenge by a part of their name, accents and case aside", () => {
+    const guild = startTrio();
+    const sira = guild.player(SIRA);
+    sira.client(`SlashCmdList.VXV("")
+      FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Le Dé Pipé" end):Run("OnClick")
+      local field = FindWidget(VXV_Window, function(widget) return widget.maxLetters == 40 and IsVisible(widget) end)
+      field:SetText("CENDRÉ")
+      field:Run("OnTextChanged")`);
+    const rows = () =>
+      sira.client(`local texts = {}
+        FindWidget(VXV_Window, function(widget)
+          if widget.row ~= nil and widget.shown and IsVisible(widget) then texts[#texts + 1] = widget.label.text end
+        end)
+        return texts`) as string[];
+    expect(plain(rows())).toContain(VORN);
+    expect(plain(rows())).not.toContain(THOM);
+    sira.client(
+      `FindWidget(VXV_Window, function(widget) return widget.row ~= nil and widget.label.text == "${VORN}" end):Run("OnMouseUp", "LeftButton")`,
+    );
+    expect(plain(rows())).toContain(`» ${VORN}`);
+    for (const player of guild.players) {
+      expect(player.errors()).toEqual([]);
+    }
   });
 
   it("tells the latest games in the Journal, the deathrolls and the Chi Fou Mi together", () => {

@@ -47,7 +47,7 @@ function DuelView.Number(game)
     return last and last.result or game.start
 end
 
---- Under the number: the minute of bets, whose turn it is, the roll being drawn, or how the game ended.
+--- Under the number: the seconds of bets, whose turn it is, the roll being drawn, or how the game ended.
 function DuelView.Status(game, rolling)
     local roller, high = Rules.Turn(game)
     if rolling then

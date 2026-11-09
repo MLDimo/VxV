@@ -84,7 +84,7 @@ end
 
 VXV.On("modules.started", Games.Resend)
 
---- A game of the guild starts, its bets open for a minute.
+--- A game of the guild starts, its bets open for 30 seconds.
 function Games.Start(game)
     live[game.id] = game
     changed()
@@ -128,7 +128,7 @@ function Games.AddRoll(id, character, high, result)
     return true
 end
 
---- A stake of the guild on a player (P15.2): during the minute of bets, by someone else, of 1 po at least.
+--- A stake of the guild on a player (P15.2): during the 30 seconds of bets, by someone else, of 1 po at least.
 function Games.AddBet(id, bettor, choice, amount)
     local game = live[id]
     if game == nil or not Rules.Betting(game) or bettor == game.challenger or bettor == game.challenged
@@ -141,14 +141,29 @@ function Games.AddBet(id, bettor, choice, amount)
     return true
 end
 
---- The winner confirms the payment (P15.6): the game goes to the website again with it.
-function Games.Pay(id, by, at)
-    local game = saved.games[id]
-    if game == nil or game.paid ~= nil or Rules.Winner(game) ~= by then
+--- The one owed confirms the payment of what another player owes them (P15.6): those of the games that this addon
+--- kept unpaid, each a game of theirs in which they won more than they lost, are paid and go to the website again.
+--- True when kept.
+function Games.Settle(ids, by, at)
+    local games, balance = {}, 0
+    for _, id in ipairs(ids) do
+        local game = saved.games[id]
+        if type(game) == "table" and game.paid == nil and game.stake > 0 then
+            local winner, loser = Rules.Winner(game), Rules.Loser(game)
+            if by ~= winner and by ~= loser then
+                return false
+            end
+            balance = balance + (by == winner and game.stake or -game.stake)
+            games[#games + 1] = game
+        end
+    end
+    if #games == 0 or balance < 0 then
         return false
     end
-    game.paid = { by = by, at = at }
-    keep(game)
+    for _, game in ipairs(games) do
+        game.paid = { by = by, at = at }
+        keep(game)
+    end
     changed()
     return true
 end

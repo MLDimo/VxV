@@ -110,7 +110,7 @@ function MatchView.RoundLabel(game, left, right, phase)
         MatchView.RoundsWon(game, right))
 end
 
---- Under the arena: the minute of bets, what the player does, the round's outcome, or the game's.
+--- Under the arena: the seconds of bets, what the player does, the round's outcome, or the game's.
 function MatchView.Status(game, me, phase, now)
     local winner = Rules.Winner(game)
     if phase == "done" then

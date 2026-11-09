@@ -3,7 +3,7 @@ import { instant, readRecords, requireRecord, wholeNumber } from "./textFormat.t
 
 /**
  * Deathrolls (P15): one against one, the challenged rolling first from the starting number, each next roll from 0 to
- * the previous result; who rolls 0 loses the stake to the other. The guild bets on the game during the minute before
+ * the previous result; who rolls 0 loses the stake to the other. The guild bets on the game during the 30 seconds before
  * the first roll.
  */
 

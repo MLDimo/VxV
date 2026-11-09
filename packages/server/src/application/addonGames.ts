@@ -3,12 +3,13 @@ import { ADDON_CHIFOUMIS_HEADER, ADDON_DEATHROLLS_HEADER, formatAddonGames } fro
 import { DEBT_LIMIT, isDebt } from "../domain/bets.ts";
 import { canGamble } from "../domain/permissions.ts";
 import { addonReaders } from "./addonReaders.ts";
-import { loserOf, winnerOf } from "./debts.ts";
+import { loserOf, pairDebts, winnerOf } from "./debts.ts";
 import type { Clock, PlayedGame, Repositories, UnitOfWork } from "./ports.ts";
 
 /**
- * What each member owes (bets, deathrolls, Chi Fou Mi), the members who owe nothing left out, and the members without
- * the role « Membre »: the addon bars from Le Dé Pipé those owing DEBT_LIMIT, and those.
+ * What each member owes (bets, and in the deathrolls and the Chi Fou Mi each pair's games set against each other), the
+ * members who owe nothing left out, and the members without the role « Membre »: the addon bars from Le Dé Pipé those
+ * owing DEBT_LIMIT, and those.
  */
 async function debtsAndNewcomers(repositories: Repositories) {
   const owed = new Map<string, number>();
@@ -22,9 +23,10 @@ async function debtsAndNewcomers(repositories: Repositories) {
       owe(stake.memberId, stake.amount);
     }
   }
-  for (const game of [...(await repositories.deathrolls.listAll()), ...(await repositories.chifoumis.listAll())]) {
-    if (game.paidAt === undefined && game.stake > 0) {
-      owe(loserOf(game).memberId, game.stake);
+  const lists: PlayedGame[][] = [await repositories.deathrolls.listAll(), await repositories.chifoumis.listAll()];
+  for (const games of lists) {
+    for (const pair of pairDebts(games)) {
+      owe(pair.debtor.memberId, pair.amount);
     }
   }
   return {

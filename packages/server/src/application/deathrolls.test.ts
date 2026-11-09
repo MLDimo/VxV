@@ -26,6 +26,18 @@ function game(id: string, stake: number, extra: readonly string[] = []): string 
   ].join("\n");
 }
 
+/** Vorn challenges Thom for the stake; Thom rolls first and rolls 0 at the third roll: Vorn wins. */
+function revenge(id: string, stake: number, extra: readonly string[] = []): string {
+  return [
+    DEATHROLL_HEADER,
+    `G;${id};Vorn Cendrelune;Thom Leboss;${String(stake)};1000;${String(ACCEPTED + 600)};${String(ACCEPTED + 720)}`,
+    "R;Thom Leboss;1000;412",
+    "R;Vorn Cendrelune;412;87",
+    "R;Thom Leboss;87;0",
+    ...extra,
+  ].join("\n");
+}
+
 describe("deathrolls", () => {
   let database: PGliteInterface;
   let sql: SqlClient;
@@ -73,8 +85,10 @@ describe("deathrolls", () => {
     const treasury = createTreasury({ unitOfWork: createUnitOfWork(sql), clock });
     // Vorn owes the stake: no bet, no deathroll, until Thom confirms.
     expect(await treasury.debtOf(vorn)).toBe(1200);
-    expect((await deathrolls.debtsOf(thom)).toConfirm.map((view) => view.game.id)).toEqual(["g1"]);
-    await expect(deathrolls.confirmPayment(vorn, "g1")).rejects.toThrow("Seul le gagnant confirme le paiement.");
+    expect((await deathrolls.debtsOf(thom)).toConfirm.map((pair) => pair.id)).toEqual(["g1"]);
+    await expect(deathrolls.confirmPayment(vorn, "g1")).rejects.toThrow(
+      "Seul celui à qui la dette est due confirme le paiement.",
+    );
     await deathrolls.confirmPayment(thom, "g1");
     expect(await treasury.debtOf(vorn)).toBe(0);
     // Paid, the debt stays in the players' history.
@@ -91,6 +105,28 @@ describe("deathrolls", () => {
     ).toEqual(["Paiement du deathroll confirmé."]);
     expect((await deathrolls.debtsOf(vorn)).owed).toEqual([]);
     expect(announced).toEqual([]);
+  });
+
+  it("sets two players' debts against each other: equal, they cancel out; else the one owed confirms the rest", async () => {
+    const treasury = createTreasury({ unitOfWork: createUnitOfWork(sql), clock });
+    await deathrolls.recordFromGame(thom, [game("e1", 10)]);
+    expect(await deathrolls.recordFromGame(vorn, [revenge("e2", 10)])).toEqual([
+      "Deathroll Vorn Cendrelune contre Thom Leboss enregistré : leurs dettes s'annulent.",
+    ]);
+    expect([await treasury.debtOf(vorn), await treasury.debtOf(thom)]).toEqual([0, 0]);
+
+    await deathrolls.recordFromGame(thom, [game("u1", 300)]);
+    await deathrolls.recordFromGame(vorn, [revenge("u2", 100)]);
+    const { owed } = await deathrolls.debtsOf(vorn);
+    expect(owed.map((pair) => [pair.creditor.name, pair.amount])).toEqual([["Thom Leboss", 200]]);
+    expect(await treasury.debtOf(thom)).toBe(0);
+    await expect(deathrolls.confirmPayment(vorn, "u2")).rejects.toThrow("Seul celui à qui la dette est due");
+    // Thom confirms the 200 po from the game, through the game Vorn won: both are paid.
+    expect(
+      await deathrolls.recordFromGame(thom, [revenge("u2", 100, [`Y;Thom Leboss;${String(ACCEPTED + 900)}`])]),
+    ).toEqual(["Paiement du deathroll confirmé."]);
+    expect(await treasury.debtOf(vorn)).toBe(0);
+    expect((await deathrolls.debtsOf(vorn)).history.every((view) => view.game.paidAt !== undefined)).toBe(true);
   });
 
   it("refuses a game sent by someone who did not play it, or out of the rules", async () => {
