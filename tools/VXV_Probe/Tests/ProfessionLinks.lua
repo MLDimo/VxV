@@ -78,7 +78,7 @@ local function list()
 end
 
 local function chosen(args)
-    local index = tonumber(Util.SplitFirst(args or "")) or #db.order
+    local index = tonumber((Util.SplitFirst(args or ""))) or #db.order
     local key = db.order[index]
     if key == nil then
         log.Fail("aucun lien n°", index, ": /vxvtest lien liste")
