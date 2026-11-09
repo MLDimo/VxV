@@ -6,7 +6,7 @@ local ns = select(2, ...).Core
 local Presence = {}
 ns.Presence = Presence
 
-local Bus, Comm, Names = ns.Bus, ns.Comm, ns.Names
+local Bus, Comm, Names, Roster = ns.Bus, ns.Comm, ns.Names, ns.Roster
 
 local HELLO = "hello"
 
@@ -63,11 +63,18 @@ function Presence.Announce()
     Comm.Broadcast(HELLO, { version = ns.VERSION })
 end
 
---- Names of the members connected with VXV, this player included, in alphabetical order.
+--- Names of the members connected with VXV, this player included, in alphabetical order: those who announced
+--- themselves, less those the guild's list says have logged off since.
 function Presence.Online()
+    local offline = {}
+    for _, member in ipairs(Roster.Read()) do
+        offline[member.name] = not member.online
+    end
     local names = {}
     for name in pairs(versions) do
-        names[#names + 1] = name
+        if not offline[name] then
+            names[#names + 1] = name
+        end
     end
     table.sort(names)
     return names

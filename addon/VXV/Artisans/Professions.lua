@@ -68,8 +68,9 @@ local function sameRecipes(left, right)
     return true
 end
 
---- The learned recipes of the profession whose window is open: only one of the player's own, at the level the list
---- tells (a profession another player links opens the same window).
+--- The learned recipes of the profession whose window is open, and its link (what a click opens for the guild while
+--- the player is online): only one of the player's own, at the level the list tells (a profession another player
+--- links opens the same window).
 local function readRecipes()
     local levels = readLevels()
     local okBase, base = Compat.GetBaseProfessionInfo()
@@ -86,11 +87,13 @@ local function readRecipes()
             recipes[id] = info.name
         end
     end
+    local okLink, link = Compat.GetTradeSkillListLink()
+    link = okLink and type(link) == "string" and not VXV.IsSecret(link) and link or nil
     local known = Directory.Own(entry.character, entry.id)
-    if known ~= nil and known.level == entry.level and sameRecipes(known.recipes, recipes) then
+    if known ~= nil and known.level == entry.level and sameRecipes(known.recipes, recipes) and known.link == link then
         return
     end
-    entry.recipes, entry.recipesAt = recipes, time()
+    entry.recipes, entry.recipesAt, entry.link = recipes, time(), link
     keep({ entry })
 end
 
@@ -100,7 +103,8 @@ function Professions.Start()
     for _, entry in pairs(readLevels()) do
         local known = Directory.Own(entry.character, entry.id)
         if known == nil or known.level ~= entry.level or known.max ~= entry.max then
-            entry.recipes, entry.recipesAt = known and known.recipes, known and known.recipesAt
+            entry.recipes, entry.recipesAt, entry.link = known and known.recipes, known and known.recipesAt,
+                known and known.link
             changed[#changed + 1] = entry
         end
     end

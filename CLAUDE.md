@@ -165,7 +165,12 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   sa liste). La lecture la plus récente gagne ; un niveau relu sans ses recettes garde les recettes connues. Partage
   dans la guilde : chaque addon dit ses métiers quand ils changent et, à la connexion, la liste de ce qu'il a ; il
   demande en chuchotement ce qui lui manque ; un officier équipé du compagnon envoie au site ce qu'il entend. « Qui peut
-  fabriquer… ? » sans accents ni casse. L'annuaire du site n'arrive que par le compagnon (trop gros pour le relais des
+  fabriquer… ? » sans accents ni casse (`VXV.Fold`, `VXV.Matches`), qui trouve en jeu un métier comme une recette.
+  Métier vu comme un lien du chat (demande du propriétaire du 9 novembre) : à l'ouverture de sa fenêtre de métier,
+  l'addon lit son lien (`C_TradeSkillUI.GetTradeSkillListLink`, sonde T13, 70 octets, sans les recettes) et le partage
+  avec les recettes ; un clic sur un artisan de l'annuaire en jeu ouvre la vraie fenêtre de son métier
+  (`SetItemRef`, `Artisans/Links.lua`), ce que le jeu ne fait que s'il est connecté (liste de guilde) ; sinon un
+  message. Hors ligne, une fenêtre de l'addon viendra plus tard. L'annuaire du site n'arrive que par le compagnon (trop gros pour le relais des
   officiers). Infobulle d'un objet de recette (`RecipeItems.lua`) : « Recette possédée par VXV » en vert ou « Recette
   non possédée par VXV » en rouge, le nom après « : » comparé sans accents ni casse ; rien sur les livres.
 - **Pêche en un bouton** (`VXV/Fishing`, Artisans › Pêche ; demande du propriétaire du 8 novembre, maquette

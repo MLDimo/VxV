@@ -674,6 +674,12 @@ C_TradeSkillUI = {
         local recipe = ShownProfession and ShownProfession.recipes[id]
         return recipe and { recipeID = id, name = recipe.name, learned = recipe.learned }
     end,
+    -- The open window's link (a profession without one, as Skinning, gives nil).
+    GetTradeSkillListLink = function()
+        local shown = ShownProfession
+        return shown and shown.link ~= false and ("|cffffd000|Htrade:Player-1-%d:%d:%d|h[%s]|h|r"):format(
+            shown.id, shown.id, shown.id, shown.name) or nil
+    end,
 }
 
 -- Fishing (probe, T12, 8 November): the bags' items, the hands, what the addon equips, the spell's name, the lure on

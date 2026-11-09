@@ -249,6 +249,11 @@ describe("the deathroll in game (P15)", () => {
       `FindWidget(VXV_Window, function(widget) return widget.row ~= nil and widget.label.text == "${VORN}" end):Run("OnMouseUp", "LeftButton")`,
     );
     expect(plain(rows())).toContain(`» ${VORN}`);
+    // Vorn logs off: the guild's list says so, and he leaves the list.
+    sira.client(`MockGuildMembers = { { name = "${VORN}", class = "MAGE", online = false } }
+      local field = FindWidget(VXV_Window, function(widget) return widget.maxLetters == 40 and IsVisible(widget) end)
+      field:Run("OnTextChanged")`);
+    expect(plain(rows())).toContain("Aucun membre connecté ne correspond.");
     for (const player of guild.players) {
       expect(player.errors()).toEqual([]);
     }
