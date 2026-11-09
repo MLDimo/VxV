@@ -18,7 +18,7 @@ local BOTTOM_OFFSET = 220
 local RINGS = { { "ink", 2 }, { "copper", 3 }, { "ink", 2 } }
 local BORDER, BAR_HEIGHT, PADDING, GAP = 7, 22, 10, 10
 local BUTTON_WIDTH, BUTTON_HEIGHT, BEVEL, KEYCAP = 88, 84, 3, 16
-local SMALL_BUTTON_HEIGHT, QUIT_WIDTH, LURE_WIDTH, LURE_HEIGHT = 22, 130, 120, 20
+local SMALL_BUTTON_HEIGHT, QUIT_WIDTH, LURE_WIDTH, LURE_HEIGHT = 22, 160, 120, 20
 -- The right column's lines under the big button's top: the state, the catches and time, the lure.
 local STATS_LINE, LURE_LINE = 20, 40
 local PROGRESS_HEIGHT = 3
