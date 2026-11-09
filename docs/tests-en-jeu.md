@@ -17,7 +17,6 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | Message système d'un duel (`DUEL_WINNER_KNOCKOUT`, `DUEL_WINNER_RETREAT`) | Un `/duel` programmé sur le site entre deux membres avec VXV : le résultat doit partir au site ; sinon `/run print(DUEL_WINNER_KNOCKOUT)` et copier le message du chat | Résultat des duels lu en jeu (`VXV/PvP/DuelResults.lua`) ; sans lui, le perdant reconnaît sa défaite |
 | Victoire en champ de bataille (`GetBattlefieldWinner` : 0 Horde, 1 Alliance ; `UnitFactionGroup("player")`) | Un champ de bataille gagné, puis un perdu, avec un autre membre équipé de VXV dans le groupe : la quête « Champs de bataille en guilde » doit compter la victoire seule ; sinon `/run print(GetBattlefieldWinner(), UnitFactionGroup("player"))` sur l'écran des scores | Quête des champs de bataille en guilde (`VXV/Missions/GuildRuns.lua`) ; sans elle, rien ne compte |
 | Dernier boss de chaque donjon du serveur officiel | Avec la sonde, finir le donjon : `/vxvtest loot status` (id de l'instance) et l'`ENCOUNTER_END` du dernier boss ; un fichier par donjon dans `data/dungeons` | Quête des donjons en guilde : un donjon absent de `data/dungeons` ne compte pas |
-| Pêche en un bouton : équipement en combat (`C_Item.EquipItemByName`, sinon macro `/equip [combat]`) | Avec VXV (version de développement), une session lancée, un monstre facile tapé canne en main : l'arme revient seule (bandeau « arme rééquipée »), sinon F la rend | Pêche en un bouton (`VXV/Fishing`) : sans équipement en combat par l'addon, la touche rend l'arme |
 | Inventaire de l'API sur le client de la sortie (4 novembre) | `/vxvtest api run`, puis `/reload` ; copier le journal dans `sessions/` | Liste des fonctions permises aux bundles (`tools/addon-harness/src/foreverApi.ts`) |
 
 ## Validations en jeu
@@ -32,5 +31,5 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | Missions | Une mission d'une semaine menée jusqu'au classement |
 | Titres | Une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu par un membre sans compagnon |
 | Artisans | Une recette apprise apparaît chez un autre membre après la synchro |
-| Pêche | Une session dans l'onglet Artisans › Pêche : canne équipée, trois prises à la touche, l'appât posé, « Quitter la session » rend l'arme ; puis un combat pendant une session |
+| Pêche | Une session dans l'onglet Artisans › Pêche : canne équipée, trois prises à la touche, l'appât posé, « Quitter la session » rend l'arme |
 | Deathroll | Une partie complète jouée aux boutons entre deux membres, chaque roll de 0 au résultat précédent (le jeu accepte-t-il un `/roll` à partir de 0 ?) jusqu'au premier 0, la dette chez le perdant |

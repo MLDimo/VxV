@@ -142,8 +142,7 @@ Seconde séance (9 novembre, `sessions/2026-11-09.txt`), Pêche 1/75 à Mulgore,
 | T12 refus | Quels textes ? | `SPELL_FAILED_LOW_CASTLEVEL` « Niveau de la technique insuffisant », `SPELL_FAILED_FISHING_TOO_LOW` « Requiert %d en Pêche », `SPELL_FAILED_NOT_FISHABLE` « Votre ligne n'a pas atteint d'eaux poissonneuses », `SPELL_FAILED_TOO_SHALLOW` « L'eau n'est pas assez profonde ». | ✅ | `Waters.lua` |
 | T12 zone | La zone se lit-elle ? | Oui : `C_Map.GetBestMapForUnit` 1412, `C_Map.GetMapInfo` « Mulgore ». | ✅ | Eaux apprises par carte |
 | T12 ferrage | La touche ferre-t-elle le bouchon ? | Oui (vu par le propriétaire) : pendant la ligne, F liée par `SetOverrideBinding` à `INTERACTTARGET` ferre, le poisson va dans les sacs. | ✅ | Pêche à une seule touche |
-
-Reste à mesurer (`docs/tests-en-jeu.md`) : l'équipement en combat.
+| T12 équiper en combat | L'addon rend-il l'arme en combat ? | Oui (vu par le propriétaire) : un monstre tapé canne en main, `C_Item.EquipItemByName` rend l'arme seule, la session se ferme après le combat avec son récapitulatif. | ✅ | La touche (`/equip [combat]`) reste le repli |
 
 ## Hypothèses de départ (sources communautaires)
 

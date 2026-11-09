@@ -171,8 +171,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   lancer un sort) : elle lance la ligne, puis le temps de la ligne ferre le bouchon (`INTERACTTARGET`, cible
   d'interaction du jeu), puis relance. Fenêtre de session posée sur le jeu (prises, durée, appât, « Quitter la
   session ») ; le bouton « Appât » pose le meilleur appât des sacs sur la canne. Un combat (`PLAYER_REGEN_DISABLED`)
-  rend les armes si le jeu le permet, sinon la touche le fait (macro `/equip [combat]`) ; la session se ferme
-  3 s après le combat, avec son récapitulatif. La fenêtre tient des boutons sécurisés : elle ne change qu'hors combat
+  rend les armes (`C_Item.EquipItemByName`, mesuré en combat ; repli : la touche, macro `/equip [combat]`) ; la
+  session se ferme 3 s après le combat, avec son récapitulatif. La fenêtre tient des boutons sécurisés : elle ne change qu'hors combat
   et Échap ne la ferme pas. Le jeu ne dit le niveau d'une eau qu'en refusant un lancer (`UI_ERROR_MESSAGE` après
   `UNIT_SPELLCAST_FAILED`, textes `SPELL_FAILED_*` du client) : refusé pour le niveau, la session s'arrête et la zone
   retient le niveau demandé (`Waters.lua`, données du compte, tous ses personnages), puis une session ne s'y lance plus
