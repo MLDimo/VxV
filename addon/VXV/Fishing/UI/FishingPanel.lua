@@ -136,8 +136,14 @@ function FishingPanel.Create(parent, width)
         if skill == nil then
             return
         end
-        level:SetText(("Pêche · %d / %d"):format(skill.level, skill.max))
-        bar:SetWidth(math.max(1, width * skill.level / math.max(skill.max, 1)))
+        -- The list of professions may not tell the level: the spell alone says the character fishes.
+        local known = skill.level ~= nil
+        level:SetText(known and ("Pêche · %d / %d"):format(skill.level, skill.max) or "Pêche")
+        track:SetShown(known)
+        bar:SetShown(known)
+        if known then
+            bar:SetWidth(math.max(1, width * skill.level / math.max(skill.max, 1)))
+        end
         start:SetText(Session.State() == "off" and "Lancer une session de pêche" or "Quitter la session")
         problem:SetText(Session.Explain() or "")
         renderKey(row)

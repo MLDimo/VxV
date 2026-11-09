@@ -68,8 +68,12 @@ function Session.Explain()
     elseif problem.kind == "fight" then
         return "Impossible pendant un combat"
     end
-    return ("Eau trop difficile%s : il faut la Pêche à %d, la tienne est à %d"):format(
-        problem.zone and (" (" .. problem.zone .. ")") or "", problem.need, problem.level)
+    local where = problem.zone and (" (" .. problem.zone .. ")") or ""
+    if problem.need == nil or problem.level == nil then
+        return "Eau trop difficile" .. where .. " pour ta Pêche"
+    end
+    return ("Eau trop difficile%s : il faut la Pêche à %d, la tienne est à %d"):format(where, problem.need,
+        problem.level)
 end
 
 --- The last session's summary { catches, seconds, best }, or nil.
@@ -90,7 +94,7 @@ function Session.Start()
         problem = { kind = "fight" }
     elseif pole == nil then
         problem = { kind = "pole" }
-    elseif need ~= nil and skill.level < need then
+    elseif need ~= nil and skill.level ~= nil and skill.level < need then
         problem = { kind = "water", need = need, level = skill.level, zone = zone }
     end
     if problem ~= nil then

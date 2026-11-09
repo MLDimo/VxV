@@ -83,10 +83,10 @@ function Waters.Refusal(text)
     end
 end
 
---- Learns that the zone needs more than this level (or exactly need, when the game told it).
+--- Learns that the zone needs more than this level (or exactly need, when the game told it); nothing without either.
 function Waters.Learn(level, need)
     local key = Waters.Zone()
-    if key ~= nil then
+    if key ~= nil and (level ~= nil or need ~= nil) then
         saved.waters[key] = math.max(saved.waters[key] or 0, need or level + 1)
     end
 end

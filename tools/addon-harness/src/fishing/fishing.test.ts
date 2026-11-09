@@ -213,6 +213,15 @@ describe("fishing in one button (Artisans › Pêche)", () => {
     expect(shown(client, "VXV_FishingWindow")).not.toContain("Trop loin de l'eau");
   });
 
+  it("knows a fisher by the fishing spell when the list of professions does not show the profession", () => {
+    const { client, state } = startFishing({ fisher: false });
+    client("KnownSpells[7620] = true");
+    client(OPEN_ARTISANS);
+    expect(shown(client, "VXV_Window")).toEqual(expect.arrayContaining(["Pêche", "Lancer une session de pêche"]));
+    client(START);
+    expect(state()).toBe("ready");
+  });
+
   it("is only for a character who fishes", () => {
     const { client, state } = startFishing({ fisher: false });
     client(START);

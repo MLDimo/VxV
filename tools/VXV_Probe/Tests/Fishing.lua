@@ -119,6 +119,7 @@ local function fishingProfession()
 end
 
 local function status()
+    log.Info("GetProfessions renvoie :", Util.Results(Compat.GetProfessions()))
     local profession = fishingProfession()
     log.Check(profession ~= nil, "métier de pêche (GetProfessions, ligne", FISHING_SKILL_LINE .. ") :", profession)
     local name, known = fishingSpell()

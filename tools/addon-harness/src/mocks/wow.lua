@@ -700,6 +700,9 @@ C_Item.EquipItemByName = function(id, slot)
     end
 end
 C_Spell = { GetSpellName = function(id) return id == 7620 and "Pêche" or nil end }
+-- The spells the player knows, by id.
+KnownSpells = {}
+function IsPlayerSpell(id) return KnownSpells[id] == true end
 Lure = { on = false, ms = 0 }
 function GetWeaponEnchantInfo() return Lure.on, Lure.ms, 1 end
 -- The keys bound by the addon: { [key] = action }.

@@ -77,6 +77,7 @@ const USED_IN_GAME = [
   "GetInventoryItemID",
   "C_Item.EquipItemByName",
   "C_Spell.GetSpellName",
+  "IsPlayerSpell",
   "GetWeaponEnchantInfo",
   "SetOverrideBindingClick",
   "ClearOverrideBindings",

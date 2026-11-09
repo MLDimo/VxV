@@ -11,20 +11,30 @@ local Compat = VXV.Compat
 -- the best rank the character knows.
 Skill.SPELL = 7620
 Skill.SPELLS = { [7620] = true, [7731] = true, [7732] = true, [18248] = true }
--- The fishing profession's skill line (measured on 7 October), and the slots GetProfessions returns.
+-- The fishing profession's skill line (measured on 7 October).
 local FISHING_SKILL_LINE = 356
-local PROFESSION_SLOTS = 5
 
---- The character's fishing { level, max }, or nil when the character does not fish.
+--- How many values a call returned, and them: GetProfessions' slots vary on WoW Forever (its order is not the
+--- usual one, measured on 3 October).
+local function results(...)
+    return select("#", ...), { ... }
+end
+
+--- The character's fishing { level, max } from the list of professions, or { } when the character knows the fishing
+--- spell but the list does not tell its level; nil when the character does not fish.
 function Skill.Read()
-    local slots = { Compat.GetProfessions() }
-    for slot = 1, slots[1] and PROFESSION_SLOTS or 0 do
-        local index = slots[slot + 1]
+    local count, slots = results(Compat.GetProfessions())
+    for slot = 2, slots[1] and count or 0 do
+        local index = slots[slot]
         if index ~= nil then
             local ok, _, _, level, max, _, _, skillLine = Compat.GetProfessionInfo(index)
             if ok and skillLine == FISHING_SKILL_LINE and type(level) == "number" and type(max) == "number" then
                 return { level = level, max = max }
             end
         end
+    end
+    local ok, known = Compat.IsPlayerSpell(Skill.SPELL)
+    if ok and known == true then
+        return {}
     end
 end

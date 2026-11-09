@@ -63,6 +63,7 @@ local ALIASES = {
     GetInventoryItemID = { "GetInventoryItemID" },
     EquipItemByName = { "C_Item.EquipItemByName", "EquipItemByName" },
     GetSpellName = { "C_Spell.GetSpellName", "GetSpellInfo" },
+    IsPlayerSpell = { "IsPlayerSpell" },
     GetWeaponEnchantInfo = { "GetWeaponEnchantInfo" },
     SetOverrideBindingClick = { "SetOverrideBindingClick" },
     ClearOverrideBindings = { "ClearOverrideBindings" },
