@@ -36,7 +36,8 @@ local FUNCTIONS = {
     "GetBindingAction", "IsFishingLoot",
     -- A profession's link (T13)
     "C_TradeSkillUI.GetTradeSkillListLink", "GetTradeSkillListLink", "C_TradeSkillUI.IsTradeSkillLinked",
-    "IsTradeSkillLinked", "SetItemRef",
+    "IsTradeSkillLinked", "SetItemRef", "C_TradeSkillUI.GetRecipeSchematic", "C_TradeSkillUI.GetCategoryInfo",
+    "C_TradeSkillUI.GetRecipeItemLink", "C_Spell.GetSpellTexture",
 }
 
 local EVENTS = {

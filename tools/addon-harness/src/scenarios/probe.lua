@@ -53,7 +53,8 @@ Fire("ADDON_LOADED", "Blizzard_Communities")
 -- Professions: window opened (its link kept, T13), the link listed, opened and written in the chat; then the classic
 -- API only.
 Fire("TRADE_SKILL_SHOW")
-for _, command in ipairs({ "lien liste", "lien ouvrir", "lien ouvrir 1", "lien ouvrir 9", "lien chat", "lien lire" }) do
+for _, command in ipairs({ "lien liste", "lien ouvrir", "lien ouvrir 1", "lien ouvrir 9", "lien chat", "lien lire",
+    "lien details", "lien recettes", "lien details" }) do
     run(command)
 end
 C_TradeSkillUI, GetProfessions = nil, nil

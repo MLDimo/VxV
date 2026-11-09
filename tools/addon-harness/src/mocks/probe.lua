@@ -255,6 +255,12 @@ C_TradeSkillUI = {
     -- A profession's link (T13): the player's own window, never a linked one.
     GetTradeSkillListLink = function() return "|cffffd000|Htrade:Player-1-0001:2018:164|h[Forge]|h|r" end,
     IsTradeSkillLinked = function() return false end,
+    GetRecipeSchematic = function(id)
+        return { name = "Recette " .. id, outputItemID = 2318, quantityMin = 1, quantityMax = 1,
+            reagentSlotSchematics = { { quantityRequired = 2, reagentType = 1, reagents = { { itemID = 2318 } } } } }
+    end,
+    GetCategoryInfo = function() return { name = "Armures" } end,
+    GetRecipeItemLink = function() return "|cffffffff|Hitem:2318|h[Cuir léger]|h|r" end,
 }
 SetItemRef = function() end
 DEFAULT_CHAT_FRAME = { AddMessage = function() end }

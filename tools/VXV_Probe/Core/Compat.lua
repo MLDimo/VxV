@@ -72,6 +72,10 @@ local ALIASES = {
     GetTradeSkillListLink = { "C_TradeSkillUI.GetTradeSkillListLink", "GetTradeSkillListLink" },
     IsTradeSkillLinked = { "C_TradeSkillUI.IsTradeSkillLinked", "IsTradeSkillLinked" },
     SetItemRef = { "SetItemRef" },
+    GetRecipeSchematic = { "C_TradeSkillUI.GetRecipeSchematic" },
+    GetCategoryInfo = { "C_TradeSkillUI.GetCategoryInfo" },
+    GetRecipeItemLink = { "C_TradeSkillUI.GetRecipeItemLink" },
+    GetSpellTexture = { "C_Spell.GetSpellTexture", "GetSpellTexture" },
 }
 
 local MISSING_API = "API absente"
