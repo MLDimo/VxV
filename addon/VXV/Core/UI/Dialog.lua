@@ -1,7 +1,8 @@
 local ns = select(2, ...).Core
 
 --- A small window in the charter, over the game and the windows (the loot panel, the text window): copper rings, a
---- header with its title and a close button, moved by dragging; named, so that Escape closes it.
+--- header with its title and a close button, moved by dragging; named, so that Escape closes it. A window with two
+--- sizes (Le Dé Pipé's games, owner's request of 9 November) has a button beside the close one that switches them.
 local Dialog = {}
 ns.Dialog = Dialog
 
@@ -12,12 +13,14 @@ local BORDER = 7
 local HEADER_HEIGHT = 34
 local PADDING = 12
 local CLOSE_SIZE = 22
+local BUTTONS_GAP = 4
 -- Above the windows (HIGH strata): in the same strata, the panels of a screen, nested levels deep, would lie over
 -- the dialog's background (seen on 6 October with the sign-up opened from the Raid screen).
 local STRATA = "DIALOG"
 
---- Creates the dialog, hidden; returns it and its body (sized, under the header).
-function Dialog.Create(name, width, height, title)
+--- Creates the dialog, hidden; returns it and its body (sized, under the header). With onResize, the header has a
+--- button beside the close one ("-", then "+" once reduced: Dialog.Resize) that calls onResize().
+function Dialog.Create(name, width, height, title, onResize)
     local frame = CreateFrame("Frame", name, UIParent)
     frame:Hide()
     frame:SetSize(width, height)
@@ -44,10 +47,24 @@ function Dialog.Create(name, width, height, title)
     close:SetScript("OnClick", function()
         frame:Hide()
     end)
+    if onResize ~= nil then
+        frame.resize = Theme.Button(frame, "wood", "-", CLOSE_SIZE, CLOSE_SIZE)
+        frame.resize:SetPoint("RIGHT", close, "LEFT", -BUTTONS_GAP, 0)
+        frame.resize:SetScript("OnClick", onResize)
+    end
 
     local body = CreateFrame("Frame", nil, frame)
     body:SetPoint("TOPLEFT", BORDER + PADDING, -(BORDER + HEADER_HEIGHT + PADDING))
     body:SetSize(width - 2 * (BORDER + PADDING), height - 2 * (BORDER + PADDING) - HEADER_HEIGHT)
     table.insert(UISpecialFrames, name)
     return frame, body
+end
+
+--- Resizes a dialog with two sizes, its body following: reduced (its resize button then shows "+") or not ("-").
+function Dialog.Resize(frame, body, width, height, reduced)
+    frame:SetSize(width, height)
+    body:SetSize(width - 2 * (BORDER + PADDING), height - 2 * (BORDER + PADDING) - HEADER_HEIGHT)
+    if frame.resize ~= nil then
+        frame.resize.label:SetText(reduced and "+" or "-")
+    end
 end

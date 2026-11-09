@@ -1,9 +1,9 @@
-import { ADDON_CHIFOUMIS_HEADER, formatAddonGames } from "@vxv/server/domain/addonGames";
-import type { Character } from "@vxv/server/domain/characters";
+import { ADDON_CHIFOUMIS_HEADER } from "@vxv/server/domain/addonGames";
 import { chifoumiRefusal, parseChifoumi } from "@vxv/server/domain/chifoumis";
 import { describe, expect, it } from "vitest";
 import { startCore } from "../core.ts";
 import { startGuild } from "../guild.ts";
+import { diceGamesData, memberOf } from "../diceGames/fixtures.ts";
 import { companionFiles } from "../sync/fixtures.ts";
 
 const BUNDLES = ["Chifoumi", "Sync"];
@@ -34,11 +34,12 @@ const SHOWN = (frame: string) => `return ${frame} ~= nil and ${frame}.shown == t
 const run = (guild: Guild, name: string, code: string) =>
   guild.player(name).bundles.Chifoumi?.run(`local _, ns = ... ${code}`);
 
-/** Thom, Vorn and Sira connected with VXV; Thom and Vorn with their companion. */
+/** Thom, Vorn and Sira connected with VXV; Thom and Vorn with their companion, which brought the website's data. */
 function startTrio(): Guild {
   const guild = startGuild([SIRA], { bundles: BUNDLES });
-  guild.join(THOM, { written: companionFiles({}) });
-  guild.join(VORN, { written: companionFiles({}) });
+  const written = companionFiles({ chifoumi: diceGamesData(ADDON_CHIFOUMIS_HEADER) });
+  guild.join(THOM, { written });
+  guild.join(VORN, { written });
   settle(guild);
   return guild;
 }
@@ -73,6 +74,15 @@ describe("Chi Fou Mi", () => {
     expect(guild.player(SIRA).client(SHOWN("VXV_ChifoumiWindow"))).toBe(false);
     expect(guild.player(VORN).client(SHOWN("VXV_ChifoumiWindow"))).toBe(true);
     const id = run(guild, SIRA, "return ns.Games.Live()[1].id") as string;
+    // The announcement's link opens the game for a member who watches; then Sira closes it.
+    const announcement = (guild.player(THOM).client("return ChatSent") as { text: string }[])[0]?.text ?? "";
+    const shown = guild
+      .player(SIRA)
+      .client(`return ChatShows("CHAT_MSG_GUILD", ${JSON.stringify(announcement)}, "${THOM}")`) as string;
+    expect(shown).toContain("|h[Regarder]|h");
+    guild.player(SIRA).client(`ClickChatLink(${JSON.stringify(shown)})`);
+    expect(guild.player(SIRA).client(SHOWN("VXV_ChifoumiWindow"))).toBe(true);
+    guild.player(SIRA).client("VXV_ChifoumiWindow:Hide()");
     // Sira watches from the tab and bets during the minute.
     expect(run(guild, SIRA, `return ns.Matches.Bet("${id}", "${THOM}", "50")`)).toBeUndefined();
     settle(guild, 1);
@@ -107,7 +117,7 @@ describe("Chi Fou Mi", () => {
     expect(sent.bets).toEqual([{ bettor: SIRA, choice: THOM, amount: 50 }]);
     // Vorn owes the stake: no new game until Thom confirms.
     expect(run(guild, VORN, `return ns.Matches.Challenge("${SIRA}", "0")`)).toBe(
-      "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour jouer de nouveau.",
+      "Tes dettes atteignent la limite (paris, deathroll, Chi Fou Mi) : règles-en pour jouer de nouveau.",
     );
     run(guild, THOM, `ns.Matches.ConfirmPaid("${id}")`);
     settle(guild, 1);
@@ -115,29 +125,19 @@ describe("Chi Fou Mi", () => {
       parseChifoumi(guild.player(THOM).client(`return VXV_SyncDB.texts.chifoumi["${id}"]`) as string).paid?.by,
     ).toBe(THOM);
     expect(run(guild, VORN, `return ns.Matches.Challenge("${SIRA}", "0")`)).toBeUndefined();
+    expect(run(guild, VORN, `return ns.Rights.History("${VORN}")[1].paid`)).toBe(true);
+    // The reduced window keeps the score and the moves; the player's choice stays.
+    guild.player(VORN).client(CLICK("VXV_ChifoumiWindow", "-"));
+    expect(guild.player(VORN).client("return VXV_ChifoumiWindow.width")).toBe(420);
+    expect(guild.player(VORN).client(WINDOW_TEXTS)).toEqual(expect.arrayContaining([expect.stringContaining("2 – 0")]));
     for (const player of guild.players) {
       expect(player.errors()).toEqual([]);
     }
   });
 
   it("draws each player with the portrait the website gives, else the initial", () => {
-    const character = (firstName: string, lastName: string, memberId: string): Character => ({
-      id: memberId,
-      firstName,
-      lastName,
-      characterClass: "ROGUE",
-      memberId,
-      isMain: true,
-      inGuild: true,
-    });
-    const text = formatAddonGames(ADDON_CHIFOUMIS_HEADER, {
-      officers: [],
-      characters: [character("Thom", "Leboss", "m-thom"), character("Vorn", "Cendrelune", "m-vorn")],
-      barred: [],
-      newcomers: [],
-      portraits: [{ memberId: "m-thom", avatar: "mv_voleur_m" }],
-      games: [],
-      exportedAt: new Date("2026-12-10T07:00:00Z"),
+    const text = diceGamesData(ADDON_CHIFOUMIS_HEADER, {
+      portraits: [{ memberId: memberOf(THOM), avatar: "mv_voleur_m" }],
     });
     const { bundles, client, errors } = startCore({
       written: companionFiles({ chifoumi: text }),

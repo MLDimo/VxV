@@ -12,7 +12,7 @@ local CHALLENGE, ANSWER, START = "chifoumi.challenge", "chifoumi.answer", "chifo
 local BET, LOCK, REVEAL, PAID = "chifoumi.bet", "chifoumi.lock", "chifoumi.reveal", "chifoumi.paid"
 -- A challenge left unanswered this long is over.
 local CHALLENGE_SECONDS = 60
-local IN_DEBT = "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour jouer de nouveau."
+local IN_DEBT = "Tes dettes atteignent la limite (paris, deathroll, Chi Fou Mi) : règles-en pour jouer de nouveau."
 local NEWCOMER = "Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord."
 
 local challenges = {}
@@ -29,7 +29,7 @@ end
 --- Why this player may not play or bet, or nil.
 local function refusal(name, self)
     if Rights.InDebt(name) then
-        return self and IN_DEBT or (name .. " a une dette : pas de Chi Fou Mi avant qu'elle soit réglée.")
+        return self and IN_DEBT or (name .. " a trop de dettes : pas de Chi Fou Mi avant qu'il en règle.")
     end
     if Rights.Newcomer(name) then
         return self and NEWCOMER or (name .. " n'a pas le rôle Membre sur Discord : pas de Chi Fou Mi.")
@@ -97,6 +97,12 @@ VXV.OnMessage(ANSWER, function(payload, sender)
     VXV.Broadcast(START, { id = payload.id, a = me, b = sender, stake = challenge.stake, at = time() })
     VXV.SayToGuild(("Chi Fou Mi : %s contre %s pour %s. Paris ouverts une minute dans l'addon."):format(me, sender,
         VXV.Gold.Format(challenge.stake)))
+end)
+
+-- The guild's announcement of a game gets a link that opens its window for the members who watch (owner's request of
+-- 9 November; the window: MatchWindow.lua).
+VXV.On("modules.started", function()
+    VXV.LinkGuildAnnouncement("chifoumi", "%[VXV%] Chi Fou Mi : (.-) contre (.-) pour ")
 end)
 
 VXV.OnMessage(START, function(payload, sender)

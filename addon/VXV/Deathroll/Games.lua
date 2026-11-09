@@ -49,7 +49,15 @@ local function changed()
     VXV.Emit(UPDATED)
 end
 
---- Keeps a game over for the website: from its players' companion, or relayed by an officer's.
+--- Hands a game over to the companion, for the website: its players', or an officer's who relays it.
+local function send(game)
+    local me = VXV.PlayerName()
+    if me == game.challenger or me == game.challenged or DeathrollData.IsOfficer(me) then
+        VXV.Emit("sync.put", KIND, game.id, Games.Text(game))
+    end
+end
+
+--- Keeps a game over for the website.
 local function keep(game)
     saved.games[game.id] = game
     local over = {}
@@ -63,11 +71,18 @@ local function keep(game)
         saved.games[over[index].id] = nil
         VXV.Emit("sync.put", KIND, over[index].id, nil)
     end
-    local me = VXV.PlayerName()
-    if me == game.challenger or me == game.challenged or DeathrollData.IsOfficer(me) then
-        VXV.Emit("sync.put", KIND, game.id, Games.Text(game))
+    send(game)
+end
+
+--- Hands every game over kept to the companion again, at each start: a game over while the companion was unseen (an
+--- update of the addon removes its inbox until its next synchronisation) reaches the website all the same.
+function Games.Resend()
+    for _, game in pairs(saved.games) do
+        send(game)
     end
 end
+
+VXV.On("modules.started", Games.Resend)
 
 --- A game of the guild starts, its bets open for a minute.
 function Games.Start(game)

@@ -5,7 +5,7 @@ local ns = select(2, ...).Deathroll
 local DeathrollTab = {}
 ns.DeathrollTab = DeathrollTab
 
-local DeathrollData, Debts, Duels, DuelWindow, Games = ns.DeathrollData, ns.Debts, ns.Duels, ns.DuelWindow, ns.Games
+local Debts, Duels, DuelWindow, Games = ns.Debts, ns.Duels, ns.DuelWindow, ns.Games
 local Rules = ns.Rules
 
 local Gold, RowList, Screen, Theme = VXV.Gold, VXV.RowList, VXV.Screen, VXV.Theme
@@ -61,16 +61,23 @@ local function debts()
             end })
         end
     end
+    local history = Debts.History(me)
+    if #history > 0 then
+        rows[#rows + 1] = row("header", "Historique")
+        for _, game in ipairs(history) do
+            rows[#rows + 1] = row("line", VXV.DiceGames.HistoryText(game, me))
+        end
+    end
     return #rows > 0 and rows or { row("line", "Aucune dette de deathroll.") }
 end
 
---- The latest games over, as the website exports them: the winner, the loser and the stake.
+--- The latest games over: the website's, and those it does not know yet.
 local function latest()
-    local data, rows = DeathrollData.Current(), {}
-    for _, game in ipairs(data and data.latest or {}) do
-        rows[#rows + 1] = row("line", ("%s bat %s · %s"):format(game.winner, game.loser, Gold.Format(game.stake)))
+    local rows = {}
+    for _, game in ipairs(Debts.Latest()) do
+        rows[#rows + 1] = row("line", VXV.DiceGames.GameText(game))
     end
-    return #rows > 0 and rows or { row("line", "Les dernières parties arrivent avec les données du site.") }
+    return #rows > 0 and rows or { row("line", "Aucune partie jouée pour l'instant.") }
 end
 
 local function render()

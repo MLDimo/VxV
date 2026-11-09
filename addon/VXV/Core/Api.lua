@@ -39,6 +39,12 @@ VXV = {
     SiteData = ns.SiteData.Create,
     --- (data, name): the website's member id of a character (the player's by default) in a part's site data.
     MemberOf = ns.SiteData.MemberOf,
+    --- What Le Dé Pipé's games share: their site data's lines and their ledger of debts. See Core/DiceGames.lua.
+    DiceGames = ns.DiceGames,
+    --- (kind, handler(data)): what a click on the addon's links of a kind does; (kind, pattern): the guild's messages
+    --- matching the pattern get such a link, its captures for data. See Core/ChatLinks.lua.
+    OnChatLink = ns.ChatLinks.On,
+    LinkGuildAnnouncement = ns.ChatLinks.Announce,
     --- (options): changes made in game, waiting for the website, relayed by an officer with the companion; and
     --- (): whether the player's companion brought data at this launch. See Core/PendingChanges.lua.
     PendingChanges = ns.PendingChanges.Create,
@@ -68,8 +74,10 @@ VXV = {
     ClassColored = ns.Theme.ClassColored,
     --- The charter's fonts, colors and pixel frames (panels, buttons, rings): see UI/Theme.lua.
     Theme = ns.Theme,
-    --- (name, width, height, title): a small window in the charter, closed by Escape; returns it and its body.
+    --- (name, width, height, title, onResize): a small window in the charter, closed by Escape; returns it and its
+    --- body; with onResize, a button switches its two sizes, set by ResizeDialog(frame, body, width, height, reduced).
     CreateDialog = ns.Dialog.Create,
+    ResizeDialog = ns.Dialog.Resize,
     --- The wording of a sign-up to a guild event: ROLE_ORDER, Role(role) { label, plural, icon }, STATUS_ORDER,
     --- Status(status), IsComing(status).
     SignupLabels = ns.SignupLabels,
@@ -88,6 +96,8 @@ VXV = {
     --- A ranking board's parts, placed by the screen: Podium, Records, Rest; and Value(unit, value, withGold). See
     --- UI/RankingBoard.lua.
     RankingBoard = ns.RankingBoard,
+    --- (parent, size): a player of Le Dé Pipé's games in a frame of their class color. See Core/UI/PlayerCard.lua.
+    PlayerCard = ns.PlayerCard.Create,
     --- "Prénom Nom" of the player, or nil before the player is in the world.
     PlayerName = function()
         return ns.Names.OfUnit("player")

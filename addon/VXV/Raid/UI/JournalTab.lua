@@ -1,7 +1,7 @@
 local ns = select(2, ...).Raid
 
---- The Journal screen (§7.7): an open accounts book, the guild's cash on the left page (to come with the bets),
---- the raids' records and the officers' changes on the right one.
+--- The Journal screen (§7.7): an open accounts book, the guild's cash on the left page, the raids' records, the
+--- officers' changes and Le Dé Pipé's latest games on the right one.
 local JournalTab = {}
 ns.JournalTab = JournalTab
 
@@ -32,8 +32,19 @@ local INTRO = "Les raids enregistrés en jeu et les modifications des officiers,
 local content, list
 local cashLines, cashTexts = {}, {}
 
+--- Le Dé Pipé's latest games, which its parts tell: ("journal.games", add(label, games)).
+local function games()
+    local entries = {}
+    VXV.Emit("journal.games", function(label, list)
+        for _, game in ipairs(list) do
+            entries[#entries + 1] = { label = label, game = game }
+        end
+    end)
+    return entries
+end
+
 local function render()
-    list.SetRows(JournalView.Rows(RaidLog.All(), RaidData.Current()))
+    list.SetRows(JournalView.Rows(RaidLog.All(), RaidData.Current(), games()))
 end
 
 --- The top of a page's line, from 0.
@@ -115,7 +126,7 @@ function JournalTab.Build(frame)
     body:SetPoint("TOPLEFT", PAGE_PADDING, -lineTop(LIST_LINE))
     body:SetSize(rightWidth - 2 * PAGE_PADDING, (lines - LIST_LINE) * RULE)
     list = RowList.Create(body, 0, "parchment")
-    VXV.Screen.Follow(content, render, { "raid.log", "raid.updated" })
+    VXV.Screen.Follow(content, render, { "raid.log", "raid.updated", "deathroll.updated", "chifoumi.updated" })
 end
 
 VXV.On("cash.updated", function(texts)

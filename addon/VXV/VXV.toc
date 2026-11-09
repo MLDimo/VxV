@@ -35,6 +35,8 @@ Core\Core\SignupLabels.lua
 Core\Core\Presence.lua
 Core\Core\SharedData.lua
 Core\Core\SiteData.lua
+Core\Core\DiceGames.lua
+Core\Core\ChatLinks.lua
 Core\Core\PendingChanges.lua
 Core\Core\EventRoles.lua
 
@@ -46,6 +48,7 @@ Core\UI\Tooltip.lua
 Core\UI\RowList.lua
 Core\UI\Screen.lua
 Core\UI\RankingBoard.lua
+Core\UI\PlayerCard.lua
 Core\UI\PlaceWindow.lua
 Core\UI\Window.lua
 Core\UI\Dialog.lua

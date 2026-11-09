@@ -15,6 +15,7 @@ local CHALLENGE_SECONDS = 60
 local DEFAULT_START = 1000
 Duels.DEFAULT_START = DEFAULT_START
 local NEWCOMER = "Paris, deathroll et Chi Fou Mi sont réservés au rôle Membre sur Discord."
+local IN_DEBT = "Tes dettes atteignent la limite (paris, deathroll, Chi Fou Mi) : règles-en pour jouer de nouveau."
 
 local challenges = {}
 local sent = 0
@@ -35,10 +36,10 @@ function Duels.Challenge(target, stake, start)
         return "Mise d'au moins 1 po et nombre de départ d'au moins 2."
     end
     if Debts.Barred(me) then
-        return "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour jouer de nouveau."
+        return IN_DEBT
     end
     if Debts.Barred(target) then
-        return target .. " a une dette : pas de deathroll avant qu'elle soit réglée."
+        return target .. " a trop de dettes : pas de deathroll avant qu'il en règle."
     end
     if Newcomers.Is(me) then
         return NEWCOMER
@@ -65,7 +66,7 @@ VXV.OnMessage(CHALLENGE, function(payload, sender)
     if Debts.Barred(VXV.PlayerName()) then
         Duels.Answer(challenge, false)
         VXV.AfterCombat(function()
-            VXV.Print(sender .. " te défie au deathroll, mais ta dette t'en empêche : règle-la d'abord.")
+            VXV.Print(sender .. " te défie au deathroll. " .. IN_DEBT)
         end)
         return
     end
@@ -101,6 +102,12 @@ VXV.OnMessage(ANSWER, function(payload, sender)
         :format(me, sender, VXV.Gold.Format(challenge.stake), challenge.start))
 end)
 
+-- The guild's announcement of a game gets a link that opens its window for the members who watch (owner's request of
+-- 9 November; the window: DuelWindow.lua).
+VXV.On("modules.started", function()
+    VXV.LinkGuildAnnouncement("deathroll", "%[VXV%] Deathroll : (.-) contre (.-) pour ")
+end)
+
 VXV.OnMessage(START, function(payload, sender)
     if type(payload) ~= "table" or payload.a ~= sender or type(payload.id) ~= "string" or type(payload.b) ~= "string"
         or wholeNumber(payload.stake) == nil or (wholeNumber(payload.start) or 0) < 2
@@ -123,7 +130,7 @@ function Duels.Bet(id, choice, amount)
         return "Les joueurs ne parient pas sur leur partie."
     end
     if Debts.Barred(me) then
-        return "Tu as une dette (paris, deathroll ou Chi Fou Mi) : règle-la pour parier de nouveau."
+        return IN_DEBT
     end
     if Newcomers.Is(me) then
         return NEWCOMER

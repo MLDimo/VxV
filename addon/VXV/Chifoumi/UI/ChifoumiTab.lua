@@ -6,7 +6,7 @@ local ns = select(2, ...).Chifoumi
 local ChifoumiTab = {}
 ns.ChifoumiTab = ChifoumiTab
 
-local ChifoumiData, Matches, MatchWindow, Games = ns.ChifoumiData, ns.Matches, ns.MatchWindow, ns.Games
+local Matches, MatchWindow, Games = ns.Matches, ns.MatchWindow, ns.Games
 local MatchView, Rights = ns.MatchView, ns.Rights
 
 local Gold, RowList, Screen, Theme = VXV.Gold, VXV.RowList, VXV.Screen, VXV.Theme
@@ -64,16 +64,23 @@ local function debts()
             end })
         end
     end
+    local history = Rights.History(me)
+    if #history > 0 then
+        rows[#rows + 1] = row("header", "Historique")
+        for _, game in ipairs(history) do
+            rows[#rows + 1] = row("line", VXV.DiceGames.HistoryText(game, me))
+        end
+    end
     return #rows > 0 and rows or { row("line", "Aucune dette de Chi Fou Mi.") }
 end
 
---- The latest games over, as the website exports them: the winner, the loser and the stake.
+--- The latest games over: the website's, and those it does not know yet.
 local function latest()
-    local data, rows = ChifoumiData.Current(), {}
-    for _, game in ipairs(data and data.latest or {}) do
-        rows[#rows + 1] = row("line", ("%s bat %s · %s"):format(game.winner, game.loser, Gold.Format(game.stake)))
+    local rows = {}
+    for _, game in ipairs(Rights.Latest()) do
+        rows[#rows + 1] = row("line", VXV.DiceGames.GameText(game))
     end
-    return #rows > 0 and rows or { row("line", "Les dernières parties arrivent avec les données du site.") }
+    return #rows > 0 and rows or { row("line", "Aucune partie jouée pour l'instant.") }
 end
 
 local function render()

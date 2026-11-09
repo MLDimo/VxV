@@ -32,4 +32,6 @@ fonction n'est permise aux bundles que si la sonde l'a vue.
 | Titres | Une réattribution réelle un mercredi (rôles Discord et annonce), puis les titres vus en jeu par un membre sans compagnon |
 | Artisans | Une recette apprise apparaît chez un autre membre après la synchro |
 | Pêche | Une session dans l'onglet Artisans › Pêche : canne équipée, trois prises à la touche, l'appât posé, « Quitter la session » rend l'arme |
-| Deathroll | Une partie complète jouée aux boutons entre deux membres, chaque roll de 0 au résultat précédent (le jeu accepte-t-il un `/roll` à partir de 0 ?) jusqu'au premier 0, la dette chez le perdant |
+| Deathroll | Une partie complète jouée aux boutons entre deux membres : le dé qui flotte puis roule, le résultat et l'historique seulement une fois les chiffres arrêtés, le fond qui rougit, « VICTOIRE » et « A goûté le sol » ; la taille réduite (« - ») ; la dette chez le perdant, puis dans l'historique une fois payée ; la partie sur le site (Dernières parties, Journal) après un `/reload` |
+| Le Dé Pipé | Un troisième membre clique sur « [Regarder] » au bout de l'annonce d'un deathroll et d'un Chi Fou Mi dans le chat de guilde : la fenêtre de la partie s'ouvre (lien d'addon `|Haddon:vxv:…|h`, crochet sur `SetItemRef`, non mesurés) |
+| Dettes | Un membre à moins de 100 po de dettes joue et parie encore ; à 100 po, défis et paris refusés en jeu et sur le site |
