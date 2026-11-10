@@ -153,7 +153,15 @@ Seconde séance (9 novembre, `sessions/2026-11-09.txt`), Pêche 1/75 à Mulgore,
 
 Reste à mesurer (`docs/tests-en-jeu.md`) : ce que le jeu dit d'une recette, la fenêtre de son métier fermée.
 
-## Hypothèses de départ (sources communautaires)
+## Lien d'une annonce dans le chat de guilde (10 novembre, T14)
+
+| Test | Question | Résultat | Statut | Conséquence |
+| --- | --- | --- | --- | --- |
+| T14 lien d'addon | Le chat affiche-t-il un lien `|Haddon:…|h`, et que donne un clic ? | Oui : « [Regarder] » s'affiche ; un clic appelle `SetItemRef("addon:vxvprobe:test", …)` (crochet sécurisé) et le rappel `SetItemRef` d'`EventRegistry`. | ✅ | Lien « [Regarder] » des parties du Dé Pipé |
+| T14 filtre de guilde | Un filtre de `CHAT_MSG_GUILD` peut-il ajouter le lien au message ? | Oui : le message « vxvtest » est passé par le filtre et s'est affiché avec le lien, cliquable. | ✅ | — |
+| T14 annonce sans clic | L'annonce d'une partie arrive-t-elle dans le chat de guilde ? | Non : envoyée par celui qui a lancé le défi, à la réception de la réponse (sans clic), elle n'est jamais arrivée (aucun `CHAT_MSG_GUILD`, Chi Fou Mi accepté à 10 h 13). Le jeu n'envoie un message de guilde que depuis un clic. | ❌ | L'annonce part du clic « Accepter » du défié |
+
+
 
 | Hypothèse | Résultat |
 | --- | --- |

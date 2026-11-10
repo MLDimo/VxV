@@ -1,0 +1,18 @@
+VXV_Probe 0.7.0 - journal du 10 novembre (T14, lien d'une annonce dans le chat de guilde), client de la sortie
+2026-11-10 10:11:54 [files] ok SavedVariables relues : chargement n° 79 précédent le 2026-11-10 10:02:16
+2026-11-10 10:11:54 [chatlien] ok EventRegistry:RegisterCallback(SetItemRef) appelé sans erreur Lua
+2026-11-10 10:11:58 [chatlien] info ligne écrite dans le chat avec le lien : ||cffff5ac8||Haddon:vxvprobe:test||h[Regarder]||h||r
+2026-11-10 10:12:00 [chatlien] ok EventRegistry SetItemRef : addon:vxvprobe:test
+2026-11-10 10:12:00 [chatlien] ok SetItemRef appelé : addon:vxvprobe:test texte ||cffff5ac8||Haddon:vxvprobe:test||h[Regarder]||h||r bouton LeftButton
+2026-11-10 10:12:20 [chatlien] ok AddMessageEventFilter(CHAT_MSG_GUILD) appelé sans erreur Lua
+2026-11-10 10:12:20 [chatlien] info écris « vxvtest » dans le chat de guilde : le lien [Regarder] doit s'ajouter au message
+2026-11-10 10:12:34 [chatlien] info CHAT_MSG_GUILD filtre appelé : vxvtest de Dimo Kokuraiko (marqué)
+2026-11-10 10:12:34 [chatlien] trace CHAT_MSG_GUILD reçu : vxvtest de Dimo Kokuraiko
+2026-11-10 10:12:35 [chatlien] ok EventRegistry SetItemRef : addon:vxvprobe:test
+2026-11-10 10:12:35 [chatlien] ok SetItemRef appelé : addon:vxvprobe:test texte ||cffff5ac8||Haddon:vxvprobe:test||h[Regarder]||h||r bouton LeftButton
+2026-11-10 10:13:47 [chatlien] info CHAT_MSG_GUILD filtre appelé : vxvtest de Dimo Kokuraiko (marqué)
+2026-11-10 10:13:47 [chatlien] trace CHAT_MSG_GUILD reçu : vxvtest de Dimo Kokuraiko
+2026-11-10 10:13:48 [chatlien] ok EventRegistry SetItemRef : addon:vxvprobe:test
+2026-11-10 10:13:48 [chatlien] ok SetItemRef appelé : addon:vxvprobe:test texte ||cffff5ac8||Haddon:vxvprobe:test||h[Regarder]||h||r bouton LeftButton
+2026-11-10 10:14:41 [files] ok SavedVariables relues : chargement n° 80 précédent le 2026-11-10 10:11:54
+2026-11-10 10:14:41 [chatlien] ok EventRegistry:RegisterCallback(SetItemRef) appelé sans erreur Lua

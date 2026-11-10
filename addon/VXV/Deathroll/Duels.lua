@@ -81,9 +81,14 @@ VXV.OnMessage(CHALLENGE, function(payload, sender)
     VXV.Emit("deathroll.challenged", challenge)
 end)
 
---- The challenged answers the challenge.
+--- The challenged answers the challenge; accepted, their click tells the guild in its chat (the game sends a guild
+--- message only from a player's click, measured on 10 November).
 function Duels.Answer(challenge, accepted)
     VXV.Whisper(ANSWER, { id = challenge.id, accepted = accepted == true }, challenge.from)
+    if accepted == true then
+        VXV.SayToGuild(("Deathroll : %s contre %s pour %s, départ %d. Paris ouverts 30 s dans l'addon."):format(
+            challenge.from, VXV.PlayerName(), VXV.Gold.Format(challenge.stake), challenge.start))
+    end
 end
 
 VXV.OnMessage(ANSWER, function(payload, sender)
@@ -99,8 +104,6 @@ VXV.OnMessage(ANSWER, function(payload, sender)
     local me = VXV.PlayerName()
     VXV.Broadcast(START, { id = payload.id, a = me, b = sender, stake = challenge.stake, start = challenge.start,
         at = time() })
-    VXV.SayToGuild(("Deathroll : %s contre %s pour %s, départ %d. Paris ouverts 30 s dans l'addon.")
-        :format(me, sender, VXV.Gold.Format(challenge.stake), challenge.start))
 end)
 
 -- The guild's announcement of a game gets a link that opens its window for the members who watch (owner's request of

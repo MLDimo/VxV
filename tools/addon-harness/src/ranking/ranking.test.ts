@@ -100,8 +100,8 @@ describe("the Ranking in game (§7.5)", () => {
     expect(shown).toContain("Sira Ventargent");
     expect(shown).toContain("◆ Numéro UNO");
     expect(shown).toContain("+120");
-    expect(shown).toContain("Toi · Thom Leboss");
-    expect(shown).toContain("ta position");
+    expect(shown).toContain("Thom Leboss");
+    expect(shown).toContain("Toi · ta position");
     expect(shown).toContain("−960");
     // The portraits come from the bundle's media.
     const portrait = client(`return FindWidget(VXV_Window, function(widget)

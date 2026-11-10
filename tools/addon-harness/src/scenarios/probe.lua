@@ -54,7 +54,7 @@ Fire("ADDON_LOADED", "Blizzard_Communities")
 -- API only.
 Fire("TRADE_SKILL_SHOW")
 for _, command in ipairs({ "lien liste", "lien ouvrir", "lien ouvrir 1", "lien ouvrir 9", "lien chat", "lien lire",
-    "lien details", "lien recettes", "lien details" }) do
+    "lien details", "lien recettes", "lien details", "chatlien local", "chatlien filtre", "chatlien filtre" }) do
     run(command)
 end
 C_TradeSkillUI, GetProfessions = nil, nil

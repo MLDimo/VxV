@@ -80,7 +80,8 @@ describe("the deathroll in game (P15)", () => {
     const guild = startTrio();
     const id = challengeAndAccept(guild);
     // The guild hears it in its chat (P15.2); the players see their window.
-    expect(guild.player(THOM).client("return ChatSent")).toEqual([{ text: ANNOUNCEMENT, channel: "GUILD" }]);
+    // Vorn's click on « Accepter » sends it: the game sends a guild message only from a click.
+    expect(guild.player(VORN).client("return ChatSent")).toEqual([{ text: ANNOUNCEMENT, channel: "GUILD" }]);
     expect(guild.player(VORN).client("return VXV_DuelWindow.shown")).toBe(true);
     // The announcement's link opens the game for a member who watches.
     const shown = guild

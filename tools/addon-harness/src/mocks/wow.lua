@@ -187,10 +187,13 @@ function CreateFrame(kind, name, parent, template)
         self.parent = newParent
         newParent.children[#newParent.children + 1] = self
     end
-    --- Test helper: runs a script as the client would (a click, a drag, a frame update).
+    --- Test helper: runs a script as the client would (a click, a drag, a frame update); a click is the player's.
     function frame:Run(script, ...)
         if self.scripts[script] ~= nil then
+            local clicked = script == "OnClick" or script == "OnMouseUp"
+            Clicking = Clicking + (clicked and 1 or 0)
             self.scripts[script](self, ...)
+            Clicking = Clicking - (clicked and 1 or 0)
         end
     end
     frames[#frames + 1] = frame
@@ -330,10 +333,21 @@ C_ChatInfo = {
         return Enum.SendAddonMessageResult.Success
     end,
     InChatMessagingLockdown = function() return ChatLockdown end,
-    SendChatMessage = function(text, chatType) ChatSent[#ChatSent + 1] = { text = text, channel = chatType } end,
+    SendChatMessage = function(text, chatType)
+        if chatType == "GUILD" and Clicking == 0 then
+            BlockedChat[#BlockedChat + 1] = { text = text, channel = chatType }
+            return
+        end
+        ChatSent[#ChatSent + 1] = { text = text, channel = chatType }
+    end,
 }
---- Messages the player wrote in a chat channel: { text, channel }.
+--- Messages the player wrote in a chat channel: { text, channel }. The guild's channel takes them only from a click of
+--- the player (measured on 10 November: an announcement sent on an addon's message never reached it); the others go
+--- to BlockedChat.
 ChatSent = {}
+BlockedChat = {}
+--- How many clicks of the player are being run (frame:Run of OnClick, OnMouseUp).
+Clicking = 0
 
 --- Hands this client's sent messages to the test as hexadecimal (exact bytes), and forgets them.
 function TakeSentMessages()
