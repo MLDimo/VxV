@@ -76,6 +76,9 @@ local ALIASES = {
     GetCategoryInfo = { "C_TradeSkillUI.GetCategoryInfo" },
     GetRecipeItemLink = { "C_TradeSkillUI.GetRecipeItemLink" },
     GetSpellTexture = { "C_Spell.GetSpellTexture", "GetSpellTexture" },
+    -- T15: the mailbox.
+    GetInboxNumItems = { "GetInboxNumItems" },
+    GetInboxHeaderInfo = { "GetInboxHeaderInfo" },
 }
 
 local MISSING_API = "API absente"

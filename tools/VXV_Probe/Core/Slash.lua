@@ -18,7 +18,7 @@ local function printTestHelp(test)
 end
 
 local function printHelp()
-    print("|cff14b8a6VXV_Probe|r : /vxvtest log [n] | report | clear | verbose | later <test> <commande>")
+    print("|cff14b8a6VXV_Probe|r : /vxvtest log [n] | report | clear | chat | verbose | later <test> <commande>")
     for _, test in ipairs(Registry.All()) do
         printTestHelp(test)
     end
@@ -51,6 +51,9 @@ local BUILTINS = {
     end,
     verbose = function()
         print("VXV_Probe : mode détaillé " .. (Log.ToggleVerbose() and "activé" or "désactivé") .. ".")
+    end,
+    chat = function()
+        print("VXV_Probe : journal dans le chat " .. (Log.ToggleChat() and "activé" or "désactivé") .. ".")
     end,
     later = function(args)
         print(string.format("VXV_Probe : « %s » lancé dans %d s, sans clic.", args, LATER_DELAY_SECONDS))

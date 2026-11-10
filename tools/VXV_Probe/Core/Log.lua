@@ -1,6 +1,7 @@
 local ADDON_NAME, ns = ...
 
---- Test journal: every entry is printed and kept in SavedVariables for the feasibility report.
+--- Test journal: every entry is kept in SavedVariables for the feasibility report; printed in the chat only once the
+--- player asks for it (/vxvtest chat, owner's request of 10 November: the probe stays quiet by default).
 local Log = {}
 ns.Log = Log
 
@@ -32,7 +33,7 @@ function Log.Record(testId, level, ...)
     if #entries > MAX_ENTRIES then
         table.remove(entries, 1)
     end
-    if level ~= "trace" or db.verbose then
+    if db.chatty and (level ~= "trace" or db.verbose) then
         print(Log.Format(entry, true))
     end
 end
@@ -89,6 +90,12 @@ end
 function Log.ToggleVerbose()
     db.verbose = not db.verbose
     return db.verbose
+end
+
+--- Whether the journal's entries are printed in the chat as they come (off by default).
+function Log.ToggleChat()
+    db.chatty = not db.chatty
+    return db.chatty
 end
 
 -- Every protected call made by this addon is journaled, whatever test triggered it.
