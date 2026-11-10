@@ -208,7 +208,8 @@ describe("Les Quêtes in game (P12.3, P12.5, P12.8)", () => {
       expect.arrayContaining([
         "QUÊTE DE LA SEMAINE · NIVEAU 60",
         "Le premier à mener un personnage au niveau 60 d'ici la fin remporte la récompense : chacun est classé sur " +
-          "le plus haut niveau atteint par ses personnages, d'après le jeu.",
+          "le plus haut niveau atteint par ses personnages, d'après le jeu. Personne au niveau 60 à la fin : pas de " +
+          "gagnant.",
         "Niveau 60 atteint, après d'autres",
         "2e",
       ]),

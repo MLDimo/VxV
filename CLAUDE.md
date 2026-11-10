@@ -136,7 +136,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   `Missions/Dungeons.lua` ; une victoire lue par `GetBattlefieldWinner` et `UnitFactionGroup`, par `Compat.Resolve`,
   non mesurés, interrogés toutes les 2 s dans un champ de bataille).
   Score : ce que gagnent les compteurs de tous les personnages liés du membre pendant la mission ; dans la course au 60,
-  le plus haut niveau atteint par ses personnages, sans ceux déjà 60 au départ ; à égalité, le premier à l'atteindre. Compteurs
+  le plus haut niveau atteint par ses personnages, sans ceux déjà 60 au départ ; à égalité, le premier à l'atteindre. Seuls ceux qui
+  atteignent le niveau 60 montent sur le podium, dans l'ordre d'arrivée ; personne au 60 à la fin, pas de gagnant
+  (décision du propriétaire du 10 novembre, `missionWinners`). Compteurs
   lus à la connexion puis chaque minute hors combat. Résultat validé par un officier ; récompense 70 / 20 / 10 % versée
   par le trésorier depuis la caisse ; hall of fame. Message Discord avec le classement en direct ; à la validation, les résultats (podium et récompenses)
   dans un message à eux du salon des quêtes (`publishResults`, demande du propriétaire du 14 octobre). Écran Quêtes comme la
@@ -189,7 +191,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   en dessous, avec un message ; ligne hors de l'eau, le bouton se grise jusqu'au lancer suivant (demande du
   propriétaire du 8 novembre).
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
-  connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde, avec un lien « [Regarder] » qui ouvre la
+  connecté avec VXV, accepté ou refusé dans la minute, un seul à la fois (demande du propriétaire du 10 novembre :
+  pas de nouveau défi tant que le précédent attend sa réponse) ; annonce à la guilde, avec un lien « [Regarder] » qui ouvre la
   fenêtre chez qui clique (demande du propriétaire du 9 novembre), et 30 s de paris (pas les joueurs, pas un
   membre à 100 po de dettes ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent
   (`RandomRoll`), le défié en premier, fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel comme la maquette

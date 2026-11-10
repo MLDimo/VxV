@@ -7,6 +7,8 @@ import {
   missionGoal,
   missionRewards,
   REWARD_SHARES,
+  TOP_LEVEL,
+  type MissionType,
 } from "@vxv/server/domain/missions";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { timestamp } from "./discordText.ts";
@@ -41,7 +43,7 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
   const shares = REWARD_SHARES.map(
     (share, index) => `${formatPlace(index + 1)} ${formatGold(Math.floor((mission.reward * share) / 100))}`,
   ).join(" · ");
-  const rewards = missionRewards(scores, mission.reward);
+  const rewards = missionRewards(mission.type, scores, mission.reward);
   const ranking = scores.slice(0, SHOWN_SCORES).map((score, index) => {
     const reward = rewards.find((candidate) => candidate.memberId === score.memberId);
     const prize = announced.status === "closed" && reward !== undefined ? ` · ${formatGold(reward.amount)}` : "";
@@ -66,11 +68,18 @@ export function missionMessage(announced: AnnouncedMission, siteUrl: string): RE
   };
 }
 
+/** Why a validated mission has nobody on its podium: nobody took part, or in the race nobody reached the top level. */
+function noPodium(type: MissionType, scores: readonly unknown[]): string {
+  return scores.length > 0 && type === "level60"
+    ? `Personne n'a atteint le niveau ${String(TOP_LEVEL)} : pas de gagnant.`
+    : "Personne n'a participé.";
+}
+
 /** The results of a mission an officer validated (owner's request of 14 October): its podium and the rewards. */
 export function missionResultsMessage(announced: AnnouncedMission, siteUrl: string): RESTPostAPIChannelMessageJSONBody {
   const { mission, scores } = announced;
   const labels = MISSION_TYPE_LABELS[mission.type];
-  const podium = missionRewards(scores, mission.reward).map((reward) => {
+  const podium = missionRewards(mission.type, scores, mission.reward).map((reward) => {
     const score = scores.find((candidate) => candidate.memberId === reward.memberId);
     return (
       `${formatPlace(reward.rank)} ${score?.memberName ?? ""} — ${formatMissionScore(mission.type, score?.score ?? 0)}` +
@@ -86,7 +95,7 @@ export function missionResultsMessage(announced: AnnouncedMission, siteUrl: stri
           `${labels.name} : ${missionGoal(mission.type)}, du ${timestamp(mission.startsAt, "D")} au ` +
           `${timestamp(mission.endsAt, "D")}. Résultat validé par un officier.`,
         color: EMBED_COLOR,
-        fields: [{ name: "Podium", value: podium.length === 0 ? "Personne n'a participé." : podium.join("\n") }],
+        fields: [{ name: "Podium", value: podium.length > 0 ? podium.join("\n") : noPodium(mission.type, scores) }],
         footer: { text: "Le trésorier verse les récompenses." },
       },
     ],

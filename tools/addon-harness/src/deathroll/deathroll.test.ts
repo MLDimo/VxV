@@ -90,6 +90,20 @@ describe("the deathroll in game (P15)", () => {
     expect(shown).toContain("|h[Regarder]|h");
     guild.player(SIRA).client(`ClickChatLink(${JSON.stringify(shown)})`);
     expect(guild.player(SIRA).client("return VXV_DuelWindow.shown")).toBe(true);
+    // The games being played show at a glance in the tab, with where they stand.
+    const tabRows = guild.player(SIRA).client(`SlashCmdList.VXV("")
+      FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Le Dé Pipé" end):Run("OnClick")
+      local texts = {}
+      FindWidget(VXV_Window, function(widget)
+        if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      end)
+      return texts`) as string[];
+    expect(plain(tabRows)).toEqual(
+      expect.arrayContaining([
+        `EN DIRECT  ${THOM} contre ${VORN} · 500 po`,
+        expect.stringMatching(/^ {4}Paris ouverts encore \d+ s, puis Vorn Cendrelune roll de 0 à 1000\.$/),
+      ]),
+    );
     // Sira bets during the minute; a player may not.
     const sira = guild.player(SIRA);
     expect(
@@ -161,6 +175,23 @@ describe("the deathroll in game (P15)", () => {
     for (const player of guild.players) {
       expect(player.errors()).toEqual([]);
     }
+  });
+
+  it("sends one challenge at a time: another waits for its answer, or the end of its minute", () => {
+    const guild = startTrio();
+    const challenge = (target: string) =>
+      guild
+        .player(THOM)
+        .bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${target}", "10", "100")`);
+    expect(challenge(VORN)).toBeUndefined();
+    expect(challenge(SIRA)).toBe("Ton défi à Vorn Cendrelune attend sa réponse encore 60 s.");
+    guild.advanceTime(61);
+    expect(challenge(SIRA)).toBeUndefined();
+    // Answered (refused), the challenge leaves room for another at once.
+    settle(guild);
+    guild.player(SIRA).client(CLICK("VXV_DeathrollChallenge", "Refuser"));
+    settle(guild, 1);
+    expect(challenge(VORN)).toBeUndefined();
   });
 
   it("shows a challenge received during a fight once it is over, while there is time left to answer it", () => {

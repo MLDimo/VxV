@@ -111,12 +111,26 @@ describe("missions", () => {
       score: 1,
       reachedAt: at(8),
     });
-    expect(missionRewards([score("a"), score("b"), score("c"), score("d")], 2000)).toEqual([
+    expect(missionRewards("fishing", [score("a"), score("b"), score("c"), score("d")], 2000)).toEqual([
       { memberId: "a", rank: 1, amount: 1400 },
       { memberId: "b", rank: 2, amount: 400 },
       { memberId: "c", rank: 3, amount: 200 },
     ]);
-    expect(missionRewards([score("a")], 999)).toEqual([{ memberId: "a", rank: 1, amount: 699 }]);
+    expect(missionRewards("fishing", [score("a")], 999)).toEqual([{ memberId: "a", rank: 1, amount: 699 }]);
+  });
+
+  it("rewards in the race only who reached level 60, nobody when nobody did (owner's decision of 10 November)", () => {
+    const level = (memberId: string, score: number): MissionScore => ({
+      memberId,
+      memberName: memberId,
+      memberClass: undefined,
+      score,
+      reachedAt: at(8),
+    });
+    expect(missionRewards("level60", [level("a", 60), level("b", 58), level("c", 41)], 1000)).toEqual([
+      { memberId: "a", rank: 1, amount: 700 },
+    ]);
+    expect(missionRewards("level60", [level("b", 58), level("c", 41)], 1000)).toEqual([]);
   });
 
   it("keeps a hall of fame: wins, gold won and mean place where the member scored", () => {
@@ -128,9 +142,15 @@ describe("missions", () => {
       reachedAt: at(8),
     });
     const fame = hallOfFame([
-      { scores: [score("Sira"), score("Vorn")], rewards: missionRewards([score("Sira"), score("Vorn")], 1000) },
-      { scores: [score("Vorn"), score("Sira")], rewards: missionRewards([score("Vorn"), score("Sira")], 2000) },
-      { scores: [score("Sira")], rewards: missionRewards([score("Sira")], 100) },
+      {
+        scores: [score("Sira"), score("Vorn")],
+        rewards: missionRewards("fishing", [score("Sira"), score("Vorn")], 1000),
+      },
+      {
+        scores: [score("Vorn"), score("Sira")],
+        rewards: missionRewards("fishing", [score("Vorn"), score("Sira")], 2000),
+      },
+      { scores: [score("Sira")], rewards: missionRewards("fishing", [score("Sira")], 100) },
     ]);
     expect(
       fame.map(({ memberName, wins, gains, averagePosition }) => [memberName, wins, gains, averagePosition]),
@@ -168,7 +188,9 @@ describe("the quest's parchment", () => {
     const scores = [60, 60, 51].map((score, index) => ({ memberId: `m${String(index + 1)}`, score }));
     expect(missionProgress(scores, "m1", "level60").text).toBe("Premier au niveau 60");
     expect(missionProgress(scores, "m2", "level60").text).toBe("Niveau 60 atteint, après d'autres");
-    expect(missionProgress(scores, "m3", "level60").text).toBe("Sur le podium : encore 10 niveaux pour la 1re place");
+    expect(missionProgress(scores, "m3", "level60").text).toBe(
+      "Encore 9 niveaux pour le niveau 60 : seul ce niveau gagne",
+    );
   });
 
   it("tells a member how far they are from the podium, a tie going to the first to reach the score", () => {

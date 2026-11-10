@@ -37,6 +37,15 @@ local function refusal(name, self)
     return nil
 end
 
+--- Why the player may not challenge again: their challenge waits for its answer, until the minute it lasts is over
+--- (owner's request of 10 November).
+local function waiting()
+    for _, challenge in pairs(challenges) do
+        return ("Ton défi à %s attend sa réponse encore %d s."):format(challenge.target,
+            math.max(1, math.ceil(challenge.sentAt + CHALLENGE_SECONDS - GetTime())))
+    end
+end
+
 --- Challenges a member connected with VXV for a stake, 0 included; returns why not, or nil when the challenge is
 --- sent.
 function Matches.Challenge(target, stake)
@@ -44,6 +53,9 @@ function Matches.Challenge(target, stake)
     stake = stakeOf(stake)
     if me == nil or target == nil or target == me then
         return "Choisis un membre à défier."
+    end
+    if waiting() ~= nil then
+        return waiting()
     end
     if stake == nil then
         return "Mise en pièces d'or entières, 0 compris."
@@ -54,7 +66,7 @@ function Matches.Challenge(target, stake)
     end
     sent = sent + 1
     local id = table.concat({ me, time(), sent }, "#")
-    challenges[id] = { target = target, stake = stake }
+    challenges[id] = { target = target, stake = stake, sentAt = GetTime() }
     VXV.Whisper(CHALLENGE, { id = id, stake = stake }, target)
     C_Timer.After(CHALLENGE_SECONDS, function()
         challenges[id] = nil

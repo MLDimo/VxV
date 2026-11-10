@@ -153,7 +153,7 @@ export function createMissions({ unitOfWork, clock }: { unitOfWork: UnitOfWork; 
             status === "closed" ? "Le résultat de cette mission est déjà validé." : "Cette mission n'est pas finie.",
           );
         }
-        const rewards = missionRewards(scores, mission.reward);
+        const rewards = missionRewards(mission.type, scores, mission.reward);
         await repositories.missionRewards.save(mission.id, rewards);
         await repositories.missions.close(mission.id, officer.id, clock());
         const after: MissionCloseRecord = {

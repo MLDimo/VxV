@@ -18,6 +18,7 @@ local BUTTON_HEIGHT = 30
 -- Under the list of members: the stake, the button and the answer.
 local FORM_HEIGHT = 112
 local TOP_SHARE = 0.5
+local REFRESH_SECONDS = 1
 
 local content
 local lists, form = {}, {}
@@ -25,15 +26,18 @@ local picker
 
 local row = VXV.RowList.Row
 
---- The games being played: a click opens the game's window, to watch it and bet.
+--- The games being played, at a glance: « EN DIRECT », the players and the stake, the player's own marked, and under
+--- each where it stands; a click opens the game's window, to watch it and bet.
 local function live()
-    local rows = {}
+    local rows, me = {}, VXV.PlayerName()
     for _, game in ipairs(Games.Live()) do
-        rows[#rows + 1] = row("line", ("%s contre %s · %d – %d · %s"):format(game.challenged, game.challenger,
-            MatchView.RoundsWon(game, game.challenged), MatchView.RoundsWon(game, game.challenger),
-            Gold.Format(game.stake)), { onClick = function()
+        local open = { onClick = function()
             MatchWindow.Show(game.id)
-        end })
+        end, tooltip = { title = "Partie en cours", lines = { "Clic : regarder la partie et parier." } } }
+        rows[#rows + 1] = row("line", VXV.DiceGames.LiveText(game, me), open)
+        local now = GetTime()
+        local status = MatchView.Status(game, me, MatchView.Phase(game, now), now)
+        rows[#rows + 1] = row("line", "    " .. Theme.Colored(status, "lavender"), open)
     end
     return #rows > 0 and rows or { row("line", "Aucune partie en cours.") }
 end
@@ -112,5 +116,13 @@ function ChifoumiTab.Build(frame)
     lists.live = RowList.Panel(content, x, GRID_TOP, width, topHeight, "Parties en cours")
     lists.latest = RowList.Panel(content, x, GRID_TOP + topHeight + GAP, width, height - topHeight - GAP,
         "Dernières parties")
+    -- The bets' countdown and the turns: the games being played are drawn again every second.
+    local refreshAt = 0
+    content:SetScript("OnUpdate", function()
+        if GetTime() >= refreshAt and #Games.Live() > 0 then
+            refreshAt = GetTime() + REFRESH_SECONDS
+            lists.live.SetRows(live())
+        end
+    end)
     Screen.Follow(content, render, { "chifoumi.updated", "presence.changed" })
 end
