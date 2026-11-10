@@ -227,8 +227,13 @@ local function createRow(parent, own)
     row.name = Theme.Text(row, "textBold", 14, "ivory")
     row.name:SetPoint("TOPLEFT", row.avatar, "TOPRIGHT", ROW_SPACE, 0)
     row.name:SetPoint("RIGHT", row.bar, "LEFT", -ROW_SPACE, 0)
+    -- One line: a long name (« Toi · Dimo Kokuraiko ») is cut short rather than written over the title (seen on
+    -- 10 November).
+    row.name:SetWordWrap(false)
     row.title = Theme.Text(row, "text", 11, own and "muted" or "sakura-light")
     row.title:SetPoint("BOTTOMLEFT", row.avatar, "BOTTOMRIGHT", ROW_SPACE, 0)
+    row.title:SetPoint("RIGHT", row.bar, "LEFT", -ROW_SPACE, 0)
+    row.title:SetWordWrap(false)
 
     function row:Set(line, view, index)
         local positive = line.value >= 0
@@ -243,8 +248,8 @@ local function createRow(parent, own)
             end
         end
         local name = Theme.ClassColored(line.name, line.class)
-        row.name:SetText(own and ("Toi · " .. name) or name)
-        row.title:SetText(own and "ta position" or (line.title ~= nil and ("◆ " .. line.title) or ""))
+        row.name:SetText(name)
+        row.title:SetText(own and "Toi · ta position" or (line.title ~= nil and ("◆ " .. line.title) or ""))
         local share = view.widest > 0 and math.abs(line.value) / view.widest or 0
         row.fill:SetWidth(math.max(1, BAR_WIDTH * share))
         row.fill:SetColorTexture(Theme.Color(positive and "gain" or "loss"))
