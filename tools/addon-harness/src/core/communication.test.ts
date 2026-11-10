@@ -196,3 +196,31 @@ describe("/vxv ping", () => {
     ]);
   });
 });
+
+describe("whispers to a member who logged off (owner's report of 10 November)", () => {
+  it("whispers nobody the guild's list says is offline, and hides the game's notice about a member it whispered", () => {
+    const { core, client, errors } = startCore({ inGuild: false });
+    client(`MockGuildMembers = {
+        { name = "Rce Pull", class = "HUNTER", online = true },
+        { name = "Workel Crotoc", class = "ROGUE", online = false },
+      }
+      ERR_CHAT_PLAYER_NOT_FOUND_S = "Aucun joueur nommé '%s' ne joue actuellement."`);
+    core.run(
+      `local _, ns = ... ns.Comm.Whisper("note", { i = 1 }, "Rce Pull") ns.Comm.Whisper("note", { i = 2 }, "Workel Crotoc")`,
+    );
+    expect(
+      client(
+        "local targets = {} for _, m in ipairs(SentAddonMessages) do targets[#targets + 1] = m.target end return targets",
+      ),
+    ).toEqual(["Rce Pull"]);
+    // Rce Pull logged off before the whisper reached him: the game's notice stays out of the chat.
+    expect(
+      client(`return ChatShows("CHAT_MSG_SYSTEM", "Aucun joueur nommé 'Rce Pull' ne joue actuellement.")`),
+    ).toBeUndefined();
+    // A notice about someone the addon did not whisper (the player's own whisper) shows.
+    expect(
+      client(`return ChatShows("CHAT_MSG_SYSTEM", "Aucun joueur nommé 'Aube Claire' ne joue actuellement.")`),
+    ).toBe("Aucun joueur nommé 'Aube Claire' ne joue actuellement.");
+    expect(errors()).toEqual([]);
+  });
+});

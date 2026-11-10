@@ -15,7 +15,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
 
 - **Socle `VXV/Core`** : modules, bus, stockage versionné, Compat ; fenêtre 1000×680 à un onglet par lieu (`/vxv`,
   icône de minimap) et mode réduit 420×600 (`/vxv` rouvre le dernier mode) ; messages entre addons (morceaux de
-  255 octets, file 10 + 1/s, pause pendant les boss, versions, présence, `/vxv ping`) ; filtre de guilde
+  255 octets, file 10 + 1/s, pause pendant les boss, versions, présence, `/vxv ping` ; aucun chuchotement à un membre
+  que la liste de guilde dit déconnecté, et l'avis « Aucun joueur nommé … » du jeu masqué pour ceux que l'addon vient de
+  chuchoter, `Core/OfflineWhispers.lua`) ; filtre de guilde
   (`Core/Config.lua` : guilde VxV du serveur officiel de Forever, monde PvP, Horde ; nom seul, casse ignorée) ;
   export de la liste de guilde (`/vxv liste`) ; données du site (`VXV.SiteData`) et changements faits en jeu (`VXV.PendingChanges`), en attente puis confirmés ou
   refusés par le site, relayés par un officier équipé pour les membres sans compagnon ; rolls lus dans le chat

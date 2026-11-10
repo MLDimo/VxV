@@ -6,6 +6,7 @@ local Comm = {}
 ns.Comm = Comm
 
 local Compat, Names, SendQueue, Serializer, Util = ns.Compat, ns.Names, ns.SendQueue, ns.Serializer, ns.Util
+local OfflineWhispers = ns.OfflineWhispers
 local Call, Events = ns.Call, ns.Events
 
 local PREFIX = "VXV"
@@ -62,8 +63,12 @@ function Comm.Broadcast(kind, payload, channel)
     dispatch(kind, payload, Names.OfUnit("player"), channel or "GUILD")
 end
 
---- Sends the data to one player, named "Prénom Nom".
+--- Sends the data to one player, named "Prénom Nom"; nothing to a member the guild's list says is offline.
 function Comm.Whisper(kind, payload, target)
+    if OfflineWhispers.Offline(target) then
+        return
+    end
+    OfflineWhispers.Note(target)
     send(kind, payload, "WHISPER", target)
 end
 

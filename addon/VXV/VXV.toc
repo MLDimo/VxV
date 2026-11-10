@@ -29,6 +29,7 @@ Core\Core\Guild.lua
 Core\Core\Roster.lua
 Core\Core\Serializer.lua
 Core\Core\SendQueue.lua
+Core\Core\OfflineWhispers.lua
 Core\Core\Comm.lua
 Core\Core\GroupChat.lua
 Core\Core\Rolls.lua
