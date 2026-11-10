@@ -8,7 +8,7 @@ parcours réels à jouer une fois. Un test fait sort de cette liste ; une mesure
 
 La sonde `tools/VXV_Probe` (addon de test, jamais distribué) s'installe avec
 `tools/install-probe.sh "<dossier du client>"`, après `npm run check` si elle a changé. En jeu, `/vxvtest` donne
-l'aide et `/vxvtest report` le journal, à copier dans `docs/phase-0/sessions/<date>.txt` (il est aussi écrit à chaque
+l'aide, `/vxvtest chat` montre le journal dans le chat au fil de l'eau (la sonde se tait par défaut) et `/vxvtest report` le journal, à copier dans `docs/phase-0/sessions/<date>.txt` (il est aussi écrit à chaque
 `/reload` dans `WTF/Account/<COMPTE>/SavedVariables/VXV_Probe.lua`). Les tests de l'addon lisent ces journaux : une
 fonction n'est permise aux bundles que si la sonde l'a vue.
 

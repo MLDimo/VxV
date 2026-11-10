@@ -9,7 +9,7 @@ for _, command in ipairs({
     "rolls roll", "rolls button", "rolls button", "chat send", "chat send guild",
     "meter list", "meter read", "counters list", "counters list tuées", "professions list", "professions recipes",
     "journaux send", "journaux start", "journaux send", "journaux state", "journaux stop",
-    "log 3", "report", "verbose", "clear",
+    "log 3", "report", "chat", "verbose", "clear",
 }) do
     run(command)
 end
