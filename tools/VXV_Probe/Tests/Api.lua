@@ -38,6 +38,8 @@ local FUNCTIONS = {
     "C_TradeSkillUI.GetTradeSkillListLink", "GetTradeSkillListLink", "C_TradeSkillUI.IsTradeSkillLinked",
     "IsTradeSkillLinked", "SetItemRef", "C_TradeSkillUI.GetRecipeSchematic", "C_TradeSkillUI.GetCategoryInfo",
     "C_TradeSkillUI.GetRecipeItemLink", "C_Spell.GetSpellTexture",
+    -- A debt paid by mail (T15)
+    "GetInboxNumItems", "GetInboxHeaderInfo", "TakeInboxMoney", "AutoLootMailItem", "C_Mail",
 }
 
 local EVENTS = {
