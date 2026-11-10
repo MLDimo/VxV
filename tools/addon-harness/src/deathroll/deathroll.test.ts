@@ -90,6 +90,20 @@ describe("the deathroll in game (P15)", () => {
     expect(shown).toContain("|h[Regarder]|h");
     guild.player(SIRA).client(`ClickChatLink(${JSON.stringify(shown)})`);
     expect(guild.player(SIRA).client("return VXV_DuelWindow.shown")).toBe(true);
+    // The games being played show at a glance in the tab, with where they stand.
+    const tabRows = guild.player(SIRA).client(`SlashCmdList.VXV("")
+      FindWidget(VXV_Window.header, function(widget) return widget.SetSelected and widget.label.text == "Le Dé Pipé" end):Run("OnClick")
+      local texts = {}
+      FindWidget(VXV_Window, function(widget)
+        if widget.row ~= nil and widget.shown then texts[#texts + 1] = widget.label.text end
+      end)
+      return texts`) as string[];
+    expect(plain(tabRows)).toEqual(
+      expect.arrayContaining([
+        `EN DIRECT  ${THOM} contre ${VORN} · 500 po`,
+        expect.stringMatching(/^ {4}Paris ouverts encore \d+ s, puis Vorn Cendrelune roll de 0 à 1000\.$/),
+      ]),
+    );
     // Sira bets during the minute; a player may not.
     const sira = guild.player(SIRA);
     expect(

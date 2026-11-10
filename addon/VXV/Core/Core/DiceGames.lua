@@ -258,3 +258,22 @@ function DiceGames.HistoryText(game, me)
     local state = game.paid and "payée" or (game.cancelled and "annulée" or "à payer")
     return ("%s · %s · %s"):format(debt, date(DATE, game.endedAt), state)
 end
+
+--- A player's name in their class color, as the guild's list tells it.
+local function colored(name)
+    for _, member in ipairs(ns.Roster.Read()) do
+        if member.name == name then
+            return ns.Theme.ClassColored(name, member.class)
+        end
+    end
+    return name
+end
+
+--- A game being played, in the list of a tab (owner's request of 10 November: it shows at a glance): « EN DIRECT
+--- Thom Leboss contre Vorn Cendrelune · 500 po », and « ta partie » for the player's own.
+function DiceGames.LiveText(game, me)
+    local mine = me == game.challenger or me == game.challenged
+    return ("%s  %s contre %s · %s%s"):format(ns.Theme.Colored("EN DIRECT", "neon"), colored(game.challenger),
+        colored(game.challenged), Gold.Format(game.stake), mine and (" · " .. ns.Theme.Colored("ta partie", "gold"))
+        or "")
+end
