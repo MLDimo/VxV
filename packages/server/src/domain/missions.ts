@@ -196,10 +196,19 @@ export interface MissionReward {
   amount: number;
 }
 
+/**
+ * The members who may win the mission, in order: in the race, only those who brought a character to TOP_LEVEL, the
+ * first there first (owner's decision of 10 November: nobody at TOP_LEVEL, no winner); else every member who scored.
+ */
+export function missionWinners<S extends Pick<MissionScore, "score">>(type: MissionType, scores: readonly S[]): S[] {
+  return type === RACE ? scores.filter((score) => score.score >= TOP_LEVEL) : [...scores];
+}
+
 /** The first three's rewards: 70 %, 20 % and 10 % of the reward, rounded down; a share without anyone stays. */
-export function missionRewards(scores: readonly MissionScore[], reward: number): MissionReward[] {
+export function missionRewards(type: MissionType, scores: readonly MissionScore[], reward: number): MissionReward[] {
+  const winners = missionWinners(type, scores);
   return REWARD_SHARES.flatMap((share, index) => {
-    const score = scores[index];
+    const score = winners[index];
     return score === undefined
       ? []
       : [{ memberId: score.memberId, rank: index + 1, amount: Math.floor((reward * share) / PERCENT) }];
@@ -240,7 +249,7 @@ export function hallOfFame(
         places: [],
       };
       entry.places.push(index + 1);
-      entry.wins += index === 0 ? 1 : 0;
+      entry.wins += rewards.some((reward) => reward.memberId === score.memberId && reward.rank === 1) ? 1 : 0;
       entry.gains += rewards.find((reward) => reward.memberId === score.memberId)?.amount ?? 0;
       entries.set(score.memberId, entry);
     });
@@ -284,7 +293,8 @@ export function missionPitch(type: MissionType): string {
   if (type === RACE) {
     return (
       `Le premier à mener un personnage au niveau ${String(TOP_LEVEL)} d'ici la fin remporte la récompense : ` +
-      "chacun est classé sur le plus haut niveau atteint par ses personnages, d'après le jeu."
+      "chacun est classé sur le plus haut niveau atteint par ses personnages, d'après le jeu. " +
+      `Personne au niveau ${String(TOP_LEVEL)} à la fin : pas de gagnant.`
     );
   }
   return (
@@ -323,6 +333,12 @@ export function missionProgress(
       place,
       text:
         place === 1 ? `Premier au niveau ${String(TOP_LEVEL)}` : `Niveau ${String(TOP_LEVEL)} atteint, après d'autres`,
+    };
+  }
+  if (type === RACE) {
+    return {
+      place,
+      text: `Encore ${String(TOP_LEVEL - mine.score)} ${counts} pour le niveau ${String(TOP_LEVEL)} : seul ce niveau gagne`,
     };
   }
   const toPass = (above: number) => `${String(above - mine.score + 1)} ${counts}`;

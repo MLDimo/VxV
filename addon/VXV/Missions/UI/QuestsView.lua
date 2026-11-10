@@ -65,7 +65,8 @@ end
 local function pitch(mission)
     if mission.kind == Counters.RACE then
         return ("Le premier à mener un personnage au niveau %d d'ici la fin remporte la récompense : chacun est "
-            .. "classé sur le plus haut niveau atteint par ses personnages, d'après le jeu."):format(Counters.TOP_LEVEL)
+            .. "classé sur le plus haut niveau atteint par ses personnages, d'après le jeu. Personne au niveau %d à "
+            .. "la fin : pas de gagnant."):format(Counters.TOP_LEVEL, Counters.TOP_LEVEL)
     end
     return ("Qui fera %s d'ici la fin remporte la récompense : main et rerolls additionnés, d'après les compteurs du "
         .. "jeu."):format(goal(mission))
@@ -117,6 +118,11 @@ local function progress(mission, ranking, memberId)
     if mission.kind == Counters.RACE and mine >= Counters.TOP_LEVEL then
         local text = index == 1 and "Premier au niveau %d" or "Niveau %d atteint, après d'autres"
         return { text = text:format(Counters.TOP_LEVEL), place = place(index) }
+    end
+    if mission.kind == Counters.RACE then
+        -- Only the top level wins the race (owner's decision of 10 November).
+        return { text = ("Encore %d %s pour le niveau %d : seul ce niveau gagne"):format(Counters.TOP_LEVEL - mine,
+            counts, Counters.TOP_LEVEL), place = place(index) }
     end
     local function toPass(above)
         return ("%d %s"):format(above - mine + 1, counts)
