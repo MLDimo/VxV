@@ -27,7 +27,7 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   site et le grand livre des dettes (`VXV.DiceGames`), le joueur dans son cadre de classe (`VXV.PlayerCard`), les
   fenêtres à deux tailles (`VXV.CreateDialog` avec `onResize`, `VXV.ResizeDialog`) et les liens du chat qui ouvrent une
   fenêtre (`VXV.OnChatLink`, `VXV.LinkGuildAnnouncement` : lien d'addon `|Haddon:vxv:…|h` suivi par un crochet
-  sécurisé sur `SetItemRef`). Installation : `tools/install-addon.sh`. Chat
+  sécurisé sur `SetItemRef`, mesurés par la sonde T14). Installation : `tools/install-addon.sh`. Chat
   (décision du propriétaire du 10 octobre) : l'addon n'y écrit que les réponses aux commandes et aux clics du joueur,
   les refus du site (`PendingChanges`, « Site VXV, changement refusé ») et les appels à agir (invitations du raid,
   défis) ; ce qui arrive seul reste dans ses écrans : données chargées et modifications (Raid, Journal), données
@@ -437,7 +437,7 @@ Mesurées par la sonde (détail et journaux : `docs/phase-0/resultats.md`).
 - Boss tué = `ENCOUNTER_END` avec succès ; `BOSS_KILL` et `ENCOUNTER_LOOT_RECEIVED` ne se déclenchent pas.
 - Gagnant d'un objet en butin de groupe : `C_LootHistory.GetSortedInfoForDrop` (nom, classe, GUID, jet).
 - Maître du butin : interface classique présente (`MasterLooterFrame`, `GiveMasterLoot`, captable par `hooksecurefunc`). L'addon peut appeler `GiveMasterLoot`, même pendant un boss. Liste de guilde : `GetGuildRosterInfo`, pas plus d'une demande toutes les 10 s.
-- Sans clic du joueur (réaction à un événement) : `C_PartyInfo.InviteUnit`, `C_PartyInfo.ConvertToRaid`, `C_ChatInfo.SendChatMessage` (hors boss) et `RandomRoll` fonctionnent.
+- Sans clic du joueur (réaction à un événement) : `C_PartyInfo.InviteUnit`, `C_PartyInfo.ConvertToRaid`, `C_ChatInfo.SendChatMessage` sur le canal du raid (hors boss) et `RandomRoll` fonctionnent ; un message du chat de guilde ne part que d'un clic (sonde T14, 10 novembre), comme l'annonce d'une partie du Dé Pipé, envoyée par le clic « Accepter » du défié.
 - `/roll` : lu dans CHAT_MSG_SYSTEM avec le format du jeu `RANDOM_ROLL_RESULT`, pour tous les joueurs.
 - Pendant une rencontre de boss : envoi de chat bloqué (ADDON_ACTION_BLOCKED, même depuis un clic), messages du groupe et messages système secrets (`/roll` compris). Tout redevient normal après ENCOUNTER_END.
 - Statistiques lisibles hors combat (196 compteurs), dont « Poissons et autres objets pêchés » (1456) et « Nombre total de victoires honorables » (588) ; aucun compteur de récoltes (herbes, minerais, peaux).

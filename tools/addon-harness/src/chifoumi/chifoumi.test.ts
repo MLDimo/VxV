@@ -68,14 +68,14 @@ describe("Chi Fou Mi", () => {
     guild.player(VORN).client(CLICK("VXV_ChifoumiChallenge", "Accepter"));
     settle(guild, 1);
     // One line in the guild's chat, no window for the others; the players see their game.
-    expect(guild.player(THOM).client("return ChatSent")).toContainEqual(
+    expect(guild.player(VORN).client("return ChatSent")).toContainEqual(
       expect.objectContaining({ text: expect.stringContaining(`Chi Fou Mi : ${THOM} contre ${VORN}`) }),
     );
     expect(guild.player(SIRA).client(SHOWN("VXV_ChifoumiWindow"))).toBe(false);
     expect(guild.player(VORN).client(SHOWN("VXV_ChifoumiWindow"))).toBe(true);
     const id = run(guild, SIRA, "return ns.Games.Live()[1].id") as string;
     // The announcement's link opens the game for a member who watches; then Sira closes it.
-    const announcement = (guild.player(THOM).client("return ChatSent") as { text: string }[])[0]?.text ?? "";
+    const announcement = (guild.player(VORN).client("return ChatSent") as { text: string }[])[0]?.text ?? "";
     const shown = guild
       .player(SIRA)
       .client(`return ChatShows("CHAT_MSG_GUILD", ${JSON.stringify(announcement)}, "${THOM}")`) as string;
