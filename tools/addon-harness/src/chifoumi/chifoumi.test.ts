@@ -135,6 +135,16 @@ describe("Chi Fou Mi", () => {
     }
   });
 
+  it("sends one challenge at a time: another waits for its answer, or the end of its minute", () => {
+    const guild = startTrio();
+    expect(run(guild, THOM, `return ns.Matches.Challenge("${VORN}", "0")`)).toBeUndefined();
+    expect(run(guild, THOM, `return ns.Matches.Challenge("${SIRA}", "0")`)).toBe(
+      "Ton défi à Vorn Cendrelune attend sa réponse encore 60 s.",
+    );
+    guild.advanceTime(61);
+    expect(run(guild, THOM, `return ns.Matches.Challenge("${SIRA}", "0")`)).toBeUndefined();
+  });
+
   it("draws each player with the portrait the website gives, else the initial", () => {
     const text = diceGamesData(ADDON_CHIFOUMIS_HEADER, {
       portraits: [{ memberId: memberOf(THOM), avatar: "mv_voleur_m" }],

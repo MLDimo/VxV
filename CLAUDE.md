@@ -189,7 +189,8 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   en dessous, avec un message ; ligne hors de l'eau, le bouton se grise jusqu'au lancer suivant (demande du
   propriétaire du 8 novembre).
 - **Deathroll** (`VXV/Deathroll`, Le Dé Pipé › Deathroll ; site `/paris/deathroll`) : défi chuchoté à un membre
-  connecté avec VXV, accepté ou refusé dans la minute ; annonce à la guilde, avec un lien « [Regarder] » qui ouvre la
+  connecté avec VXV, accepté ou refusé dans la minute, un seul à la fois (demande du propriétaire du 10 novembre :
+  pas de nouveau défi tant que le précédent attend sa réponse) ; annonce à la guilde, avec un lien « [Regarder] » qui ouvre la
   fenêtre chez qui clique (demande du propriétaire du 9 novembre), et 30 s de paris (pas les joueurs, pas un
   membre à 100 po de dettes ou sans le rôle Membre) ; puis chacun roll à son tour de 0 au résultat précédent
   (`RandomRoll`), le défié en premier, fin au premier 0 (`LOSING_ROLL`). Fenêtre du duel comme la maquette

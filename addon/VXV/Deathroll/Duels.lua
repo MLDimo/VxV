@@ -26,12 +26,24 @@ local function wholeNumber(value)
     return number ~= nil and number >= 1 and number % 1 == 0 and number or nil
 end
 
+--- Why the player may not challenge again: their challenge waits for its answer, until the minute it lasts is over
+--- (owner's request of 10 November).
+local function waiting()
+    for _, challenge in pairs(challenges) do
+        return ("Ton défi à %s attend sa réponse encore %d s."):format(challenge.target,
+            math.max(1, math.ceil(challenge.sentAt + CHALLENGE_SECONDS - GetTime())))
+    end
+end
+
 --- Challenges a member connected with VXV; returns why not, or nil when the challenge is sent.
 function Duels.Challenge(target, stake, start)
     local me = VXV.PlayerName()
     stake, start = wholeNumber(stake), wholeNumber(start)
     if me == nil or target == nil or target == me then
         return "Choisis un membre à défier."
+    end
+    if waiting() ~= nil then
+        return waiting()
     end
     if stake == nil or start == nil or start < 2 then
         return "Mise d'au moins 1 po et nombre de départ d'au moins 2."
@@ -50,7 +62,7 @@ function Duels.Challenge(target, stake, start)
     end
     sent = sent + 1
     local id = table.concat({ me, time(), sent }, "#")
-    challenges[id] = { target = target, stake = stake, start = start }
+    challenges[id] = { target = target, stake = stake, start = start, sentAt = GetTime() }
     VXV.Whisper(CHALLENGE, { id = id, stake = stake, start = start }, target)
     C_Timer.After(CHALLENGE_SECONDS, function()
         challenges[id] = nil

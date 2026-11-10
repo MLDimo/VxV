@@ -163,6 +163,23 @@ describe("the deathroll in game (P15)", () => {
     }
   });
 
+  it("sends one challenge at a time: another waits for its answer, or the end of its minute", () => {
+    const guild = startTrio();
+    const challenge = (target: string) =>
+      guild
+        .player(THOM)
+        .bundles.Deathroll?.run(`local _, ns = ... return ns.Duels.Challenge("${target}", "10", "100")`);
+    expect(challenge(VORN)).toBeUndefined();
+    expect(challenge(SIRA)).toBe("Ton défi à Vorn Cendrelune attend sa réponse encore 60 s.");
+    guild.advanceTime(61);
+    expect(challenge(SIRA)).toBeUndefined();
+    // Answered (refused), the challenge leaves room for another at once.
+    settle(guild);
+    guild.player(SIRA).client(CLICK("VXV_DeathrollChallenge", "Refuser"));
+    settle(guild, 1);
+    expect(challenge(VORN)).toBeUndefined();
+  });
+
   it("shows a challenge received during a fight once it is over, while there is time left to answer it", () => {
     const guild = startTrio();
     const shown = (name: string) =>
