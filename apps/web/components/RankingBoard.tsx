@@ -63,9 +63,7 @@ function Banner({ board, line, place }: { board: Board; line: RankingLine; place
           <Avatar characterClass={line.characterClass} race={line.race} sex={line.sex} size={72} />
         </span>
         <b className="font-pixel text-[21px] leading-tight">{line.name.split(" ")[0]}</b>
-        <span className="min-h-[14px] text-[11px] font-extrabold text-banner-title">
-          {line.title === undefined ? "" : `◆ ${line.title}`}
-        </span>
+        <span className="min-h-[14px] text-[11px] font-extrabold text-banner-title">{line.title ?? ""}</span>
         <b className="bg-banner-ink px-2 py-0.5 font-pixel text-[19px] text-ivory">
           {valueText(board, line.value, true)}
         </b>
@@ -134,7 +132,7 @@ function Row({ board, line, widest, mine }: { board: Board; line: RankingLine; w
           <MemberName name={line.name} characterClass={line.characterClass} />
         </b>
         <span className={`text-[11px] ${mine ? "text-muted" : "text-sakura-light"}`}>
-          {mine ? "ta position" : line.title === undefined ? "" : `◆ ${line.title}`}
+          {mine ? "ta position" : (line.title ?? "")}
         </span>
       </span>
       <span className="h-1.5 overflow-hidden bg-line">

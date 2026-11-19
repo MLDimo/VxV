@@ -7,7 +7,6 @@ ns.Titles = Titles
 local TitlesData = ns.TitlesData
 local Theme = VXV.Theme
 
-local MARK = "◆ "
 local COLOR = "sakura-light"
 local SEPARATOR = " · "
 
@@ -25,20 +24,17 @@ function Titles.Of(name)
     return held
 end
 
---- "◆ Roi du gambling", in the titles' color.
+--- "Roi du gambling", in the titles' color.
 function Titles.Label(name)
-    return Theme.Colored(MARK .. name, COLOR)
+    return Theme.Colored(name, COLOR)
 end
 
---- Every title of a character, for their messages and their name in the guild list: "[◆ A · ◆ B]" in the titles'
+--- Every title of a character, for their messages and their name in the guild list: "[A · B]" in the titles'
 --- color, or nil without any.
 function Titles.Tag(name)
     local held = Titles.Of(name)
     if #held == 0 then
         return nil
-    end
-    for index, title in ipairs(held) do
-        held[index] = MARK .. title
     end
     return Theme.Colored("[" .. table.concat(held, SEPARATOR) .. "]", COLOR)
 end

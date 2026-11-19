@@ -151,7 +151,7 @@ describe("titles", () => {
       ["Goûteur de sol", "Roi du gambling", "Lève toi copaing", "Sugar Daddy", "Chibrax au max"].map(titleRole).sort(),
     );
     expect(discord.roleNamesOf(morgane.discordId).sort()).toEqual(
-      ["Bien gras", "Roi de la dette", "Remboursé par la Sécu", "Princesse"].map(titleRole).sort(),
+      ["Bien gras", "L'endetté", "Remboursé par la Sécu", "Princesse"].map(titleRole).sort(),
     );
     expect(announced[0]?.holders.find((holder) => holder.title === "Numéro UNO")).toMatchObject({ holder: undefined });
     // Once a week only.

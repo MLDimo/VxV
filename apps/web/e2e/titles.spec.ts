@@ -8,7 +8,7 @@ import { signInAs } from "./sessions";
 const MEMBERS_DISCORD_IDS = ["100", "200", "500", "600"];
 const TITLE_NAMES = [
   "Roi du gambling",
-  "Roi de la dette",
+  "L'endetté",
   "Numéro UNO",
   "Bien gras",
   "Goûteur de sol",
@@ -16,7 +16,7 @@ const TITLE_NAMES = [
   "Remboursé par la Sécu",
   "Lève toi copaing",
   "Sugar Daddy",
-  "Il cheat c'est sûr",
+  "Cheater",
   "Loser",
   "Princesse",
   "Grand duelliste",
@@ -41,9 +41,9 @@ test("each Wednesday the titles are given once: the Ranking shows them, Discord 
   await page.getByRole("link", { name: "Titres" }).click();
   await expect(page).toHaveURL(/\/ranking\/titres$/);
   const titles = page.getByRole("region", { name: "Titres de la semaine" });
-  await expect(titles.getByRole("heading")).toHaveText(TITLE_NAMES.map((name) => `◆ ${name}`));
+  await expect(titles.getByRole("heading")).toHaveText(TITLE_NAMES);
   // The seeded raids gave items: Bien gras has a holder.
-  await expect(titles.getByRole("article").filter({ hasText: "◆ Bien gras" })).not.toContainText(
+  await expect(titles.getByRole("article").filter({ hasText: "Bien gras" })).not.toContainText(
     "Personne cette semaine",
   );
   await expect(page.getByRole("region", { name: "Officiers · titres à donner" })).toHaveCount(0);
@@ -53,7 +53,7 @@ test("each Wednesday the titles are given once: the Ranking shows them, Discord 
   );
   const embeds = message?.body.embeds as { title: string; fields: { name: string }[] }[] | undefined;
   expect(embeds?.[0]?.title).toBe(`${emoji("ranking")} Les titres de la semaine`);
-  expect(embeds?.[0]?.fields.map((field) => field.name)).toEqual(TITLE_NAMES.map((name) => `◆ ${name}`));
+  expect(embeds?.[0]?.fields.map((field) => field.name)).toEqual(TITLE_NAMES);
   const holders = await Promise.all(MEMBERS_DISCORD_IDS.map((userId) => discordMemberState(request, userId)));
   expect(holders.filter((state) => state.roles.includes("◆ Bien gras"))).toHaveLength(1);
 });
@@ -72,7 +72,7 @@ test("an officer gives Princesse for the week: the Ranking shows her holder, Dis
   await form.getByRole("button", { name: "Donner le titre" }).click();
   await expect(form.getByText("Titre donné pour la semaine.")).toBeVisible();
   const titles = page.getByRole("region", { name: "Titres de la semaine" });
-  await expect(titles.getByRole("article").filter({ hasText: "◆ Princesse" })).toContainText("Dune Sable");
+  await expect(titles.getByRole("article").filter({ hasText: "Princesse" })).toContainText("Dune Sable");
   expect((await discordMemberState(request, "500")).roles).toContain("◆ Princesse");
   await page.goto("/journal");
   await expect(page.getByText("Princesse : Dune Sable")).toBeVisible();
@@ -97,7 +97,7 @@ test("an officer makes a title by hand: the Ranking shows it, Discord gives the 
   const made = page
     .getByRole("region", { name: "Titres faits main" })
     .getByRole("article")
-    .filter({ hasText: "◆ Sauveur du raid" });
+    .filter({ hasText: "Sauveur du raid" });
   await expect(made).toContainText("Dune Sable");
   await expect(made).toContainText("A tenu Onyxia seul");
   await expect(made).toContainText("pour une durée indéterminée");
