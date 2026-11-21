@@ -44,7 +44,9 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (`event.delete`), tant qu'il n'a ni présents, ni loots, ni exploit du Hall of Fame (inscriptions, SR et message
   Discord partent avec lui ; demande du propriétaire du 3 novembre) ; inscriptions et SR depuis le site, le bouton du
   message Discord ou le jeu ; objets exclus par un officier ; SR verrouillées 30 minutes avant le raid ; rappel sur
-  Discord. Le nombre de SR est fixé à la création. Seuls les objets que la classe du personnage inscrit peut équiper se
+  Discord. Le nombre de SR est fixé à la création, de 0 à 10 : à 0 (demande du propriétaire du 21 novembre, pour
+  UBRS), soirée sans SR, chaque objet en roll libre, sans choix ni rappel des SR. Seuls les objets que la classe du
+  personnage inscrit peut équiper se
   réservent (décision du propriétaire du 10 octobre, règles de Classic au niveau 60, `domain/equipment.ts`) : l'addon
   de chaque membre lit dans le jeu la catégorie, la sous-catégorie et l'emplacement des objets des raids
   (`VXV/Raid/ItemKinds.lua`, `C_Item.GetItemInfo`, relu toutes les 10 s tant qu'un objet manque au cache) et les envoie

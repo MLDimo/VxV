@@ -68,9 +68,10 @@ local function equippable(event, player)
     return items
 end
 
---- True when the player may choose reserves: signed up (or waiting for it), before the lock.
+--- True when the player may choose reserves: a raid night with soft reserves, signed up (or waiting for it), before
+--- the lock.
 function Choices.CanReserve(event, player)
-    return event ~= nil and time() < RaidData.LockAt(event)
+    return event ~= nil and event.softReservesPerPlayer > 0 and time() < RaidData.LockAt(event)
         and (EventData.SignupOf(event, player) ~= nil or Changes.Pending("signup") ~= nil)
 end
 

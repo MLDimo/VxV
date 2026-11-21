@@ -16,7 +16,7 @@ local FIELD_TOP, SECTION = 20, 64
 local FIELD_PADDING, SHORT_FIELD = 6, 120
 local TOGGLE_GAP, BUTTON_WIDTH, BUTTON_HEIGHT, STEP_SIZE = 6, 160, 30, 26
 -- The website's bounds of the soft reserves per player.
-local MIN_SOFT_RESERVES, MAX_SOFT_RESERVES, DEFAULT_SOFT_RESERVES = 1, 10, 1
+local MIN_SOFT_RESERVES, MAX_SOFT_RESERVES, DEFAULT_SOFT_RESERVES = 0, 10, 1
 local MAX_LETTERS = { date = 10, time = 5, reason = 200 }
 local MISSING = "Il manque : %s."
 

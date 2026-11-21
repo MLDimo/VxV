@@ -11,12 +11,14 @@ import { Field, ReasonField } from "./Field";
 export function EventForm({
   raids,
   roles,
+  minSoftReserves,
   defaultSoftReserves,
   maxSoftReserves,
 }: {
   raids: RaidSummary[];
   /** The Discord roles the event may be reserved to, everybody first. */
   roles: EventRoleChoice[];
+  minSoftReserves: number;
   defaultSoftReserves: number;
   maxSoftReserves: number;
 }) {
@@ -38,11 +40,11 @@ export function EventForm({
         </div>
       </fieldset>
       <EventRoleField roles={roles} />
-      <Field label="SR par joueur">
+      <Field label="SR par joueur (0 : sans SR, tout en roll libre)">
         <input
           type="number"
           name="softReservesPerPlayer"
-          min={1}
+          min={minSoftReserves}
           max={maxSoftReserves}
           defaultValue={defaultSoftReserves}
           required

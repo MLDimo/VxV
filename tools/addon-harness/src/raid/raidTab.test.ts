@@ -105,6 +105,19 @@ describe("Raid screen", () => {
     expect(errors()).toEqual([]);
   });
 
+  it("says a raid night without soft reserve rolls every item freely, and offers no choice of reserves", () => {
+    const { raid, importText, errors } = startRaid();
+    importText(websiteText({ ...ONYXIA_NIGHT, event: { ...ONYXIA_NIGHT.event, softReservesPerPlayer: 0 } }));
+    const view = viewOf(raid);
+    expect(view.header.subtitle).toBe("10/12 20:00 · Sans SR · données de Ðéjà Vu, copiées le 10/12 19:45");
+    expect(view.header.badges[2]).toEqual({ text: "Sans SR", color: "gold" });
+    expect(texts(view.myReserves)).toEqual(["Soirée sans SR : chaque objet se joue en roll libre."]);
+    expect(raid.run("local _, ns = ... return ns.Choices.CanReserve(ns.RaidData.Current(), VXV.PlayerName())")).toBe(
+      false,
+    );
+    expect(errors()).toEqual([]);
+  });
+
   it("shows my sign-up and my soft reserves with their SR+", () => {
     const { raid, importText } = startRaid();
     importText(websiteText());

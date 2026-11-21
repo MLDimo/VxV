@@ -180,7 +180,7 @@ describe("initial schema", () => {
       await expect(reserve(null, "Raideur R1")).rejects.toThrow(/events_role_named/);
     });
 
-    it("gives a PvP outing a title and no soft reserve, a raid night soft reserves and no title", async () => {
+    it("gives a PvP outing a title and no soft reserve, a raid night no title and soft reserves, maybe none", async () => {
       const memberId = await insertMember(database, "1");
       const eventId = await insertEvent(database, memberId);
       const set = (kind: string, title: string | null, softReserves: number) =>
@@ -193,10 +193,11 @@ describe("initial schema", () => {
 
       await expect(set("pvp", "Raid sur Astranaar", 0)).resolves.toBeDefined();
       await expect(set("raid", null, 1)).resolves.toBeDefined();
+      await expect(set("raid", null, 0)).resolves.toBeDefined();
       await expect(set("pvp", null, 0)).rejects.toThrow(/events_kind_fields/);
       await expect(set("pvp", "Raid sur Astranaar", 1)).rejects.toThrow(/events_kind_fields/);
       await expect(set("raid", "Onyxia", 1)).rejects.toThrow(/events_kind_fields/);
-      await expect(set("raid", null, 0)).rejects.toThrow(/events_kind_fields/);
+      await expect(set("raid", null, -1)).rejects.toThrow(/events_kind_fields/);
       await expect(set("arena", null, 1)).rejects.toThrow(/events_kind/);
     });
   });

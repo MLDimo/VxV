@@ -17,6 +17,8 @@ local ROLE_COUNTS = { tank = "tanks", healer = "heals", dps = "DPS" }
 local METHOD_TAGS = { soft_reserve = "epic", soft_reserve_plus = "gold", free_roll = "gain", loot_council = "sakura" }
 local LAST_LOOTS = 10
 local STALE = "Données d'avant le verrouillage : recharge-les"
+local NO_RESERVES_BADGE = "Sans SR"
+local NO_RESERVES = "Soirée sans SR : chaque objet se joue en roll libre."
 
 local row = VXV.RowList.Row
 
@@ -96,16 +98,18 @@ function RaidView.Header(event, sender, now)
     end
     local _, expected = RaidView.ExpectedByRole(event)
     local lockAt = RaidData.LockAt(event)
-    local lock = now >= lockAt and "SR verrouillées" or ("SR verrouillées dans " .. VXV.Remaining(lockAt - now))
+    local withReserves = event.softReservesPerPlayer > 0
+    local lock = not withReserves and NO_RESERVES_BADGE or now >= lockAt and "SR verrouillées"
+        or ("SR verrouillées dans " .. VXV.Remaining(lockAt - now))
     -- An officer whose data predate the lock would pass on reserves that may still change: they load newer ones.
-    local stale = now >= lockAt and event.exportedAt < lockAt and RaidData.IsOfficer(VXV.PlayerName())
+    local stale = withReserves and now >= lockAt and event.exportedAt < lockAt and RaidData.IsOfficer(VXV.PlayerName())
     local origin = sender and string.format("données de %s, copiées le %s", sender, Labels.DateTime(event.exportedAt))
         or ("données du compagnon, du " .. Labels.DateTime(event.exportedAt))
     return {
         kicker = "Conseil de guerre · prochain raid",
         title = event.title,
-        subtitle = string.format("%s · %d SR par joueur · %s", Labels.DateTime(event.startsAt),
-            event.softReservesPerPlayer, origin),
+        subtitle = string.format("%s · %s · %s", Labels.DateTime(event.startsAt),
+            withReserves and (event.softReservesPerPlayer .. " SR par joueur") or NO_RESERVES_BADGE, origin),
         badges = {
             { text = event.audience, color = "amethyst" },
             { text = VXV.Count(expected, "attendu"), color = "gain" },
@@ -132,6 +136,9 @@ end
 
 --- "Mes SR": each item with its boss and the SR+ bonus; the reserves waiting for the website, or why it refused.
 function RaidView.MyReserves(event, player)
+    if event ~= nil and event.softReservesPerPlayer == 0 then
+        return { row("line", NO_RESERVES) }
+    end
     local signup = findSignup(event, player)
     local changes = changeRows("reserves", function(change)
         local names = {}
@@ -244,7 +251,7 @@ function RaidView.RaidReserves(event)
         end
     end
     if #rows == 0 then
-        rows[1] = row("line", "Aucune SR pour l'instant.")
+        rows[1] = row("line", event.softReservesPerPlayer == 0 and NO_RESERVES or "Aucune SR pour l'instant.")
     end
     return rows
 end

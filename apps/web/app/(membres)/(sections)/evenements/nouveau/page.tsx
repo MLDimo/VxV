@@ -1,4 +1,4 @@
-import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES } from "@vxv/server";
+import { DEFAULT_SOFT_RESERVES, MAX_SOFT_RESERVES, MIN_SOFT_RESERVES } from "@vxv/server";
 import { EventForm } from "@/components/EventForm";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { getApplication } from "@/server/application";
@@ -14,6 +14,7 @@ export default async function NewEventPage() {
       <EventForm
         raids={raids}
         roles={roles}
+        minSoftReserves={MIN_SOFT_RESERVES}
         defaultSoftReserves={DEFAULT_SOFT_RESERVES}
         maxSoftReserves={MAX_SOFT_RESERVES}
       />

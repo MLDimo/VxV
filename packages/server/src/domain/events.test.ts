@@ -15,15 +15,19 @@ describe("newEventRefusal", () => {
     expect(newEventRefusal(valid, now, raids)).toBeUndefined();
   });
 
+  it("accepts a raid night without soft reserve", () => {
+    expect(newEventRefusal({ ...valid, softReservesPerPlayer: 0 }, now, raids)).toBeUndefined();
+  });
+
   it.each([
     ["an invalid date", { startsAt: new Date("invalid") }, /invalides/],
     ["a date in the past", { startsAt: new Date("2026-11-30T20:00:00Z") }, /dans le futur/],
     ["the current instant", { startsAt: now }, /dans le futur/],
     ["no raid", { raidIds: [] }, /au moins un raid/],
     ["an unknown raid", { raidIds: ["onyxia", "naxxramas"] }, /n'existe pas/],
-    ["zero soft reserve", { softReservesPerPlayer: 0 }, /entre 1 et 10/],
-    ["too many soft reserves", { softReservesPerPlayer: 11 }, /entre 1 et 10/],
-    ["a fractional count", { softReservesPerPlayer: 1.5 }, /entre 1 et 10/],
+    ["a negative count", { softReservesPerPlayer: -1 }, /entre 0 et 10/],
+    ["too many soft reserves", { softReservesPerPlayer: 11 }, /entre 0 et 10/],
+    ["a fractional count", { softReservesPerPlayer: 1.5 }, /entre 0 et 10/],
   ])("refuses %s", (_case, change, message) => {
     expect(newEventRefusal({ ...valid, ...change }, now, raids)).toMatch(message);
   });

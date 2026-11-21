@@ -38,6 +38,25 @@ test.describe.serial("raid events", () => {
     );
   });
 
+  test("an officer creates a raid night without soft reserve: every item goes to a free roll", async ({
+    page,
+    context,
+  }) => {
+    await signInAs(context, "officer");
+    await page.goto("/evenements/nouveau");
+    await page.getByLabel("Date et heure (heure de Paris)").fill("2030-12-26T21:00");
+    await page.getByLabel("La salle des Thanes").check();
+    await page.getByLabel("SR par joueur").fill("0");
+    await page.getByLabel("Qui peut s'inscrire (rôle Discord)").selectOption({ label: "Tout le monde" });
+    await page.getByLabel("Motif (visible dans le journal)").fill("Raid sans SR");
+    await page.getByRole("button", { name: "Créer l'événement" }).click();
+
+    await expect(page.getByText("jeudi 26 décembre 2030 à 21:00")).toBeVisible();
+    await expect(page.getByText("Sans SR", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Soirée sans SR : chaque objet se joue en roll libre/)).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Corriger les SR d'un joueur" })).toHaveCount(0);
+  });
+
   test("an officer sees why an event is refused", async ({ page, context }) => {
     await signInAs(context, "officer");
     await page.goto("/evenements/nouveau");
