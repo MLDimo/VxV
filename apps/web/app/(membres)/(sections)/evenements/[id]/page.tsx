@@ -18,6 +18,10 @@ import { SoftReserveOverrideForm } from "@/components/SoftReserveOverrideForm";
 import { getApplication } from "@/server/application";
 import { requireMember } from "@/server/session";
 
+/** A raid night without soft reserve: how its loot is given. */
+const NO_RESERVES =
+  "Soirée sans SR : chaque objet se joue en roll libre, entre les classes qui peuvent l'équiper. Un objet exclu va au loot council.";
+
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, member] = await Promise.all([params, requireMember()]);
   const { events, signups, characters, softReserves, addonExport } = getApplication();
@@ -40,6 +44,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   }
   const mine = board.mySignup;
   const expected = eventSignups.filter((signup) => isComing(signup.status)).length;
+  const withReserves = event.softReservesPerPlayer > 0;
 
   return (
     <>
@@ -47,7 +52,9 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         <span className="text-lavender">{formatEventDate(event.startsAt)}</span>
         <Badge tone="amethyst">{eventAudience(event.role)}</Badge>
         <Badge tone="gain">{expected} attendus</Badge>
-        <Badge tone="gold">{board.locked ? "SR verrouillées" : `SR jusqu'au ${formatDateTime(board.lockAt)}`}</Badge>
+        <Badge tone="gold">
+          {!withReserves ? "Sans SR" : board.locked ? "SR verrouillées" : `SR jusqu'au ${formatDateTime(board.lockAt)}`}
+        </Badge>
       </ScreenHeader>
       <RaidNav />
 
@@ -56,23 +63,27 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           eventId={event.id}
           characters={ownCharacters}
           current={mine}
-          note={`${softReserveCount(event.softReservesPerPlayer)} par joueur`}
+          note={withReserves ? `${softReserveCount(event.softReservesPerPlayer)} par joueur` : "Sans SR"}
         />
         <EventSignups signups={eventSignups} />
       </div>
 
       <section className="panel mt-8">
         <h2 className="font-pixel text-lg text-ivory">Soft reserves</h2>
-        <SoftReserveBoardForm
-          key={mine?.characterId ?? "none"}
-          eventId={event.id}
-          items={board.items}
-          allowance={board.allowance}
-          characterClass={mine?.characterClass}
-          reusable={board.reusable}
-          locked={board.locked}
-          lockLabel={formatDateTime(board.lockAt)}
-        />
+        {withReserves ? (
+          <SoftReserveBoardForm
+            key={mine?.characterId ?? "none"}
+            eventId={event.id}
+            items={board.items}
+            allowance={board.allowance}
+            characterClass={mine?.characterClass}
+            reusable={board.reusable}
+            locked={board.locked}
+            lockLabel={formatDateTime(board.lockAt)}
+          />
+        ) : (
+          <p className="mt-2 text-muted">{NO_RESERVES}</p>
+        )}
       </section>
 
       {addonText !== undefined && (
@@ -99,16 +110,20 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             Exclure un objet retire les SR déjà posées dessus. Chaque changement est inscrit au journal.
           </p>
           <ExclusionForm eventId={event.id} items={board.items} />
-          <h3 className="mt-8 font-pixel text-ivory">Corriger les SR d&apos;un joueur</h3>
-          <SoftReserveOverrideForm
-            eventId={event.id}
-            items={board.items}
-            players={eventSignups.map(({ characterId, characterName, characterClass }) => ({
-              characterId,
-              characterName,
-              characterClass,
-            }))}
-          />
+          {withReserves && (
+            <>
+              <h3 className="mt-8 font-pixel text-ivory">Corriger les SR d&apos;un joueur</h3>
+              <SoftReserveOverrideForm
+                eventId={event.id}
+                items={board.items}
+                players={eventSignups.map(({ characterId, characterName, characterClass }) => ({
+                  characterId,
+                  characterName,
+                  characterClass,
+                }))}
+              />
+            </>
+          )}
           <h3 className="mt-8 font-pixel text-ivory">Supprimer l&apos;événement</h3>
           <p className="mt-1 text-sm text-muted">
             Les inscriptions, les SR et le message Discord partent avec lui. Impossible une fois des présents ou des

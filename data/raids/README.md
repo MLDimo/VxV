@@ -40,6 +40,11 @@ dans le jeu et l'envoie au site par le compagnon, qui en déduit les classes qui
 
 ## Fichiers actuels
 
-Aucun pour l'instant : les tables de butin d'Onyxia, du Mont Hyjal et des Profondeurs des tertres arrivent avec leur
-ouverture, le 9 décembre. La salle des Thanes, donjon de la bêta, n'est pas un raid : elle ne sert plus qu'aux tests de
+- `ubrs.json`, le Pic Blackrock supérieur, raid à 10 de la guilde (demande du propriétaire du 21 novembre) : valeurs de
+  WoW Classic, à vérifier en jeu (`docs/tests-en-jeu.md`). Objets rares et épiques propres à chaque boss, d'après les
+  tables de Wowhead Classic, sans ceux de Season of Discovery (absents de Forever) ; ceux de Gyth avec Rend, de la même
+  rencontre. Jed Runewatcher et Goraluk Brisenclume n'y sont pas : sans identifiant de rencontre connu.
+
+Les tables de butin d'Onyxia, du Mont Hyjal et des Profondeurs des tertres arrivent avec leur ouverture, le
+9 décembre. La salle des Thanes, donjon de la bêta, n'est pas un raid : elle ne sert plus qu'aux tests de
 bout en bout.

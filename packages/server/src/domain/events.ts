@@ -49,6 +49,8 @@ export interface PlannedEvent extends Omit<NewRaidEvent, "roleId"> {
   role: EventRole | undefined;
 }
 
+/** A raid night without soft reserve (owner's request of 21 November): every item goes to a free roll. */
+export const MIN_SOFT_RESERVES = 0;
 export const DEFAULT_SOFT_RESERVES = 1;
 export const MAX_SOFT_RESERVES = 10;
 
@@ -95,8 +97,8 @@ export function newEventRefusal(event: NewRaidEvent, now: Date, knownRaidIds: Re
     return "Un des raids choisis n'existe pas.";
   }
   const count = event.softReservesPerPlayer;
-  if (!Number.isInteger(count) || count < DEFAULT_SOFT_RESERVES || count > MAX_SOFT_RESERVES) {
-    return `Le nombre de SR par joueur doit être compris entre ${DEFAULT_SOFT_RESERVES} et ${MAX_SOFT_RESERVES}.`;
+  if (!Number.isInteger(count) || count < MIN_SOFT_RESERVES || count > MAX_SOFT_RESERVES) {
+    return `Le nombre de SR par joueur doit être compris entre ${MIN_SOFT_RESERVES} et ${MAX_SOFT_RESERVES}.`;
   }
   return undefined;
 }

@@ -16,6 +16,7 @@ export {
   DEFAULT_SOFT_RESERVES,
   MAX_EVENT_TITLE_LENGTH,
   MAX_SOFT_RESERVES,
+  MIN_SOFT_RESERVES,
   type EventKind,
   type GuildEvent,
   type NewPvpEvent,
