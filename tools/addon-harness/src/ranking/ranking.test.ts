@@ -20,7 +20,7 @@ const BOARDS: AddonRankingFacts = {
   members: [
     member("m-vorn", "Vorn Cendrelune", "WARRIOR", "orc_guerrier_m", "Roi du gambling"),
     member("m-thessa", "Thessa Lune", "DRUID", "tauren_druide_m"),
-    member("m-kaelys", "Kaelys Brume", "MAGE", "troll_mage_m", "Il cheat c'est sûr"),
+    member("m-kaelys", "Kaelys Brume", "MAGE", "troll_mage_m", "Cheater"),
     member("m-sira", "Sira Ventargent", "HUNTER", undefined, "Numéro UNO"),
     member("m-thom", "Thom Leboss", "ROGUE", "mv_voleur_m"),
     member("m-ciel", "Ciel Gris", "PRIEST", "mv_pretre_f"),
@@ -89,7 +89,7 @@ describe("the Ranking in game (§7.5)", () => {
       expect(shown).toContain(text);
     }
     // The podium: Vorn first in gold, with his title and his gain.
-    for (const text of ["OR", "ARGENT", "BRONZE", "Vorn", "◆ Roi du gambling", "+3 215 po", "Thessa", "+1 840 po"]) {
+    for (const text of ["OR", "ARGENT", "BRONZE", "Vorn", "Roi du gambling", "+3 215 po", "Thessa", "+1 840 po"]) {
       expect(shown).toContain(text);
     }
     // The records, then the following places, the player's own at the bottom.
@@ -98,7 +98,7 @@ describe("the Ranking in game (§7.5)", () => {
     }
     expect(shown).toContain("gain net · Saison 2");
     expect(shown).toContain("Sira Ventargent");
-    expect(shown).toContain("◆ Numéro UNO");
+    expect(shown).toContain("Numéro UNO");
     expect(shown).toContain("+120");
     expect(shown).toContain("Thom Leboss");
     expect(shown).toContain("Toi · ta position");

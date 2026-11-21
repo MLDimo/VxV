@@ -15,8 +15,8 @@ describe("titles message", () => {
     );
     expect(message.embeds?.[0]?.url).toBe("https://vxv.test/ranking/titres");
     expect(message.embeds?.[0]?.fields).toEqual([
-      { name: "◆ Roi du gambling", value: "**Thom Leboss**\nPlus gros gain net.", inline: true },
-      { name: "◆ Sugar Daddy", value: "Personne cette semaine\nPlus gros donateur.", inline: true },
+      { name: "Roi du gambling", value: "**Thom Leboss**\nPlus gros gain net.", inline: true },
+      { name: "Sugar Daddy", value: "Personne cette semaine\nPlus gros donateur.", inline: true },
     ]);
   });
 });

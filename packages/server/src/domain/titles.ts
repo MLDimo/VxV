@@ -8,7 +8,7 @@ import { eloRatings, type DuelOutcome } from "./duels.ts";
 
 export const TITLES = [
   { id: "gamblingKing", name: "Roi du gambling", rule: "Plus gros gain net aux paris sur la saison." },
-  { id: "debtKing", name: "Roi de la dette", rule: "Plus grosse perte nette aux paris sur la saison." },
+  { id: "debtKing", name: "L'endetté", rule: "Plus grosse perte nette aux paris sur la saison." },
   { id: "numberOne", name: "Numéro UNO", rule: "Vainqueur de la dernière mission de guilde terminée." },
   { id: "wellFed", name: "Bien gras", rule: "Le plus d'objets reçus en raid sur la saison." },
   { id: "floorTaster", name: "Goûteur de sol", rule: "Le plus de morts pendant les raids VXV sur la saison." },
@@ -24,7 +24,7 @@ export const TITLES = [
     rule: "Le plus de résurrections acceptées pendant les raids VXV sur la saison.",
   },
   { id: "sugarDaddy", name: "Sugar Daddy", rule: "Le plus gros donateur à la caisse de la guilde sur la saison." },
-  { id: "cheater", name: "Il cheat c'est sûr", rule: "Plus gros gain net au deathroll sur la saison." },
+  { id: "cheater", name: "Cheater", rule: "Plus gros gain net au deathroll sur la saison." },
   { id: "loser", name: "Loser", rule: "Plus grosse perte nette au deathroll sur la saison." },
   {
     id: "princess",

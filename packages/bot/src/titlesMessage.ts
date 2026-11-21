@@ -1,6 +1,5 @@
 import type { AnnouncedTitles } from "@vxv/server";
 import { colorValue, COLORS } from "@vxv/design";
-import { titleRole } from "@vxv/server";
 import type { RESTPostAPIChannelMessageJSONBody } from "discord-api-types/v10";
 import { emoji } from "./emojis.ts";
 
@@ -17,7 +16,7 @@ export function titlesMessage({ holders }: AnnouncedTitles, siteUrl: string): RE
         description: "Chaque mercredi, les titres vont aux membres en tête sur la saison. Un rôle Discord par titre.",
         color: EMBED_COLOR,
         fields: holders.map(({ title, rule, holder }) => ({
-          name: titleRole(title),
+          name: title,
           value: `${holder === undefined ? "Personne cette semaine" : `**${holder}**`}\n${rule}`,
           inline: true,
         })),

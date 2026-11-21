@@ -1,4 +1,4 @@
-import { canManageRaids, TITLES, titleRole } from "@vxv/server";
+import { canManageRaids, TITLES } from "@vxv/server";
 import { customTitleDuration } from "@vxv/server/domain/customTitles";
 import { CustomTitleForm } from "@/components/CustomTitleForm";
 import { CustomTitleTakeBackForm } from "@/components/CustomTitleTakeBackForm";
@@ -34,7 +34,7 @@ export default async function TitlesRankingPage({
           const holder = current?.holders.find((candidate) => candidate.titleId === title.id);
           return (
             <article key={title.id} className="panel">
-              <h2 className="font-pixel text-lg text-sakura-light">{titleRole(title.name)}</h2>
+              <h2 className="font-pixel text-lg text-sakura-light">{title.name}</h2>
               <p className="mt-2 text-lg">
                 {holder === undefined ? (
                   <span className="text-muted">Personne cette semaine</span>
@@ -56,7 +56,7 @@ export default async function TitlesRankingPage({
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {custom.map((title) => (
               <article key={title.id} className="panel">
-                <h3 className="font-pixel text-lg text-sakura-light">{titleRole(title.name)}</h3>
+                <h3 className="font-pixel text-lg text-sakura-light">{title.name}</h3>
                 <p className="mt-2 text-lg">
                   <MemberName name={title.memberName} characterClass={title.memberClass} />
                 </p>
