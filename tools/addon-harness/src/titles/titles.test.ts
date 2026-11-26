@@ -24,17 +24,17 @@ const WEEK: AddonTitlesFacts = {
 };
 /** The texts without their colors. */
 const plain = (texts: unknown) => (texts as string[]).map((text) => text.replace(/\|c\w{8}(.*?)\|r/gu, "$1"));
-const TAG = "[Roi du gambling · Sugar Daddy]";
+const TAG = "[Roi du gambling]";
 
 function startTitles(facts: AddonTitlesFacts = WEEK) {
   return startCore({ written: companionFiles({ titres: formatAddonTitles(facts) }), bundles: BUNDLES });
 }
 
 describe("the titles in game (P13.3, P13.4)", () => {
-  it("adds a member's titles to their tooltip, their guild messages and their name in the guild list", () => {
+  it("adds a member's most stylish title to their tooltip, their guild messages and their name in the guild list", () => {
     const { client, errors } = startTitles();
     client('Units.target = "Thom Reroll" Units.mouseover = "Ciel Gris"');
-    expect(plain(client('return UnitTooltip("target")'))).toEqual(["Roi du gambling", "Sugar Daddy"]);
+    expect(plain(client('return UnitTooltip("target")'))).toEqual(["Roi du gambling"]);
     expect(client('return UnitTooltip("mouseover")')).toEqual({});
     expect(plain([client('return ChatShows("CHAT_MSG_GUILD", "salut", "Thom Leboss")')])).toEqual([`${TAG} salut`]);
     expect(client('return ChatShows("CHAT_MSG_GUILD", "salut", "Ciel Gris")')).toBe("salut");
@@ -53,13 +53,24 @@ describe("the titles in game (P13.3, P13.4)", () => {
       carried = guild.deliver();
     }
     const thom = guild.player("Thom Leboss");
-    expect(plain(thom.client('return UnitTooltip("player")'))).toEqual(["Roi du gambling", "Sugar Daddy"]);
+    expect(plain(thom.client('return UnitTooltip("player")'))).toEqual(["Roi du gambling"]);
     expect(thom.errors()).toEqual([]);
   });
 
   it("shows a title the website adds, without any update of the addon (P13.6)", () => {
-    const text = `${formatAddonTitles(WEEK)}\nT;newTitle;Le Nouveau;Une règle à venir.;m-thom;Thom Leboss;PRIEST;7`;
+    const text = `${formatAddonTitles(WEEK)}\nT;newTitle;Le Nouveau;Une règle à venir.;m-deja;Ðéjà Vu;ROGUE;7`;
     const { client } = startCore({ written: companionFiles({ titres: text }), bundles: BUNDLES });
-    expect(plain(client('Units.target = "Thom Leboss" return UnitTooltip("target")'))).toContain("Le Nouveau");
+    expect(plain(client('Units.target = "Ðéjà Vu" return UnitTooltip("target")'))).toEqual(["Le Nouveau"]);
+  });
+
+  it("shows a title made by hand before all the others", () => {
+    const custom = { id: "t1", name: "Sauveur du raid", reason: "A tenu Onyxia seul", memberId: "m-thom" };
+    const { client } = startTitles({
+      ...WEEK,
+      custom: [{ ...custom, memberName: "Thom Leboss", memberClass: "PRIEST" }],
+    });
+    expect(plain([client('return ChatShows("CHAT_MSG_GUILD", "salut", "Thom Leboss")')])).toEqual([
+      "[Sauveur du raid] salut",
+    ]);
   });
 });

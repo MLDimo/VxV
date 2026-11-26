@@ -14,7 +14,7 @@ import {
   type RankingCategory,
   type RankingUnit,
 } from "../domain/rankingBoards.ts";
-import { TITLES, titleWeek } from "../domain/titles.ts";
+import { TITLES, TITLES_BY_STYLE, titleWeek } from "../domain/titles.ts";
 import { rankedGame } from "./debts.ts";
 import { checkOfficerAction } from "./officerActions.ts";
 import type { Clock, MemberLook, Repositories, Season, UnitOfWork } from "./ports.ts";
@@ -99,8 +99,13 @@ async function boardContext(repositories: Repositories) {
   const lookOf = (memberId: string): MemberLook =>
     looks.get(memberId) ?? { memberId, name: "", characterClass: undefined, race: undefined, sex: undefined };
   const holders = await repositories.titles.listLatestWeeks(1);
-  const titleOf = (memberId: string) =>
-    TITLES.find((title) => holders.some((holder) => holder.memberId === memberId && holder.titleId === title.id))?.name;
+  // The member's most stylish title, as the addon shows it.
+  const titleOf = (memberId: string) => {
+    const shown = TITLES_BY_STYLE.find((id) =>
+      holders.some((holder) => holder.memberId === memberId && holder.titleId === id),
+    );
+    return TITLES.find((title) => title.id === shown)?.name;
+  };
   return { season, lookOf, titleOf };
 }
 

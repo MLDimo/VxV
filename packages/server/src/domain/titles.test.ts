@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ahead, awardTitles, titleWeek, type TitleFacts } from "./titles.ts";
+import { ahead, awardTitles, TITLES, TITLES_BY_STYLE, titleWeek, type TitleFacts } from "./titles.ts";
 
 const at = (day: number, hour = 20) => new Date(Date.UTC(2026, 9, day, hour));
 const NOTHING: TitleFacts = {
@@ -114,5 +114,11 @@ describe("titles", () => {
     expect(titleWeek(new Date("2026-10-07T05:00:00Z"))).toBe("2026-10-07");
     expect(titleWeek(new Date("2026-10-13T23:00:00Z"))).toBe("2026-10-07");
     expect(titleWeek(new Date("2026-10-06T12:00:00Z"))).toBe("2026-09-30");
+  });
+});
+
+describe("titles by style", () => {
+  it("ranks every title once, so that a member holding several shows the most stylish in game", () => {
+    expect(TITLES_BY_STYLE.toSorted()).toEqual(TITLES.map((title) => title.id).toSorted());
   });
 });

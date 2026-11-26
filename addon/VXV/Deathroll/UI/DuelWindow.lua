@@ -50,13 +50,13 @@ local function playSound(name)
     end
 end
 
---- A player's VXV titles (the Titles part answers), joined.
-local function titlesOf(name)
-    local titles = {}
-    VXV.Emit("titles.request", name, function(held)
-        titles = held
+--- A player's VXV title (the Titles part answers), or "".
+local function titleOf(name)
+    local title = ""
+    VXV.Emit("titles.request", name, function(shown)
+        title = shown or ""
     end)
-    return table.concat(titles, " · ")
+    return title
 end
 
 local function classOf(name)
@@ -113,7 +113,7 @@ local function renderSide(side, game, name, me)
     local class = classOf(name)
     side.card.Set(name, class, VXV.DiceGames.Portrait(ns.DeathrollData.Current(), name))
     side.name:SetText(VXV.ClassColored(name, class))
-    side.titles:SetText(titlesOf(name))
+    side.titles:SetText(titleOf(name))
     side.role:SetText(DuelView.Role(game, name, me))
     local loser = Rules.Loser(game)
     side.result:SetText(loser == nil and "" or (loser == name and "A goûté le sol" or "VICTOIRE"))

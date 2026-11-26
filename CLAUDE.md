@@ -164,8 +164,10 @@ Raids et soft reserves (SR), attribution et suivi du loot, paris, missions, titr
   (nom, membre, motif affiché avec le titre) jusqu'au reset du mercredi ou pour une durée indéterminée, et les retire
   avec motif (`title.custom`, `title.takeBack`) ; rôle Discord, annonce du mercredi et lignes `T` de l'addon comme les
   autres, jamais comptés dans le classement des titres. En
-  jeu : une ligne dans l'infobulle d'un membre, ses titres avant ses messages dans le canal de guilde et après son nom
-  dans la liste de guilde ; un nouveau titre ne demande pas de mise à jour de l'addon.
+  jeu, un seul titre par membre, le plus stylé (décision du propriétaire du 26 novembre : `TITLES_BY_STYLE`, les
+  titres faits main d'abord ; le site les envoie dans cet ordre, et le Ranking montre le même) : une ligne dans
+  l'infobulle d'un membre, son titre avant ses messages dans le canal de guilde et après son nom dans la liste de
+  guilde ; un nouveau titre ne demande pas de mise à jour de l'addon.
 - **Artisans** (`VXV/Artisans` ; site `/artisans`) : niveaux des métiers relus à chaque connexion, recettes apprises à
   l'ouverture de la fenêtre du métier, pour chaque personnage du compte (seulement les métiers du joueur, au niveau de
   sa liste). La lecture la plus récente gagne ; un niveau relu sans ses recettes garde les recettes connues. Partage
