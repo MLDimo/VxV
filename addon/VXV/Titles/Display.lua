@@ -17,7 +17,8 @@ local function decorateTooltip(tooltip)
     if VXV.IsSecret(unit) or type(unit) ~= "string" then
         return
     end
-    for _, title in ipairs(Titles.Of(VXV.NameOfUnit(unit))) do
+    local title = Titles.Of(VXV.NameOfUnit(unit))
+    if title ~= nil then
         tooltip:AddLine(Titles.Label(title))
     end
 end
@@ -63,7 +64,7 @@ end
 local Display = {}
 ns.Display = Display
 
--- Another part asks for a player's titles (the deathroll's window): ("Prénom Nom", reply(titles)).
+-- Another part asks for a player's title (the deathroll's window): ("Prénom Nom", reply(title or nil)).
 VXV.On("titles.request", function(name, reply)
     if type(reply) == "function" then
         reply(Titles.Of(name))

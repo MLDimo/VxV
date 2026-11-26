@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { formatAddonTitles } from "./addonTitles.ts";
 import type { Character } from "./characters.ts";
-import { TITLES } from "./titles.ts";
+import { TITLES, TITLES_BY_STYLE } from "./titles.ts";
 
 const character = (firstName: string, lastName: string, memberId: string): Character => ({
   id: `c-${firstName}`,
@@ -14,7 +14,7 @@ const character = (firstName: string, lastName: string, memberId: string): Chara
 });
 
 describe("titles for the addon", () => {
-  it("writes every title of the week, with its holder or nobody, then those made by hand, after the head", () => {
+  it("writes the titles made by hand, then every title of the week from the most stylish, with its holder or nobody", () => {
     const vorn = character("Vorn", "Cendrelune", "m-vorn");
     const lines = formatAddonTitles({
       officers: [vorn],
@@ -49,8 +49,9 @@ describe("titles for the addon", () => {
       "M;m-sira;Sira Ventargent",
     ]);
     expect(lines.slice(5)).toHaveLength(TITLES.length + 1);
-    // A title made by hand: its reason as its rule, no score.
-    expect(lines.at(-1)).toBe("T;custom-t1;Sauveur du raid;A tenu Onyxia seul;m-sira;Sira Ventargent;;0");
+    // A title made by hand first: its reason as its rule, no score; then the most stylish title, down to the least.
+    expect(lines[5]).toBe("T;custom-t1;Sauveur du raid;A tenu Onyxia seul;m-sira;Sira Ventargent;;0");
+    expect(lines.slice(6).map((record) => record.split(";")[1])).toEqual(TITLES_BY_STYLE);
     expect(lines).toContain(
       "T;wellFed;Bien gras;Le plus d'objets reçus en raid sur la saison.;m-sira;Sira Ventargent;;3",
     );

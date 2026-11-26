@@ -8,20 +8,19 @@ local TitlesData = ns.TitlesData
 local Theme = VXV.Theme
 
 local COLOR = "sakura-light"
-local SEPARATOR = " · "
 
---- The names of the titles the member of this character ("Prénom Nom") holds, in the website's order.
+--- The one title shown for the member of this character ("Prénom Nom"), or nil: of those they hold, the first in the
+--- website's order, the most stylish (owner's choice of 26 November).
 function Titles.Of(name)
-    local data, held = TitlesData.Current(), {}
+    local data = TitlesData.Current()
     if data == nil or VXV.IsSecret(name) or type(name) ~= "string" or data.members[name] == nil then
-        return held
+        return nil
     end
     for _, title in ipairs(data.titles) do
         if title.memberId == data.members[name] then
-            held[#held + 1] = title.name
+            return title.name
         end
     end
-    return held
 end
 
 --- "Roi du gambling", in the titles' color.
@@ -29,12 +28,9 @@ function Titles.Label(name)
     return Theme.Colored(name, COLOR)
 end
 
---- Every title of a character, for their messages and their name in the guild list: "[A · B]" in the titles'
---- color, or nil without any.
+--- A character's title, for their messages and their name in the guild list: "[A]" in the titles' color, or nil
+--- without any.
 function Titles.Tag(name)
-    local held = Titles.Of(name)
-    if #held == 0 then
-        return nil
-    end
-    return Theme.Colored("[" .. table.concat(held, SEPARATOR) .. "]", COLOR)
+    local title = Titles.Of(name)
+    return title and Theme.Colored("[" .. title .. "]", COLOR)
 end

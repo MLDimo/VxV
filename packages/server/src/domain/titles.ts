@@ -36,6 +36,26 @@ export const TITLES = [
 
 export type TitleId = (typeof TITLES)[number]["id"];
 
+/**
+ * The titles from the most stylish to the least (owner's choice of 26 November): a member holding several shows only
+ * the first in game; the titles made by hand go before them all.
+ */
+export const TITLES_BY_STYLE: readonly TitleId[] = [
+  "grandDuelist",
+  "numberOne",
+  "topDamage",
+  "gamblingKing",
+  "sugarDaddy",
+  "topHealing",
+  "princess",
+  "mostRaised",
+  "cheater",
+  "wellFed",
+  "floorTaster",
+  "debtKing",
+  "loser",
+];
+
 /** Each title is a Discord role of this name, held by the week's holder. */
 export function titleRole(titleName: string): string {
   return `◆ ${titleName}`;

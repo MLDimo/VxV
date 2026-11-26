@@ -88,6 +88,19 @@ describe("ranking", () => {
     expect((await journal.listRecent())[0]).toMatchObject({ action: "season.start", after: { number: 2 } });
   });
 
+  it("shows a member holding several titles with the most stylish only, as the addon does", async () => {
+    await playOne("Septembre");
+    await titleRepository(sql).saveWeek(
+      "2026-09-16",
+      [
+        { titleId: "gamblingKing", memberId: vorn.id, score: 80 },
+        { titleId: "numberOne", memberId: vorn.id, score: 1 },
+      ],
+      now,
+    );
+    expect((await ranking.board("paris", "always")).lines[0]).toMatchObject({ title: "Numéro UNO" });
+  });
+
   it("shows each member of a board by their main character, with their title of the week, and the records", async () => {
     await playOne("Septembre");
     const [main] = await createGuildCharacters(sql, "Vorn Cendrelune");
